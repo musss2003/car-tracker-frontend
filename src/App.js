@@ -1,23 +1,22 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import LoginForm from './components/LoginForm';
-import Dashboard from './components/Dashboard';
-import GradeInputForm from './components/GradeInputForm';
-import GradeDetails from './components/GradeDetails';
 import Settings from './components/Settings'; 
+import Home from './components/Home';
+import Dashboard from './components/Dashboard';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LoginForm />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/grade-input" element={<GradeInputForm />} />
-        <Route path="/grade-details/:subject" element={<GradeDetails />} />
-        <Route path="/settings" element={<Settings />} />
-
-      </Routes>
+      <Navbar />  {/* This places the Navbar at the top of all pages */}
+      <div className="mt-8">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </div>
     </Router>
   );
 }

@@ -48,3 +48,9 @@ code {
   transform: translateX(20px);
 }
 
+
+/* Optional: Add transitions for smooth dropdown animations */
+.menu-transition {
+  transition: all 0.3s ease-in-out;
+}
+
