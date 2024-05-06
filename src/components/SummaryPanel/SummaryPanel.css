@@ -1,0 +1,55 @@
+/* SummaryPanel.css */
+.summary-panel {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.gpa-overview h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.gpa-overview p {
+    margin: 5px 0;
+}
+
+.progress-bar {
+    height: 20px;
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-filled {
+    height: 100%;
+    background-color: green;
+    border-radius: 10px;
+}
+
+.term-selector select {
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.academic-status .status-indicator {
+    padding: 5px 10px;
+    color: white;
+    border-radius: 5px;
+}
+
+.status-indicator.good {
+    background-color: green;
+}
+
+.status-indicator.probation {
+    background-color: orange;
+}
+
+.status-indicator.poor {
+    background-color: red;
+}

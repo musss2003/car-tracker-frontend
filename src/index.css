@@ -54,3 +54,8 @@ code {
   transition: all 0.3s ease-in-out;
 }
 
+/* Customizing the toast notifications */
+.Toastify__toast-container {
+  max-width: 350px; /* Adjust the width of the toasts */
+  margin: 1rem; /* Add some space around the toasts */
+}
