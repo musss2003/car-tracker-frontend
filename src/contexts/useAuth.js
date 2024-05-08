@@ -17,18 +17,25 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                // Make a request to the session-check endpoint
-                const response = await axios.get(API_URL + 'session-check', { withCredentials: true });
-                if (response.status === 200) {
-                    setUser({ username: response.data.username, email: response.data.email });
-                } else {
-                    setUser(null);  // Reset user state if not authenticated
-                }
+                    const response = await axios.get(API_URL + 'session-check', { withCredentials: true });
+                    if (response.status === 200) {
+                        setUser({ username: response.data.username, email: response.data.email, id: response.data.id });
+                        console.log("Authenticated!");
+                    } else {
+                        throw new Error('Failed to authenticate');
+                    }
+                
             } catch (error) {
-                console.error('Error checking session:', error);
-                setUser(null);  // Reset user state on error
+                if (error.response) {
+                    console.error('Error data:', error.response.data);
+                } else if (error.request) {
+                    console.error('Error request:', error.request);
+                } else {
+                    console.error('Error message:', error.message);
+                }
+                setUser(null);
             } finally {
-                setIsReady(true);  // Ensure readiness is set irrespective of auth status
+                setIsReady(true);
             }
         };
 
@@ -52,8 +59,8 @@ export const UserProvider = ({ children }) => {
         try {
             const res = await loginAPI(username, password);
             if (res.status === 200) {
-                setUser({ username: res.data.username, email: res.data.email });
-                toast.success("Login Success!");
+                setUser({ username: res.data.username, email: res.data.email, id: res.data.id });
+                toast.success("Welcome " + username);
                 navigate("/");
             }
         } catch (error) {
@@ -73,7 +80,8 @@ export const UserProvider = ({ children }) => {
             toast.warning("Logout failed!");
         } finally {
             setUser(null);
-            navigate('/login');
+            // Redirect to login page or perform other cleanup
+            window.location.href = '/';
         }
     };
 

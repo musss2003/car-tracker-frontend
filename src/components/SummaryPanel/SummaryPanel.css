@@ -1,55 +1,56 @@
 /* SummaryPanel.css */
 .summary-panel {
-    display: flex;
-    justify-content: space-around;
-    padding: 20px;
-    background-color: #f4f4f4;
+    background: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
 .gpa-overview h1 {
-    font-size: 2rem;
-    margin: 0;
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
 }
 
 .gpa-overview p {
-    margin: 5px 0;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px;
 }
 
 .progress-bar {
-    height: 20px;
+    background-color: #eee;
+    border-radius: 8px;
+    height: 10px;
     width: 100%;
-    background-color: #ddd;
-    border-radius: 10px;
-    overflow: hidden;
 }
 
 .progress-bar-filled {
-    height: 100%;
-    background-color: green;
-    border-radius: 10px;
+    background-color: #4CAF50;
+    height: 10px;
+    border-radius: 8px;
+}
+
+.term-selector label {
+    font-size: 16px;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
 }
 
 .term-selector select {
-    padding: 5px;
-    font-size: 1rem;
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
-.academic-status .status-indicator {
+.academic-status span {
+    display: inline-block;
     padding: 5px 10px;
+    background-color: #4CAF50;
     color: white;
-    border-radius: 5px;
-}
-
-.status-indicator.good {
-    background-color: green;
-}
-
-.status-indicator.probation {
-    background-color: orange;
-}
-
-.status-indicator.poor {
-    background-color: red;
+    border-radius: 8px;
+    font-size: 14px;
 }
