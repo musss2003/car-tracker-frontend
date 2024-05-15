@@ -42,12 +42,12 @@ export const UserProvider = ({ children }) => {
         checkSession();
     }, []);
 
-    const registerUser = async (email, username, password, role) => {
+    const registerUser = async (email, username, password) => {
         try {
-            const res = await registerAPI(email, username, password, role);
-            if (res.status === 200) {
-                setUser({ username: res.data.username, email: res.data.email });
-                toast.success("Registration Successful!");
+            const res = await registerAPI(email, username, password);
+            if (res.status === 201) {
+                setUser({ username: res.data.username, email: res.data.email, id: res.data.id });
+                toast.success("Registered user: " + res.data.username);
                 navigate("/");
             }
         } catch (error) {

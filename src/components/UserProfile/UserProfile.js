@@ -1,32 +1,33 @@
 import "./UserProfile.css";
 import React, { useEffect, useState } from 'react';
-import { getUserDetails, updateUser, deleteUser } from '../../services/userService';
+import { getUser, updateUser, deleteUser } from '../../services/userService';
 import { toast } from "react-toastify";
 import { PencilIcon } from '@heroicons/react/solid';
 import defaultAvatar from '../../assets/default_avatar.png';
-
-
-
-
 
 const UserProfile = ({ userId }) => {
     const [user, setUser] = useState({
         username: '',
         email: '',
+        password: '',
         fullName: '',
         profilePhotoUrl: '',
-        role: '',
+        role: 'STUDENT',
         location: '',
         language: '',
-        privacySettings: {}
+        citizenshipId: '',
+        lastLogin: null,
+        createdAt: null,
+        privacySettings: null
     });
 
     const [currentEdit, setCurrentEdit] = useState(null);
     const [editValue, setEditValue] = useState('');
 
     useEffect(() => {
-        getUserDetails(userId)
+        getUser(userId)
             .then(response => {
+                console.log(response.data);
                 setUser(response.data);
             })
             .catch(error => {
@@ -40,15 +41,12 @@ const UserProfile = ({ userId }) => {
     }
 
     const handleSave = () => {
-        console.log(currentEdit, editValue);
-
         const updatedData = { [currentEdit]: editValue };
         setUser(prevUser => ({ ...prevUser, ...updatedData }));
         updateUser(userId, updatedData)
             .then(response => {
                 setUser(prevUser => ({ ...prevUser, [currentEdit]: response.data[currentEdit] }));
                 setCurrentEdit(null);
-                console.log("Update successful, user state:", user);
             })
             .catch(error => console.error(`Update failed for ${currentEdit}:`, error));
     };
@@ -89,7 +87,6 @@ const UserProfile = ({ userId }) => {
                 {Object.keys(user).map(key => (
                     key !== "__v" &&
                     key !== "password" &&
-                    key !== "_id" &&
                     key !== "profilePhotoUrl" &&
                     key !== "privacySettings" && (
                         <div key={key} className="flex items-center justify-between">
@@ -99,7 +96,7 @@ const UserProfile = ({ userId }) => {
                                     {key === "createdAt" || key === "lastLogin" ? formatDate(user[key]) : user[key]}
                                 </span>
                             </div>
-                            {key !== "createdAt" && key !== "lastLogin" && (
+                            {key !== "createdAt" && key !== "lastLogin" && key !== "role" && (
                                 <button onClick={() => handleEdit(key)} className="ml-4 text-blue-500 hover:text-blue-700">
                                     <PencilIcon className="w-6 h-6" />
                                 </button>
