@@ -9,30 +9,28 @@ const UserProfile = ({ userId }) => {
     const [user, setUser] = useState({
         username: '',
         email: '',
-        password: '',
-        fullName: '',
+        name: '',
         profilePhotoUrl: '',
-        role: 'STUDENT',
-        location: '',
-        language: '',
         citizenshipId: '',
-        lastLogin: null,
-        createdAt: null,
-        privacySettings: null
+        lastLogin: '',
+        role: '',
+        createdAt: '',
     });
-
+    const [error, setError] = useState(null);
     const [currentEdit, setCurrentEdit] = useState(null);
     const [editValue, setEditValue] = useState('');
 
     useEffect(() => {
-        getUser(userId)
-            .then(response => {
-                console.log(response.data);
-                setUser(response.data);
-            })
-            .catch(error => {
-                console.error('Failed to fetch user details', error);
-            });
+        const fetchUser = async () => {
+            try {
+                const data = await getUser(userId);
+                setUser(data);
+            } catch (error) {
+                setError(error.message);
+            }
+        };
+
+        fetchUser();
     }, [userId]);
 
     const handleEdit = (field) => {
@@ -40,31 +38,32 @@ const UserProfile = ({ userId }) => {
         setEditValue(user[field]);
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const updatedData = { [currentEdit]: editValue };
-        setUser(prevUser => ({ ...prevUser, ...updatedData }));
-        updateUser(userId, updatedData)
-            .then(response => {
-                setUser(prevUser => ({ ...prevUser, [currentEdit]: response.data[currentEdit] }));
-                setCurrentEdit(null);
-            })
-            .catch(error => console.error(`Update failed for ${currentEdit}:`, error));
+        try {
+            const response = await updateUser(userId, updatedData);
+            setUser(prevUser => ({ ...prevUser, ...updatedData }));
+            toast.success(`Updated ${currentEdit}`);
+            setCurrentEdit(null);
+        } catch (error) {
+            console.error(`Update failed for ${currentEdit}:`, error);
+            toast.error(`Failed to update ${currentEdit}`);
+        }
     };
-
 
     const handleCancel = () => {
         setCurrentEdit(null);
     };
 
-    const handleDeleteUser = () => {
-        deleteUser(userId)
-            .then(() => {
-                toast.warning('User deleted');
-                setUser(null);
-            })
-            .catch(error => {
-                console.error('Failed to delete user', error);
-            });
+    const handleDeleteUser = async () => {
+        try {
+            await deleteUser(userId);
+            toast.warning('User deleted');
+            setUser(null);
+        } catch (error) {
+            console.error('Failed to delete user', error);
+            toast.error('Failed to delete user');
+        }
     };
 
     // Date formatter
@@ -79,13 +78,14 @@ const UserProfile = ({ userId }) => {
     return (
         <div className="max-w-2xl mt-10 mx-auto p-6 bg-white rounded-lg shadow-lg">
             <div className="flex items-center space-x-4 mb-6">
-                <img src={user.profilePhotoUrl || defaultAvatar} className="w-16 h-16 rounded-full" />
+                <img src={user.profilePhotoUrl || defaultAvatar} className="w-16 h-16 rounded-full" alt="User Avatar" />
                 <h2 className="text-2xl font-bold text-gray-900">User Profile</h2>
                 <button onClick={() => handleEdit("profilePhotoUrl")} className="text-sm text-blue-500 hover:text-blue-700">Edit Photo</button>
             </div>
             <div className="space-y-3">
                 {Object.keys(user).map(key => (
                     key !== "__v" &&
+                    key !== "_id" &&
                     key !== "password" &&
                     key !== "profilePhotoUrl" &&
                     key !== "privacySettings" && (
@@ -93,7 +93,7 @@ const UserProfile = ({ userId }) => {
                             <div className="flex-1 min-w-0">
                                 <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
                                 <span className="ml-2 truncate block">
-                                    {key === "createdAt" || key === "lastLogin" ? formatDate(user[key]) : user[key]}
+                                    {key === "createdAt" || key === "lastLogin" ? formatDate(user[key]) : user[key] || 'N/A'}
                                 </span>
                             </div>
                             {key !== "createdAt" && key !== "lastLogin" && key !== "role" && (

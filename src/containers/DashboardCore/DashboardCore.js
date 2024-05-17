@@ -1,9 +1,3 @@
-import CoursesOverview from "../../components/CoursesOverview/CoursesOverview";
-import Notifications from "../../components/Notifications/Notifications";
-import PerformanceGraphs from "../../components/PerformanceGraphs/PerformanceGraphs";
-import SummaryPanel from "../../components/SummaryPanel/SummaryPanel";
-import UpcomingAssignments from "../../components/UpcomingAssignments/UpcomingAssignments";
-
 function DashboardCore() {
 
     const assignments = [
@@ -85,11 +79,7 @@ function DashboardCore() {
     
     return (
         <>
-            <SummaryPanel user={user} />
-            <UpcomingAssignments assignments={assignments}/>
-            <PerformanceGraphs data={performance} />
-            <CoursesOverview courses={courses}/>
-            <Notifications alerts={notifications}/>
+
         </>
     );
 }

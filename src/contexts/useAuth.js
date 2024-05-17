@@ -17,14 +17,13 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                    const response = await axios.get(API_URL + 'session-check', { withCredentials: true });
-                    if (response.status === 200) {
-                        setUser({ username: response.data.username, email: response.data.email, id: response.data.id });
-                        console.log("Authenticated!");
-                    } else {
-                        throw new Error('Failed to authenticate');
-                    }
-                
+                const response = await axios.get(API_URL + 'session-check', { withCredentials: true });
+                if (response.status === 200) {
+                    setUser({ username: response.data.username, email: response.data.email, id: response.data.id });
+                } else {
+                    throw new Error('Failed to authenticate');
+                }
+
             } catch (error) {
                 if (error.response) {
                     console.error('Error data:', error.response.data);

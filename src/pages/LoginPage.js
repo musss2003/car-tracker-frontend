@@ -19,7 +19,6 @@ function LoginPage(props){
     } = useForm({ resolver: yupResolver(validation) });
 
     const handleLogin = (form) => {
-        console.log(form);
         loginUser(form.username, form.password);
     };
     return (
