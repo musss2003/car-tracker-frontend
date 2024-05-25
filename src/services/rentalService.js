@@ -7,9 +7,10 @@ export const getRental = (rentalId) => {
         withCredentials: true
     });
 };
-export const getRentals = async () => {
+export const getRentals = async (params) => {
     try {
         const response = await axios.get(`${API_URL}`, {
+            params: params,
             withCredentials: true
         });
         return response.data;
@@ -18,14 +19,37 @@ export const getRentals = async () => {
         throw error;
     }
 };
-export const updateRental = async (id, car) => {
+export const updateRental = async (rent, id) => {
     try {
-        const response = await axios.put(`${API_URL}/${id}`, car, {
+        const response = await axios.put(`${API_URL}${id}`, rent, {
+            withCredentials: true
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating rental:', error);
+        throw error;
+    }
+};
+export const deleteRental = async (id) => {
+    try {
+        const response = await axios.delete(`${API_URL}${id}`, {
+            withCredentials: true
+        });
+        return response;
+    } catch (error) {
+        console.error('Error updating rental:', error);
+        throw error;
+    }
+};
+export const addRental = async (rental) => {
+    try {
+        const response = await axios.post(`${API_URL}`, rental, {
             withCredentials: true
         });
         return response.data;
     } catch (error) {
-        console.error('Error updating rental:', error);
+        console.error('Error adding rental:', error);
         throw error;
     }
 };

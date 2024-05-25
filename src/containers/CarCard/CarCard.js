@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import EditCarModal from '../../components/EditCarModal/EditCarModal';
-import ViewRentalsModal from '../../components/ViewRentalsModal/ViewRentalsModal';
+import EditCarModal from '../../components/Car/EditCarModal/EditCarModal';
+import ViewRentalsModal from '../../components/Rental/RentalDetailsModals/RentalDetailsModal';
 import { TrashIcon } from '@heroicons/react/outline'; // Using Heroicons for delete icon
 
 const CarCard = ({ car, onEdit, onDelete }) => {
@@ -9,11 +9,10 @@ const CarCard = ({ car, onEdit, onDelete }) => {
 
     const handleEditClick = () => setShowEditModal(true);
     const handleViewRentalsClick = () => setShowRentalsModal(true);
+
     const handleDeleteClick = () => {
-        const confirmed = window.confirm(`Are you sure you want to delete ${car.make} ${car.model}?`);
-        if (confirmed) {
-            onDelete(car._id);
-        }
+        onDelete(car._id);
+
     };
 
     return (

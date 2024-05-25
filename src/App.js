@@ -11,7 +11,8 @@ import DashboardPage from './pages/DashboardPage.js';
 import DashboardCore from './containers/DashboardCore/DashboardCore.js';
 import UserData from './containers/UserData/UserData.js';
 import CarsPage from './pages/CarsPage.js';
-import RentalsPage from './pages/RentalsPage.js';
+import CustomerList from './containers/Customer/CustomerList/CustomerList.js';
+import RentalList from './containers/Rental/RentalList/RentalList.js';
 
 function App() {
   return (
@@ -26,7 +27,8 @@ function App() {
           <Route exact path='/dashboard' element={<DashboardPage children={<DashboardCore />} />} />
           <Route exact path='/profile' element={<UserData />} />
           <Route exact path='/cars' element={<CarsPage />} />
-          <Route exact path="/rentals" component={<RentalsPage />} />
+          <Route exact path="/rentals" element={<RentalList />} />
+          <Route exact path="/customers" element={<CustomerList />} />
         </Route>
       </Routes>
     </>

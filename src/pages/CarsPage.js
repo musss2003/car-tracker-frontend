@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import CarCard from '../containers/CarCard/CarCard.js';
 import { getCars, updateCar, deleteCar, addCar } from '../services/carService.js';
-import AddCarModal from '../components/AddCarModal/AddCarModal';
+import AddCarModal from '../components/Car/AddCarModal/AddCarModal.js';
+import ConfirmationModal from '../components/UtilsComponent/ConfirmationModal/ConfirmationModal.js';
+import { toast } from "react-toastify";
 
 const CarsPage = () => {
     const [cars, setCars] = useState([]);
     const [error, setError] = useState(null);
     const [showAddCarModal, setShowAddCarModal] = useState(false);
+    const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+    const [carToDelete, setCarToDelete] = useState(null);
 
     useEffect(() => {
         const fetchCars = async () => {
@@ -32,14 +36,33 @@ const CarsPage = () => {
         }
     };
 
-    const handleDeleteCar = async (carId) => {
+    const handleDeleteCar = (car) => {
+        setCarToDelete(car);
+        setIsConfirmationModalOpen(true);
+    };
+
+    const confirmDeleteCar = async () => {
         try {
-            await deleteCar(carId);
-            setCars(cars.filter(car => car._id !== carId));
+            await deleteCar(carToDelete?._id);
+            try {
+                const data = await getCars();
+                setCars(data);
+            } catch (error) {
+                console.error('Error fetching cars:', error);
+                setError(error.message);
+            }
+            setIsConfirmationModalOpen(false);
+            toast.success(carToDelete?.make + ' ' + carToDelete?.model + ' uspješno obrisan');
         } catch (error) {
-            console.error('Error deleting car:', error);
-            setError(error.message);
+            console.error('Error deleting customer:', error);
+            setError('Error deleting customer');
         }
+    };
+
+
+    const cancelDeleteCustomer = () => {
+        setIsConfirmationModalOpen(false);
+        setCarToDelete(null);
     };
 
     const handleAddCar = async (newCar) => {
@@ -56,7 +79,7 @@ const CarsPage = () => {
         <div className="cars-page p-6 text-center">
             <h1 className="text-3xl font-bold mb-6">LISTA AUTA</h1>
             {error && <p className="text-red-500">{error}</p>}
-            <button 
+            <button
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition mb-4"
                 onClick={() => setShowAddCarModal(true)}
             >
@@ -64,11 +87,18 @@ const CarsPage = () => {
             </button>
             <div className="car-list flex flex-wrap justify-center">
                 {cars.map(car => (
-                    <CarCard key={car._id} car={car} onEdit={handleEditCar} onDelete={handleDeleteCar} />
+                    <CarCard key={car._id} car={car} onEdit={handleEditCar} onDelete={() => handleDeleteCar(car)} />
                 ))}
             </div>
 
             {showAddCarModal && <AddCarModal onClose={() => setShowAddCarModal(false)} onAdd={handleAddCar} />}
+
+            <ConfirmationModal
+                isOpen={isConfirmationModalOpen}
+                message={`Da li ste sigurni da želite izbrisati ${carToDelete?.make} ${carToDelete?.model}?`}
+                onConfirm={confirmDeleteCar}
+                onCancel={cancelDeleteCustomer}
+            />
         </div>
     );
 }

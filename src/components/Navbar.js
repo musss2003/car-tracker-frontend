@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 // Example Icons from Heroicons (https://heroicons.com/)
 // Import appropriate icons for your links
-import { ChartBarIcon, UserIcon, TruckIcon, NewspaperIcon } from '@heroicons/react/solid';
+import { ChartBarIcon, UserIcon, TruckIcon, NewspaperIcon, GlobeIcon } from '@heroicons/react/solid';
 
 function Navbar() {
     return (
@@ -18,6 +18,10 @@ function Navbar() {
                     <Link to="/dashboard" className="flex flex-row items-center hover:text-gray-300 md:flex-row md:ml-8">
                         <ChartBarIcon className="w-6 h-6 md:hidden" />
                         <span className="hidden md:inline">Dashboard</span>
+                    </Link>
+                    <Link to="/customers" className="flex items-center hover:text-gray-300 md:flex-row md:ml-8">
+                        <GlobeIcon className="w-6 h-6 md:hidden" />
+                        <span className="hidden md:inline">Gosti</span>
                     </Link>
                     <Link to="/rentals" className="flex items-center hover:text-gray-300 md:flex-row md:ml-8">
                         <NewspaperIcon className="w-6 h-6 md:hidden" />

@@ -1,9 +1,9 @@
 import "./UserProfile.css";
 import React, { useEffect, useState } from 'react';
-import { getUser, updateUser, deleteUser } from '../../services/userService';
+import { getUser, updateUser, deleteUser } from '../../../services/userService.js';
 import { toast } from "react-toastify";
 import { PencilIcon } from '@heroicons/react/solid';
-import defaultAvatar from '../../assets/default_avatar.png';
+import defaultAvatar from '../../../assets/default_avatar.png';
 
 const UserProfile = ({ userId }) => {
     const [user, setUser] = useState({
