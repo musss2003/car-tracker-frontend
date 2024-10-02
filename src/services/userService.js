@@ -4,15 +4,29 @@ const API_URL = process.env.REACT_APP_API_BASE_URL + '/api/'; // Adjust based on
 
 export const getUser = async (userId) => {
     try {
-        const response = await axios.get(`${API_URL}users/${userId}`, {
-            withCredentials: true // Include credentials to send cookies
+        const accessToken = localStorage.getItem("accessToken");
+        const response = await fetch(`${API_URL}users/${userId}`, {
+            method: 'GET',
+            credentials: 'include', // Include credentials to send cookies
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${accessToken}`
+            }
         });
-        return response.data;
+
+        if (!response.ok) {
+            throw new Error(`Error fetching user: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+
     } catch (error) {
-        console.error(`Error fetching user: ${error.response?.statusText || error.message}`);
+        console.error(`Error fetching user: ${error.message}`);
         throw error;
     }
 };
+
 
 export const updateUser = async (userId, userData) => {
     try {

@@ -17,21 +17,28 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         const checkSession = async () => {
             try {
-                const response = await axios.get(API_URL + 'session-check', { withCredentials: true });
-                if (response.status === 200) {
-                    setUser({ username: response.data.username, email: response.data.email, id: response.data.id });
-                } else {
-                    throw new Error('Failed to authenticate');
+                const accessToken = localStorage.getItem("accessToken");
+                console.log("My accessToken: " + accessToken);
+
+                const response = await fetch(API_URL + 'session-check', {
+                    method: 'GET',
+                    credentials: 'include', // Include credentials to send cookies
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to authenticate'); // Handle non-200 responses
                 }
 
+                const data = await response.json(); // Parse the JSON response
+                setUser({ username: data.username, email: data.email, id: data.id });
+
             } catch (error) {
-                if (error.response) {
-                    console.error('Error data:', error.response.data);
-                } else if (error.request) {
-                    console.error('Error request:', error.request);
-                } else {
-                    console.error('Error message:', error.message);
-                }
+                // Handle the error appropriately
+                console.error('Error message:', error.message);
                 setUser(null);
             } finally {
                 setIsReady(true);
@@ -45,6 +52,7 @@ export const UserProvider = ({ children }) => {
         try {
             const res = await registerAPI(email, username, password);
             if (res.status === 201) {
+
                 setUser({ username: res.data.username, email: res.data.email, id: res.data.id });
                 toast.success("Registered user: " + res.data.username);
                 navigate("/");
@@ -58,6 +66,7 @@ export const UserProvider = ({ children }) => {
         try {
             const res = await loginAPI(username, password);
             if (res.status === 200) {
+
                 setUser({ username: res.data.username, email: res.data.email, id: res.data.id });
                 toast.success("Welcome " + username);
                 navigate("/");

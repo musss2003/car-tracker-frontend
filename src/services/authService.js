@@ -19,6 +19,9 @@ export const loginAPI = async (username, password) => {
         }
 
         const data = await response.json();
+
+        localStorage.setItem("accessToken", data.accessToken);
+
         return {
             status: response.status,
             data
@@ -35,6 +38,7 @@ export const registerAPI = async (email, username, password) => {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'include', // Include credentials to send cookies
             body: JSON.stringify({
                 email: email,
                 username: username,
@@ -47,6 +51,9 @@ export const registerAPI = async (email, username, password) => {
         }
 
         const data = await response.json();
+
+        localStorage.setItem("accessToken", data.accessToken);
+
         return {
             status: response.status,
             data

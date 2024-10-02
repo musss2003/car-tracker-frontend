@@ -1,13 +1,84 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { getCars } from '../services/carService';
 
-const DashboardPage = ({ children }) => {
+// Example of Dashboard Cards
+import { ContractsContext } from '../contexts/ContractsContext';
+import { TruckIcon, UserIcon, CurrencyDollarIcon, ClipboardListIcon } from '@heroicons/react/solid';
+
+const getNumberOfCars = async () => {
+    return await getCars().then((data) => {
+        return data.length;
+    })
+}
+
+function DashboardPage() {
+    const { contracts } = useContext(ContractsContext);
+
     return (
-        <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {children}
+        <div className="p-8">
+            <h1 className="text-3xl font-bold mb-8">Komandna tabla</h1>
+
+            {/* Metrics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                {/* Active Contracts */}
+                <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                    <ClipboardListIcon className="w-10 h-10 text-blue-500 mr-4" />
+                    <div>
+                        <h2 className="text-xl font-bold">{contracts.length}</h2>
+                        <p className="text-gray-500">Active Contracts</p>
+                    </div>
+                </div>
+
+                {/* Available Cars */}
+                <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                    <TruckIcon className="w-10 h-10 text-green-500 mr-4" />
+                    <div>
+                        <h2 className="text-xl font-bold">{getNumberOfCars}</h2>
+                        <p className="text-gray-500">Available Cars</p>
+                    </div>
+                </div>
+
+                {/* Total Customers */}
+                <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                    <UserIcon className="w-10 h-10 text-purple-500 mr-4" />
+                    <div>
+                        <h2 className="text-xl font-bold">120</h2>
+                        <p className="text-gray-500">Total Customers</p>
+                    </div>
+                </div>
+
+                {/* Total Revenue */}
+                <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                    <CurrencyDollarIcon className="w-10 h-10 text-yellow-500 mr-4" />
+                    <div>
+                        <h2 className="text-xl font-bold">$45,000</h2>
+                        <p className="text-gray-500">Total Revenue</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Links to Details */}
+            <div className="mt-12">
+                <h2 className="text-2xl font-bold mb-6">Quick Links</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Link to="/contracts" className="block bg-gray-200 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300">
+                        Manage Contracts
+                    </Link>
+                    <Link to="/customers" className="block bg-gray-200 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300">
+                        View Customers
+                    </Link>
+                    <Link to="/cars" className="block bg-gray-200 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300">
+                        Available Cars
+                    </Link>
+                    <Link to="/rentals" className="block bg-gray-200 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300">
+                        Rental Details
+                    </Link>
+                </div>
             </div>
         </div>
     );
-};
+}
 
 export default DashboardPage;
