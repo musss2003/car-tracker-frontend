@@ -1,14 +1,8 @@
 // services/carService.js
+import { getAuthHeaders } from "../utils/getAuthHeaders";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL + '/api/'; // Adjust based on your actual API URL
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('accessToken'); // Retrieve access token from local storage
-    return {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`, // Set Authorization header with token
-    };
-};
 
 export const getCar = async (carId) => {
     try {
