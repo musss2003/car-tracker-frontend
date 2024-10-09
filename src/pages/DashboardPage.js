@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getCars } from '../services/carService';
 
@@ -6,14 +6,18 @@ import { getCars } from '../services/carService';
 import { ContractsContext } from '../contexts/ContractsContext';
 import { TruckIcon, UserIcon, CurrencyDollarIcon, ClipboardListIcon } from '@heroicons/react/solid';
 
-const getNumberOfCars = async () => {
-    return await getCars().then((data) => {
-        return data.length;
-    })
-}
-
 function DashboardPage() {
     const { contracts } = useContext(ContractsContext);
+    const [numberOfCars, setNumberOfCars] = useState(0); // State for number of cars
+
+    useEffect(() => {
+        const fetchNumberOfCars = async () => {
+            const data = await getCars();
+            setNumberOfCars(data.length); // Store the length of the cars array
+        };
+
+        fetchNumberOfCars(); // Call the fetch function
+    }, []); // Run once when the component mounts
 
     return (
         <div className="p-8">
@@ -35,7 +39,7 @@ function DashboardPage() {
                 <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
                     <TruckIcon className="w-10 h-10 text-green-500 mr-4" />
                     <div>
-                        <h2 className="text-xl font-bold">{getNumberOfCars}</h2>
+                        <h2 className="text-xl font-bold">{numberOfCars}</h2> {/* Use the state variable */}
                         <p className="text-gray-500">Available Cars</p>
                     </div>
                 </div>

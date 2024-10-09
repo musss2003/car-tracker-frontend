@@ -1,8 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { toast } from "react-toastify";
 import { loginAPI, registerAPI } from "../services/authService";
-import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getAuthHeaders } from '../utils/getAuthHeaders';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL + "/api/auth/";
 
@@ -14,37 +14,38 @@ export const UserProvider = ({ children }) => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const checkSession = async () => {
-            try {
-                const accessToken = localStorage.getItem("accessToken");
+    const location = useLocation(); // Use location to detect route changes
 
-                const response = await fetch(API_URL + 'session-check', {
-                    method: 'GET',
-                    credentials: 'include', // Include credentials to send cookies
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${accessToken}`
-                    }
-                });
+    const checkSession = async () => {
+        try {
+            const response = await fetch(API_URL + 'session-check', {
+                method: 'GET',
+                credentials: 'include', // Include credentials to send cookies
+                headers: getAuthHeaders()
+            });
 
-                if (!response.ok) {
-                    throw new Error('Failed to authenticate'); // Handle non-200 responses
-                }
-
-                const data = await response.json(); // Parse the JSON response
-                setUser({ username: data.username, email: data.email, id: data.id });
-
-            } catch (error) {
-                // Handle the error appropriately
-                console.error('Error message:', error.message);
-                setUser(null);
-            } finally {
-                setIsReady(true);
+            if (!response.ok) {
+                throw new Error('Failed to authenticate'); // Handle non-200 responses
             }
-        };
 
-        checkSession();
+            const data = await response.json(); // Parse the JSON response
+            setUser({ username: data.username, email: data.email, id: data.id });
+
+        } catch (error) {
+            // Handle the error appropriately
+            console.error('Error message:', error.message);
+            setUser(null);
+        } finally {
+            setIsReady(true);
+        }
+    };
+
+    useEffect(() => {
+        checkSession(); // Check session on route change
+    }, [location.pathname]); // Trigger check when the path changes
+
+    useEffect(() => {
+        setIsReady(true); // Ensure isReady is true after initial check
     }, []);
 
     const registerUser = async (email, username, password) => {
@@ -76,21 +77,33 @@ export const UserProvider = ({ children }) => {
     };
 
     const isLoggedIn = () => {
-        return !!user;
+        return user !== null; // Return true if user is authenticated
     };
+
 
     const logout = async () => {
         try {
-            await axios.post(API_URL + 'logout', {}, { withCredentials: true });
+            const response = await fetch(API_URL + 'logout', {
+                method: 'POST',
+                credentials: 'include', // Include credentials to send cookies
+                headers: getAuthHeaders(),
+                body: JSON.stringify({}), // Send an empty body if necessary
+            });
+
+            if (!response.ok) {
+                throw new Error('Logout failed'); // Handle non-200 responses
+            }
+
             toast.success("Logout Successful!");
         } catch (error) {
             toast.warning("Logout failed!");
         } finally {
             setUser(null);
-            // Redirect to login page or perform other cleanup
-            window.location.href = '/';
+            navigate('/login'); // Redirect to login after logout
         }
     };
+
+
 
     return (
         <UserContext.Provider

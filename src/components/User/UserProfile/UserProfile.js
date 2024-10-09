@@ -18,7 +18,6 @@ const UserProfile = ({ userId }) => {
                 setUser(data);
             } catch (error) {
                 setError(error.message);
-                toast.error(`Error fetching user: ${error.message}`); // Show error to the user
             }
         };
 
