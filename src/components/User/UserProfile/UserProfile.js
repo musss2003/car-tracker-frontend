@@ -64,13 +64,15 @@ const UserProfile = ({ userId }) => {
     if (!user) return <div>Loading...</div>; // Handling loading state
 
     return (
-        <div className="max-w-2xl mt-10 mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <div className="flex items-center space-x-4 mb-6">
-                <img src={user.profilePhotoUrl || defaultAvatar} className="w-16 h-16 rounded-full" alt="User Avatar" />
-                <h2 className="text-2xl font-bold text-gray-900">User Profile</h2>
-                <button onClick={() => handleEdit("profilePhotoUrl")} className="text-sm text-blue-500 hover:text-blue-700">Edit Photo</button>
+        <div className="user-profile-container">
+            <div className="user-profile-header">
+                <img src={user.profilePhotoUrl || defaultAvatar} className="user-profile-avatar" alt="User Avatar" />
+                <div>
+                    <h2 className="user-profile-title">{user.name}</h2>
+                    <p className="text-gray-600">{user.bio || 'No bio available'}</p>
+                </div>
+                <button onClick={() => handleEdit("profilePhotoUrl")} className="user-profile-edit-button">Edit Photo</button>
             </div>
-            {/* New component for edit fields */}
             <UserEditFields
                 user={user}
                 currentEdit={currentEdit}
@@ -81,7 +83,7 @@ const UserProfile = ({ userId }) => {
                 formatDate={formatDate} // Pass formatDate to the UserEditFields
                 handleEdit={handleEdit} // Pass handleEdit to the UserEditFields
             />
-            <button onClick={handleDeleteUser} className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">Delete User</button>
+            <button onClick={handleDeleteUser} className="user-profile-delete-button">Delete User</button>
         </div>
     );
 };
