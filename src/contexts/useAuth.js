@@ -18,7 +18,6 @@ export const UserProvider = ({ children }) => {
         const checkSession = async () => {
             try {
                 const accessToken = localStorage.getItem("accessToken");
-                console.log("My accessToken: " + accessToken);
 
                 const response = await fetch(API_URL + 'session-check', {
                     method: 'GET',
