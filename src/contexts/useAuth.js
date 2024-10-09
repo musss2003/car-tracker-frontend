@@ -23,7 +23,9 @@ export const UserProvider = ({ children }) => {
                 credentials: 'include', // Include credentials to send cookies
                 headers: getAuthHeaders()
             });
-
+            
+            console.log(response);
+            
             if (!response.ok) {
                 throw new Error('Failed to authenticate'); // Handle non-200 responses
             }
@@ -42,10 +44,12 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         checkSession(); // Check session on route change
+
     }, [location.pathname]); // Trigger check when the path changes
 
     useEffect(() => {
-        setIsReady(true); // Ensure isReady is true after initial check
+        checkSession();
+        
     }, []);
 
     const registerUser = async (email, username, password) => {

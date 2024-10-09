@@ -1,34 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { getActiveContracts } from '../../services/contractService';
-import EditCarForm from './EditCarForm'; // Importing the EditCarForm
-import { updateCar, getCars } from '../../services/carService';
+import { getActiveContracts } from '../../services/contractService'; // Make sure to import the deleteCar function
+import EditCarForm from './EditCarForm';
+import { updateCar, getCars, deleteCar } from '../../services/carService';
+import { TrashIcon } from '@heroicons/react/solid';
 
 const CarTable = ({ cars, setCars }) => {
-    const [activeContracts, setActiveContracts] = useState([]); // State to hold active contracts
-    const [editCar, setEditCar] = useState(null); // State to manage the car being edited
+    const [activeContracts, setActiveContracts] = useState([]);
+    const [editCar, setEditCar] = useState(null);
 
     useEffect(() => {
         const fetchActiveContracts = async () => {
             try {
-                const contracts = await getActiveContracts(); // Fetch active contracts
-                setActiveContracts(contracts); // Set the active contracts state
+                const contracts = await getActiveContracts();
+                setActiveContracts(contracts);
             } catch (error) {
                 console.error('Error fetching active contracts:', error);
             }
         };
-        fetchActiveContracts(); // Call the function to fetch contracts
+        fetchActiveContracts();
     }, []);
 
     const handleSave = async (updatedCar) => {
         try {
-            // Update the car in the backend
             await updateCar(updatedCar.license_plate, updatedCar);
-
-            // Refetch cars to get the latest state
             const updatedCars = await getCars();
-            setCars(updatedCars); // Update the cars state with the new data
-
-            // Close the edit form
+            setCars(updatedCars);
             setEditCar(null);
         } catch (error) {
             console.error('Error saving car:', error);
@@ -36,14 +32,28 @@ const CarTable = ({ cars, setCars }) => {
     };
 
     const handleCancel = () => {
-        setEditCar(null); // Close the edit form
+        setEditCar(null);
     };
 
-    const busyCars = new Set(activeContracts.map(contract => contract.carLicensePlate)); // Set of busy cars
+    const busyCars = new Set(activeContracts.map(contract => contract.carLicensePlate));
+
+    const handleDelete = async (licensePlate) => {
+        const confirmed = window.confirm("Are you sure you want to delete this car?");
+        if (confirmed) {
+            try {
+                await deleteCar(licensePlate); // Call your delete function here
+                // Refetch cars after deletion to get the latest state
+                const updatedCars = await getCars();
+                setCars(updatedCars);
+            } catch (error) {
+                console.error('Error deleting car:', error);
+            }
+        }
+    };
 
     return (
         <>
-            {editCar && <EditCarForm car={editCar} onSave={handleSave} onCancel={handleCancel} />} {/* Render edit form if editing */}
+            {editCar && <EditCarForm car={editCar} onSave={handleSave} onCancel={handleCancel} />}
             <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                     <tr>
@@ -73,6 +83,18 @@ const CarTable = ({ cars, setCars }) => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <button onClick={() => setEditCar(car)}>Edit</button>
+                                <button onClick={() => handleDelete(car.license_plate)} className="ml-2 text-red-500">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6 mr-1 ml-4"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M6 2a1 1 0 00-1 1v1H4a1 1 0 000 2h12a1 1 0 000-2h-1V3a1 1 0 00-1-1H6zm2 0h4v1H8V2zm1 4a1 1 0 00-1 1v10a1 1 0 002 0V7a1 1 0 00-1-1z" />
+                                        <path d="M5 8a1 1 0 011-1h8a1 1 0 011 1v10a1 1 0 01-1 1H6a1 1 0 01-1-1V8z" />
+                                    </svg>
+                                </button>
                             </td>
                         </tr>
                     ))}
@@ -82,4 +104,4 @@ const CarTable = ({ cars, setCars }) => {
     );
 };
 
-export default CarTable; // Export the CarTable component
+export default CarTable;

@@ -24,7 +24,7 @@ function App() {
             <div className="flex">
                 <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
-                <div className={`flex-1 p-6 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : ''}`}>
+                <main className={`flex-1 p-6 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : ''}`}>
                     {/* Hamburger icon for mobile */}
                     {!isSidebarOpen && ( // Only show the hamburger icon when sidebar is closed
                         <button onClick={toggleSidebar} className="md:hidden p-2 text-white bg-gray-800 fixed z-20 top-4 left-4 rounded" aria-label="Toggle sidebar">
@@ -42,7 +42,7 @@ function App() {
                             <Route path="/cars" element={<CarsPage />} />
                         </Route>
                     </Routes>
-                </div>
+                </main>
             </div>
         </ContractsProvider>
     );
