@@ -1,6 +1,5 @@
 import React from 'react';
 import { PencilIcon } from '@heroicons/react/solid';
-import { toast } from "react-toastify";
 
 const UserEditFields = ({ user, currentEdit, setCurrentEdit, editValue, setEditValue, handleSave, formatDate, handleEdit }) => {
     return (

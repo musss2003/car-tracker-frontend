@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify'; // Ensure you have react-toastify installed
+import { toast } from 'react-toastify';
 
 const EditCarForm = ({ car, onSave, onCancel }) => {
-    // State to hold the form values
     const [formData, setFormData] = useState({
         manufacturer: '',
         model: '',
@@ -13,7 +12,6 @@ const EditCarForm = ({ car, onSave, onCancel }) => {
     });
 
     useEffect(() => {
-        // Populate the form fields with the current car data
         if (car) {
             setFormData({
                 manufacturer: car.manufacturer,
@@ -26,7 +24,6 @@ const EditCarForm = ({ car, onSave, onCancel }) => {
         }
     }, [car]);
 
-    // Handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -35,102 +32,93 @@ const EditCarForm = ({ car, onSave, onCancel }) => {
         });
     };
 
-    // Function to handle the update
     const handleUpdateCar = async (e) => {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
         try {
-            // Call the onSave function passed from the parent
             await onSave(formData);
-            toast.success('Car updated successfully!'); // Show success message
+            toast.success('Car updated successfully!');
         } catch (error) {
             console.error('Error updating car:', error);
-            toast.error('Failed to update car.'); // Show error message
+            toast.error('Failed to update car.');
         }
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+        <div className="flex items-center justify-center bg-gray-500 bg-opacity-75 fixed inset-0">
             <div className="bg-white shadow-lg rounded-lg p-8 max-w-xl w-full">
                 <h2 className="text-2xl font-bold mb-6 text-center">Edit Car</h2>
                 <form onSubmit={handleUpdateCar}>
-                    <div className="mb-4">
-                        <input
-                            type="text"
-                            name="manufacturer"
-                            value={formData.manufacturer}
-                            onChange={handleChange}
-                            placeholder="Manufacturer"
-                            required
-                            className="border border-gray-300 p-2 w-full rounded"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <input
-                            type="text"
-                            name="model"
-                            value={formData.model}
-                            onChange={handleChange}
-                            placeholder="Model"
-                            required
-                            className="border border-gray-300 p-2 w-full rounded"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <input
-                            type="number"
-                            name="year"
-                            value={formData.year}
-                            onChange={handleChange}
-                            placeholder="Year"
-                            required
-                            className="border border-gray-300 p-2 w-full rounded"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <input
-                            type="text"
-                            name="color"
-                            value={formData.color}
-                            onChange={handleChange}
-                            placeholder="Color"
-                            className="border border-gray-300 p-2 w-full rounded"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <input
-                            type="text"
-                            name="license_plate"
-                            value={formData.license_plate}
-                            onChange={handleChange}
-                            placeholder="License Plate"
-                            required
-                            className="border border-gray-300 p-2 w-full rounded"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <input
-                            type="number"
-                            name="price_per_day"
-                            value={formData.price_per_day}
-                            onChange={handleChange}
-                            placeholder="Price Per Day"
-                            className="border border-gray-300 p-2 w-full rounded"
-                        />
-                    </div>
-                    <div className="flex justify-between">
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-                        >
-                            Save
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onCancel}
-                            className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition"
-                        >
-                            Cancel
-                        </button>
+                    <div className="space-y-4">
+                        <div className="form-control">
+                            <label className="block text-sm font-medium text-gray-700">Manufacturer</label>
+                            <input
+                                name="manufacturer"
+                                value={formData.manufacturer}
+                                onChange={handleChange}
+                                placeholder="Manufacturer"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                required
+                            />
+                        </div>
+                        <div className="form-control">
+                            <label className="block text-sm font-medium text-gray-700">Model</label>
+                            <input
+                                name="model"
+                                value={formData.model}
+                                onChange={handleChange}
+                                placeholder="Model"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                required
+                            />
+                        </div>
+                        <div className="form-control">
+                            <label className="block text-sm font-medium text-gray-700">Year</label>
+                            <input
+                                name="year"
+                                value={formData.year}
+                                onChange={handleChange}
+                                placeholder="Year"
+                                type="number"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                required
+                            />
+                        </div>
+                        <div className="form-control">
+                            <label className="block text-sm font-medium text-gray-700">Color</label>
+                            <input
+                                name="color"
+                                value={formData.color}
+                                onChange={handleChange}
+                                placeholder="Color"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            />
+                        </div>
+                        <div className="form-control">
+                            <label className="block text-sm font-medium text-gray-700">License Plate</label>
+                            <input
+                                name="license_plate"
+                                value={formData.license_plate}
+                                onChange={handleChange}
+                                placeholder="License Plate"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                required
+                            />
+                        </div>
+                        <div className="form-control">
+                            <label className="block text-sm font-medium text-gray-700">Price Per Day</label>
+                            <input
+                                name="price_per_day"
+                                value={formData.price_per_day}
+                                onChange={handleChange}
+                                placeholder="Price Per Day"
+                                type="number"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            />
+                        </div>
+                        <div className="flex justify-between">
+                            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md">Save</button>
+                            <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-500 text-white rounded-md">Cancel</button>
+                        </div>
                     </div>
                 </form>
             </div>

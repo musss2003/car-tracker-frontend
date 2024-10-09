@@ -5,18 +5,18 @@ import { ChartBarIcon, UserIcon, TruckIcon } from '@heroicons/react/solid';
 const Sidebar = ({ isOpen, toggleSidebar }) => {
     return (
         <nav
-            className={`fixed inset-y-0 left-0 bg-gray-800 text-white p-4 z-10 transition-transform duration-300
+            className={`fixed inset-y-0 left-0 bg-gray-800 text-white p-4 z-10 min-h-screen h-auto transition-transform duration-300
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:relative md:block md:w-64`}
             style={{ width: '250px' }} // Set a fixed width for the sidebar
         >
             <div className="flex flex-col h-full">
-                <div className="flex items-center mb-8">
+                <div className="flex items-center mb-8 justify-between">
                     <Link to="/" className="flex items-center text-xl font-bold hover:text-gray-300">
                         RENT A CAR
                     </Link>
-                    <button onClick={toggleSidebar} className="md:hidden ml-2 p-2 bg-gray-700 rounded" aria-label="Toggle sidebar">
+                    <button onClick={toggleSidebar} className="md:hidden ml-2 p-2 bg-gray-800 rounded hover:bg-gray-600" aria-label="Toggle sidebar">
                         {isOpen ? (
-                            <span className="text-white">✖</span> // Cross icon when opened
+                            <span className="text-white ">✖</span> // Cross icon when opened
                         ) : (
                             <span className="text-white">☰</span> // Hamburger icon
                         )}

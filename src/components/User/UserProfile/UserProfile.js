@@ -7,7 +7,6 @@ import UserEditFields from '../UserEditFields.js'; // Import the new component
 
 const UserProfile = ({ userId }) => {
     const [user, setUser] = useState(null); // Start with null for user
-    const [error, setError] = useState(null);
     const [currentEdit, setCurrentEdit] = useState(null);
     const [editValue, setEditValue] = useState('');
 
@@ -17,7 +16,7 @@ const UserProfile = ({ userId }) => {
                 const data = await getUser(userId);
                 setUser(data);
             } catch (error) {
-                setError(error.message);
+                // TO DO
             }
         };
 
