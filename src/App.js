@@ -10,6 +10,7 @@ import UserData from './containers/UserData/UserData.js';
 import CarsPage from './pages/CarsPage.js';
 import { ContractsProvider } from './contexts/ContractsContext.js';
 import Sidebar from './components/Sidebar'; // Import the sidebar
+import ContractsPage from './pages/ContractsPage.js';
 
 function App() {
     const [isSidebarOpen, setSidebarOpen] = useState(false); // State for sidebar visibility
@@ -40,6 +41,7 @@ function App() {
                             <Route path="/dashboard" element={<DashboardPage />} />
                             <Route path="/profile" element={<UserData />} />
                             <Route path="/cars" element={<CarsPage />} />
+                            <Route path="/contracts" element={<ContractsPage />} />
                         </Route>
                     </Routes>
                 </main>

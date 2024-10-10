@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChartBarIcon, UserIcon, TruckIcon } from '@heroicons/react/solid';
+import { ChartBarIcon, UserIcon, TruckIcon, ClipboardListIcon } from '@heroicons/react/solid';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
     return (
@@ -25,6 +25,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <div className="flex flex-col space-y-4">
                     <NavLink to="/dashboard" icon={<ChartBarIcon className="w-6 h-6" />} label="Dashboard" />
                     <NavLink to="/cars" icon={<TruckIcon className="w-6 h-6" />} label="Auta" />
+                    <NavLink to="/contracts" icon={<ClipboardListIcon className="w-6 h-6" />} label="Ugovori" />
                     <NavLink to="/profile" icon={<UserIcon className="w-6 h-6" />} label="Profil" />
                 </div>
             </div>
