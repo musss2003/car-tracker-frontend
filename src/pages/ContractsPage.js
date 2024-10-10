@@ -1,11 +1,11 @@
 // pages/ContractsPage.js
 import React from 'react';
-import ContractList from '../components/ContractList/ContractList';
+import ContractsTable from '../containers/Contract/ContractsTable/ContractsTable';
 
 const ContractsPage = () => {
     return (
         <div className="contracts-page-container">
-            <ContractList />
+            <ContractsTable />
         </div>
     );
 };

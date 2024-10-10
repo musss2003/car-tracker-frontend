@@ -24,8 +24,6 @@ export const UserProvider = ({ children }) => {
                 headers: getAuthHeaders()
             });
             
-            console.log(response);
-            
             if (!response.ok) {
                 throw new Error('Failed to authenticate'); // Handle non-200 responses
             }
