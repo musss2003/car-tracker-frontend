@@ -4,6 +4,7 @@ import { getAvailableCarsForPeriod } from '../../../services/carService';
 import { searchCustomersByName } from '../../../services/customerService'; // New service for customer search
 import './CreateContractForm.css';
 import Modal from '../../Modal/Modal';
+import { toast } from "react-toastify"
 
 export const CreateContractForm = ({ onClose }) => {
     const [newContract, setNewContract] = useState({
@@ -53,14 +54,32 @@ export const CreateContractForm = ({ onClose }) => {
 
     const handleDateChange = (e) => {
         const { name, value } = e.target;
-        handleChange(e);
-
         const { startDate, endDate } = {
             ...newContract.rentalPeriod,
             [name.split('.')[1]]: value,
         };
 
-        if (startDate && endDate) {
+        // Validate that end date is not earlier than start date
+        if (name === "rentalPeriod.endDate" && new Date(value) < new Date(startDate)) {
+            alert('End date cannot be earlier than start date');
+            return;
+        }
+
+        if (name === "rentalPeriod.startDate" && endDate && new Date(endDate) < new Date(value)) {
+            alert('Start date cannot be later than end date');
+            return;
+        }
+
+        setNewContract((prev) => ({
+            ...prev,
+            rentalPeriod: {
+                ...prev.rentalPeriod,
+                [name.split('.')[1]]: value,
+            },
+        }));
+
+        // Fetch cars only when both dates are valid and selected
+        if (startDate && endDate && new Date(startDate) <= new Date(endDate)) {
             fetchCarsForPeriod(startDate, endDate);
         }
     };
@@ -78,17 +97,21 @@ export const CreateContractForm = ({ onClose }) => {
         }
     };
 
-    const handleCarSelect = (car) => {
-        setNewContract((prev) => ({
-            ...prev,
-            car: car,
-            rentalPrice: {
-                ...prev.rentalPrice,
-                dailyRate: car.dailyRate,
-                totalAmount: calculateTotalAmount(prev.rentalPeriod.startDate, prev.rentalPeriod.endDate, car.dailyRate),
-            },
-        }));
+    const handleCarSelect = (carId) => {
+        const selectedCar = availableCars.find((car) => car._id === carId);
+        if (selectedCar) {
+            setNewContract((prev) => ({
+                ...prev,
+                car: selectedCar,
+                rentalPrice: {
+                    ...prev.rentalPrice,
+                    dailyRate: selectedCar.price_per_day,
+                    totalAmount: calculateTotalAmount(prev.rentalPeriod.startDate, prev.rentalPeriod.endDate, selectedCar.price_per_day),
+                },
+            }));
+        }
     };
+
 
     const calculateTotalAmount = (startDate, endDate, dailyRate) => {
         const start = new Date(startDate);
@@ -104,6 +127,8 @@ export const CreateContractForm = ({ onClose }) => {
         try {
             await createContract(newContract);
             // Handle success, e.g., navigate or show success message
+            onClose();
+            toast.success("Uspješno kreiran ugovor");
         } catch (error) {
             console.error('Error creating contract:', error);
         }
@@ -111,8 +136,9 @@ export const CreateContractForm = ({ onClose }) => {
 
     // Fetch customers as the user types
     const handleCustomerSearch = async (e) => {
-        
+
         const query = e.target.value;
+
         setCustomerSearch(query);
 
         if (query.length > 2) { // Minimum 3 characters before searching
@@ -139,9 +165,8 @@ export const CreateContractForm = ({ onClose }) => {
     return (
         <Modal onClose={onClose}>
             <form onSubmit={handleSubmit} className="create-contract-form">
-                {/* Customer Search Field */}
-                <label>
-                    Search Customer:
+                <div className="customer-search">
+                    <label>Search Customer:</label>
                     <input
                         type="text"
                         value={customerSearch}
@@ -153,16 +178,15 @@ export const CreateContractForm = ({ onClose }) => {
                         <ul className="customer-results-list">
                             {customerResults.map((customer) => (
                                 <li key={customer._id} onClick={() => handleCustomerSelect(customer)}>
-                                    {customer.name} ({customer.email})
+                                    {customer.name} ({customer.passport_number})
                                 </li>
                             ))}
                         </ul>
                     )}
-                </label>
+                </div>
 
-                {/* Start and End Date Fields */}
-                <label>
-                    Start Date:
+                <div className="date-picker">
+                    <label>Start Date:</label>
                     <input
                         type="date"
                         name="rentalPeriod.startDate"
@@ -170,9 +194,8 @@ export const CreateContractForm = ({ onClose }) => {
                         onChange={handleDateChange}
                         required
                     />
-                </label>
-                <label>
-                    End Date:
+
+                    <label>End Date:</label>
                     <input
                         type="date"
                         name="rentalPeriod.endDate"
@@ -180,32 +203,33 @@ export const CreateContractForm = ({ onClose }) => {
                         onChange={handleDateChange}
                         required
                     />
-                </label>
+                </div>
 
-                {/* Available cars based on the selected dates */}
-                {datesSelected && (
-                    <>
-                        {loadingCars ? (
-                            <p>Loading available cars...</p>
-                        ) : (
-                            <label>
-                                Select Car:
-                                <select name="car" onChange={(e) => handleCarSelect(availableCars[e.target.selectedIndex])} required>
-                                    <option value="">Select a car</option>
-                                    {availableCars.length > 0 ? (
-                                        availableCars.map((car) => (
-                                            <option key={car._id} value={car._id}>
-                                                {car.model} - ${car.dailyRate}/day
-                                            </option>
-                                        ))
-                                    ) : (
-                                        <option disabled>No cars available</option>
-                                    )}
-                                </select>
-                            </label>
-                        )}
-                    </>
-                )}
+                <div className="car-select">
+                    {datesSelected && (
+                        <>
+                            <label>Select Car:</label>
+                            <select
+                                name="car"
+                                value={newContract.car._id || ""}
+                                onChange={(e) => handleCarSelect(e.target.value)} // Pass the selected car's _id
+                                required
+                            >
+                                <option value="">Select a car</option>
+                                {availableCars.length > 0 ? (
+                                    availableCars.map((car) => (
+                                        <option key={car._id} value={car._id}>
+                                            {car.model} - ${car.price_per_day}/day
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option disabled>No cars available</option>
+                                )}
+                            </select>
+                        </>
+                    )}
+                </div>
+
 
                 {/* Rental Pricing */}
                 {newContract.rentalPrice.dailyRate > 0 && (
@@ -215,30 +239,6 @@ export const CreateContractForm = ({ onClose }) => {
                     </>
                 )}
 
-                {/* Payment Details */}
-                <label>
-                    Payment Method:
-                    <input
-                        type="text"
-                        name="paymentDetails.paymentMethod"
-                        value={newContract.paymentDetails.paymentMethod}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
-
-                <label>
-                    Payment Status:
-                    <select
-                        name="paymentDetails.paymentStatus"
-                        value={newContract.paymentDetails.paymentStatus}
-                        onChange={handleChange}
-                    >
-                        <option value="pending">Pending</option>
-                        <option value="paid">Paid</option>
-                    </select>
-                </label>
-
                 {/* Additional Notes */}
                 <label>
                     Additional Notes:
@@ -246,6 +246,8 @@ export const CreateContractForm = ({ onClose }) => {
                         name="additionalNotes"
                         value={newContract.additionalNotes}
                         onChange={handleChange}
+                        rows={4} // Set a default number of rows for better visibility
+                        placeholder="Enter any additional notes here..." // Placeholder for guidance
                     />
                 </label>
 
@@ -257,6 +259,7 @@ export const CreateContractForm = ({ onClose }) => {
                         name="contractPhoto"
                         value={newContract.contractPhoto}
                         onChange={handleChange}
+                        placeholder="Enter photo URL..." // Placeholder for guidance
                     />
                 </label>
 

@@ -61,13 +61,12 @@ export const getActiveContracts = async () => {
 };
 
 export const updateContract = async (contractId, updatedContract) => {
+    console.log(updatedContract);
+    
     try {
-        const response = await fetch(`${API_URL}/contracts/${contractId}`, {
+        const response = await fetch(`${API_URL}${contractId}`, {
             method: 'PUT',
-            headers: {
-                ...getAuthHeaders(),
-                'Content-Type': 'application/json', // Specify that the body is JSON
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(updatedContract), // Convert the updated contract object to JSON
         });
 
@@ -85,7 +84,7 @@ export const updateContract = async (contractId, updatedContract) => {
 
 export const deleteContract = async (contractId) => {
     try {
-        const response = await fetch(`${API_URL}/contracts/${contractId}`, {
+        const response = await fetch(`${API_URL}${contractId}`, {
             method: 'DELETE',
             headers: getAuthHeaders(), // Include authorization headers if needed
         });
@@ -104,7 +103,7 @@ export const deleteContract = async (contractId) => {
 
 export const createContract = async (contractData) => {
     try {
-        const response = await fetch(`${API_URL}/contracts`, {
+        const response = await fetch(`${API_URL}`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(contractData)

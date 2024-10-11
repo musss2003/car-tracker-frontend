@@ -26,17 +26,18 @@
     background-color: #f1f1f1; /* Highlight row on hover */
 }
 
+.status-confirmed {
+    color: orange; /* Example styling */
+}
+
 .status-active {
-    color: green;
+    color: lightgreen; /* Example styling */
 }
 
 .status-completed {
-    color: orange;
+    color: lightcoral; /* Example styling */
 }
 
-.status-cancelled {
-    color: red;
-}
 
 /* Add to ContractsTable.css or ContractDetailsModal.css */
 .delete-button {

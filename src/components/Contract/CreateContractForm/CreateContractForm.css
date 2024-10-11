@@ -1,83 +1,112 @@
-.create-contract-form {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    background-color: #f9f9f9;
+.create-contract-form label {
+    display: block; /* Full width for each label */
+    margin-bottom: 10px; /* Space below each label */
+    font-weight: bold; /* Bold text for labels */
+    color: #333; /* Dark gray for better readability */
+}
+
+.create-contract-form textarea {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for comfort */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    margin-top: 5px; /* Space above */
+    font-size: 16px; /* Larger font size */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    resize: vertical; /* Allows vertical resizing only */
+    transition: border-color 0.3s; /* Smooth transition for focus effect */
+}
+
+.create-contract-form textarea:focus {
+    border-color: #007BFF; /* Blue border on focus */
+    outline: none; /* Remove default outline */
+}
+
+.create-contract-form input[type="text"] {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for comfort */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    margin-top: 5px; /* Space above */
+    font-size: 16px; /* Larger font size */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: border-color 0.3s; /* Smooth transition for focus effect */
+}
+
+.create-contract-form input[type="text"]:focus {
+    border-color: #007BFF; /* Blue border on focus */
+    outline: none; /* Remove default outline */
+}
+
+
+
+.customer-search {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 1rem;
+}
+
+.customer-search input {
+    width: 100%;
+    padding: 0.5rem;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.create-contract-form h2 {
-    margin-bottom: 20px;
-    text-align: center;
-    color: #333;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #555;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    border-color: #007bff;
+    font-size: 16px;
     outline: none;
+    transition: border-color 0.3s ease;
 }
 
-.price-summary {
-    background-color: #e7f3fe;
-    padding: 15px;
-    border-radius: 4px;
-    margin: 15px 0;
-    border-left: 5px solid #007bff;
+.customer-search input:focus {
+    border-color: #4a90e2;
 }
 
-.form-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+.customer-results-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
+.customer-results-list li {
+    padding: 0.5rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
-button:hover {
-    background-color: #0056b3;
+.customer-results-list li:hover {
+    background-color: #f0f0f0;
 }
 
-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+.date-picker input {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+    font-size: 16px;
 }
 
-button[type="button"] {
-    background-color: #dc3545;
+.date-picker input:focus {
+    border-color: #4a90e2;
 }
 
-button[type="button"]:hover {
-    background-color: #c82333;
+.car-select select {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    margin-bottom: 1rem;
+}
+
+.car-select select:focus {
+    border-color: #4a90e2;
 }

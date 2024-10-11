@@ -44,12 +44,9 @@ export const getCustomers = async (params) => {
 // customerService.js
 export const searchCustomersByName = async (name) => {
     try {
-
-        console.log(`${API_URL}search?name=${encodeURIComponent(name)}`);
-        
         const response = await fetch(`${API_URL}search?name=${encodeURIComponent(name)}`, {
             method: 'GET',
-            headers: getAuthHeaders()
+            headers: getAuthHeaders(),
         });
 
         if (!response.ok) {

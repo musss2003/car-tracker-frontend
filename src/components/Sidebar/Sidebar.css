@@ -1,0 +1,66 @@
+/* Sidebar.css */
+
+nav {
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5); /* Add a subtle shadow */
+    transition: width 0.3s ease; /* Smooth width transition */
+}
+
+h1 {
+    font-size: 1.5rem;
+    color: white;
+    margin: 0;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+}
+
+.space-y-4 > * + * {
+    margin-top: 1rem; /* Space between navigation links */
+}
+
+/* Style for NavLink */
+.link {
+    display: flex;
+    align-items: center;
+    color: white; /* Change to your desired color */
+    text-decoration: none; /* Remove underline */
+    padding: 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effects */
+.link:hover {
+    background-color: #4b5563; /* Darker gray on hover */
+}
+
+.nav-header {
+    font-size: 1.25rem; /* Font size for the header */
+}
+
+/* Button styles */
+button {
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #4b5563; /* Darker gray on hover */
+}
+
+/* Sidebar items */
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-col > * {
+    margin-bottom: 1rem; /* Space between sidebar items */
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+    nav {
+        width: 250px; /* Fixed width for larger screens */
+    }
+}

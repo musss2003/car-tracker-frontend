@@ -12,16 +12,17 @@ const ContractsTable = () => {
     const [isCreateModalOpen, setCreateModalOpen] = useState(false); // To manage Create Modal state
 
 
+    const fetchContracts = async () => {
+        try {
+            const data = await getContractsPopulated();
+            setContracts(data);
+        } catch (err) {
+            setError('Failed to fetch contracts');
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
-        const fetchContracts = async () => {
-            try {
-                const data = await getContractsPopulated();
-                setContracts(data);
-            } catch (err) {
-                setError('Failed to fetch contracts');
-                console.error(err);
-            }
-        };
 
         fetchContracts();
     }, []);
@@ -32,6 +33,7 @@ const ContractsTable = () => {
 
     const handleCloseContractDetailsModal = () => {
         setSelectedContract(null);
+        fetchContracts();
     };
 
     const handleUpdateContract = (updatedContract) => {
@@ -53,8 +55,8 @@ const ContractsTable = () => {
     };
 
     const handleCloseModal = () => {
-        console.log("zatvoreno")
         setCreateModalOpen(false);
+        fetchContracts();
     };
 
     if (error) {
@@ -68,7 +70,6 @@ const ContractsTable = () => {
             <table className="table">
                 <thead>
                     <tr>
-                        <th>Contract Number</th>
                         <th>Customer Name</th>
                         <th>Passport Number</th>
                         <th>Car Model</th>
@@ -81,16 +82,29 @@ const ContractsTable = () => {
                 <tbody>
                     {contracts.map(contract => (
                         <tr key={contract._id} onClick={() => handleContractClick(contract)}>
-                            <td>{contract.contractNumber}</td>
                             <td>{contract.customer ? contract.customer.name : 'N/A'}</td>
                             <td>{contract.customer ? contract.customer.passport_number : 'N/A'}</td>
                             <td>{contract.car ? contract.car.model : 'N/A'}</td>
                             <td>{contract.car ? contract.car.license_plate : 'N/A'}</td>
                             <td>{contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : 'N/A'}</td>
                             <td>{contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : 'N/A'}</td>
-                            <td className={contract.status === 'active' ? 'status-active' : contract.status === 'completed' ? 'status-completed' : 'status-cancelled'}>
-                                {contract.status}
+                            <td className={
+                                new Date() < new Date(contract.rentalPeriod.startDate)
+                                    ? 'status-confirmed' // Confirmed
+                                    : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
+                                        ? 'status-active' // Active
+                                        : 'status-completed' // Completed
+                            }>
+                                {
+                                    new Date() < new Date(contract.rentalPeriod.startDate)
+                                        ? 'confirmed'
+                                        : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
+                                            ? 'active'
+                                            : 'completed'
+                                }
                             </td>
+
+
                         </tr>
                     ))}
                 </tbody>
