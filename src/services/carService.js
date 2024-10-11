@@ -97,3 +97,23 @@ export const addCar = async (car) => {
         throw error;
     }
 };
+
+export const getAvailableCarsForPeriod = async (startingDate, endingDate) => {
+    try {
+        const response = await fetch(`${API_URL}cars/available`, {
+            method: 'POST', // We are posting because we need to send data (the rental period)
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ startingDate, endingDate }), // Send the dates to the backend
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error fetching available cars: ${response.status}`);
+        }
+
+        const availableCars = await response.json();
+        return availableCars; // This will return the list of available cars
+    } catch (error) {
+        console.error('Error fetching available cars:', error);
+        throw error;
+    }
+};

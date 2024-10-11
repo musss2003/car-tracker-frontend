@@ -1,58 +1,130 @@
-import axios from 'axios';
+import { getAuthHeaders } from "../utils/getAuthHeaders"; // Ensure this utility function is correctly imported
 
-const API_URL = process.env.REACT_APP_API_BASE_URL + '/api/'; // Adjust based on your actual API URL
+const API_URL = process.env.REACT_APP_API_BASE_URL + '/api/customers/';
 
-export const getCustomer = (customerId) => {
-    return axios.get(`${API_URL}customers/${customerId}`, {
-        withCredentials: true
-    });
+export const getCustomer = async (customerId) => {
+    try {
+        const response = await fetch(`${API_URL}${customerId}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data; // Return the fetched customer data
+    } catch (error) {
+        console.error('Error fetching customer:', error);
+        throw error; // Propagate the error for further handling
+    }
 };
 
 export const getCustomers = async (params) => {
     try {
-        const response = await axios.get(`${API_URL}customers`, {
-            params: params,
-            withCredentials: true
+        const query = new URLSearchParams(params).toString();
+        const response = await fetch(`${API_URL}?${query}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
         });
-        return response.data;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data; // Return the list of customers
     } catch (error) {
-        console.error('Error getting all customers:', error);
+        console.error('Error fetching all customers:', error);
+        throw error; // Propagate the error for further handling
+    }
+};
+
+// customerService.js
+export const searchCustomersByName = async (name) => {
+    try {
+
+        console.log(`${API_URL}search?name=${encodeURIComponent(name)}`);
+        
+        const response = await fetch(`${API_URL}search?name=${encodeURIComponent(name)}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Error searching for customers');
+        }
+
+        const customers = await response.json();
+        return customers;
+    } catch (error) {
+        console.error('Error fetching customers:', error);
         throw error;
     }
 };
 
-export const updateCustomer = async (id, customer) => {
+
+export const updateCustomer = async (customerId, updatedCustomer) => {
     try {
-        const response = await axios.put(`${API_URL}customers/${id}`, customer, {
-            withCredentials: true
+        const response = await fetch(`${API_URL}${customerId}`, {
+            method: 'PUT',
+            headers: {
+                ...getAuthHeaders(),
+                'Content-Type': 'application/json', // Specify that the body is JSON
+            },
+            body: JSON.stringify(updatedCustomer), // Convert the updated customer object to JSON
         });
-        return response.data;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data; // Return the updated customer data
     } catch (error) {
         console.error('Error updating customer:', error);
-        throw error;
+        throw error; // Propagate the error for further handling
     }
 };
 
-export const deleteCustomer = async (id) => {
+export const deleteCustomer = async (customerId) => {
     try {
-        const response = await axios.delete(`${API_URL}customers/${id}`, {
-            withCredentials: true
+        const response = await fetch(`${API_URL}${customerId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(), // Include authorization headers if needed
         });
-        return response.data;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        return; // Simply return if the deletion was successful (no response data)
     } catch (error) {
         console.error('Error deleting customer:', error);
-        throw error;
+        throw error; // Propagate the error for further handling
     }
 };
 
 export const addCustomer = async (newCustomer) => {
     try {
-        const response = await axios.post(API_URL + 'customers', newCustomer, {
-            withCredentials: true
+        const response = await fetch(`${API_URL}`, {
+            method: 'POST',
+            headers: {
+                ...getAuthHeaders(),
+                'Content-Type': 'application/json', // Specify that the body is JSON
+            },
+            body: JSON.stringify(newCustomer), // Convert the new customer object to JSON
         });
-        return response.data;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data; // Return the added customer data
     } catch (error) {
         console.error('Error adding customer:', error);
-        throw error;
+        throw error; // Propagate the error for further handling
     }
 };
