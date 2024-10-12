@@ -4,6 +4,7 @@ import { createContract, getContractsPopulated } from '../../../services/contrac
 import './ContractsTable.css';
 import { ContractDetailsModal } from '../../../components/Contract/ContractDetailsModal/ContractDetailsModal';
 import { CreateContractForm } from '../../../components/Contract/CreateContractForm/CreateContractForm';
+import { toast } from 'react-toastify';
 
 const ContractsTable = () => {
     const [contracts, setContracts] = useState([]);
@@ -42,6 +43,7 @@ const ContractsTable = () => {
                 contract._id === updatedContract._id ? updatedContract : contract
             )
         );
+        toast.success("Uspješno ažuriran ugovor");
     };
 
     const handleCreateContract = async (newContractData) => {

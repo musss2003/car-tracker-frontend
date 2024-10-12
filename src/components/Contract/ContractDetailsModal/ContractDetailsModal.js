@@ -110,13 +110,18 @@ export const ContractDetailsModal = ({ contract, onClose, onUpdate }) => {
     };
 
     const handleDelete = async () => {
-        try {
-            await deleteContract(contract._id);
-            onClose();
-        } catch (error) {
-            console.error("Error deleting contract:", error);
+        const isConfirmed = window.confirm("Are you sure you want to delete this contract? This action cannot be undone.");
+
+        if (isConfirmed) {
+            try {
+                await deleteContract(contract._id);
+                onClose(); // Close modal after deletion
+            } catch (error) {
+                console.error("Error deleting contract:", error);
+            }
         }
     };
+
 
     return (
         <div className="modal">
