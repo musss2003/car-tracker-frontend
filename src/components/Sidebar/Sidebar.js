@@ -1,20 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChartBarIcon, UserIcon, TruckIcon, ClipboardListIcon } from '@heroicons/react/solid';
+import './Sidebar.css'; // Import the CSS file
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
     return (
         <nav
-            className={`fixed inset-y-0 left-0 bg-gray-800 text-white p-4 z-10 transition-transform duration-300 
-                ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:relative md:w-64`}
-            style={{ width: '250px' }} // Fixed width for the sidebar
+            className={`sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}
         >
-            <div className="flex flex-col h-full">
-                <div className="flex items-center mb-8 justify-between">
-                    <Link to="/" className="flex items-center text-xl font-bold hover:text-gray-300">
+            <div className="sidebar-content">
+                <div className="sidebar-header">
+                    <Link to="/" className="sidebar-link">
                         RENT A CAR
                     </Link>
-                    <button onClick={toggleSidebar} className="md:hidden ml-2 p-2 bg-gray-800 rounded hover:bg-gray-600" aria-label="Toggle sidebar">
+                    <button onClick={toggleSidebar} className="sidebar-button" aria-label="Toggle sidebar">
                         {isOpen ? (
                             <span className="text-white">✖</span> // Cross icon when opened
                         ) : (
@@ -22,11 +21,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         )}
                     </button>
                 </div>
-                <div className="flex flex-col space-y-4 overflow-y-auto">
-                    <NavLink to="/dashboard" icon={<ChartBarIcon className="w-6 h-6" />} label="Dashboard" />
-                    <NavLink to="/cars" icon={<TruckIcon className="w-6 h-6" />} label="Auta" />
-                    <NavLink to="/contracts" icon={<ClipboardListIcon className="w-6 h-6" />} label="Ugovori" />
-                    <NavLink to="/profile" icon={<UserIcon className="w-6 h-6" />} label="Profil" />
+                <div className="sidebar-nav">
+                    <NavLink to="/dashboard" icon={<ChartBarIcon className="nav-icon" />} label="Dashboard" />
+                    <NavLink to="/cars" icon={<TruckIcon className="nav-icon" />} label="Auta" />
+                    <NavLink to="/contracts" icon={<ClipboardListIcon className="nav-icon" />} label="Ugovori" />
+                    <NavLink to="/profile" icon={<UserIcon className="nav-icon" />} label="Profil" />
                 </div>
             </div>
         </nav>
@@ -35,8 +34,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
 // Reusable NavLink component
 const NavLink = ({ to, icon, label }) => (
-    <Link to={to} className="flex items-center hover:text-gray-300">
-        <div className="mr-4">{icon}</div>
+    <Link to={to} className="nav-link">
+        <div className="nav-icon">{icon}</div>
         <span>{label}</span>
     </Link>
 );

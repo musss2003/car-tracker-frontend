@@ -1,66 +1,91 @@
-/* Sidebar.css */
-
-nav {
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5); /* Add a subtle shadow */
-    transition: width 0.3s ease; /* Smooth width transition */
-}
-
-h1 {
-    font-size: 1.5rem;
+.sidebar {
+    position: fixed;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    background-color: #2d3748; /* bg-gray-800 */
     color: white;
-    margin: 0;
+    padding: 16px; /* p-4 */
+    z-index: 30; /* Higher z-index to ensure it is above other elements */
+    transition: transform 0.3s; /* transition-transform duration-300 */
+    width: 200px; /* Fixed width for the sidebar */
 }
 
-.flex {
-    display: flex;
-    align-items: center;
+.sidebar-open {
+    transform: translateX(0); /* translate-x-0 */
 }
 
-.space-y-4 > * + * {
-    margin-top: 1rem; /* Space between navigation links */
+.sidebar-closed {
+    transform: translateX(100%); /* translate-x-full */
 }
 
-/* Style for NavLink */
-.link {
-    display: flex;
-    align-items: center;
-    color: white; /* Change to your desired color */
-    text-decoration: none; /* Remove underline */
-    padding: 10px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-}
-
-/* Hover effects */
-.link:hover {
-    background-color: #4b5563; /* Darker gray on hover */
-}
-
-.nav-header {
-    font-size: 1.25rem; /* Font size for the header */
-}
-
-/* Button styles */
-button {
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #4b5563; /* Darker gray on hover */
-}
-
-/* Sidebar items */
-.flex-col {
-    flex-direction: column;
-}
-
-.flex-col > * {
-    margin-bottom: 1rem; /* Space between sidebar items */
-}
-
-/* Responsive styles */
-@media (min-width: 768px) {
-    nav {
-        width: 250px; /* Fixed width for larger screens */
+@media screen and (min-width: 768px) {
+    .sidebar {
+        left: 0;
+        right: auto;
+        transform: translateX(0); /* Ensure it is visible on larger screens */
     }
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 32px; /* mb-8 */
+    justify-content: space-between;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem; /* text-xl */
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.sidebar-link:hover {
+    color: #a0aec0; /* hover:text-gray-300 */
+}
+
+.sidebar-button {
+    display: block; /* Ensure the button is visible */
+    margin-left: 8px; /* ml-2 */
+    padding: 8px; /* p-2 */
+    background-color: #2d3748; /* bg-gray-800 */
+    border-radius: 4px; /* rounded */
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.sidebar-button:hover {
+    background-color: #4a5568; /* hover:bg-gray-600 */
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* space-y-4 */
+    overflow-y: auto;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: #a0aec0; /* hover:text-gray-300 */
+}
+
+.nav-icon {
+    margin-right: 16px; /* mr-4 */
 }

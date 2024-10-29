@@ -1,7 +1,7 @@
 // Parent Component
 import React, { useEffect, useState } from 'react';
 import { getCars } from '../../services/carService';
-import CarTable from './CarTable';
+import CarTable from '../../containers/Car/CarTable/CarTable';
 
 const CarList = () => {
     const [cars, setCars] = useState([]);

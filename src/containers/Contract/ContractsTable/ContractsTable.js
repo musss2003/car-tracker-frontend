@@ -1,4 +1,3 @@
-// ContractsTable.js
 import React, { useEffect, useState } from 'react';
 import { createContract, getContractsPopulated } from '../../../services/contractService';
 import './ContractsTable.css';
@@ -12,7 +11,6 @@ const ContractsTable = () => {
     const [selectedContract, setSelectedContract] = useState(null);
     const [isCreateModalOpen, setCreateModalOpen] = useState(false); // To manage Create Modal state
 
-
     const fetchContracts = async () => {
         try {
             const data = await getContractsPopulated();
@@ -24,7 +22,6 @@ const ContractsTable = () => {
     };
 
     useEffect(() => {
-
         fetchContracts();
     }, []);
 
@@ -69,15 +66,15 @@ const ContractsTable = () => {
         <div className="table-container">
             <button className="create-btn" onClick={() => setCreateModalOpen(true)}>Create New Contract</button>
 
-            <table className="table">
+            <table className="contracts-table">
                 <thead>
                     <tr>
                         <th>Customer Name</th>
-                        <th>Passport Number</th>
-                        <th>Car Model</th>
-                        <th>License Plate</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
+                        <th className="hide-on-small">Passport Number</th>
+                        <th className="hide-on-small">Car Model</th>
+                        <th className="hide-on-small">License Plate</th>
+                        <th className="hide-on-small">Start Date</th>
+                        <th className="hide-on-small">End Date</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -85,11 +82,11 @@ const ContractsTable = () => {
                     {contracts.map(contract => (
                         <tr key={contract._id} onClick={() => handleContractClick(contract)}>
                             <td>{contract.customer ? contract.customer.name : 'N/A'}</td>
-                            <td>{contract.customer ? contract.customer.passport_number : 'N/A'}</td>
-                            <td>{contract.car ? contract.car.model : 'N/A'}</td>
-                            <td>{contract.car ? contract.car.license_plate : 'N/A'}</td>
-                            <td>{contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : 'N/A'}</td>
-                            <td>{contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : 'N/A'}</td>
+                            <td className="hide-on-small">{contract.customer ? contract.customer.passport_number : 'N/A'}</td>
+                            <td className="hide-on-small">{contract.car ? contract.car.model : 'N/A'}</td>
+                            <td className="hide-on-small">{contract.car ? contract.car.license_plate : 'N/A'}</td>
+                            <td className="hide-on-small">{contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : 'N/A'}</td>
+                            <td className="hide-on-small">{contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : 'N/A'}</td>
                             <td className={
                                 new Date() < new Date(contract.rentalPeriod.startDate)
                                     ? 'status-confirmed' // Confirmed
@@ -105,8 +102,6 @@ const ContractsTable = () => {
                                             : 'completed'
                                 }
                             </td>
-
-
                         </tr>
                     ))}
                 </tbody>

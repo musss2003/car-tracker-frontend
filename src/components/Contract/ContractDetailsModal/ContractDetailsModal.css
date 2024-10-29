@@ -1,7 +1,7 @@
 .modal {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     position: fixed;
     top: 0;
     left: 0;
@@ -103,7 +103,7 @@ select:focus {
 }
 
 
-button {
+.edit-form button, .details-view button {
     margin-top: 15px;
     padding: 10px;
     border: none;
@@ -114,7 +114,10 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+.details-view button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+.edit-from button:hover {
     background-color: #0056b3; /* Darker blue on hover */
 }
 

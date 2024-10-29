@@ -9,6 +9,7 @@ const API_URL = process.env.REACT_APP_API_BASE_URL + "/api/auth/";
 const UserContext = createContext({});
 
 export const UserProvider = ({ children }) => {
+
     const [user, setUser] = useState(null);
     const [isReady, setIsReady] = useState(false);
 
@@ -35,6 +36,7 @@ export const UserProvider = ({ children }) => {
             // Handle the error appropriately
             console.error('Error message:', error.message);
             setUser(null);
+            navigate('/login'); // Redirect to login if session check fails
         } finally {
             setIsReady(true);
         }

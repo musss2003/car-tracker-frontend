@@ -44,7 +44,7 @@ const EditCarForm = ({ car, onSave, onCancel }) => {
     };
 
     return (
-        <div className="flex items-center justify-center bg-gray-500 bg-opacity-75 fixed inset-0">
+        <div className="flex items-center justify-center bg-gray-500 bg-opacity-75 fixed inset-0 z-40">
             <div className="bg-white shadow-lg rounded-lg p-8 max-w-xl w-full">
                 <h2 className="text-2xl font-bold mb-6 text-center">Edit Car</h2>
                 <form onSubmit={handleUpdateCar}>

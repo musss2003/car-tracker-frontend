@@ -2,6 +2,7 @@
     width: 100%;
     overflow-x: auto; /* Enable horizontal scrolling for smaller screens */
     padding: 16px; /* Add some padding */
+    border-radius: 8px;
 }
 
 .create-btn {
@@ -19,25 +20,25 @@
     background-color: #2d3748; /* bg-gray-800 */
 }
 
-.contracts-table {
+.cars-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 16px; /* Add some margin below the table */
 }
 
-.contracts-table th,
-.contracts-table td {
+.cars-table th,
+.cars-table td {
     padding: 8px;
-    text-align: left;
+    text-align: center; /* Center text in table headers and cells */
     border-bottom: 1px solid #ddd;
 }
 
-.contracts-table th {
+.cars-table th {
     background-color: #2d3748; /* bg-gray-800 */
     color: white;
 }
 
-.contracts-table tr:hover {
+.cars-table tr:hover {
     background-color: #f1f1f1;
 }
 
@@ -53,6 +54,29 @@
     color: #e53e3e; /* red-600 */
 }
 
+.action-button {
+    margin-left: 8px; /* ml-2 */
+    padding: 8px 12px; /* px-3 py-1 */
+    border-radius: 4px; /* rounded-md */
+    transition: all 0.2s ease-in-out; /* transition-all duration-200 ease-in-out */
+}
+
+.action-button-blue {
+    color: #3182ce; /* text-blue-600 */
+}
+
+.action-button-blue:hover {
+    color: #2b6cb0; /* hover:text-blue-900 */
+}
+
+.action-button-red {
+    color: #e53e3e; /* text-red-600 */
+}
+
+.action-button-red:hover {
+    color: #c53030; /* hover:text-red-900 */
+}
+
 @media screen and (max-width: 768px) {
     .table-container {
         padding: 8px; /* Reduce padding for smaller screens */
@@ -63,28 +87,28 @@
         margin-bottom: 8px; /* Reduce margin below the button */
     }
 
-    .contracts-table th,
-    .contracts-table td {
+    .cars-table th,
+    .cars-table td {
         padding: 4px; /* Reduce padding for table cells */
     }
 
-    .contracts-table th {
+    .cars-table th {
         font-size: 0.875rem; /* Reduce font size for table headers */
     }
 
-    .contracts-table td {
+    .cars-table td {
         font-size: 0.875rem; /* Reduce font size for table cells */
     }
 
     /* Hide specific columns on smaller screens */
-    .contracts-table th:nth-child(2),
-    .contracts-table td:nth-child(2),
-    .contracts-table th:nth-child(3),
-    .contracts-table td:nth-child(3),
-    .contracts-table th:nth-child(5),
-    .contracts-table td:nth-child(5),
-    .contracts-table th:nth-child(6),
-    .contracts-table td:nth-child(6) {
+    .cars-table th:nth-child(2),
+    .cars-table td:nth-child(2),
+    .cars-table th:nth-child(3),
+    .cars-table td:nth-child(3),
+    .cars-table th:nth-child(4),
+    .cars-table td:nth-child(4),
+    .cars-table th:nth-child(5),
+    .cars-table td:nth-child(5) {
         display: none;
     }
 }

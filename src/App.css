@@ -1,0 +1,67 @@
+/* Ensure the flex container takes full height */
+.flex-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Main content styles */
+.main-content {
+    flex: 1;
+    padding: 24px; /* 6 * 4px (1.5rem) */
+    transition: all 0.3s;
+    max-width: 100vw;
+    overflow-y: scroll;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.5), transparent, rgba(0, 0, 0, 0.5)); /* Gradient background */
+}
+
+/* Top bar styles for mobile */
+.top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.8), transparent, rgba(0, 0, 0, 0.8)), url('./assets/family-photo.jpg'); /* Adjust the path to your image */
+    padding: 16px; /* 4 * 4px (1rem) */
+    z-index: 20; /* Ensure it is below the sidebar */
+    background-size: cover;
+    background-position: center;
+    height: 200px;
+}
+
+.top-bar img {
+    height: 80px; /* 20 * 4px (5rem) */
+}
+
+.top-bar button {
+    padding: 8px; /* 2 * 4px (0.5rem) */
+    background: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.logo{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+@media screen and (min-width: 768px) {
+    .top-bar {
+        display: none;
+    }
+    .main-content {
+        margin-left: 200px;
+    }
+}
+@media screen and (max-width: 768px) {
+    .main-content {
+        margin-top: 200px;
+    }
+}
