@@ -9,7 +9,7 @@ const ContractsTable = () => {
     const [contracts, setContracts] = useState([]);
     const [error, setError] = useState(null);
     const [selectedContract, setSelectedContract] = useState(null);
-    const [isCreateModalOpen, setCreateModalOpen] = useState(false); // To manage Create Modal state
+    const [isCreateModalOpen, setCreateModalOpen] = useState(false);
 
     const fetchContracts = async () => {
         try {
@@ -46,8 +46,8 @@ const ContractsTable = () => {
     const handleCreateContract = async (newContractData) => {
         try {
             const createdContract = await createContract(newContractData);
-            setContracts([...contracts, createdContract]); // Add new contract to the list
-            setCreateModalOpen(false); // Close modal
+            setContracts([...contracts, createdContract]);
+            setCreateModalOpen(false);
         } catch (error) {
             console.error('Error creating contract:', error);
         }
@@ -65,47 +65,48 @@ const ContractsTable = () => {
     return (
         <div className="table-container">
             <button className="create-btn" onClick={() => setCreateModalOpen(true)}>Create New Contract</button>
-
-            <table className="contracts-table">
-                <thead>
-                    <tr>
-                        <th>Customer Name</th>
-                        <th className="hide-on-small">Passport Number</th>
-                        <th className="hide-on-small">Car Model</th>
-                        <th className="hide-on-small">License Plate</th>
-                        <th className="hide-on-small">Start Date</th>
-                        <th className="hide-on-small">End Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {contracts.map(contract => (
-                        <tr key={contract._id} onClick={() => handleContractClick(contract)}>
-                            <td>{contract.customer ? contract.customer.name : 'N/A'}</td>
-                            <td className="hide-on-small">{contract.customer ? contract.customer.passport_number : 'N/A'}</td>
-                            <td className="hide-on-small">{contract.car ? contract.car.model : 'N/A'}</td>
-                            <td className="hide-on-small">{contract.car ? contract.car.license_plate : 'N/A'}</td>
-                            <td className="hide-on-small">{contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : 'N/A'}</td>
-                            <td className="hide-on-small">{contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : 'N/A'}</td>
-                            <td className={
-                                new Date() < new Date(contract.rentalPeriod.startDate)
-                                    ? 'status-confirmed' // Confirmed
-                                    : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
-                                        ? 'status-active' // Active
-                                        : 'status-completed' // Completed
-                            }>
-                                {
-                                    new Date() < new Date(contract.rentalPeriod.startDate)
-                                        ? 'confirmed'
-                                        : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
-                                            ? 'active'
-                                            : 'completed'
-                                }
-                            </td>
+            <div className="overflow-x-auto">
+                <table className="contracts-table min-w-full bg-white shadow-lg border border-gray-200 rounded-lg">
+                    <thead className="bg-gray-100">
+                        <tr>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer Name</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hide-on-small">Passport Number</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hide-on-small">Car Model</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hide-on-small">License Plate</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hide-on-small">Start Date</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hide-on-small">End Date</th>
+                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {contracts.map(contract => (
+                            <tr key={contract._id} onClick={() => handleContractClick(contract)}>
+                                <td className="px-6 py-4">{contract.customer ? contract.customer.name : 'N/A'}</td>
+                                <td className="px-6 py-4 hide-on-small">{contract.customer ? contract.customer.passport_number : 'N/A'}</td>
+                                <td className="px-6 py-4 hide-on-small">{contract.car ? contract.car.model : 'N/A'}</td>
+                                <td className="px-6 py-4 hide-on-small">{contract.car ? contract.car.license_plate : 'N/A'}</td>
+                                <td className="px-6 py-4 hide-on-small">{contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : 'N/A'}</td>
+                                <td className="px-6 py-4 hide-on-small">{contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : 'N/A'}</td>
+                                <td className={`px-6 py-4 ${
+                                    new Date() < new Date(contract.rentalPeriod.startDate)
+                                        ? 'status-confirmed'
+                                        : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
+                                            ? 'status-active'
+                                            : 'status-completed'
+                                }`}>
+                                    {
+                                        new Date() < new Date(contract.rentalPeriod.startDate)
+                                            ? 'confirmed'
+                                            : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
+                                                ? 'active'
+                                                : 'completed'
+                                    }
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {selectedContract && (
                 <ContractDetailsModal

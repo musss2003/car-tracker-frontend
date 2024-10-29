@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getActiveContracts } from '../../../services/contractService';
 import EditCarForm from '../../../components/Car/EditCarForm';
-import { updateCar, getCars, deleteCar } from '../../../services/carService';
+import { updateCar, getCars, deleteCar, addCar } from '../../../services/carService';
 import './CarTable.css';
+import CreateCarForm from '../../../components/Car/CreateCarForm/CreateCarForm';
 
 const ActionButton = ({ onClick, icon, label, className }) => (
     <button onClick={onClick} className={`action-button ${className}`}>
@@ -14,6 +15,7 @@ const ActionButton = ({ onClick, icon, label, className }) => (
 const CarTable = ({ cars, setCars }) => {
     const [activeContracts, setActiveContracts] = useState([]);
     const [editCar, setEditCar] = useState(null);
+    const [isCreatingCar, setIsCreatingCar] = useState(null);
 
     useEffect(() => {
         const fetchActiveContracts = async () => {
@@ -35,6 +37,17 @@ const CarTable = ({ cars, setCars }) => {
             setEditCar(null);
         } catch (error) {
             console.error('Error saving car:', error);
+        }
+    };
+
+    const handleCreate = async (newCar) => {
+        try {
+            await addCar(newCar);
+            const updatedCars = await getCars();
+            setCars(updatedCars);
+            setIsCreatingCar(null);
+        } catch (error) {
+            console.error('Error creating car:', error);
         }
     };
 
@@ -60,8 +73,9 @@ const CarTable = ({ cars, setCars }) => {
     return (
         <>
             {editCar && <EditCarForm car={editCar} onSave={handleSave} onCancel={handleCancel} />}
+            {isCreatingCar && <CreateCarForm onSave={handleCreate} onClose={() => setIsCreatingCar(false)} />}
             <div className="table-container">
-                <button className="create-btn">Create New Car</button>
+                <button className="create-btn" onClick={() => setIsCreatingCar(true)}>Create New Car</button>
                 <div className="overflow-x-auto">
                     <table className="cars-table min-w-full bg-white shadow-lg border border-gray-200 rounded-lg">
                         <thead className="bg-gray-100">
