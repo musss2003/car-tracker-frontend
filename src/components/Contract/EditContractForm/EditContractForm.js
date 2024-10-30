@@ -1,48 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAvailableCarsForPeriod } from '../../../services/carService';
-import { searchCustomersByName } from '../../../services/customerService'; // New service for customer search
-import './CreateContractForm.css';
+import { searchCustomersByName } from '../../../services/customerService';
 import Modal from '../../Modal/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCar } from '@fortawesome/free-solid-svg-icons';
+import './EditContractForm.css';
 
-export const CreateContractForm = ({ onClose, onSave }) => {
-    const [newContract, setNewContract] = useState({
-        customer: {}, // Will hold the selected customer object
-        car: {}, // Will hold the selected car
+const EditContractForm = ({ contract, onCancel, onSave }) => {
+    const [editContract, setEditContract] = useState({
+        _id: contract._id,
+        customer: contract.customer, // Will hold the selected customer object
+        car: contract.car, // Will hold the selected car
         rentalPeriod: {
-            startDate: '',
-            endDate: '',
+            startDate: contract.rentalPeriod.startDate.split('T')[0],
+            endDate: contract.rentalPeriod.endDate.split('T')[0],
         },
         rentalPrice: {
-            dailyRate: 0,
-            totalAmount: 0,
+            dailyRate: contract.rentalPrice.dailyRate,
+            totalAmount: contract.rentalPrice.totalAmount,
         },
-        status: 'active', // Default to 'active'
-        paymentDetails: {
-            paymentMethod: '',
-            paymentStatus: 'pending', // Default to 'pending'
-        },
-        additionalNotes: '',
-        contractPhoto: '', // Optional photo field
+        additionalNotes: contract.additionalNotes,
+        contractPhoto: contract.contractPhoto,
     });
 
     const [availableCars, setAvailableCars] = useState([]);
     const [loadingCars, setLoadingCars] = useState(false);
     const [datesSelected, setDatesSelected] = useState(false);
 
-    const [customerSearch, setCustomerSearch] = useState(''); // To hold the search query
-    const [customerResults, setCustomerResults] = useState([]); // To hold the search results
-    const [loadingCustomers, setLoadingCustomers] = useState(false); // To track loading customers
+    const [customerSearch, setCustomerSearch] = useState(contract.customer.name);
+    const [customerResults, setCustomerResults] = useState([]);
+    const [loadingCustomers, setLoadingCustomers] = useState(false);
+
+    useEffect(() => {
+        // Fetch available cars if dates are selected
+        if (editContract.rentalPeriod.startDate && editContract.rentalPeriod.endDate) {
+            fetchCarsForPeriod(editContract.rentalPeriod.startDate, editContract.rentalPeriod.endDate);
+        }
+    }, [editContract.rentalPeriod]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         const path = name.split('.');
 
         if (path.length === 1) {
-            setNewContract((prev) => ({ ...prev, [name]: value }));
+            setEditContract((prev) => ({ ...prev, [name]: value }));
         } else {
-            setNewContract((prev) => ({
+            setEditContract((prev) => ({
                 ...prev,
                 [path[0]]: {
                     ...prev[path[0]],
@@ -55,11 +58,11 @@ export const CreateContractForm = ({ onClose, onSave }) => {
     const handleDateChange = (e) => {
         const { name, value } = e.target;
         const { startDate, endDate } = {
-            ...newContract.rentalPeriod,
+            ...editContract.rentalPeriod,
             [name.split('.')[1]]: value,
         };
 
-        // Validate that end date is not earlier than start date
+        // Validate date selection
         if (name === "rentalPeriod.endDate" && new Date(value) < new Date(startDate)) {
             alert('End date cannot be earlier than start date');
             return;
@@ -70,7 +73,7 @@ export const CreateContractForm = ({ onClose, onSave }) => {
             return;
         }
 
-        setNewContract((prev) => ({
+        setEditContract((prev) => ({
             ...prev,
             rentalPeriod: {
                 ...prev.rentalPeriod,
@@ -78,7 +81,7 @@ export const CreateContractForm = ({ onClose, onSave }) => {
             },
         }));
 
-        // Fetch cars only when both dates are valid and selected
+        // Fetch cars for the selected period
         if (startDate && endDate && new Date(startDate) <= new Date(endDate)) {
             fetchCarsForPeriod(startDate, endDate);
         }
@@ -100,7 +103,7 @@ export const CreateContractForm = ({ onClose, onSave }) => {
     const handleCarSelect = (carId) => {
         const selectedCar = availableCars.find((car) => car._id === carId);
         if (selectedCar) {
-            setNewContract((prev) => ({
+            setEditContract((prev) => ({
                 ...prev,
                 car: selectedCar,
                 rentalPrice: {
@@ -111,7 +114,6 @@ export const CreateContractForm = ({ onClose, onSave }) => {
             }));
         }
     };
-
 
     const calculateTotalAmount = (startDate, endDate, dailyRate) => {
         const start = new Date(startDate);
@@ -125,25 +127,21 @@ export const CreateContractForm = ({ onClose, onSave }) => {
         e.preventDefault();
 
         try {
-            onSave(newContract);
-            // Handle success, e.g., navigate or show success message
-            onClose();
+            onSave(editContract);
+            onCancel();
         } catch (error) {
-            console.error('Error creating contract:', error);
+            console.error('Error updating contract:', error);
         }
     };
 
-    // Fetch customers as the user types
     const handleCustomerSearch = async (e) => {
-
         const query = e.target.value;
-
         setCustomerSearch(query);
 
-        if (query.length > 2) { // Minimum 3 characters before searching
+        if (query.length > 2) {
             setLoadingCustomers(true);
             try {
-                const results = await searchCustomersByName(query); // API call to search customers
+                const results = await searchCustomersByName(query);
                 setCustomerResults(results);
             } catch (error) {
                 console.error('Error fetching customers:', error);
@@ -151,71 +149,80 @@ export const CreateContractForm = ({ onClose, onSave }) => {
                 setLoadingCustomers(false);
             }
         } else {
-            setCustomerResults([]); // Clear results if query is too short
+            setCustomerResults([]);
         }
     };
 
     const handleCustomerSelect = (customer) => {
-        setNewContract((prev) => ({ ...prev, customer }));
+        setEditContract((prev) => ({ ...prev, customer }));
         setCustomerSearch(customer.name); // Update input field to selected customer name
         setCustomerResults([]); // Clear search results after selection
     };
 
     return (
-        <Modal onClose={onClose}>
-            <form onSubmit={handleSubmit} className="create-contract-form">
-                <div className="customer-search">
-                    <label>Search Customer:</label>
+        <Modal onClose={onCancel}>
+            <form onSubmit={handleSubmit} className="edit-contract-form">
+                {/* Customer Search */}
+                <div className="form-section customer-search">
+                    <label className="form-label">Search Customer:</label>
                     <input
                         type="text"
                         value={customerSearch}
                         onChange={handleCustomerSearch}
                         placeholder="Enter customer name"
-                        required
+                        className="form-input"
                     />
-                    {loadingCustomers && <p>Loading customers...</p>}
+                    {loadingCustomers && <p className="loading-text">Loading customers...</p>}
                     {customerResults.length > 0 && (
                         <ul className="customer-results-list">
                             {customerResults.map((customer) => (
-                                <li key={customer._id} onClick={() => handleCustomerSelect(customer)}>
+                                <li
+                                    key={customer._id}
+                                    onClick={() => handleCustomerSelect(customer)}
+                                    className="customer-item"
+                                >
                                     {customer.name} ({customer.passport_number})
                                 </li>
                             ))}
                         </ul>
                     )}
                 </div>
-
-                <div className="date-picker">
-                    <label>Start Date:</label>
+    
+                {/* Date Picker */}
+                <div className="form-section date-picker">
+                    <label className="form-label">Start Date:</label>
                     <input
                         type="date"
                         name="rentalPeriod.startDate"
-                        value={newContract.rentalPeriod.startDate}
+                        value={editContract.rentalPeriod.startDate}
                         onChange={handleDateChange}
+                        className="form-input"
                         required
                     />
-
-                    <label>End Date:</label>
+                    <label className="form-label">End Date:</label>
                     <input
                         type="date"
                         name="rentalPeriod.endDate"
-                        value={newContract.rentalPeriod.endDate}
+                        value={editContract.rentalPeriod.endDate}
                         onChange={handleDateChange}
+                        className="form-input"
                         required
                     />
                 </div>
-
-                <div className="car-select">
+    
+                {/* Car Select */}
+                <div className="form-section car-select">
                     {datesSelected && (
                         <>
-                            <label>Select Car:</label>
+                            <label className="form-label">Select Car:</label>
                             <select
                                 name="car"
-                                value={newContract.car._id || ""}
-                                onChange={(e) => handleCarSelect(e.target.value)} // Pass the selected car's _id
+                                value={editContract.car._id || ""}
+                                onChange={(e) => handleCarSelect(e.target.value)}
+                                className="form-select"
                                 required
                             >
-                                <option value="">Select a car</option>
+                                <option value={editContract.car}>{editContract.car.model} {editContract.car.license_plate}</option>
                                 {availableCars.length > 0 ? (
                                     availableCars.map((car) => (
                                         <option key={car._id} value={car._id}>
@@ -229,49 +236,61 @@ export const CreateContractForm = ({ onClose, onSave }) => {
                         </>
                     )}
                 </div>
-
-
+    
                 {/* Rental Pricing */}
-                {newContract.rentalPrice.dailyRate > 0 && (
-                    <>
-                        <p><strong>Daily Rate:</strong> ${newContract.rentalPrice.dailyRate}</p>
-                        <p><strong>Total Amount:</strong> ${newContract.rentalPrice.totalAmount}</p>
-                    </>
+                {editContract.rentalPrice.dailyRate > 0 && (
+                    <div className="form-section rental-pricing">
+                        <p className="price-text"><strong>Daily Rate:</strong> ${editContract.rentalPrice.dailyRate}</p>
+                        <p className="price-text"><strong>Total Amount:</strong> ${editContract.rentalPrice.totalAmount}</p>
+                    </div>
                 )}
-
+    
                 {/* Additional Notes */}
-                <label>
-                    Additional Notes:
-                    <textarea
-                        name="additionalNotes"
-                        value={newContract.additionalNotes}
-                        onChange={handleChange}
-                        rows={4} // Set a default number of rows for better visibility
-                        placeholder="Enter any additional notes here..." // Placeholder for guidance
-                    />
-                </label>
-
+                <div className="form-section">
+                    <label className="form-label">
+                        Additional Notes:
+                        <textarea
+                            name="additionalNotes"
+                            value={editContract.additionalNotes}
+                            onChange={handleChange}
+                            rows={4}
+                            placeholder="Enter any additional notes here..."
+                            className="form-textarea"
+                        />
+                    </label>
+                </div>
+    
                 {/* Contract Photo */}
-                <label>
-                    Contract Photo (URL):
-                    <input
-                        type="text"
-                        name="contractPhoto"
-                        value={newContract.contractPhoto}
-                        onChange={handleChange}
-                        placeholder="Enter photo URL..." // Placeholder for guidance
-                    />
-                </label>
-
-                {/* Submit Button */}
-                <button type="submit" disabled={!datesSelected || !newContract.car._id || !newContract.customer._id} style={{ marginRight: '10px', padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                    <FontAwesomeIcon icon={faCar} style={{ marginRight: '5px' }} />
-                    Create Contract
-                </button>
-                <button type="button" onClick={onClose} style={{ padding: '10px 20px', backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                    Cancel
-                </button>
+                <div className="form-section">
+                    <label className="form-label">
+                        Contract Photo (URL):
+                        <input
+                            type="text"
+                            name="contractPhoto"
+                            value={editContract.contractPhoto}
+                            onChange={handleChange}
+                            placeholder="Enter photo URL..."
+                            className="form-input"
+                        />
+                    </label>
+                </div>
+    
+                {/* Submit and Cancel Buttons */}
+                <div className="form-buttons">
+                    <button
+                        type="submit"
+                        disabled={!datesSelected || !editContract.car._id || !editContract.customer._id}
+                        className="submit-button"
+                    >
+                        <FontAwesomeIcon icon={faCar} /> Update Contract
+                    </button>
+                    <button type="button" onClick={onCancel} className="cancel-button">
+                        Cancel
+                    </button>
+                </div>
             </form>
         </Modal>
     );
 };
+
+export default EditContractForm;

@@ -1,0 +1,77 @@
+/* Styles for when the EditContractForm is active */
+.blur {
+    filter: blur(4px); /* Adjust the blur amount as needed */
+    transition: filter 0.3s ease; /* Smooth transition */
+}
+
+.edit-contract-form {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.form-section {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.customer-results-list {
+    margin-top: 5px;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.customer-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.customer-item:hover {
+    background-color: #f0f0f0;
+}
+
+.price-text {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.submit-button, .cancel-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.submit-button {
+    background-color: #4CAF50;
+}
+
+.cancel-button {
+    background-color: #f44336;
+}

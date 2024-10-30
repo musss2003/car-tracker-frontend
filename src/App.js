@@ -32,13 +32,31 @@ function App() {
                 <main className="main-content">
                     {/* Hamburger icon for mobile */}
                     <div className="top-bar">
-                        <div className='logo'>
-                        <FontAwesomeIcon icon={faCar} /> 
-                        <span>RENT A CAR</span>
+                        <div className='first-row'>
+                            <div className='logo'>
+                                <FontAwesomeIcon icon={faCar} />
+                                <span>RENT A CAR</span>
+                            </div>
+                            <button onClick={toggleSidebar} aria-label="Toggle sidebar">
+                                ☰ Menu{/* Hamburger Icon */}
+                            </button>
                         </div>
-                        <button onClick={toggleSidebar} aria-label="Toggle sidebar">
-                            ☰ Menu{/* Hamburger Icon */}
-                        </button>
+                        <div className='second-row'>
+                            <h3>Looking for a vehicle? You’re at the right place.
+                            </h3>
+                        </div>
+                        <div className='third-row-background'></div>
+                        <div className='third-row'>
+                            <button className='saving-button'>
+                                SAVE 15%
+                            </button>
+                            <span className='ml-2'>
+                                Discover Bosnia and Herzegowina with us
+                            </span>
+                            <button className='details-button'>
+                                <span>More details</span>
+                            </button>
+                        </div>
                     </div>
 
                     <Routes>

@@ -1,7 +1,7 @@
 .table-container {
     width: 100%;
     overflow-x: auto; /* Enable horizontal scrolling for smaller screens */
-    padding: 16px; /* Add some padding */
+    padding: 8px; /* Add some padding */
     border-radius: 8px;
 }
 
@@ -101,12 +101,12 @@
     }
 
     /* Hide specific columns on smaller screens */
+    .cars-table th:nth-child(1),
+    .cars-table td:nth-child(1),
     .cars-table th:nth-child(2),
     .cars-table td:nth-child(2),
     .cars-table th:nth-child(3),
     .cars-table td:nth-child(3),
-    .cars-table th:nth-child(4),
-    .cars-table td:nth-child(4),
     .cars-table th:nth-child(5),
     .cars-table td:nth-child(5) {
         display: none;

@@ -70,6 +70,7 @@ const CreateCarForm = ({ onSave, onClose }) => {
                             name="color"
                             value={car.color || ''}
                             onChange={handleChange}
+                            required
                         />
                     </div>
                     <div>
@@ -89,6 +90,7 @@ const CreateCarForm = ({ onSave, onClose }) => {
                             name="chassis_number"
                             value={car.chassis_number || ''}
                             onChange={handleChange}
+                            required
                         />
                     </div>
                     <div>
@@ -98,6 +100,7 @@ const CreateCarForm = ({ onSave, onClose }) => {
                             name="price_per_day"
                             value={car.price_per_day || ''}
                             onChange={handleChange}
+                            required
                         />
                     </div>
                     <button type="submit">Create Car</button>

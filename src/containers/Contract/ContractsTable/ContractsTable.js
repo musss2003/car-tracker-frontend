@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { createContract, getContractsPopulated } from '../../../services/contractService';
+import { createContract, deleteContract, getContractsPopulated, updateContract } from '../../../services/contractService';
 import './ContractsTable.css';
-import { ContractDetailsModal } from '../../../components/Contract/ContractDetailsModal/ContractDetailsModal';
 import { CreateContractForm } from '../../../components/Contract/CreateContractForm/CreateContractForm';
 import { toast } from 'react-toastify';
+import EditContractForm from '../../../components/Contract/EditContractForm/EditContractForm';
+import ContractDetails from '../../../components/Contract/ContractDetails/ContractDetails';
 
 const ContractsTable = () => {
     const [contracts, setContracts] = useState([]);
     const [error, setError] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
     const [selectedContract, setSelectedContract] = useState(null);
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
 
@@ -23,39 +25,53 @@ const ContractsTable = () => {
 
     useEffect(() => {
         fetchContracts();
-    }, []);
+    }, [contracts]);
+
+    const handleDeleteContract = async () => {
+        try{
+            await deleteContract(selectedContract._id);
+            await fetchContracts();
+
+            setSelectedContract(null);
+            toast.success("Uspješno izbrisan ugovor")
+        }catch(error){
+            toast.error(error);
+        }
+    }
 
     const handleContractClick = (contract) => {
         setSelectedContract(contract);
     };
 
-    const handleCloseContractDetailsModal = () => {
-        setSelectedContract(null);
-        fetchContracts();
-    };
+    const handleEdit = () => setIsEditing(true);
 
-    const handleUpdateContract = (updatedContract) => {
-        setContracts((prevContracts) =>
-            prevContracts.map((contract) =>
-                contract._id === updatedContract._id ? updatedContract : contract
-            )
-        );
+    const handleCancel = () => {
+        setIsEditing(false);
+        setSelectedContract(null);
+    }
+    const handleSave = async (updatedContract) => {
+        await updateContract(updatedContract._id, updatedContract);
+
+        await fetchContracts();
         toast.success("Uspješno ažuriran ugovor");
+        setIsEditing(false);
     };
 
     const handleCreateContract = async (newContractData) => {
+        console.log(newContractData);
         try {
             const createdContract = await createContract(newContractData);
+
             setContracts([...contracts, createdContract]);
-            setCreateModalOpen(false);
+            toast.success("Uspješno kreiran ugovor");
         } catch (error) {
             console.error('Error creating contract:', error);
         }
     };
 
-    const handleCloseModal = () => {
-        setCreateModalOpen(false);
-        fetchContracts();
+    const handleCloseDetails = () => {
+        setSelectedContract(null);
+        setIsEditing(false);
     };
 
     if (error) {
@@ -87,13 +103,12 @@ const ContractsTable = () => {
                                 <td className="px-6 py-4 hide-on-small">{contract.car ? contract.car.license_plate : 'N/A'}</td>
                                 <td className="px-6 py-4 hide-on-small">{contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : 'N/A'}</td>
                                 <td className="px-6 py-4 hide-on-small">{contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : 'N/A'}</td>
-                                <td className={`px-6 py-4 ${
-                                    new Date() < new Date(contract.rentalPeriod.startDate)
-                                        ? 'status-confirmed'
-                                        : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
-                                            ? 'status-active'
-                                            : 'status-completed'
-                                }`}>
+                                <td className={`px-6 py-4 ${new Date() < new Date(contract.rentalPeriod.startDate)
+                                    ? 'status-confirmed'
+                                    : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
+                                        ? 'status-active'
+                                        : 'status-completed'
+                                    }`}>
                                     {
                                         new Date() < new Date(contract.rentalPeriod.startDate)
                                             ? 'confirmed'
@@ -108,18 +123,23 @@ const ContractsTable = () => {
                 </table>
             </div>
 
-            {selectedContract && (
-                <ContractDetailsModal
+            {isEditing && (
+
+                <EditContractForm
                     contract={selectedContract}
-                    onClose={handleCloseContractDetailsModal}
-                    onUpdate={handleUpdateContract}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
                 />
+
             )}
+
+            {selectedContract && <ContractDetails contract={selectedContract} onEdit={handleEdit} onBack={handleCloseDetails} onDelete={handleDeleteContract} />}
+
 
             {isCreateModalOpen && (
                 <CreateContractForm
                     onSave={handleCreateContract}
-                    onClose={handleCloseModal}
+                    onClose={() => setCreateModalOpen(false)}
                 />
             )}
         </div>

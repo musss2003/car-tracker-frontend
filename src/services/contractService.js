@@ -60,9 +60,7 @@ export const getActiveContracts = async () => {
     }
 };
 
-export const updateContract = async (contractId, updatedContract) => {
-    console.log(updatedContract);
-    
+export const updateContract = async (contractId, updatedContract) => { 
     try {
         const response = await fetch(`${API_URL}${contractId}`, {
             method: 'PUT',

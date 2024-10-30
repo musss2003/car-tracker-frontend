@@ -5,10 +5,12 @@ import { getCars } from '../services/carService';
 // Example of Dashboard Cards
 import { ContractsContext } from '../contexts/ContractsContext';
 import { TruckIcon, UserIcon, CurrencyDollarIcon, ClipboardListIcon } from '@heroicons/react/solid';
+import { getCustomers } from '../services/customerService';
 
 function DashboardPage() {
     const { contracts } = useContext(ContractsContext);
     const [numberOfCars, setNumberOfCars] = useState(0); // State for number of cars
+    const [numberOfCustomers, setNumberOfCustomers] = useState(0); // State for number of customers
 
     useEffect(() => {
         const fetchNumberOfCars = async () => {
@@ -16,11 +18,19 @@ function DashboardPage() {
             setNumberOfCars(data.length); // Store the length of the cars array
         };
 
+
+        const fetchNumberOfCustomers = async () => {
+            const data = await getCustomers();
+            setNumberOfCustomers(data.length); // Store the length of the customers array
+        };
+
+
+        fetchNumberOfCustomers(); // Call the fetch function
         fetchNumberOfCars(); // Call the fetch function
     }, []); // Run once when the component mounts
 
     return (
-        <div className="p-8">
+        <div>
             <h1 className="text-3xl font-bold mb-8">Komandna tabla</h1>
 
             {/* Metrics Cards */}
@@ -48,7 +58,7 @@ function DashboardPage() {
                 <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
                     <UserIcon className="w-10 h-10 text-purple-500 mr-4" />
                     <div>
-                        <h2 className="text-xl font-bold">120</h2>
+                        <h2 className="text-xl font-bold">{numberOfCustomers}</h2>
                         <p className="text-gray-500">Total Customers</p>
                     </div>
                 </div>
