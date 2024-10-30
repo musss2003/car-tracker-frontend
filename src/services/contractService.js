@@ -2,6 +2,23 @@ import { getAuthHeaders } from "../utils/getAuthHeaders";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL + '/api/contracts/';
 
+
+
+export const getTotalRevenue = async () => {
+    try {
+        const response = await fetch(`${API_URL}revenue`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching total revenue:', error);
+        throw error;
+    }
+};
+
 export const getContracts = async () => {
     try {
         const response = await fetch(`${API_URL}/`, {

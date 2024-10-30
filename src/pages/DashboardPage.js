@@ -6,11 +6,13 @@ import { getCars } from '../services/carService';
 import { ContractsContext } from '../contexts/ContractsContext';
 import { TruckIcon, UserIcon, CurrencyDollarIcon, ClipboardListIcon } from '@heroicons/react/solid';
 import { getCustomers } from '../services/customerService';
+import { getTotalRevenue } from '../services/contractService';
 
 function DashboardPage() {
     const { contracts } = useContext(ContractsContext);
     const [numberOfCars, setNumberOfCars] = useState(0); // State for number of cars
     const [numberOfCustomers, setNumberOfCustomers] = useState(0); // State for number of customers
+    const [totalRevenue, setTotalRevenue] = useState(0); // State for total revenue
 
     useEffect(() => {
         const fetchNumberOfCars = async () => {
@@ -24,7 +26,13 @@ function DashboardPage() {
             setNumberOfCustomers(data.length); // Store the length of the customers array
         };
 
+        const fetchTotalRevenue = async () => {
+            const data = await getTotalRevenue();
+            setTotalRevenue(data.totalRevenue);
+        }
 
+
+        fetchTotalRevenue(); // Call the fetch function
         fetchNumberOfCustomers(); // Call the fetch function
         fetchNumberOfCars(); // Call the fetch function
     }, []); // Run once when the component mounts
@@ -67,7 +75,7 @@ function DashboardPage() {
                 <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
                     <CurrencyDollarIcon className="w-10 h-10 text-yellow-500 mr-4" />
                     <div>
-                        <h2 className="text-xl font-bold">$45,000</h2>
+                        <h2 className="text-xl font-bold">${totalRevenue}</h2>
                         <p className="text-gray-500">Total Revenue</p>
                     </div>
                 </div>
