@@ -21,10 +21,9 @@ export const getCustomer = async (customerId) => {
     }
 };
 
-export const getCustomers = async (params) => {
+export const getCustomers = async () => {
     try {
-        const query = new URLSearchParams(params).toString();
-        const response = await fetch(`${API_URL}?${query}`, {
+        const response = await fetch(`${API_URL}`, {
             method: 'GET',
             headers: getAuthHeaders()
         });
@@ -67,8 +66,7 @@ export const updateCustomer = async (customerId, updatedCustomer) => {
         const response = await fetch(`${API_URL}${customerId}`, {
             method: 'PUT',
             headers: {
-                ...getAuthHeaders(),
-                'Content-Type': 'application/json', // Specify that the body is JSON
+                ...getAuthHeaders()
             },
             body: JSON.stringify(updatedCustomer), // Convert the updated customer object to JSON
         });
@@ -108,8 +106,7 @@ export const addCustomer = async (newCustomer) => {
         const response = await fetch(`${API_URL}`, {
             method: 'POST',
             headers: {
-                ...getAuthHeaders(),
-                'Content-Type': 'application/json', // Specify that the body is JSON
+                ...getAuthHeaders()
             },
             body: JSON.stringify(newCustomer), // Convert the new customer object to JSON
         });

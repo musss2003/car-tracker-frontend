@@ -14,6 +14,7 @@ import Sidebar from './components/Sidebar/Sidebar.js';
 import './App.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCar } from '@fortawesome/free-solid-svg-icons';
+import CustomersPage from './pages/CustomersPage.js';
 
 function App() {
     const [isSidebarOpen, setSidebarOpen] = useState(false); // State for sidebar visibility
@@ -68,6 +69,7 @@ function App() {
                             <Route path="/profile" element={<UserData />} />
                             <Route path="/cars" element={<CarsPage />} />
                             <Route path="/contracts" element={<ContractsPage />} />
+                            <Route path="/customers" element={<CustomersPage />} />
                         </Route>
                     </Routes>
                 </main>

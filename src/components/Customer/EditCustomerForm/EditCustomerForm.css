@@ -1,0 +1,56 @@
+/* EditCustomerForm.css */
+.edit-customer-form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 40;
+}
+
+.edit-customer-form h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.edit-customer-form label {
+    margin-bottom: 10px;
+}
+
+.edit-customer-form input {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.save-button, .cancel-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+.save-button:hover {
+    background-color: #45a049;
+}
+
+.cancel-button {
+    background-color: #f44336; /* Red */
+    color: white;
+}
+
+.cancel-button:hover {
+    background-color: #e53935;
+}

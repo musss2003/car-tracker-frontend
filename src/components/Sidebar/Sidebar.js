@@ -1,9 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChartBarIcon, UserIcon, TruckIcon, ClipboardListIcon } from '@heroicons/react/solid';
+import { ChartBarIcon, UserIcon, TruckIcon, ClipboardListIcon, UserCircleIcon } from '@heroicons/react/solid';
 import './Sidebar.css'; // Import the CSS file
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+    // Reusable NavLink component
+    const NavLink = ({ to, icon, label }) => (
+        <Link onClick={toggleSidebar} to={to} className="nav-link">
+            <div className="nav-icon">{icon}</div>
+            <span>{label}</span>
+        </Link>
+    );
+
     return (
         <nav
             className={`sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}
@@ -22,9 +30,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </button>
                 </div>
                 <div className="sidebar-nav">
-                    <NavLink to="/dashboard" icon={<ChartBarIcon className="nav-icon" />} label="Dashboard" />
+                    <NavLink to="/dashboard" icon={<ChartBarIcon className="nav-icon" />} label="Komandna tabela" />
                     <NavLink to="/cars" icon={<TruckIcon className="nav-icon" />} label="Auta" />
                     <NavLink to="/contracts" icon={<ClipboardListIcon className="nav-icon" />} label="Ugovori" />
+                    <NavLink to="/customers" icon={<UserCircleIcon className="nav-icon" />} label="Korisnici" />
                     <NavLink to="/profile" icon={<UserIcon className="nav-icon" />} label="Profil" />
                 </div>
             </div>
@@ -32,12 +41,5 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     );
 };
 
-// Reusable NavLink component
-const NavLink = ({ to, icon, label }) => (
-    <Link to={to} className="nav-link">
-        <div className="nav-icon">{icon}</div>
-        <span>{label}</span>
-    </Link>
-);
 
 export default Sidebar;

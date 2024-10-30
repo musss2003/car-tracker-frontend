@@ -119,6 +119,7 @@ const ContractsTable = () => {
 
     const handleContractClick = (contract) => {
         setSelectedContract(contract);
+        console.log(contract);
     };
 
     const handleEdit = () => setIsEditing(true);
