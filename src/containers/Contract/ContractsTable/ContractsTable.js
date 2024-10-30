@@ -12,11 +12,40 @@ const ContractsTable = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [selectedContract, setSelectedContract] = useState(null);
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'confirmed', 'active', 'completed'
+    const [currentPage, setCurrentPage] = useState(1);
+    const contractsPerPage = 10; // Customize this as needed
+
+    const indexOfLastContract = currentPage * contractsPerPage;
+    const indexOfFirstContract = indexOfLastContract - contractsPerPage;
+    const currentContracts = contracts.slice(indexOfFirstContract, indexOfLastContract);
+    const totalPages = Math.ceil(contracts.length / contractsPerPage);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+
 
     const fetchContracts = async () => {
         try {
             const data = await getContractsPopulated();
-            setContracts(data);
+
+            const filteredContracts = data.filter(contract => {
+                const matchesSearch = contract.customer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    contract.customer?.passport_number.includes(searchTerm) ||
+                    contract.car?.model.toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesStatus = filterStatus === 'all' ||
+                    (filterStatus === 'confirmed' && new Date() < new Date(contract.rentalPeriod.startDate)) ||
+                    (filterStatus === 'active' && new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)) ||
+                    (filterStatus === 'completed' && new Date() > new Date(contract.rentalPeriod.endDate));
+                return matchesSearch && matchesStatus;
+            });
+            setContracts(filteredContracts);
         } catch (err) {
             setError('Failed to fetch contracts');
             console.error(err);
@@ -25,16 +54,16 @@ const ContractsTable = () => {
 
     useEffect(() => {
         fetchContracts();
-    }, [contracts]);
+    }, [searchTerm, filterStatus, contracts]);
 
     const handleDeleteContract = async () => {
-        try{
+        try {
             await deleteContract(selectedContract._id);
             await fetchContracts();
 
             setSelectedContract(null);
             toast.success("Uspješno izbrisan ugovor")
-        }catch(error){
+        } catch (error) {
             toast.error(error);
         }
     }
@@ -80,6 +109,25 @@ const ContractsTable = () => {
 
     return (
         <div className="table-container">
+            <div className="filters">
+                <input
+                    type="text"
+                    placeholder="Search by customer name, passport number, or car model"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                />
+                <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="status-filter"
+                >
+                    <option value="all">All</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="active">Active</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
             <button className="create-btn" onClick={() => setCreateModalOpen(true)}>Create New Contract</button>
             <div className="overflow-x-auto">
                 <table className="contracts-table min-w-full bg-white shadow-lg border border-gray-200 rounded-lg">
@@ -95,7 +143,7 @@ const ContractsTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {contracts.map(contract => (
+                        {currentContracts.map(contract => (
                             <tr key={contract._id} onClick={() => handleContractClick(contract)}>
                                 <td className="px-6 py-4">{contract.customer ? contract.customer.name : 'N/A'}</td>
                                 <td className="px-6 py-4 hide-on-small">{contract.customer ? contract.customer.passport_number : 'N/A'}</td>
@@ -121,6 +169,13 @@ const ContractsTable = () => {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="pagination-controls">
+                <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
             </div>
 
             {isEditing && (
