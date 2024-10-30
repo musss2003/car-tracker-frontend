@@ -1,158 +1,203 @@
 .table-container {
-    width: 100%;
-    overflow-x: auto;
-    padding: 8px;
+  width: 100%;
+  overflow-x: auto;
+  padding: 8px;
 }
 
-.filters {
+.export-btns{
+    position: relative;
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    width: 100%;
+}
+
+.export-excel-btn {
+    margin: 0.5em;
+    padding: 0.5em 1em;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    font-weight: bold;
+}
+
+.export-excel-btn:hover {
+    background-color: #45a049;
+}
+
+.export-pdf-btn {
+    margin: 0.5em;
+    padding: 0.5em 1em;
+    border: none;
+    background-color: #ff0000;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    font-weight: bold;
+}
+
+.export-pdf-btn:hover {
+    background-color: #c63434;
+}
+
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .search-input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    color: #333;
-    background-color: white;
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
 }
 
 .search-input:focus {
-    outline: none;
-    border-color: #4CAF50; /* Green border on focus */
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3); /* Slight shadow on focus */
+  outline: none;
+  border-color: #4caf50; /* Green border on focus */
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3); /* Slight shadow on focus */
 }
 
 .status-filter {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    color: #333;
-    background-color: white;
-    cursor: pointer;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
+  cursor: pointer;
 }
 
 .status-filter:focus {
-    outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
 }
 
 .status-filter option {
-    font-size: 14px;
-    color: #333;
+  font-size: 14px;
+  color: #333;
 }
 
 .create-btn {
-    display: block;
-    margin-bottom: 16px;
-    padding: 8px 16px;
-    background-color: #4a5568; /* bg-gray-600 */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  display: block;
+  margin-bottom: 16px;
+  padding: 8px 16px;
+  background-color: #4a5568; /* bg-gray-600 */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .create-btn:hover {
-    background-color: #2d3748; /* bg-gray-800 */
+  background-color: #2d3748; /* bg-gray-800 */
 }
 
 .contracts-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 16px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
 }
 
 .contracts-table th,
 .contracts-table td {
-    padding: 8px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
 .contracts-table th {
-    background-color: #2d3748; /* bg-gray-800 */
-    color: white;
+  background-color: #2d3748; /* bg-gray-800 */
+  color: white;
 }
 
-.contracts-table tr {
-    background-color: white;
-}
-
-.contracts-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-.status-confirmed {
-    color: #3182ce; /* blue-600 */
-}
-
-.status-active {
-    color: #38a169; /* green-600 */
-}
-
-.status-completed {
-    color: #e53e3e; /* red-600 */
-}
-
-.pagination-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 15px;
-    gap: 10px;
-}
-
-.pagination-controls button {
-    padding: 8px 12px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
+th.cursor-pointer {
     cursor: pointer;
 }
 
-.pagination-controls button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+th.cursor-pointer:hover {
+    color: #007bff;
 }
 
+.contracts-table tr {
+  background-color: white;
+}
+
+.contracts-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.status-confirmed {
+  color: #3182ce; /* blue-600 */
+}
+
+.status-active {
+  color: #38a169; /* green-600 */
+}
+
+.status-completed {
+  color: #e53e3e; /* red-600 */
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.pagination-controls button {
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 
 @media screen and (max-width: 768px) {
-    .table-container {
-        padding: 8px;
-    }
+  .table-container {
+    padding: 8px;
+  }
 
-    .create-btn {
-        width: 100%;
-        margin-bottom: 8px;
-    }
+  .create-btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
 
-    .contracts-table th {
-        font-size: 0.875rem;
-    }
+  .contracts-table th {
+    font-size: 0.875rem;
+  }
 
-    .contracts-table td {
-        font-size: 0.875rem;
-    }
+  .contracts-table td {
+    font-size: 0.875rem;
+  }
 
-    .contracts-table th:nth-child(2),
-    .contracts-table td:nth-child(2),
-    .contracts-table th:nth-child(3),
-    .contracts-table td:nth-child(3),
-    .contracts-table th:nth-child(4),
-    .contracts-table td:nth-child(4),
-    .contracts-table th:nth-child(5),
-    .contracts-table td:nth-child(5) {
-        display: none;
-    }
+  .contracts-table th:nth-child(2),
+  .contracts-table td:nth-child(2),
+  .contracts-table th:nth-child(3),
+  .contracts-table td:nth-child(3),
+  .contracts-table th:nth-child(4),
+  .contracts-table td:nth-child(4) {
+    display: none;
+  }
 }

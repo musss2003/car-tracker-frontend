@@ -17,6 +17,8 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.8",
     "framer-motion": "^11.11.7",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -28,6 +30,7 @@
     "react-tooltip": "^5.28.0",
     "recharts": "^2.12.6",
     "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5",
     "yup": "^1.4.0"
   },
   "scripts": {
