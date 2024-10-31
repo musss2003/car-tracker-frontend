@@ -160,7 +160,6 @@ export const CreateContractForm = ({ onClose, onSave }) => {
         setCustomerSearch(customer.name); // Update input field to selected customer name
         setCustomerResults([]); // Clear search results after selection
     };
-
     return (
         <Modal onClose={onClose}>
             <form onSubmit={handleSubmit} className="create-contract-form">

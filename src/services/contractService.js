@@ -38,6 +38,26 @@ export const getContracts = async () => {
     }
 };
 
+export const getContractTemplate = async () => {
+    try {
+        const response = await fetch(`${API_URL}template`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = response;
+
+        return data;
+    } catch (error) {
+        console.error('Error fetching contracts:', error);
+        throw error;
+    }
+};
+
 export const getContractsPopulated = async () => {
     try {
         const response = await fetch(`${API_URL}populated`, {
@@ -77,7 +97,7 @@ export const getActiveContracts = async () => {
     }
 };
 
-export const updateContract = async (contractId, updatedContract) => { 
+export const updateContract = async (contractId, updatedContract) => {
     try {
         const response = await fetch(`${API_URL}${contractId}`, {
             method: 'PUT',
@@ -115,8 +135,7 @@ export const deleteContract = async (contractId) => {
     }
 };
 
-
-export const createContract = async (contractData) => {
+export const createAndDownloadContract = async (contractData) => {
     try {
         const response = await fetch(`${API_URL}`, {
             method: 'POST',
@@ -125,17 +144,80 @@ export const createContract = async (contractData) => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`Error creating contract: ${response.statusText}`);
         }
 
-        const data = await response.json();
-        return data;
+        // Read the response as a Blob
+        const blob = await response.blob();
+
+        // Convert part of the Blob to JSON to get the contract data
+        const text = await blob.text();
+        const { contract, docx } = JSON.parse(text);
+
+        // Convert base64 string to a Blob
+        const docxBlob = await extractDocxBlobFromResponse(docx);
+
+        // Trigger the download of the generated DOCX file
+        triggerDownloadContract(docxBlob, contract._id);
+
+        return contract;
     } catch (error) {
-        console.error('Error creating contract:', error);
-        throw error;
+        console.error('Error creating and downloading contract:', error);
     }
 };
 
+export const downloadContract = async (contractId) => {
+    try {
+        const response = await fetch(`${API_URL}download/${contractId}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error downloading contract: ${response.statusText}`);
+        }
+
+        // Read the response as JSON
+        const data = await response.json();
+
+        // Extract the base64 string from the response
+        const { docx } = data;
+
+        // Convert base64 string to a Blob
+        const blob = await extractDocxBlobFromResponse(docx);
+
+        // Trigger the download of the generated DOCX file
+        triggerDownloadContract(blob, contractId);
+    } catch (error) {
+        console.error('Error downloading contract:', error);
+    }
+}
+
+
+const extractDocxBlobFromResponse = async (docx) => {
+    // Convert base64 string to a Blob
+    const byteCharacters = atob(docx);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+
+    return blob;
+}
+
+const triggerDownloadContract = (blob, contractId) => {
+    // Trigger the download of the generated DOCX file
+    // Trigger the download of the generated DOCX file
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `contract_${contractId}.docx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
 
 
 

@@ -1,6 +1,6 @@
 /* Container for the Customer List */
 .customer-list-container {
-    padding: 20px;
+    padding: 10px;
     border-radius: 8px;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .customer-table-header .customer-table-heading {
-    background-color: #4CAF50;
+    background-color: #2d3748;
     color: #ffffff;
     font-weight: bold;
     text-transform: uppercase;

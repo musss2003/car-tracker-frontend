@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ContractDetails = ({ contract, onEdit, onBack, onDelete }) => {
+const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => {
     // Check if the contract is valid
     if (!contract) {
         return <div className="text-red-500">No contract details available.</div>;
@@ -69,6 +69,12 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete }) => {
                         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
                     >
                         Edit Contract
+                    </button>
+                    <button 
+                        onClick={onDownload}
+                        className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
+                    >
+                        Download Contract
                     </button>
                     <button 
                         onClick={onDelete}

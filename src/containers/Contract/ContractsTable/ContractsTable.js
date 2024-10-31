@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createContract, deleteContract, getContractsPopulated, updateContract } from '../../../services/contractService';
+import { createAndDownloadContract, deleteContract, downloadContract, getContractsPopulated, updateContract } from '../../../services/contractService';
 import './ContractsTable.css';
 import { CreateContractForm } from '../../../components/Contract/CreateContractForm/CreateContractForm';
 import { toast } from 'react-toastify';
@@ -103,15 +103,26 @@ const ContractsTable = () => {
 
     useEffect(() => {
         fetchContracts();
-    }, [searchTerm, filterStatus, contracts]);
+    }, [searchTerm, filterStatus, contracts.length]);
 
     const handleDeleteContract = async () => {
+        if (!window.confirm("Are you sure you want to delete this contract?")) {
+            return;
+        }
         try {
             await deleteContract(selectedContract._id);
             await fetchContracts();
 
             setSelectedContract(null);
             toast.success("Uspješno izbrisan ugovor")
+        } catch (error) {
+            toast.error(error);
+        }
+    }
+
+    const handleDownloadContract = async () => {
+        try {
+            downloadContract(selectedContract._id);
         } catch (error) {
             toast.error(error);
         }
@@ -139,7 +150,7 @@ const ContractsTable = () => {
     const handleCreateContract = async (newContractData) => {
         console.log(newContractData);
         try {
-            const createdContract = await createContract(newContractData);
+            const createdContract = await createAndDownloadContract(newContractData);
 
             setContracts([...contracts, createdContract]);
             toast.success("Uspješno kreiran ugovor");
@@ -307,7 +318,7 @@ const ContractsTable = () => {
 
             )}
 
-            {selectedContract && <ContractDetails contract={selectedContract} onEdit={handleEdit} onBack={handleCloseDetails} onDelete={handleDeleteContract} />}
+            {selectedContract && <ContractDetails contract={selectedContract} onEdit={handleEdit} onBack={handleCloseDetails} onDelete={handleDeleteContract} onDownload={handleDownloadContract} />}
 
 
             {isCreateModalOpen && (
