@@ -4,9 +4,12 @@ import { getUser, updateUser, deleteUser } from '../../../services/userService.j
 import { toast } from "react-toastify";
 import defaultAvatar from '../../../assets/default_avatar.png';
 import UserEditFields from '../UserEditFields.js'; // Import the new component
+import { useAuth } from "../../../contexts/useAuth.js";
 
-const UserProfile = ({ userId }) => {
-    const [user, setUser] = useState(null); // Start with null for user
+const UserProfile = () => {
+    const { user } = useAuth();
+    const userId = user.id;
+    const [eUser, setUser] = useState(null); // Start with null for user
     const [currentEdit, setCurrentEdit] = useState(null);
     const [editValue, setEditValue] = useState('');
 
@@ -61,20 +64,20 @@ const UserProfile = ({ userId }) => {
         });
     };
 
-    if (!user) return <div>Loading...</div>; // Handling loading state
+    if (!eUser) return <div>Loading...</div>; // Handling loading state
 
     return (
         <div className="user-profile-container">
             <div className="user-profile-header">
-                <img src={user.profilePhotoUrl || defaultAvatar} className="user-profile-avatar" alt="User Avatar" />
+                <img src={eUser.profilePhotoUrl || defaultAvatar} className="user-profile-avatar" alt="User Avatar" />
                 <div>
-                    <h2 className="user-profile-title">{user.name}</h2>
-                    <p className="text-gray-600">{user.bio || 'No bio available'}</p>
+                    <h2 className="user-profile-title">{eUser.name}</h2>
+                    <p className="text-gray-600">{eUser.bio || 'No bio available'}</p>
                 </div>
                 <button onClick={() => handleEdit("profilePhotoUrl")} className="user-profile-edit-button">Edit Photo</button>
             </div>
             <UserEditFields
-                user={user}
+                user={eUser}
                 currentEdit={currentEdit}
                 setCurrentEdit={setCurrentEdit}
                 editValue={editValue}

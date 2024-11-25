@@ -57,7 +57,9 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
                     </div>
                 )}
 
-                <div className="flex justify-between mt-4">
+                
+
+                <div className="flex gap-2 justify-between mt-4">
                     <button 
                         onClick={onBack}
                         className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition"

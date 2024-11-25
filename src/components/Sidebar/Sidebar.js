@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChartBarIcon, UserIcon, TruckIcon, ClipboardListIcon, UserCircleIcon } from '@heroicons/react/solid';
 import './Sidebar.css'; // Import the CSS file
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
     // Reusable NavLink component
     const NavLink = ({ to, icon, label }) => (
         <Link onClick={toggleSidebar} to={to} className="nav-link">
@@ -21,13 +21,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <Link to="/" className="sidebar-link">
                         RENT A CAR
                     </Link>
+                    {isOpen && isSmallScreen && 
                     <button onClick={toggleSidebar} className="sidebar-button" aria-label="Toggle sidebar">
-                        {isOpen ? (
-                            <span className="text-white">✖</span> // Cross icon when opened
-                        ) : (
-                            <span className="text-white">☰</span> // Hamburger icon
-                        )}
+                        ✖
                     </button>
+                    }
                 </div>
                 <div className="sidebar-nav">
                     <NavLink to="/dashboard" icon={<ChartBarIcon className="nav-icon" />} label="Komandna tabela" />

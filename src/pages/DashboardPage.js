@@ -38,9 +38,7 @@ function DashboardPage() {
     }, []); // Run once when the component mounts
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-8">Komandna tabla</h1>
-
+        <div className='p-4'>
             {/* Metrics Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
@@ -49,7 +47,7 @@ function DashboardPage() {
                     <ClipboardListIcon className="w-10 h-10 text-blue-500 mr-4" />
                     <div>
                         <h2 className="text-xl font-bold">{contracts.length}</h2>
-                        <p className="text-gray-500">Active Contracts</p>
+                        <p className="text-gray-500">Ugovori</p>
                     </div>
                 </div>
 
@@ -58,7 +56,7 @@ function DashboardPage() {
                     <TruckIcon className="w-10 h-10 text-green-500 mr-4" />
                     <div>
                         <h2 className="text-xl font-bold">{numberOfCars}</h2> {/* Use the state variable */}
-                        <p className="text-gray-500">Available Cars</p>
+                        <p className="text-gray-500">Dostupna auta</p>
                     </div>
                 </div>
 
@@ -67,7 +65,7 @@ function DashboardPage() {
                     <UserIcon className="w-10 h-10 text-purple-500 mr-4" />
                     <div>
                         <h2 className="text-xl font-bold">{numberOfCustomers}</h2>
-                        <p className="text-gray-500">Total Customers</p>
+                        <p className="text-gray-500">Korisnici</p>
                     </div>
                 </div>
 
@@ -76,14 +74,14 @@ function DashboardPage() {
                     <CurrencyDollarIcon className="w-10 h-10 text-yellow-500 mr-4" />
                     <div>
                         <h2 className="text-xl font-bold">${totalRevenue}</h2>
-                        <p className="text-gray-500">Total Revenue</p>
+                        <p className="text-gray-500">Totalni prihodi</p>
                     </div>
                 </div>
             </div>
 
             {/* Links to Details */}
             <div className="mt-12">
-                <h2 className="text-2xl font-bold mb-6">Quick Links</h2>
+                <h2 className="text-white text-2xl font-bold mb-6">Quick Links</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Link to="/contracts" className="block bg-gray-200 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300">
                         Manage Contracts
