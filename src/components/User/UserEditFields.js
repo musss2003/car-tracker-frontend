@@ -14,7 +14,7 @@ const UserEditFields = ({ user, currentEdit, setCurrentEdit, editValue, setEditV
                         <div className="flex-1 min-w-0">
                             <strong className="user-profile-field-label">{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
                             <span className="ml-2 truncate block user-profile-field-value">
-                                {key === "createdAt" || key === "lastLogin" ? formatDate(user[key]) : user[key] || 'N/A'}
+                                {key === "lastLogin" ? formatDate(user[key]) : user[key] || 'N/A'}
                             </span>
                         </div>
                         {key !== "createdAt" && key !== "lastLogin" && key !== "role" && (

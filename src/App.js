@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -18,25 +18,18 @@ import useScreenSize from './hooks/useScreenSize.js';
 import Navbar from './components/Navbar/Navbar.js';
 import DashboardPageTest from './pages/DashboardPageTest.js';
 import UserProfile from './components/User/UserProfile/UserProfile.js';
-import io from 'socket.io-client';
+import { useAuth } from './contexts/useAuth.js';
+import NotificationsPage from './pages/NotificationsPage.js';
 
 
 function App() {
+    const { isLoggedIn, user } = useAuth();
     const [isSidebarOpen, setSidebarOpen] = useState(false); // State for sidebar visibility
     const isSmallScreen = useScreenSize('(max-width: 768px)'); // Check for small screens
-    const socket = io(process.env.REACT_APP_API_BASE_URL); // Replace with your backend URL
-
-
 
     const toggleSidebar = () => {
         setSidebarOpen(!isSidebarOpen); // Toggle sidebar visibility
     };
-
-    useEffect(() => {
-        socket.on('notification', (message) => {
-            toast.info(message);
-        });
-    }, []);
 
     return (
         <ContractsProvider>
@@ -46,7 +39,7 @@ function App() {
                 <Sidebar isOpen={isSidebarOpen} isSmallScreen={isSmallScreen} toggleSidebar={toggleSidebar} />
 
                 <main className="main-content">
-                {!isSmallScreen && <Navbar />}
+                {!isSmallScreen && isLoggedIn() && <Navbar />}
                     {/* Hamburger icon for mobile */}
                     <div className="top-bar">
                         <div className='first-row'>
@@ -83,10 +76,12 @@ function App() {
                         <Route path="/dashboard-test" element={<DashboardPageTest />} />
                         <Route element={<ProtectedRoute />}>
                             <Route path="/dashboard" element={<DashboardPage />} />
-                            <Route path="/profile" element={<UserProfile />} />
+                            {user && <Route path="/profile" element={<UserProfile id={user.id} />} />}
                             <Route path="/cars" element={<CarsPage />} />
                             <Route path="/contracts" element={<ContractsPage />} />
                             <Route path="/customers" element={<CustomersPage />} />
+                            <Route path="/notifications" element={<NotificationsPage />} />
+
                         </Route>
                     </Routes>
                 </main>

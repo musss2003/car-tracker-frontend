@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/useAuth";
+import Notification from "../Notification/Notification";
 
 const Navbar = () => {
     // State to track which dropdown is open
@@ -46,32 +47,8 @@ const Navbar = () => {
 
                 {/* Navbar Items */}
                 <ul className="navbar-items">
-                    {/* Alerts Dropdown */}
-                    <li className="dropdown">
-                        <button
-                            className="dropdown-toggle"
-                            type="button"
-                            onClick={() => toggleDropdown("alerts")}
-                        >
-                            <span className="badge">3+</span>
-                            <i className="fas fa-bell"></i>
-                        </button>
-                        {openDropdown === "alerts" && (
-                            <div className="dropdown-menu">
-                                <h6 className="dropdown-header">Alerts Center</h6>
-                                <button className="dropdown-item" type="button">
-                                    <div className="icon-circle bg-primary">
-                                        <i className="fas fa-file-alt"></i>
-                                    </div>
-                                    <div>
-                                        <span className="dropdown-time">December 12, 2019</span>
-                                        <p>A new monthly report is ready to download!</p>
-                                    </div>
-                                </button>
-                                <button className="dropdown-footer" type="button">Show All Alerts</button>
-                            </div>
-                        )}
-                    </li>
+                    
+                    <Notification openDropdown={openDropdown} toggleDropdown={toggleDropdown} />
 
                     {/* Messages Dropdown */}
                     <li className="dropdown">

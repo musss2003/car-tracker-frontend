@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChartBarIcon, UserIcon, TruckIcon, ClipboardListIcon, UserCircleIcon } from '@heroicons/react/solid';
+import { ChartBarIcon, UserIcon, TruckIcon, ClipboardListIcon, UserCircleIcon, BellIcon } from '@heroicons/react/solid';
 import './Sidebar.css'; // Import the CSS file
 
 const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
@@ -32,6 +32,7 @@ const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
                     <NavLink to="/cars" icon={<TruckIcon className="nav-icon" />} label="Auta" />
                     <NavLink to="/contracts" icon={<ClipboardListIcon className="nav-icon" />} label="Ugovori" />
                     <NavLink to="/customers" icon={<UserCircleIcon className="nav-icon" />} label="Korisnici" />
+                    <NavLink to="/notifications" icon={<BellIcon className="nav-icon" />} label="Notification" />
                     <NavLink to="/profile" icon={<UserIcon className="nav-icon" />} label="Profil" />
                 </div>
             </div>

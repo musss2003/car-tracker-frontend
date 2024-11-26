@@ -1,0 +1,126 @@
+/* General Page Styling */
+.notifications-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+.notifications-page h1 {
+    font-size: 1.8rem;
+    color: #222;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Button Styles */
+.mark-all-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.mark-all-button:hover {
+    background-color: #0056b3;
+}
+
+.mark-all-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Feedback Text */
+.loading-text,
+.error-text,
+.no-notifications-text {
+    text-align: center;
+    font-size: 1rem;
+    margin: 20px 0;
+}
+
+.loading-text {
+    color: #007bff;
+}
+
+.error-text {
+    color: #dc3545;
+}
+
+.no-notifications-text {
+    color: #888;
+}
+
+/* Notifications List */
+.notifications-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notification-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Notification Content */
+.notification-type,
+.notification-message,
+.notification-status,
+.notification-created-at {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.notification-type strong,
+.notification-message strong,
+.notification-status strong,
+.notification-created-at strong {
+    color: #555;
+}
+
+/* Status Styles */
+.status-new {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.status-seen {
+    color: #28a745;
+}
+
+/* Mark as Seen Button */
+.mark-as-seen-button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    color: #fff;
+    background-color: #28a745;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.mark-as-seen-button:hover {
+    background-color: #218838;
+}

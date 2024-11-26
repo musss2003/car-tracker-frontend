@@ -34,7 +34,7 @@
 }
 
 .search-btn {
-    background-color: #007bff;
+    background-color: var(--sidebar-background);
     color: white;
     border: none;
     padding: 0.5rem 1rem;
