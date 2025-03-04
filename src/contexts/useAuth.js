@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { toast } from "react-toastify";
 import { loginAPI, registerAPI } from "../services/authService";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -9,60 +9,51 @@ const API_URL = process.env.REACT_APP_API_BASE_URL + "/api/auth/";
 const UserContext = createContext({});
 
 export const UserProvider = ({ children }) => {
-
     const [user, setUser] = useState(null);
     const [isReady, setIsReady] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation(); // Detect route changes
 
-    const location = useLocation(); // Use location to detect route changes
-
-    const checkSession = async () => {
+    const checkSession = useCallback(async () => {
         try {
             const response = await fetch(API_URL + 'session-check', {
                 method: 'GET',
-                credentials: 'include', // Include credentials to send cookies
-                headers: getAuthHeaders()
+                credentials: 'include',
+                headers: getAuthHeaders(),
             });
-            
+
             if (!response.ok) {
-                throw new Error('Failed to authenticate'); // Handle non-200 responses
+                throw new Error('Failed to authenticate');
             }
 
-            const data = await response.json(); // Parse the JSON response
+            const data = await response.json();
             setUser({ username: data.username, email: data.email, id: data.id });
 
         } catch (error) {
-            // Handle the error appropriately
             console.error('Error message:', error.message);
             setUser(null);
-            navigate('/login'); // Redirect to login if session check fails
+            navigate('/login'); // Redirect only if authentication fails
         } finally {
             setIsReady(true);
         }
-    };
+    }, [navigate]); // Keep dependencies minimal to avoid unnecessary re-renders
 
     useEffect(() => {
-        checkSession(); // Check session on route change
-
-    }, [location.pathname]); // Trigger check when the path changes
-
-    useEffect(() => {
-        checkSession();
-        
-    }, []);
+        checkSession(); // Run on route change
+    }, [location.pathname]); 
 
     const registerUser = async (email, username, password) => {
         try {
             const res = await registerAPI(email, username, password);
             if (res.status === 201) {
-
                 setUser({ username: res.data.username, email: res.data.email, id: res.data.id });
                 toast.success("Registered user: " + res.data.username);
                 navigate("/");
             }
         } catch (error) {
-            toast.warning("Server error occurred");
+            const errorMessage = error.response?.data?.message || "Server error occurred";
+            toast.warning(errorMessage);
         }
     };
 
@@ -70,49 +61,42 @@ export const UserProvider = ({ children }) => {
         try {
             const res = await loginAPI(username, password);
             if (res.status === 200) {
-
                 setUser({ username: res.data.username, email: res.data.email, id: res.data.id });
                 toast.success("Welcome " + username);
                 navigate("/");
             }
         } catch (error) {
-            toast.warning("Server error occurred");
+            const errorMessage = error.response?.data?.message || "Server error occurred";
+            toast.warning(errorMessage);
         }
     };
 
-    const isLoggedIn = () => {
-        return user !== null; // Return true if user is authenticated
-    };
-
+    const isLoggedIn = () => user !== null;
 
     const logout = async () => {
         try {
             const response = await fetch(API_URL + 'logout', {
                 method: 'POST',
-                credentials: 'include', // Include credentials to send cookies
+                credentials: 'include',
                 headers: getAuthHeaders(),
-                body: JSON.stringify({}), // Send an empty body if necessary
+                body: JSON.stringify({}), 
             });
 
             if (!response.ok) {
-                throw new Error('Logout failed'); // Handle non-200 responses
+                throw new Error('Logout failed');
             }
 
             toast.success("Logout Successful!");
         } catch (error) {
             toast.warning("Logout failed!");
         } finally {
-            setUser(null);
-            navigate('/login'); // Redirect to login after logout
+            setUser(null); // Ensure user state is cleared first
+            navigate('/login'); 
         }
     };
 
-
-
     return (
-        <UserContext.Provider
-            value={{ loginUser, user, setUser, logout, isLoggedIn, registerUser }}
-        >
+        <UserContext.Provider value={{ loginUser, user, setUser, logout, isLoggedIn, registerUser }}>
             {isReady ? children : null}
         </UserContext.Provider>
     );

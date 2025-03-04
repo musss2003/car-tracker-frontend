@@ -7,7 +7,6 @@ import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from "./routes/ProtectedRoute.js";
 import DashboardPage from './pages/DashboardPage.js';
 import CarsPage from './pages/CarsPage.js';
-import { ContractsProvider } from './contexts/ContractsContext.js';
 import ContractsPage from './pages/ContractsPage.js';
 import Sidebar from './components/Sidebar/Sidebar.js';
 import './App.css'; // Import the CSS file
@@ -32,61 +31,59 @@ function App() {
     };
 
     return (
-        <ContractsProvider>
+        <div className="flex-container"> {/* Ensure the flex container takes full height */}
             <ToastContainer position='bottom-right' />
-            <div className="flex-container"> {/* Ensure the flex container takes full height */}
-                {/* Sidebar */}
-                <Sidebar isOpen={isSidebarOpen} isSmallScreen={isSmallScreen} toggleSidebar={toggleSidebar} />
+            {/* Sidebar */}
+            <Sidebar isOpen={isSidebarOpen} isSmallScreen={isSmallScreen} toggleSidebar={toggleSidebar} />
 
-                <main className="main-content">
+            <main className="main-content">
                 {!isSmallScreen && isLoggedIn() && <Navbar />}
-                    {/* Hamburger icon for mobile */}
-                    <div className="top-bar">
-                        <div className='first-row'>
-                            <div className='logo'>
-                                <FontAwesomeIcon icon={faCar} />
-                                <span>RENT A CAR</span>
-                            </div>
-                            <button onClick={toggleSidebar} aria-label="Toggle sidebar">
-                                ☰ Menu{/* Hamburger Icon */}
-                            </button>
+                {/* Hamburger icon for mobile */}
+                <div className="top-bar">
+                    <div className='first-row'>
+                        <div className='logo'>
+                            <FontAwesomeIcon icon={faCar} />
+                            <span>RENT A CAR</span>
                         </div>
-                        <div className='second-row'>
-                            <h3>Looking for a vehicle? You’re at the right place.
-                            </h3>
-                        </div>
-                        <div className='third-row-background'></div>
-                        <div className='third-row'>
-                            <button className='saving-button'>
-                                SAVE 15%
-                            </button>
-                            <span className='ml-2'>
-                                Discover Bosnia and Herzegowina with us
-                            </span>
-                            <button className='details-button'>
-                                <span>More details</span>
-                            </button>
-                        </div>
+                        <button onClick={toggleSidebar} aria-label="Toggle sidebar">
+                            ☰ Menu{/* Hamburger Icon */}
+                        </button>
                     </div>
+                    <div className='second-row'>
+                        <h3>Looking for a vehicle? You’re at the right place.
+                        </h3>
+                    </div>
+                    <div className='third-row-background'></div>
+                    <div className='third-row'>
+                        <button className='saving-button'>
+                            SAVE 15%
+                        </button>
+                        <span className='ml-2'>
+                            Discover Bosnia and Herzegowina with us
+                        </span>
+                        <button className='details-button'>
+                            <span>More details</span>
+                        </button>
+                    </div>
+                </div>
 
-                    <Routes>
-                        <Route path="/" element={<DashboardPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/register" element={<RegisterPage />} />
-                        <Route path="/dashboard-test" element={<DashboardPageTest />} />
-                        <Route element={<ProtectedRoute />}>
-                            <Route path="/dashboard" element={<DashboardPage />} />
-                            {user && <Route path="/profile" element={<UserProfile id={user.id} />} />}
-                            <Route path="/cars" element={<CarsPage />} />
-                            <Route path="/contracts" element={<ContractsPage />} />
-                            <Route path="/customers" element={<CustomersPage />} />
-                            <Route path="/notifications" element={<NotificationsPage />} />
+                <Routes>
+                    <Route path="/" element={<DashboardPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/dashboard-test" element={<DashboardPageTest />} />
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/dashboard" element={<DashboardPage />} />
+                        {user && <Route path="/profile" element={<UserProfile id={user.id} />} />}
+                        <Route path="/cars" element={<CarsPage />} />
+                        <Route path="/contracts" element={<ContractsPage />} />
+                        <Route path="/customers" element={<CustomersPage />} />
+                        <Route path="/notifications" element={<NotificationsPage />} />
 
-                        </Route>
-                    </Routes>
-                </main>
-            </div>
-        </ContractsProvider>
+                    </Route>
+                </Routes>
+            </main>
+        </div>
     );
 }
 
