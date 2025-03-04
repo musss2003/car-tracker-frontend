@@ -15,7 +15,6 @@ import { faCar } from '@fortawesome/free-solid-svg-icons';
 import CustomersPage from './pages/CustomersPage.js';
 import useScreenSize from './hooks/useScreenSize.js';
 import Navbar from './components/Navbar/Navbar.js';
-import DashboardPageTest from './pages/DashboardPageTest.js';
 import UserProfile from './components/User/UserProfile/UserProfile.js';
 import { useAuth } from './contexts/useAuth.js';
 import NotificationsPage from './pages/NotificationsPage.js';
@@ -71,7 +70,6 @@ function App() {
                     <Route path="/" element={<DashboardPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/dashboard-test" element={<DashboardPageTest />} />
                     <Route element={<ProtectedRoute />}>
                         <Route path="/dashboard" element={<DashboardPage />} />
                         {user && <Route path="/profile" element={<UserProfile id={user.id} />} />}
