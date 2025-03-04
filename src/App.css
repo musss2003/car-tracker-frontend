@@ -1,147 +1,65 @@
-/* Ensure the flex container takes full height */
-.flex-container {
+.app-container {
   display: flex;
   min-height: 100vh;
+  width: 100%;
 }
 
-/* Main content styles */
 .main-content {
   flex: 1;
-
-  transition: all 0.3s;
-  max-width: 100vw;
-  overflow-y: scroll;
-
-  /* Example gradient from dark gray to slate blue */
-  background: var(--background);
-}
-
-/* Top bar styles for mobile */
-.top-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  background: linear-gradient(
-      to right,
-      var(--background),
-      transparent,
-      var(--background)
-    ),
-    linear-gradient(to bottom, var(--background), transparent 90%),
-    url("./assets/family-photo.jpg"); /* Adjust the path to your image */
-  padding: 16px; /* 4 * 4px (1rem) */
-  z-index: 20; /* Ensure it is below the sidebar */
-  font-weight: bold;
-  background-size: cover;
-  background-position: center;
-  height: 250px;
+  overflow-x: hidden;
+  transition: margin-left 0.3s ease;
 }
 
-.top-bar img {
-  height: 80px; /* 20 * 4px (5rem) */
+/* Adjust main content based on sidebar state */
+.with-sidebar-open {
+  margin-left: 0; /* The sidebar is already taking up space as position: sticky */
 }
 
-.top-bar button {
-  padding: 8px; /* 2 * 4px (0.5rem) */
-  background: none;
-  color: white;
-  border-radius: 4px;
-}
-.first-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 10px;
-}
-.second-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  color: white;
+.with-sidebar-closed {
+  margin-left: 0; /* The sidebar is already taking up space as position: sticky */
 }
 
-.third-row-background {
-  position: absolute;
-  display: flex;
-  box-sizing: border-box;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-around;
-  top: 100px;
-  left: 16px;
-  right: 16px;
-  color: white;
-  background-image: url("./assets/bosnian_flag.png"); /* Adjust the path to your image */
-  opacity: 0.2;
-  background-size: cover;
-  background-position: center;
+.page-content {
+  flex: 1;
+  padding: 1rem;
+  background-color: #f8f9fa;
+}
+
+/* Error boundary styles */
+.error-boundary {
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 600px;
+  text-align: center;
+  background-color: #fff;
   border-radius: 8px;
-  margin-top: 15px;
-  height: 150px;
-}
-.third-row {
-  position: absolute;
-  display: flex;
-  box-sizing: border-box;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-around;
-  top: 100px;
-  left: 16px;
-  right: 16px;
-  color: white;
-  background-size: cover;
-  background-position: center;
-  border-radius: 8px;
-  margin-top: 15px;
-  height: 150px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.third-row .saving-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #ff0000;
+.refresh-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #0056b3;
   color: white;
+  border: none;
   border-radius: 4px;
   cursor: pointer;
-  padding: 8px;
-  margin: 4px 8px;
 }
 
-.third-row .saving-button:hover {
-  background-color: #f57f7f;
+.refresh-button:hover {
+  background-color: #003d7a;
 }
 
-.third-row .details-button:hover {
-  font-size: large;
-}
-
-.logo {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 1.5rem;
-}
-
-@media screen and (min-width: 768px) {
-  .top-bar {
-    display: none;
+/* Media query for mobile */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
   }
+
   .main-content {
-    margin-left: 200px;
+    margin-left: 0 !important;
   }
 }
-@media screen and (max-width: 768px) {
-  .main-content {
-    margin-top: 250px;
-  }
-}
+

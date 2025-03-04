@@ -1,88 +1,98 @@
-import React, { useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import ProtectedRoute from "./routes/ProtectedRoute.js";
-import DashboardPage from './pages/DashboardPage.js';
-import CarsPage from './pages/CarsPage.js';
-import ContractsPage from './pages/ContractsPage.js';
-import Sidebar from './components/Sidebar/Sidebar.js';
-import './App.css'; // Import the CSS file
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCar } from '@fortawesome/free-solid-svg-icons';
-import CustomersPage from './pages/CustomersPage.js';
-import useScreenSize from './hooks/useScreenSize.js';
-import Navbar from './components/Navbar/Navbar.js';
-import UserProfile from './components/User/UserProfile/UserProfile.js';
-import { useAuth } from './contexts/useAuth.js';
-import NotificationsPage from './pages/NotificationsPage.js';
+"use client"
+
+import "./App.css"
+
+import React, { useState, lazy, Suspense } from "react"
+import { Route, Routes, Navigate } from "react-router-dom"
+import { ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import { useAuth } from "./contexts/useAuth.js"
+import useScreenSize from "./hooks/useScreenSize.js"
+
+// Layout Components
+import Sidebar from "./components/Sidebar/Sidebar.js"
+import Navbar from "./components/Navbar/Navbar.js"
+import AppHeader from "./components/AppHeader/AppHeader.js"
+import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary.js"
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner.js"
+
+// Route Protection
+import ProtectedRoute from "./routes/ProtectedRoute.js"
+
+// Lazy-loaded Pages
+const LoginPage = lazy(() => import("./pages/LoginPage"))
+const RegisterPage = lazy(() => import("./pages/RegisterPage"))
+const DashboardPage = lazy(() => import("./pages/DashboardPage"))
+const CarsPage = lazy(() => import("./pages/CarsPage"))
+const ContractsPage = lazy(() => import("./pages/ContractsPage"))
+const CustomersPage = lazy(() => import("./pages/CustomersPage"))
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"))
+const UserProfile = lazy(() => import("./components/User/UserProfile/UserProfile"))
 
 
 function App() {
-    const { isLoggedIn, user } = useAuth();
-    const [isSidebarOpen, setSidebarOpen] = useState(false); // State for sidebar visibility
-    const isSmallScreen = useScreenSize('(max-width: 768px)'); // Check for small screens
+  const { isLoggedIn, user } = useAuth()
+  const [isSidebarOpen, setSidebarOpen] = useState(true) // Default open on desktop
+  const isSmallScreen = useScreenSize("(max-width: 768px)")
 
-    const toggleSidebar = () => {
-        setSidebarOpen(!isSidebarOpen); // Toggle sidebar visibility
-    };
+  // Close sidebar by default on small screens
+  React.useEffect(() => {
+    if (isSmallScreen) {
+      setSidebarOpen(false)
+    } else {
+      setSidebarOpen(true)
+    }
+  }, [isSmallScreen])
 
-    return (
-        <div className="flex-container"> {/* Ensure the flex container takes full height */}
-            <ToastContainer position='bottom-right' />
-            {/* Sidebar */}
-            <Sidebar isOpen={isSidebarOpen} isSmallScreen={isSmallScreen} toggleSidebar={toggleSidebar} />
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen)
+  }
 
-            <main className="main-content">
-                {!isSmallScreen && isLoggedIn() && <Navbar />}
-                {/* Hamburger icon for mobile */}
-                <div className="top-bar">
-                    <div className='first-row'>
-                        <div className='logo'>
-                            <FontAwesomeIcon icon={faCar} />
-                            <span>RENT A CAR</span>
-                        </div>
-                        <button onClick={toggleSidebar} aria-label="Toggle sidebar">
-                            ☰ Menu{/* Hamburger Icon */}
-                        </button>
-                    </div>
-                    <div className='second-row'>
-                        <h3>Looking for a vehicle? You’re at the right place.
-                        </h3>
-                    </div>
-                    <div className='third-row-background'></div>
-                    <div className='third-row'>
-                        <button className='saving-button'>
-                            SAVE 15%
-                        </button>
-                        <span className='ml-2'>
-                            Discover Bosnia and Herzegowina with us
-                        </span>
-                        <button className='details-button'>
-                            <span>More details</span>
-                        </button>
-                    </div>
-                </div>
+  return (
+    <ErrorBoundary>
+      <div className="app-container">
+        <ToastContainer position="bottom-right" />
 
-                <Routes>
-                    <Route path="/" element={<DashboardPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route element={<ProtectedRoute />}>
-                        <Route path="/dashboard" element={<DashboardPage />} />
-                        {user && <Route path="/profile" element={<UserProfile id={user.id} />} />}
-                        <Route path="/cars" element={<CarsPage />} />
-                        <Route path="/contracts" element={<ContractsPage />} />
-                        <Route path="/customers" element={<CustomersPage />} />
-                        <Route path="/notifications" element={<NotificationsPage />} />
+        {isLoggedIn() && <Sidebar isOpen={isSidebarOpen} isSmallScreen={isSmallScreen} toggleSidebar={toggleSidebar} />}
 
-                    </Route>
-                </Routes>
-            </main>
-        </div>
-    );
+        <main
+          className={`main-content ${isLoggedIn() && !isSmallScreen && isSidebarOpen ? "with-sidebar-open" : isLoggedIn() && !isSmallScreen && !isSidebarOpen ? "with-sidebar-closed" : ""}`}
+        >
+          {isLoggedIn() && !isSmallScreen && <Navbar />}
+
+          {/* App Header - only show on mobile */}
+          {isSmallScreen && (
+            <AppHeader isLoggedIn={isLoggedIn()} toggleSidebar={toggleSidebar} isSmallScreen={isSmallScreen} />
+          )}
+
+          <div className="page-content">
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={isLoggedIn() ? <Navigate to="/dashboard" /> : <LoginPage />} />
+                <Route path="/register" element={isLoggedIn() ? <Navigate to="/dashboard" /> : <RegisterPage />} />
+
+                {/* Protected routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/" element={<Navigate to="/dashboard" />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/cars" element={<CarsPage />} />
+                  <Route path="/contracts" element={<ContractsPage />} />
+                  <Route path="/customers" element={<CustomersPage />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  {user && <Route path="/profile" element={<UserProfile id={user.id} />} />}
+                </Route>
+
+                {/* Catch-all route */}
+                <Route path="*" element={<Navigate to={isLoggedIn() ? "/dashboard" : "/login"} />} />
+              </Routes>
+            </Suspense>
+          </div>
+        </main>
+      </div>
+    </ErrorBoundary>
+  )
 }
 
-export default App;
+export default App
+
