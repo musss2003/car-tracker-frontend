@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { toast } from "react-toastify"
-import { XIcon, ExclamationCircleIcon, PlusCircleIcon } from "@heroicons/react/solid"
-import "./CreateCarForm.css"
+import { XIcon, ExclamationCircleIcon, SaveIcon } from "@heroicons/react/solid"
+import "./EditCarForm.css"
 
 const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i)
 const LICENSE_PLATE_REGEX = /^[A-Z0-9]{1,10}$/i
 const CHASSIS_NUMBER_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/i
 
-const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
+const EditCarForm = ({ car, onSave, onCancel, manufacturers = [] }) => {
   // Form state
-  const [car, setCar] = useState({
+  const [formData, setFormData] = useState({
     manufacturer: "",
     model: "",
     year: CURRENT_YEAR,
@@ -27,6 +27,9 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
     seats: 5,
     image: "",
   })
+
+  // Original data for comparison
+  const [originalData, setOriginalData] = useState({})
 
   // Validation state
   const [errors, setErrors] = useState({})
@@ -52,6 +55,30 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
     "Cruise Control",
   ]
 
+  // Initialize form data from car prop
+  useEffect(() => {
+    if (car) {
+      const initialData = {
+        manufacturer: car.manufacturer || "",
+        model: car.model || "",
+        year: car.year || CURRENT_YEAR,
+        color: car.color || "#000000",
+        license_plate: car.license_plate || "",
+        chassis_number: car.chassis_number || "",
+        price_per_day: car.price_per_day || "",
+        description: car.description || "",
+        features: car.features || [],
+        transmission: car.transmission || "automatic",
+        fuel_type: car.fuel_type || "gasoline",
+        seats: car.seats || 5,
+        image: car.image || "",
+      }
+
+      setFormData(initialData)
+      setOriginalData(initialData)
+    }
+  }, [car])
+
   // Handle form field changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -59,7 +86,7 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
     // Handle different input types
     const newValue = type === "checkbox" ? checked : value
 
-    setCar((prev) => ({ ...prev, [name]: newValue }))
+    setFormData((prev) => ({ ...prev, [name]: newValue }))
 
     // Mark field as touched
     if (!touched[name]) {
@@ -69,8 +96,8 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
 
   // Add a new feature to the car
   const handleAddFeature = () => {
-    if (newFeature.trim() && !car.features.includes(newFeature.trim())) {
-      setCar((prev) => ({
+    if (newFeature.trim() && !formData.features.includes(newFeature.trim())) {
+      setFormData((prev) => ({
         ...prev,
         features: [...prev.features, newFeature.trim()],
       }))
@@ -80,8 +107,8 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
 
   // Add a common feature to the car
   const handleAddCommonFeature = (feature) => {
-    if (!car.features.includes(feature)) {
-      setCar((prev) => ({
+    if (!formData.features.includes(feature)) {
+      setFormData((prev) => ({
         ...prev,
         features: [...prev.features, feature],
       }))
@@ -90,7 +117,7 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
 
   // Remove a feature from the car
   const handleRemoveFeature = (feature) => {
-    setCar((prev) => ({
+    setFormData((prev) => ({
       ...prev,
       features: prev.features.filter((f) => f !== feature),
     }))
@@ -101,24 +128,24 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
     const newErrors = {}
 
     // Required fields
-    if (!car.manufacturer) newErrors.manufacturer = "Manufacturer is required"
-    if (!car.model) newErrors.model = "Model is required"
-    if (!car.year) newErrors.year = "Year is required"
-    if (!car.license_plate) newErrors.license_plate = "License plate is required"
+    if (!formData.manufacturer) newErrors.manufacturer = "Manufacturer is required"
+    if (!formData.model) newErrors.model = "Model is required"
+    if (!formData.year) newErrors.year = "Year is required"
+    if (!formData.license_plate) newErrors.license_plate = "License plate is required"
 
     // License plate format
-    if (car.license_plate && !LICENSE_PLATE_REGEX.test(car.license_plate)) {
+    if (formData.license_plate && !LICENSE_PLATE_REGEX.test(formData.license_plate)) {
       newErrors.license_plate = "License plate format is invalid"
     }
 
     // Chassis number format (if provided)
-    if (car.chassis_number && !CHASSIS_NUMBER_REGEX.test(car.chassis_number)) {
+    if (formData.chassis_number && !CHASSIS_NUMBER_REGEX.test(formData.chassis_number)) {
       newErrors.chassis_number = "Chassis number must be 17 characters (excluding I, O, Q)"
     }
 
     // Price validation
-    if (car.price_per_day) {
-      const price = Number.parseFloat(car.price_per_day)
+    if (formData.price_per_day) {
+      const price = Number.parseFloat(formData.price_per_day)
       if (isNaN(price) || price <= 0) {
         newErrors.price_per_day = "Price must be a positive number"
       }
@@ -127,8 +154,8 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
     }
 
     // Seats validation
-    if (car.seats) {
-      const seats = Number.parseInt(car.seats)
+    if (formData.seats) {
+      const seats = Number.parseInt(formData.seats)
       if (isNaN(seats) || seats < 1 || seats > 10) {
         newErrors.seats = "Seats must be between 1 and 10"
       }
@@ -136,6 +163,11 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
+  }
+
+  // Check if form has been modified
+  const hasChanges = () => {
+    return JSON.stringify(formData) !== JSON.stringify(originalData)
   }
 
   // Handle form submission
@@ -164,17 +196,17 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
 
       // Format the data before saving
       const carData = {
-        ...car,
-        year: Number.parseInt(car.year),
-        price_per_day: Number.parseFloat(car.price_per_day),
-        seats: Number.parseInt(car.seats),
+        ...formData,
+        year: Number.parseInt(formData.year),
+        price_per_day: Number.parseFloat(formData.price_per_day),
+        seats: Number.parseInt(formData.seats),
       }
 
       await onSave(carData)
-      toast.success("Car created successfully")
+      toast.success("Car updated successfully")
     } catch (error) {
-      console.error("Error creating car:", error)
-      toast.error("Failed to create car")
+      console.error("Error updating car:", error)
+      toast.error("Failed to update car")
     } finally {
       setIsSubmitting(false)
     }
@@ -182,15 +214,12 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
 
   // Handle cancel with unsaved changes
   const handleCancel = () => {
-    // Check if form has been modified
-    const hasChanges = Object.keys(touched).length > 0
-
-    if (hasChanges) {
+    if (hasChanges()) {
       if (window.confirm("You have unsaved changes. Are you sure you want to cancel?")) {
-        onClose()
+        onCancel()
       }
     } else {
-      onClose()
+      onCancel()
     }
   }
 
@@ -199,7 +228,7 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
     if (Object.keys(touched).length > 0) {
       validateForm()
     }
-  }, [car, touched])
+  }, [formData, touched])
 
   // Render form field with label and error message
   const renderField = (label, name, type = "text", options = {}) => {
@@ -218,7 +247,7 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
           <select
             id={name}
             name={name}
-            value={car[name] || ""}
+            value={formData[name] || ""}
             onChange={handleChange}
             className={hasError ? "error" : ""}
             required={required}
@@ -233,7 +262,7 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
           <textarea
             id={name}
             name={name}
-            value={car[name] || ""}
+            value={formData[name] || ""}
             onChange={handleChange}
             placeholder={placeholder}
             className={hasError ? "error" : ""}
@@ -245,7 +274,7 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
             type={type}
             id={name}
             name={name}
-            value={car[name] || ""}
+            value={formData[name] || ""}
             onChange={handleChange}
             placeholder={placeholder}
             min={min}
@@ -271,15 +300,17 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
   }
 
   return (
-    <div className="create-car-form-container">
+    <div className="edit-car-form-container">
       <div className="form-header">
-        <h2>Add New Car</h2>
+        <h2>
+          Edit Car: {car.manufacturer} {car.model}
+        </h2>
         <button type="button" className="close-button" onClick={handleCancel}>
           <XIcon className="icon" />
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="create-car-form">
+      <form onSubmit={handleSubmit} className="edit-car-form">
         <div className="form-sections">
           <div className="form-section">
             <h3 className="section-title">Basic Information</h3>
@@ -397,23 +428,25 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
                     <button
                       key={feature}
                       type="button"
-                      className={`common-feature ${car.features.includes(feature) ? "selected" : ""}`}
+                      className={`common-feature ${formData.features.includes(feature) ? "selected" : ""}`}
                       onClick={() =>
-                        car.features.includes(feature) ? handleRemoveFeature(feature) : handleAddCommonFeature(feature)
+                        formData.features.includes(feature)
+                          ? handleRemoveFeature(feature)
+                          : handleAddCommonFeature(feature)
                       }
                     >
                       {feature}
-                      {car.features.includes(feature) ? " ✓" : " +"}
+                      {formData.features.includes(feature) ? " ✓" : " +"}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {car.features.length > 0 && (
+              {formData.features.length > 0 && (
                 <div className="selected-features">
                   <p className="selected-features-label">Selected features:</p>
                   <div className="features-list">
-                    {car.features.map((feature) => (
+                    {formData.features.map((feature) => (
                       <div key={feature} className="feature-tag">
                         <span>{feature}</span>
                         <button type="button" className="remove-feature" onClick={() => handleRemoveFeature(feature)}>
@@ -447,16 +480,16 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
             Cancel
           </button>
 
-          <button type="submit" className="submit-button" disabled={isSubmitting}>
+          <button type="submit" className="submit-button" disabled={isSubmitting || !hasChanges()}>
             {isSubmitting ? (
               <>
                 <div className="spinner"></div>
-                Creating...
+                Saving...
               </>
             ) : (
               <>
-                <PlusCircleIcon className="icon" />
-                Create Car
+                <SaveIcon className="icon" />
+                Save Changes
               </>
             )}
           </button>
@@ -466,5 +499,5 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
   )
 }
 
-export default CreateCarForm
+export default EditCarForm
 

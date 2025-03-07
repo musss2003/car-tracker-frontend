@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../../contexts/useAuth"
 import Notification from "../Notification/Notification"
@@ -18,11 +18,11 @@ const Navbar = () => {
   }
 
   // Handle clicks outside of dropdowns
-  const handleOutsideClick = (e) => {
+  const handleOutsideClick = useCallback((e) => {
     if (openDropdown && dropdownRefs.current[openDropdown] && !dropdownRefs.current[openDropdown].contains(e.target)) {
       setOpenDropdown(null)
     }
-  }
+  }, [openDropdown, dropdownRefs])
 
   // Handle search submission
   const handleSearch = (e) => {
@@ -46,7 +46,7 @@ const Navbar = () => {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick)
     }
-  }, [openDropdown])
+  }, [openDropdown, handleOutsideClick])
 
   // Register dropdown refs
   const registerDropdownRef = (name, element) => {
