@@ -1,122 +1,171 @@
-import React, { useState } from "react";
-import "./Navbar.css";
-import { Link } from "react-router-dom";
-import { useAuth } from "../../contexts/useAuth";
-import Notification from "../Notification/Notification";
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+import { Link } from "react-router-dom"
+import { useAuth } from "../../contexts/useAuth"
+import Notification from "../Notification/Notification"
+import "./Navbar.css"
 
 const Navbar = () => {
-    // State to track which dropdown is open
-    const [openDropdown, setOpenDropdown] = useState(null);
-    const { user } = useAuth();
+  const [openDropdown, setOpenDropdown] = useState(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const { user, logout } = useAuth()
+  const dropdownRefs = useRef({})
 
-    // Function to toggle the specific dropdown
-    const toggleDropdown = (dropdownName) => {
-        setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
-    };
+  // Handle dropdown toggling
+  const toggleDropdown = (dropdownName) => {
+    setOpenDropdown(openDropdown === dropdownName ? null : dropdownName)
+  }
 
-    const handleOutsideClick = (e) => {
-        // Close dropdown if clicked outside
-        if (!e.target.closest(".dropdown")) {
-            setOpenDropdown(null);
-        }
-    };
+  // Handle clicks outside of dropdowns
+  const handleOutsideClick = (e) => {
+    if (openDropdown && dropdownRefs.current[openDropdown] && !dropdownRefs.current[openDropdown].contains(e.target)) {
+      setOpenDropdown(null)
+    }
+  }
 
-    React.useEffect(() => {
-        document.addEventListener("click", handleOutsideClick);
-        return () => {
-            document.removeEventListener("click", handleOutsideClick);
-        };
-    }, []);
+  // Handle search submission
+  const handleSearch = (e) => {
+    e.preventDefault()
+    // Implement search functionality here
+    console.log("Searching for:", searchQuery)
+    // You could redirect to search results page or filter content
+  }
 
-    return (
-        <nav className="navbar">
-            <div className="container">
-                {/* Search Bar */}
-                <form className="navbar-search">
-                    <div className="search-input-group">
-                        <input
-                            type="text"
-                            className="search-input"
-                            placeholder="Search for..."
-                        />
-                        <button className="search-btn" type="button">
-                            <i className="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
+  // Handle logout
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to log out?")) {
+      logout()
+      // Redirect to login page or handle in your auth context
+    }
+  }
 
-                {/* Navbar Items */}
-                <ul className="navbar-items">
-                    
-                    <Notification openDropdown={openDropdown} toggleDropdown={toggleDropdown} />
+  // Set up event listeners
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOutsideClick)
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick)
+    }
+  }, [openDropdown])
 
-                    {/* Messages Dropdown */}
-                    <li className="dropdown">
-                        <button
-                            className="dropdown-toggle"
-                            type="button"
-                            onClick={() => toggleDropdown("messages")}
-                        >
-                            <span className="badge">7</span>
-                            <i className="fas fa-envelope"></i>
-                        </button>
-                        {openDropdown === "messages" && (
-                            <div className="dropdown-menu">
-                                <h6 className="dropdown-header">Message Center</h6>
-                                <button className="dropdown-item" type="button">
-                                    <img
-                                        className="dropdown-avatar"
-                                        src="avatars/avatar4.jpeg"
-                                        alt="Avatar"
-                                    />
-                                    <div>
-                                        <p className="text-truncate">
-                                            Hi there! Can you help me with a problem I've been having?
-                                        </p>
-                                        <span className="dropdown-time">Emily Fowler · 58m</span>
-                                    </div>
-                                </button>
-                                <button className="dropdown-footer" type="button">Show All Messages</button>
-                            </div>
-                        )}
-                    </li>
+  // Register dropdown refs
+  const registerDropdownRef = (name, element) => {
+    if (element && !dropdownRefs.current[name]) {
+      dropdownRefs.current[name] = element
+    }
+  }
 
-                    {/* User Profile */}
-                    <li className="dropdown">
-                        <button
-                            className="dropdown-toggle"
-                            type="button"
-                            onClick={() => toggleDropdown("profile")}
-                        >
-                            <span className="user-name">{user.username}</span>
-                            <img
-                                className="user-avatar"
-                                src="https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o="
-                                alt="Profile"
-                            />
-                        </button>
-                        {openDropdown === "profile" && (
-                            <div className="dropdown-menu">
-                                <Link to="/profile" className="dropdown-item" type="button">
-                                    <i className="fas fa-user"></i>  
-                                    <span>Profile</span>
-                                </Link>
-                                <button className="dropdown-item" type="button">
-                                    <i className="fas fa-cogs"></i>
-                                    <span>Settings</span>
-                                </button>
-                                <div className="dropdown-divider"></div>
-                                <button className="dropdown-item" type="button">
-                                    <i className="fas fa-sign-out-alt"></i>
-                                    <span>Logout</span>
-                                </button>
-                            </div>
-                        )}
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    );
-};
+  return (
+    <nav className="navbar" aria-label="Main navigation">
+      <div className="container">
+        {/* Search Bar */}
+        <form className="navbar-search" onSubmit={handleSearch}>
+          <div className="search-input-group">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search for..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search"
+            />
+            <button className="search-btn" type="submit" aria-label="Submit search">
+              <i className="fas fa-search" aria-hidden="true"></i>
+            </button>
+          </div>
+        </form>
 
-export default Navbar;
+        {/* Navbar Items */}
+        <ul className="navbar-items">
+          {/* Notifications Component */}
+          <Notification
+            openDropdown={openDropdown}
+            toggleDropdown={toggleDropdown}
+            registerRef={(el) => registerDropdownRef("notifications", el)}
+          />
+
+          {/* Messages Dropdown */}
+          <li className="dropdown" ref={(el) => registerDropdownRef("messages", el)}>
+            <button
+              className="dropdown-toggle"
+              type="button"
+              onClick={() => toggleDropdown("messages")}
+              aria-expanded={openDropdown === "messages"}
+              aria-haspopup="true"
+              aria-label="Messages"
+            >
+              <span className="badge" aria-label="7 unread messages">
+                7
+              </span>
+              <i className="fas fa-envelope" aria-hidden="true"></i>
+            </button>
+
+            {openDropdown === "messages" && (
+              <div className="dropdown-menu" role="menu">
+                <h6 className="dropdown-header">Message Center</h6>
+
+                <button className="dropdown-item" type="button">
+                  <img className="dropdown-avatar" src="avatars/avatar4.jpeg" alt="Emily Fowler" />
+                  <div>
+                    <p className="text-truncate">Hi there! Can you help me with a problem I've been having?</p>
+                    <span className="dropdown-time">Emily Fowler · 58m</span>
+                  </div>
+                </button>
+
+                <button className="dropdown-footer" type="button">
+                  Show All Messages
+                </button>
+              </div>
+            )}
+          </li>
+
+          {/* User Profile */}
+          <li className="dropdown user-dropdown" ref={(el) => registerDropdownRef("profile", el)}>
+            <button
+              className="dropdown-toggle"
+              type="button"
+              onClick={() => toggleDropdown("profile")}
+              aria-expanded={openDropdown === "profile"}
+              aria-haspopup="true"
+              aria-label="User profile"
+            >
+              <span className="user-name">{user?.username || "User"}</span>
+              <img
+                className="user-avatar"
+                src={
+                  user?.avatar ||
+                  "https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o="
+                }
+                alt="Profile"
+              />
+            </button>
+
+            {openDropdown === "profile" && (
+              <div className="dropdown-menu" role="menu">
+                <Link to="/profile" className="dropdown-item">
+                  <i className="fas fa-user" aria-hidden="true"></i>
+                  <span>Profile</span>
+                </Link>
+
+                <Link to="/settings" className="dropdown-item">
+                  <i className="fas fa-cogs" aria-hidden="true"></i>
+                  <span>Settings</span>
+                </Link>
+
+                <div className="dropdown-divider"></div>
+
+                <button className="dropdown-item logout-item" type="button" onClick={handleLogout}>
+                  <i className="fas fa-sign-out-alt" aria-hidden="true"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </li>
+        </ul>
+      </div>
+    </nav>
+  )
+}
+
+export default Navbar
+
