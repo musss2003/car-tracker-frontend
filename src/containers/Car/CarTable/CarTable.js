@@ -148,7 +148,6 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       setCars(updatedCars)
       setParentCars(updatedCars)
       setEditCar(null)
-      toast.success("Car updated successfully")
     } catch (error) {
       console.error("Error saving car:", error)
       toast.error("Failed to update car")

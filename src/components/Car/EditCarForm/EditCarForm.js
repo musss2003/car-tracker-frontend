@@ -134,9 +134,9 @@ const EditCarForm = ({ car, onSave, onCancel, manufacturers = [] }) => {
     if (!formData.license_plate) newErrors.license_plate = "License plate is required"
 
     // License plate format
-    if (formData.license_plate && !LICENSE_PLATE_REGEX.test(formData.license_plate)) {
-      newErrors.license_plate = "License plate format is invalid"
-    }
+    // if (formData.license_plate && !LICENSE_PLATE_REGEX.test(formData.license_plate)) {
+    //   newErrors.license_plate = "License plate format is invalid"
+    // }
 
     // Chassis number format (if provided)
     if (formData.chassis_number && !CHASSIS_NUMBER_REGEX.test(formData.chassis_number)) {
