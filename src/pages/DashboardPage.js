@@ -5,6 +5,9 @@ import { Link } from "react-router-dom"
 import { getCars } from "../services/carService"
 import { getCustomers } from "../services/customerService"
 import { getTotalRevenue, getActiveContracts } from "../services/contractService"
+import { LineChart, Line } from "recharts";
+import { XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+
 
 // Custom hook for data fetching with loading and error states
 function useDataFetcher(fetchFn, initialValue = null) {
@@ -54,12 +57,29 @@ function DashboardPage() {
 
   // Mock data for charts and trends
   const monthlyRevenue = [12500, 14000, 15800, 14200, 16500, 17800, 19200, 18500, 20100, 21500, 22800, totalRevenue]
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  // Transform the data for Recharts
+  const revenue = months.map((month, index) => ({
+    name: month,
+    revenue: monthlyRevenue[index],
+  }));
   const carUtilization = numberOfCars ? (numberOfContracts / numberOfCars) * 100 : 0
   const revenueChange = 12.5 // Percentage change from last month
   const customerChange = 8.3 // Percentage change from last month
 
   // Check if any errors occurred
   const hasErrors = carsError || customersError || revenueError || contractsError
+
+  const RevenueLineChart = () => (
+    <ResponsiveContainer width="100%" height={320}>
+      <LineChart data={revenue}>
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Line type="monotone" dataKey="revenue" stroke="#82ca9d" strokeWidth={3} />
+      </LineChart>
+    </ResponsiveContainer>
+  );
 
   return (
     <div className="flex flex-col gap-6 p-6 bg-white min-h-screen">
@@ -323,7 +343,7 @@ function DashboardPage() {
           <p className="text-sm text-gray-500">Monthly revenue for the current year</p>
         </div>
         <div className="h-80">
-          <RevenueChart data={monthlyRevenue} />
+              <RevenueLineChart />
         </div>
       </div>
 
@@ -451,31 +471,6 @@ function DashboardPage() {
   )
 }
 
-// Revenue Chart Component
-function RevenueChart({ data }) {
-  // This is a placeholder for a real chart component
-  // In a real application, you would use a library like Recharts, Chart.js, or D3.js
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-  const maxValue = Math.max(...data)
-
-  return (
-    <div className="w-full h-full flex items-end gap-2">
-      {data.map((value, index) => (
-        <div key={index} className="relative flex flex-col items-center flex-1 group">
-          <div
-            className="w-full bg-blue-100 hover:bg-blue-200 rounded-t transition-all duration-200"
-            style={{ height: `${(value / maxValue) * 100}%` }}
-          >
-            <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border rounded px-2 py-1 text-xs">
-              ${value.toLocaleString()}
-            </div>
-          </div>
-          <div className="text-xs mt-2">{months[index]}</div>
-        </div>
-      ))}
-    </div>
-  )
-}
 
 // Mock data for recent activities
 const recentActivities = [
