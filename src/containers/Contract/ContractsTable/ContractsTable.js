@@ -1,333 +1,674 @@
-import React, { useEffect, useState } from 'react';
-import { createAndDownloadContract, deleteContract, downloadContract, getContractsPopulated, updateContract } from '../../../services/contractService';
-import './ContractsTable.css';
-import { CreateContractForm } from '../../../components/Contract/CreateContractForm/CreateContractForm';
-import { toast } from 'react-toastify';
-import EditContractForm from '../../../components/Contract/EditContractForm/EditContractForm';
-import ContractDetails from '../../../components/Contract/ContractDetails/ContractDetails';
-import jsPDF from "jspdf";
-import "jspdf-autotable"; // Ensures table support in jsPDF
-import * as XLSX from "xlsx";
+"use client"
+
+import { useEffect, useState, useMemo } from "react"
+import {
+  createAndDownloadContract,
+  deleteContract,
+  downloadContract,
+  getContractsPopulated,
+  updateContract,
+} from "../../../services/contractService"
+import { toast } from "react-toastify"
+import {
+  PlusCircleIcon,
+  SearchIcon,
+  FilterIcon,
+  SortAscendingIcon,
+  SortDescendingIcon,
+  DocumentDownloadIcon,
+  DocumentTextIcon,
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  XIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  CheckIcon,
+} from "@heroicons/react/solid"
+import jsPDF from "jspdf"
+import "jspdf-autotable"
+import * as XLSX from "xlsx"
+import "./ContractsTable.css"
+
+import EditContractForm from "../../../components/Contract/EditContractForm/EditContractForm"
+import ContractDetails from "../../../components/Contract/ContractDetails/ContractDetails"
+import CreateContractForm from "../../../components/Contract/CreateContractForm/CreateContractForm"
 
 
 const ContractsTable = () => {
-    const [contracts, setContracts] = useState([]);
-    const [error, setError] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [selectedContract, setSelectedContract] = useState(null);
-    const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'confirmed', 'active', 'completed'
-    const [currentPage, setCurrentPage] = useState(1);
-    const contractsPerPage = 10; // Customize this as needed
+  // State management
+  const [contracts, setContracts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [selectedContract, setSelectedContract] = useState(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
+  const [isViewingDetails, setIsViewingDetails] = useState(false)
 
-    const indexOfLastContract = currentPage * contractsPerPage;
-    const indexOfFirstContract = indexOfLastContract - contractsPerPage;
+  // Filtering and sorting state
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filterStatus, setFilterStatus] = useState("all")
+  const [sortConfig, setSortConfig] = useState({
+    key: "rentalPeriod.startDate",
+    direction: "desc",
+  })
 
-    const totalPages = Math.ceil(contracts.length / contractsPerPage);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
-    const [sortColumn, setSortColumn] = useState(null); // e.g., "customer.name", "car.model", "rentalPeriod.startDate"
-    const [sortOrder, setSortOrder] = useState("asc"); // Can be "asc" for ascending or "desc" for descending
+  // Fetch contracts data
+  const fetchContracts = async () => {
+    try {
+      setLoading(true)
+      const data = await getContractsPopulated()
+      setContracts(data)
+      setError(null)
+    } catch (err) {
+      console.error("Failed to fetch contracts:", err)
+      setError("Failed to load contracts. Please try again later.")
+      toast.error("Failed to load contracts")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-    const sortedContracts = [...contracts].sort((a, b) => {
-        let aValue, bValue;
+  useEffect(() => {
+    fetchContracts()
+  }, [])
 
-        switch (sortColumn) {
-            case "customer.name":
-                aValue = a.customer?.name?.toLowerCase() || "";
-                bValue = b.customer?.name?.toLowerCase() || "";
-                break;
-            case "car.model":
-                aValue = a.car?.model?.toLowerCase() || "";
-                bValue = b.car?.model?.toLowerCase() || "";
-                break;
-            case "rentalPeriod.startDate":
-                aValue = new Date(a.rentalPeriod.startDate);
-                bValue = new Date(b.rentalPeriod.startDate);
-                break;
-            case "rentalPeriod.endDate":
-                aValue = new Date(a.rentalPeriod.endDate);
-                bValue = new Date(b.rentalPeriod.endDate);
-                break;
-            default:
-                return 0;
+  // Filter and sort contracts
+  const filteredAndSortedContracts = useMemo(() => {
+    // First, filter the contracts
+    let result = [...contracts]
+
+    // Apply search filter
+    if (searchTerm) {
+      const lowerSearchTerm = searchTerm.toLowerCase()
+      result = result.filter(
+        (contract) =>
+          contract.customer?.name?.toLowerCase().includes(lowerSearchTerm) ||
+          contract.customer?.passport_number?.includes(searchTerm) ||
+          contract.car?.model?.toLowerCase().includes(lowerSearchTerm) ||
+          contract.car?.license_plate?.includes(searchTerm),
+      )
+    }
+
+    // Apply status filter
+    if (filterStatus !== "all") {
+      const now = new Date()
+      result = result.filter((contract) => {
+        const startDate = new Date(contract.rentalPeriod.startDate)
+        const endDate = new Date(contract.rentalPeriod.endDate)
+
+        switch (filterStatus) {
+          case "confirmed":
+            return now < startDate
+          case "active":
+            return now >= startDate && now <= endDate
+          case "completed":
+            return now > endDate
+          default:
+            return true
         }
+      })
+    }
 
-        if (sortOrder === "asc") {
-            return aValue > bValue ? 1 : -1;
+    // Then, sort the filtered results
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        let aValue, bValue
+
+        // Handle nested properties
+        if (sortConfig.key.includes(".")) {
+          const [obj, prop] = sortConfig.key.split(".")
+
+          if (obj === "customer") {
+            aValue = a.customer?.[prop] || ""
+            bValue = b.customer?.[prop] || ""
+          } else if (obj === "car") {
+            aValue = a.car?.[prop] || ""
+            bValue = b.car?.[prop] || ""
+          } else if (obj === "rentalPeriod") {
+            aValue = new Date(a.rentalPeriod[prop])
+            bValue = new Date(b.rentalPeriod[prop])
+          }
         } else {
-            return aValue < bValue ? 1 : -1;
+          aValue = a[sortConfig.key]
+          bValue = b[sortConfig.key]
         }
-    });
 
-    const currentContracts = sortedContracts.slice(indexOfFirstContract, indexOfLastContract);
+        // Handle string values
+        if (typeof aValue === "string") {
+          aValue = aValue.toLowerCase()
+          bValue = bValue.toLowerCase()
+        }
 
-    const handleSort = (column) => {
-        if (sortColumn === column) {
-            setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+        if (aValue < bValue) {
+          return sortConfig.direction === "asc" ? -1 : 1
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === "asc" ? 1 : -1
+        }
+        return 0
+      })
+    }
+
+    return result
+  }, [contracts, searchTerm, filterStatus, sortConfig])
+
+  // Pagination logic
+  const paginatedContracts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return filteredAndSortedContracts.slice(startIndex, startIndex + itemsPerPage)
+  }, [filteredAndSortedContracts, currentPage, itemsPerPage])
+
+  const totalPages = Math.ceil(filteredAndSortedContracts.length / itemsPerPage)
+
+  // Event handlers
+  const handleSort = (key) => {
+    setSortConfig((prevConfig) => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === "asc" ? "desc" : "asc",
+    }))
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1)
+  }
+
+  const handleContractClick = (contract) => {
+    setSelectedContract(contract)
+    setIsViewingDetails(true)
+  }
+
+  const handleEdit = () => {
+    setIsEditing(true)
+    setIsViewingDetails(false)
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
+    setSelectedContract(null)
+  }
+
+  const handleSave = async (updatedContract) => {
+    try {
+      setLoading(true)
+      await updateContract(updatedContract._id, updatedContract)
+      await fetchContracts()
+      toast.success("Contract updated successfully")
+      setIsEditing(false)
+      setSelectedContract(null)
+    } catch (error) {
+      console.error("Error updating contract:", error)
+      toast.error("Failed to update contract")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCreateContract = async (newContractData) => {
+    try {
+      setLoading(true)
+      const createdContract = await createAndDownloadContract(newContractData)
+      await fetchContracts()
+      toast.success("Contract created successfully")
+      setIsCreating(false)
+    } catch (error) {
+      console.error("Error creating contract:", error)
+      toast.error("Failed to create contract")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteContract = async () => {
+    if (!window.confirm("Are you sure you want to delete this contract?")) {
+      return
+    }
+
+    try {
+      setLoading(true)
+      await deleteContract(selectedContract._id)
+      await fetchContracts()
+      toast.success("Contract deleted successfully")
+      setSelectedContract(null)
+      setIsViewingDetails(false)
+    } catch (error) {
+      console.error("Error deleting contract:", error)
+      toast.error("Failed to delete contract")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDownloadContract = async () => {
+    try {
+      await downloadContract(selectedContract._id)
+      toast.success("Contract download initiated")
+    } catch (error) {
+      console.error("Error downloading contract:", error)
+      toast.error("Failed to download contract")
+    }
+  }
+
+  const handleCloseDetails = () => {
+    setSelectedContract(null)
+    setIsViewingDetails(false)
+    setIsEditing(false)
+  }
+
+  // Export functions
+  const exportToPDF = () => {
+    try {
+      const doc = new jsPDF()
+      doc.text("Contracts List", 20, 10)
+
+      const tableColumn = [
+        "Customer Name",
+        "Passport Number",
+        "Car Model",
+        "License Plate",
+        "Start Date",
+        "End Date",
+        "Status",
+      ]
+      const tableRows = filteredAndSortedContracts.map((contract) => {
+        const now = new Date()
+        const startDate = new Date(contract.rentalPeriod.startDate)
+        const endDate = new Date(contract.rentalPeriod.endDate)
+
+        let status
+        if (now < startDate) {
+          status = "Confirmed"
+        } else if (now >= startDate && now <= endDate) {
+          status = "Active"
         } else {
-            setSortColumn(column);
-            setSortOrder("asc");
+          status = "Completed"
         }
-    };
 
-    const handleNextPage = () => {
-        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-    };
+        return [
+          contract.customer?.name || "N/A",
+          contract.customer?.passport_number || "N/A",
+          contract.car?.model || "N/A",
+          contract.car?.license_plate || "N/A",
+          startDate.toLocaleDateString(),
+          endDate.toLocaleDateString(),
+          status,
+        ]
+      })
 
-    const handlePrevPage = () => {
-        if (currentPage > 1) setCurrentPage(currentPage - 1);
-    };
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [66, 135, 245] },
+      })
 
-
-    const fetchContracts = async () => {
-        try {
-            const data = await getContractsPopulated();
-
-            const filteredContracts = data.filter(contract => {
-                const matchesSearch = contract.customer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    contract.customer?.passport_number.includes(searchTerm) ||
-                    contract.car?.model.toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesStatus = filterStatus === 'all' ||
-                    (filterStatus === 'confirmed' && new Date() < new Date(contract.rentalPeriod.startDate)) ||
-                    (filterStatus === 'active' && new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)) ||
-                    (filterStatus === 'completed' && new Date() > new Date(contract.rentalPeriod.endDate));
-                return matchesSearch && matchesStatus;
-            });
-            setContracts(filteredContracts);
-        } catch (err) {
-            setError('Failed to fetch contracts');
-            console.error(err);
-        }
-    };
-
-    useEffect(() => {
-        fetchContracts();
-    }, [searchTerm, filterStatus, contracts.length]);
-
-    const handleDeleteContract = async () => {
-        if (!window.confirm("Are you sure you want to delete this contract?")) {
-            return;
-        }
-        try {
-            await deleteContract(selectedContract._id);
-            await fetchContracts();
-
-            setSelectedContract(null);
-            toast.success("Uspješno izbrisan ugovor")
-        } catch (error) {
-            toast.error(error);
-        }
+      doc.save("contracts.pdf")
+      toast.success("PDF exported successfully")
+    } catch (error) {
+      console.error("Error exporting to PDF:", error)
+      toast.error("Failed to export PDF")
     }
+  }
 
-    const handleDownloadContract = async () => {
-        try {
-            downloadContract(selectedContract._id);
-        } catch (error) {
-            toast.error(error);
+  const exportToExcel = () => {
+    try {
+      const workbook = XLSX.utils.book_new()
+
+      const worksheetData = filteredAndSortedContracts.map((contract) => {
+        const now = new Date()
+        const startDate = new Date(contract.rentalPeriod.startDate)
+        const endDate = new Date(contract.rentalPeriod.endDate)
+
+        let status
+        if (now < startDate) {
+          status = "Confirmed"
+        } else if (now >= startDate && now <= endDate) {
+          status = "Active"
+        } else {
+          status = "Completed"
         }
-    }
 
-    const handleContractClick = (contract) => {
-        setSelectedContract(contract);
-    };
-
-    const handleEdit = () => setIsEditing(true);
-
-    const handleCancel = () => {
-        setIsEditing(false);
-        setSelectedContract(null);
-    }
-    const handleSave = async (updatedContract) => {
-        await updateContract(updatedContract._id, updatedContract);
-
-        await fetchContracts();
-        toast.success("Uspješno ažuriran ugovor");
-        setIsEditing(false);
-    };
-
-    const handleCreateContract = async (newContractData) => {
-        console.log(newContractData);
-        try {
-            const createdContract = await createAndDownloadContract(newContractData);
-
-            setContracts([...contracts, createdContract]);
-            toast.success("Uspješno kreiran ugovor");
-        } catch (error) {
-            console.error('Error creating contract:', error);
+        return {
+          "Customer Name": contract.customer?.name || "N/A",
+          "Passport Number": contract.customer?.passport_number || "N/A",
+          "Car Model": contract.car?.model || "N/A",
+          "License Plate": contract.car?.license_plate || "N/A",
+          "Start Date": startDate.toLocaleDateString(),
+          "End Date": endDate.toLocaleDateString(),
+          "Total Price": contract.totalPrice ? `$${contract.totalPrice}` : "N/A",
+          Status: status,
         }
-    };
+      })
 
-    const handleCloseDetails = () => {
-        setSelectedContract(null);
-        setIsEditing(false);
-    };
+      const worksheet = XLSX.utils.json_to_sheet(worksheetData)
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Contracts")
+      XLSX.writeFile(workbook, "contracts.xlsx")
+      toast.success("Excel exported successfully")
+    } catch (error) {
+      console.error("Error exporting to Excel:", error)
+      toast.error("Failed to export Excel")
+    }
+  }
 
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.text("Contracts List", 20, 10);
-    
-        const tableColumn = ["Customer Name", "Passport Number", "Car Model", "License Plate", "Start Date", "End Date", "Status"];
-        const tableRows = sortedContracts.map(contract => [
-            contract.customer ? contract.customer.name : "N/A",
-            contract.customer ? contract.customer.passport_number : "N/A",
-            contract.car ? contract.car.model : "N/A",
-            contract.car ? contract.car.license_plate : "N/A",
-            contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : "N/A",
-            contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : "N/A",
-            new Date() < new Date(contract.rentalPeriod.startDate) ? "confirmed" :
-            (new Date() <= new Date(contract.rentalPeriod.endDate) ? "active" : "completed")
-        ]);
-    
-        doc.autoTable({
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-    
-        doc.save("contracts.pdf");
-    };
+  // Helper function to determine contract status
+  const getContractStatus = (contract) => {
+    const now = new Date()
+    const startDate = new Date(contract.rentalPeriod.startDate)
+    const endDate = new Date(contract.rentalPeriod.endDate)
 
-    const exportToExcel = () => {
-        const workbook = XLSX.utils.book_new();
-        const worksheetData = sortedContracts.map(contract => ({
-            "Customer Name": contract.customer ? contract.customer.name : "N/A",
-            "Passport Number": contract.customer ? contract.customer.passport_number : "N/A",
-            "Car Model": contract.car ? contract.car.model : "N/A",
-            "License Plate": contract.car ? contract.car.license_plate : "N/A",
-            "Start Date": contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : "N/A",
-            "End Date": contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : "N/A",
-            "Status": new Date() < new Date(contract.rentalPeriod.startDate)
-                ? "confirmed"
-                : new Date() <= new Date(contract.rentalPeriod.endDate)
-                    ? "active"
-                    : "completed",
-        }));
-    
-        const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Contracts");
-        XLSX.writeFile(workbook, "contracts.xlsx");
-    };
+    if (now < startDate) {
+      return { status: "confirmed", className: "status-confirmed" }
+    } else if (now >= startDate && now <= endDate) {
+      return { status: "active", className: "status-active" }
+    } else {
+      return { status: "completed", className: "status-completed" }
+    }
+  }
 
-    if (error) {
-        return <div>{error}</div>;
+  // Render table header with sort indicators
+  const renderTableHeader = (label, key, additionalClass = "") => {
+    const isSorted = sortConfig.key === key
+    const SortIcon = sortConfig.direction === "asc" ? SortAscendingIcon : SortDescendingIcon
+
+    return (
+      <th className={`table-header-cell ${additionalClass}`} onClick={() => handleSort(key)}>
+        <div className="header-content">
+          <span>{label}</span>
+          {isSorted ? <SortIcon className="sort-icon active" /> : <SortAscendingIcon className="sort-icon" />}
+        </div>
+      </th>
+    )
+  }
+
+  // Render status badge
+  const renderStatusBadge = (status, className) => {
+    let icon
+    switch (status) {
+      case "confirmed":
+        icon = <ClockIcon className="status-icon" />
+        break
+      case "active":
+        icon = <CheckCircleIcon className="status-icon" />
+        break
+      case "completed":
+        icon = <CheckIcon className="status-icon" />
+        break
+      default:
+        icon = null
     }
 
     return (
-        <div className="table-container">
-            <div className='export-btns'>
-                <button onClick={exportToPDF} className="export-pdf-btn">Export to PDF</button>
-                <button onClick={exportToExcel} className="export-excel-btn">Export to Excel</button>
-            </div>
+      <div className={`status-badge ${className}`}>
+        {icon}
+        <span className="status-text">{status}</span>
+      </div>
+    )
+  }
 
-            <div className="filters">
-                <input
-                    type="text"
-                    placeholder="Search by customer name, passport number, or car model"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                />
-                <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="status-filter"
-                >
-                    <option value="all">All</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
-                </select>
-            </div>
-            <button className="create-btn" onClick={() => setCreateModalOpen(true)}>Create New Contract</button>
-            <div className="overflow-x-auto rounded-lg">
-                <table className="contracts-table min-w-full bg-white shadow-lg border border-gray-200 rounded-lg">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th
-                                className="px-6 py-3 text-xs font-semibold text-gray-800 uppercase tracking-wider cursor-pointer"
-                                onClick={() => handleSort("customer.name")}
-                            >Customer Name {sortColumn === "customer.name" && (sortOrder === "asc" ? "↑" : "↓")}</th>
-                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hide-on-small">Passport Number</th>
-                            <th
-                                className="px-6 py-3 text-xs font-semibold text-gray-800 uppercase tracking-wider cursor-pointer hide-on-small"
-                                onClick={() => handleSort("car.model")}
-                            >
-                                Car Model {sortColumn === "car.model" && (sortOrder === "asc" ? "↑" : "↓")}
-                            </th>
-                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider hide-on-small">License Plate</th>
-                            <th
-                                className="px-6 py-3 text-xs font-semibold text-gray-800 uppercase tracking-wider cursor-pointer hide-on-small"
-                                onClick={() => handleSort("rentalPeriod.startDate")}
-                            >
-                                Start Date {sortColumn === "rentalPeriod.startDate" && (sortOrder === "asc" ? "↑" : "↓")}
-                            </th>
-                            <th
-                                className="px-6 py-3 text-xs font-semibold text-gray-800 uppercase tracking-wider cursor-pointer hide-on-small"
-                                onClick={() => handleSort("rentalPeriod.endDate")}
-                            >
-                                End Date {sortColumn === "rentalPeriod.endDate" && (sortOrder === "asc" ? <span>↑</span> : <span>↓</span>)}
-                            </th>
-                            <th className="px-6 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentContracts.map(contract => (
-                            <tr key={contract._id} onClick={() => handleContractClick(contract)}>
-                                <td className="px-6 py-4">{contract.customer ? contract.customer.name : 'N/A'}</td>
-                                <td className="px-6 py-4 hide-on-small">{contract.customer ? contract.customer.passport_number : 'N/A'}</td>
-                                <td className="px-6 py-4 hide-on-small">{contract.car ? contract.car.model : 'N/A'}</td>
-                                <td className="px-6 py-4 hide-on-small">{contract.car ? contract.car.license_plate : 'N/A'}</td>
-                                <td className="px-6 py-4 hide-on-small">{contract.rentalPeriod.startDate ? new Date(contract.rentalPeriod.startDate).toLocaleDateString() : 'N/A'}</td>
-                                <td className="px-6 py-4 hide-on-small">{contract.rentalPeriod.endDate ? new Date(contract.rentalPeriod.endDate).toLocaleDateString() : 'N/A'}</td>
-                                <td className={`px-6 py-4 ${new Date() < new Date(contract.rentalPeriod.startDate)
-                                    ? 'status-confirmed'
-                                    : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
-                                        ? 'status-active'
-                                        : 'status-completed'
-                                    }`}>
-                                    {
-                                        new Date() < new Date(contract.rentalPeriod.startDate)
-                                            ? 'confirmed'
-                                            : new Date() >= new Date(contract.rentalPeriod.startDate) && new Date() <= new Date(contract.rentalPeriod.endDate)
-                                                ? 'active'
-                                                : 'completed'
-                                    }
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+  return (
+    <div className="contracts-table-container">
+      {/* Table controls */}
+      <div className="table-controls">
+        <div className="left-controls">
+          <button className="create-btn" onClick={() => setIsCreating(true)}>
+            <PlusCircleIcon className="btn-icon" />
+            Create New Contract
+          </button>
 
-            {/* Pagination Controls */}
-            <div className="pagination-controls">
-                <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
-                <span>Page {currentPage} of {totalPages}</span>
-                <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
-            </div>
+          <div className="export-controls">
+            <button className="export-btn pdf" onClick={exportToPDF}>
+              <DocumentTextIcon className="btn-icon" />
+              Export PDF
+            </button>
 
-            {isEditing && (
-
-                <EditContractForm
-                    contract={selectedContract}
-                    onSave={handleSave}
-                    onCancel={handleCancel}
-                />
-
-            )}
-
-            {selectedContract && <ContractDetails contract={selectedContract} onEdit={handleEdit} onBack={handleCloseDetails} onDelete={handleDeleteContract} onDownload={handleDownloadContract} />}
-
-
-            {isCreateModalOpen && (
-                <CreateContractForm
-                    onSave={handleCreateContract}
-                    onClose={() => setCreateModalOpen(false)}
-                />
-            )}
+            <button className="export-btn excel" onClick={exportToExcel}>
+              <DocumentDownloadIcon className="btn-icon" />
+              Export Excel
+            </button>
+          </div>
         </div>
-    );
-};
 
-export default ContractsTable;
+        <div className="right-controls">
+          <div className="search-container">
+            <SearchIcon className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by customer, passport, or car..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            {searchTerm && (
+              <button className="clear-search" onClick={() => setSearchTerm("")}>
+                <XIcon className="clear-icon" />
+              </button>
+            )}
+          </div>
+
+          <div className="filter-container">
+            <FilterIcon className="filter-icon" />
+            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="filter-select">
+              <option value="all">All Statuses</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Error message */}
+      {error && (
+        <div className="error-message">
+          <XIcon className="error-icon" />
+          {error}
+        </div>
+      )}
+
+      {/* Loading indicator */}
+      {loading && (
+        <div className="loading-indicator">
+          <div className="spinner"></div>
+          <span>Loading contracts...</span>
+        </div>
+      )}
+
+      {/* Contracts table */}
+      <div className="table-wrapper">
+        <table className="contracts-table">
+          <thead>
+            <tr>
+              {renderTableHeader("Customer", "customer.name")}
+              {renderTableHeader("Passport", "customer.passport_number", "hide-on-small")}
+              {renderTableHeader("Car", "car.model")}
+              {renderTableHeader("License Plate", "car.license_plate", "hide-on-small")}
+              {renderTableHeader("Start Date", "rentalPeriod.startDate", "hide-on-small")}
+              {renderTableHeader("End Date", "rentalPeriod.endDate", "hide-on-small")}
+              {renderTableHeader("Status", "status")}
+              <th className="table-header-cell">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedContracts.length > 0 ? (
+              paginatedContracts.map((contract) => {
+                const { status, className } = getContractStatus(contract)
+
+                return (
+                  <tr key={contract._id} className="contract-row">
+                    <td className="table-cell">
+                      <div className="customer-info">
+                        <div className="customer-avatar">{contract.customer?.name?.charAt(0) || "?"}</div>
+                        <div className="customer-name">{contract.customer?.name || "N/A"}</div>
+                      </div>
+                    </td>
+                    <td className="table-cell hide-on-small">{contract.customer?.passport_number || "N/A"}</td>
+                    <td className="table-cell">{contract.car?.model || "N/A"}</td>
+                    <td className="table-cell hide-on-small">{contract.car?.license_plate || "N/A"}</td>
+                    <td className="table-cell hide-on-small">
+                      {contract.rentalPeriod.startDate
+                        ? new Date(contract.rentalPeriod.startDate).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td className="table-cell hide-on-small">
+                      {contract.rentalPeriod.endDate
+                        ? new Date(contract.rentalPeriod.endDate).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td className="table-cell">{renderStatusBadge(status, className)}</td>
+                    <td className="table-cell actions-cell">
+                      <div className="action-buttons">
+                        <button
+                          className="action-btn view"
+                          onClick={() => handleContractClick(contract)}
+                          title="View Details"
+                        >
+                          <EyeIcon className="action-icon" />
+                        </button>
+                        <button
+                          className="action-btn edit"
+                          onClick={() => {
+                            setSelectedContract(contract)
+                            handleEdit()
+                          }}
+                          title="Edit Contract"
+                        >
+                          <PencilIcon className="action-icon" />
+                        </button>
+                        <button
+                          className="action-btn download"
+                          onClick={() => {
+                            setSelectedContract(contract)
+                            handleDownloadContract()
+                          }}
+                          title="Download Contract"
+                        >
+                          <DocumentDownloadIcon className="action-icon" />
+                        </button>
+                        <button
+                          className="action-btn delete"
+                          onClick={() => {
+                            setSelectedContract(contract)
+                            handleDeleteContract()
+                          }}
+                          title="Delete Contract"
+                        >
+                          <TrashIcon className="action-icon" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })
+            ) : (
+              <tr>
+                <td colSpan="8" className="empty-table-message">
+                  {searchTerm || filterStatus !== "all"
+                    ? "No contracts match your search criteria"
+                    : "No contracts available"}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      {filteredAndSortedContracts.length > 0 && (
+        <div className="pagination">
+          <div className="pagination-info">
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+            {Math.min(currentPage * itemsPerPage, filteredAndSortedContracts.length)} of{" "}
+            {filteredAndSortedContracts.length} contracts
+          </div>
+
+          <div className="pagination-controls">
+            <button className="pagination-btn" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+              First
+            </button>
+            <button className="pagination-btn" onClick={handlePrevPage} disabled={currentPage === 1}>
+              <ChevronLeftIcon className="pagination-icon" />
+            </button>
+
+            <span className="pagination-page">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button className="pagination-btn" onClick={handleNextPage} disabled={currentPage === totalPages}>
+              <ChevronRightIcon className="pagination-icon" />
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              Last
+            </button>
+          </div>
+
+          <div className="items-per-page">
+            <label htmlFor="itemsPerPage">Items per page:</label>
+            <select
+              id="itemsPerPage"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value))
+                setCurrentPage(1)
+              }}
+              className="items-per-page-select"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Modals */}
+      {isViewingDetails && selectedContract && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <ContractDetails
+              contract={selectedContract}
+              onEdit={handleEdit}
+              onBack={handleCloseDetails}
+              onDelete={handleDeleteContract}
+              onDownload={handleDownloadContract}
+            />
+          </div>
+        </div>
+      )}
+
+      {isEditing && selectedContract && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <EditContractForm contract={selectedContract} onSave={handleSave} onCancel={handleCancel} />
+          </div>
+        </div>
+      )}
+
+      {isCreating && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <CreateContractForm onSave={handleCreateContract} onClose={() => setIsCreating(false)} />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default ContractsTable
+
