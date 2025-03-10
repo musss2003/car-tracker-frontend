@@ -145,15 +145,6 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
     paymentDetails = {},
   } = contract
 
-  // Debugging line:
-  console.log("Contract data being displayed:", {
-    customer,
-    car,
-    rentalPeriod,
-    rentalPrice,
-    paymentDetails,
-  })
-
   // Destructure nested objects with defaults
   const { name = "", passport_number = "", driver_license_number = "", address = "" } = customer
   const { model = "", license_plate = "", manufacturer = "", year = "" } = car
@@ -171,9 +162,6 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
             <span>{status}</span>
           </div>
         </div>
-        <button className="close-button" onClick={onBack} aria-label="Close">
-          <XIcon className="close-icon" />
-        </button>
       </div>
 
       <div className="contract-body">

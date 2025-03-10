@@ -360,9 +360,6 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
             <span>{status}</span>
           </div>
         </div>
-        <button type="button" className="close-button" onClick={onCancel}>
-          <XIcon className="icon" />
-        </button>
       </div>
 
       {errors.submit && (

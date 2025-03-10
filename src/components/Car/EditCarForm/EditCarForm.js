@@ -475,7 +475,7 @@ const EditCarForm = ({ car, onSave, onCancel, manufacturers = [] }) => {
           </div>
         </div>
 
-        <div className="form-actions">
+        <div className="edit-car-form-actions">
           <button type="button" className="cancel-button" onClick={handleCancel} disabled={isSubmitting}>
             Cancel
           </button>
