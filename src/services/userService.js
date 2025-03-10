@@ -63,3 +63,30 @@ export const deleteUser = async (userId) => {
         throw error;
     }
 };
+
+export const uploadProfilePhoto = async (userId, photoFile) => {
+    const formData = new FormData();
+    formData.append('photo', photoFile);
+
+    try {
+        const response = await fetch(`${API_URL}users/${userId}/photo`, {
+            method: 'POST',
+            credentials: 'include', // Include credentials to send cookies
+            headers: {
+                ...getAuthHeaders(),
+                // 'Content-Type': 'multipart/form-data' // Do not set Content-Type for FormData
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error uploading profile photo: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(`Error uploading profile photo: ${error.message}`);
+        throw error;
+    }
+};
