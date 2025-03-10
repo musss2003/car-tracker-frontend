@@ -70,3 +70,19 @@ export const getUnreadNotifications = async () => {
         console.error(err.message || "Something went wrong");
     }
 };
+export const deleteNotification = async (notificationId) => {
+    try {
+        const response = await fetch(`${API_URL}${notificationId}`, {
+            method: "DELETE",
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to delete notification");
+        }
+
+        return response.json();
+    } catch (err) {
+        console.error(err.message);
+    }
+};
