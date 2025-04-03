@@ -1,3 +1,4 @@
+/* Base container styles */
 .car-table-container {
   background-color: white;
   border-radius: 0.5rem;
@@ -25,7 +26,8 @@
 }
 
 .create-btn,
-.export-btn {
+.export-btn,
+.view-toggle-btn {
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
@@ -45,13 +47,15 @@
   background-color: #2563eb;
 }
 
-.export-btn {
+.export-btn,
+.view-toggle-btn {
   background-color: white;
   color: #4b5563;
   border: 1px solid #d1d5db;
 }
 
-.export-btn:hover {
+.export-btn:hover,
+.view-toggle-btn:hover {
   background-color: #f9fafb;
 }
 
@@ -211,7 +215,7 @@
 .action-buttons {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .action-button {
@@ -365,6 +369,13 @@
   margin: 1rem;
 }
 
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -378,7 +389,7 @@
   justify-content: center;
   z-index: 50;
   padding: 1rem;
-  overflow-y: auto; /* Allow scrolling on the overlay if needed */
+  overflow-y: auto;
 }
 
 .modal-content {
@@ -387,9 +398,8 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   width: 100%;
   max-width: 800px;
-  max-height: 85vh; /* Limit height to 85% of viewport height */
-  display: flex;
-  flex-direction: column;
+  max-height: 85vh;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -401,17 +411,120 @@
   border: none;
   color: #6b7280;
   cursor: pointer;
-  z-index: 11; /* Above the sticky header */
+  z-index: 11;
 }
 
 .modal-close:hover {
   color: #1f2937;
 }
 
+/* Card View Styles */
+.car-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.car-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.car-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.car-card-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.car-card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.car-card-title h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.car-card-status {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.car-card-content {
+  padding: 1rem;
+}
+
+.car-card-detail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.car-card-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+  margin-right: 0.5rem;
+}
+
+.car-card-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  width: 4rem;
+}
+
+.car-card-value {
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.car-card-color {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.car-card-actions {
+  display: flex;
+  justify-content: space-around;
+  padding: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
   .hide-on-small {
     display: none;
+  }
+
+  .btn-text {
+    display: none;
+  }
+
+  .create-btn,
+  .export-btn {
+    padding: 0.5rem;
   }
 
   .right-controls {
@@ -424,28 +537,71 @@
     width: 100%;
   }
 
+  .filter-container {
+    width: 100%;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
   .pagination {
     flex-direction: column;
     align-items: center;
   }
 
-  .action-buttons {
-    flex-direction: column;
+  .pagination-info {
+    text-align: center;
   }
 
-  .action-button {
+  .pagination-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .items-per-page {
     width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .car-cards-container {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: row;
+  }
+
+  .car-card-actions{
+    gap: 1rem;
+  }
+  .action-button {
+    flex: 1;
   }
 
   .action-label {
     display: inline;
     margin-left: 0.5rem;
   }
+
+  .table-controls {
+    flex-direction: column;
+  }
+
+  .left-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1024px) {
   .search-input {
     width: 200px;
+  }
+
+  .car-cards-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

@@ -19,11 +19,19 @@ import {
   EyeIcon,
   DownloadIcon,
   XIcon,
+  CurrencyDollarIcon,
+  CalendarIcon,
+  TagIcon,
+  ColorSwatchIcon,
+  ViewGridIcon,
+  ViewListIcon,
 } from "@heroicons/react/solid"
 import "./CarTable.css"
+import EditCarForm from "../../../components/Car/EditCarForm/EditCarForm"
 import CarDetails from "../../../components/Car/CarDetails/CarDetails"
 import CreateCarForm from "../../../components/Car/CreateCarForm/CreateCarForm"
-import EditCarForm from "../../../components/Car/EditCarForm/EditCarForm"
+import { useMediaQuery } from "../../../hooks/useMediaQuery"
+
 
 const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
   // State management
@@ -34,6 +42,7 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
   const [isCreatingCar, setIsCreatingCar] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [viewMode, setViewMode] = useState("table") // "table" or "card"
 
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState("")
@@ -43,6 +52,18 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  // Check if on mobile
+  const isMobile = useMediaQuery("(max-width: 768px)")
+
+  // Set view mode based on screen size
+  useEffect(() => {
+    if (isMobile) {
+      setViewMode("card")
+    } else {
+      setViewMode("table")
+    }
+  }, [isMobile])
 
   // Fetch active contracts
   useEffect(() => {
@@ -148,6 +169,7 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       setCars(updatedCars)
       setParentCars(updatedCars)
       setEditCar(null)
+      toast.success("Car updated successfully")
     } catch (error) {
       console.error("Error saving car:", error)
       toast.error("Failed to update car")
@@ -205,6 +227,11 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
     setSelectedCar(null)
   }
 
+  // Toggle view mode
+  const toggleViewMode = () => {
+    setViewMode(viewMode === "table" ? "card" : "table")
+  }
+
   // Render table header with sort indicators
   const renderTableHeader = (label, key) => {
     const isSorted = sortConfig.key === key
@@ -234,6 +261,7 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       className={`action-button ${className} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       disabled={disabled}
       title={label}
+      aria-label={label}
     >
       {icon}
       <span className="action-label">{label}</span>
@@ -266,13 +294,94 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
     document.body.removeChild(link)
   }
 
+  // Render car card for mobile view
+  const renderCarCard = (car) => {
+    const isBusy = busyCarLicensePlates.has(car.license_plate)
+
+    return (
+      <div key={car.license_plate} className="car-card">
+        <div className="car-card-header">
+          <div className="car-card-title">
+            <h3>
+              {car.manufacturer} {car.model}
+            </h3>
+            <span className={`car-card-status ${isBusy ? "status-busy" : "status-available"}`}>
+              {isBusy ? (
+                <>
+                  <ExclamationCircleIcon className="h-4 w-4 mr-1" />
+                  <span>Busy</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircleIcon className="h-4 w-4 mr-1" />
+                  <span>Available</span>
+                </>
+              )}
+            </span>
+          </div>
+        </div>
+
+        <div className="car-card-content">
+          <div className="car-card-detail">
+            <CalendarIcon className="car-card-icon" />
+            <span className="car-card-label">Year:</span>
+            <span className="car-card-value">{car.year}</span>
+          </div>
+
+          <div className="car-card-detail">
+            <TagIcon className="car-card-icon" />
+            <span className="car-card-label">License:</span>
+            <span className="car-card-value">{car.license_plate}</span>
+          </div>
+
+          <div className="car-card-detail">
+            <ColorSwatchIcon className="car-card-icon" />
+            <span className="car-card-label">Color:</span>
+            <div className="car-card-color">
+              {car.color && <div className="color-dot" style={{ backgroundColor: car.color }}></div>}
+              <span>{car.color || "N/A"}</span>
+            </div>
+          </div>
+
+          <div className="car-card-detail">
+            <CurrencyDollarIcon className="car-card-icon" />
+            <span className="car-card-label">Price/Day:</span>
+            <span className="car-card-value">{car.price_per_day ? `$${car.price_per_day}` : "N/A"}</span>
+          </div>
+        </div>
+
+        <div className="car-card-actions">
+          <ActionButton
+            onClick={() => handleViewDetails(car)}
+            icon={<EyeIcon className="h-5 w-5" />}
+            label="View"
+            className="action-view"
+          />
+          <ActionButton
+            onClick={() => setEditCar(car)}
+            icon={<PencilIcon className="h-5 w-5" />}
+            label="Edit"
+            className="action-edit"
+          />
+          <ActionButton
+            onClick={() => handleDelete(car.license_plate)}
+            icon={<TrashIcon className="h-5 w-5" />}
+            label="Delete"
+            className="action-delete"
+            disabled={isBusy}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="car-table-container">
       {/* Modals */}
       {editCar && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="modal-close" onClick={() => setEditCar(null)}>
+          <button className="modal-close" onClick={() => setEditCar(null)}>
               <XIcon className="h-5 w-5" />
             </button>
             <EditCarForm car={editCar} onSave={handleSave} onCancel={() => setEditCar(null)} />
@@ -315,13 +424,33 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
         <div className="left-controls">
           <button className="create-btn" onClick={() => setIsCreatingCar(true)}>
             <PlusCircleIcon className="h-5 w-5 mr-2" />
-            Add New Car
+            <span className="btn-text">Add New Car</span>
           </button>
 
           <button className="export-btn" onClick={exportToCSV}>
             <DownloadIcon className="h-5 w-5 mr-2" />
-            Export
+            <span className="btn-text">Export</span>
           </button>
+
+          {!isMobile && (
+            <button
+              className="view-toggle-btn"
+              onClick={toggleViewMode}
+              aria-label={`Switch to ${viewMode === "table" ? "card" : "table"} view`}
+            >
+              {viewMode === "table" ? (
+                <>
+                  <ViewGridIcon className="h-5 w-5 mr-2" />
+                  <span className="btn-text">Card View</span>
+                </>
+              ) : (
+                <>
+                  <ViewListIcon className="h-5 w-5 mr-2" />
+                  <span className="btn-text">Table View</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         <div className="right-controls">
@@ -368,107 +497,125 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
         </div>
       )}
 
-      {/* Car table */}
-      <div className="table-wrapper">
-        <table className="car-table">
-          <thead>
-            <tr>
-              {renderTableHeader("Manufacturer", "manufacturer")}
-              {renderTableHeader("Model", "model")}
-              {renderTableHeader("Year", "year")}
-              <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hide-on-small">
-                Color
-              </th>
-              <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hide-on-small">
-                License Plate
-              </th>
-              {renderTableHeader("Price/Day", "price_per_day")}
-              <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedCars.length > 0 ? (
-              paginatedCars.map((car) => {
-                const isBusy = busyCarLicensePlates.has(car.license_plate)
-
-                return (
-                  <tr key={car.license_plate} className="car-row">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="car-icon-placeholder"></div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">{car.manufacturer}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{car.model}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{car.year}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 hide-on-small">
-                      <div className="flex items-center">
-                        {car.color && <div className="color-dot" style={{ backgroundColor: car.color }}></div>}
-                        <span>{car.color || "N/A"}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 hide-on-small">
-                      {car.license_plate}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {car.price_per_day ? `$${car.price_per_day}` : "N/A"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`status-badge ${isBusy ? "status-busy" : "status-available"}`}>
-                        {isBusy ? (
-                          <>
-                            <ExclamationCircleIcon className="h-4 w-4 mr-1" />
-                            <span>Busy</span>
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircleIcon className="h-4 w-4 mr-1" />
-                            <span>Available</span>
-                          </>
-                        )}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <div className="action-buttons">
-                        <ActionButton
-                          onClick={() => handleViewDetails(car)}
-                          icon={<EyeIcon className="h-5 w-5" />}
-                          label="View"
-                          className="action-view"
-                        />
-                        <ActionButton
-                          onClick={() => setEditCar(car)}
-                          icon={<PencilIcon className="h-5 w-5" />}
-                          label="Edit"
-                          className="action-edit"
-                        />
-                        <ActionButton
-                          onClick={() => handleDelete(car.license_plate)}
-                          icon={<TrashIcon className="h-5 w-5" />}
-                          label="Delete"
-                          className="action-delete"
-                          disabled={isBusy}
-                        />
-                      </div>
-                    </td>
+      {/* Car table or card view */}
+      {!isLoading && (
+        <>
+          {viewMode === "table" ? (
+            <div className="table-wrapper">
+              <table className="car-table">
+                <thead>
+                  <tr>
+                    {renderTableHeader("Manufacturer", "manufacturer")}
+                    {renderTableHeader("Model", "model")}
+                    {renderTableHeader("Year", "year")}
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hide-on-small">
+                      Color
+                    </th>
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hide-on-small">
+                      License Plate
+                    </th>
+                    {renderTableHeader("Price/Day", "price_per_day")}
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider text-center">
+                      Actions
+                    </th>
                   </tr>
-                )
-              })
-            ) : (
-              <tr>
-                <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
+                </thead>
+                <tbody>
+                  {paginatedCars.length > 0 ? (
+                    paginatedCars.map((car) => {
+                      const isBusy = busyCarLicensePlates.has(car.license_plate)
+
+                      return (
+                        <tr key={car.license_plate} className="car-row">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="car-icon-placeholder"></div>
+                              <div className="ml-3">
+                                <div className="text-sm font-medium text-gray-900">{car.manufacturer}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{car.model}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{car.year}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 hide-on-small">
+                            <div className="flex items-center">
+                              {car.color && <div className="color-dot" style={{ backgroundColor: car.color }}></div>}
+                              <span>{car.color || "N/A"}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 hide-on-small">
+                            {car.license_plate}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {car.price_per_day ? `$${car.price_per_day}` : "N/A"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`status-badge ${isBusy ? "status-busy" : "status-available"}`}>
+                              {isBusy ? (
+                                <>
+                                  <ExclamationCircleIcon className="h-4 w-4 mr-1" />
+                                  <span>Busy</span>
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircleIcon className="h-4 w-4 mr-1" />
+                                  <span>Available</span>
+                                </>
+                              )}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <div className="action-buttons">
+                              <ActionButton
+                                onClick={() => handleViewDetails(car)}
+                                icon={<EyeIcon className="h-5 w-5" />}
+                                label="View"
+                                className="action-view"
+                              />
+                              <ActionButton
+                                onClick={() => setEditCar(car)}
+                                icon={<PencilIcon className="h-5 w-5" />}
+                                label="Edit"
+                                className="action-edit"
+                              />
+                              <ActionButton
+                                onClick={() => handleDelete(car.license_plate)}
+                                icon={<TrashIcon className="h-5 w-5" />}
+                                label="Delete"
+                                className="action-delete"
+                                disabled={isBusy}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
+                        {searchTerm || statusFilter !== "all"
+                          ? "No cars match your search criteria"
+                          : "No cars available"}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="car-cards-container">
+              {paginatedCars.length > 0 ? (
+                paginatedCars.map((car) => renderCarCard(car))
+              ) : (
+                <div className="empty-message">
                   {searchTerm || statusFilter !== "all" ? "No cars match your search criteria" : "No cars available"}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
 
       {/* Pagination */}
       {filteredAndSortedCars.length > 0 && (

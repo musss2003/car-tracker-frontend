@@ -305,9 +305,6 @@ const EditCarForm = ({ car, onSave, onCancel, manufacturers = [] }) => {
         <h2>
           Edit Car: {car.manufacturer} {car.model}
         </h2>
-        <button type="button" className="close-button" onClick={handleCancel}>
-          <XIcon className="icon" />
-        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="edit-car-form">
