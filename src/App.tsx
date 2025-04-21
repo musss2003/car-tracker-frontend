@@ -6,15 +6,15 @@ import React, { useState, lazy, Suspense } from "react"
 import { Route, Routes, Navigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import { useAuth } from "./contexts/useAuth.js"
-import useScreenSize from "./hooks/useScreenSize.js"
+import { useAuth } from "./contexts/useAuth"
+import useScreenSize from "./hooks/useScreenSize"
 
 // Layout Components
-import Sidebar from "./components/Sidebar/Sidebar.js"
-import Navbar from "./components/Navbar/Navbar.js"
-import AppHeader from "./components/AppHeader/AppHeader.js"
-import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary.js"
-import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner.js"
+import Sidebar from "./components/Sidebar/Sidebar"
+import Navbar from "./components/Navbar/Navbar"
+import AppHeader from "./components/AppHeader/AppHeader"
+import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary"
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner"
 
 // Route Protection
 import ProtectedRoute from "./routes/ProtectedRoute.js"
