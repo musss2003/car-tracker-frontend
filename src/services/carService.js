@@ -117,3 +117,23 @@ export const getAvailableCarsForPeriod = async (startingDate, endingDate) => {
         throw error;
     }
 };
+
+
+export const getCarAvailability = async (licensePlate) => {
+    // const response = await fetch(`/api/cars/${licensePlate}/availability`)
+    // if (!response.ok) {
+    //   throw new Error('Failed to fetch car availability')
+    // }
+    // return await response.json()
+    return mockAvailability;
+  }
+  
+
+  const mockAvailability = [
+    {
+      start: new Date(2025, 3, 24),
+      end: new Date(2025, 3, 26),
+      title: 'Reserved by Customer A',
+    },
+  ]
+  

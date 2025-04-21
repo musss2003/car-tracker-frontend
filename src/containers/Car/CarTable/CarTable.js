@@ -27,10 +27,11 @@ import {
   ViewListIcon,
 } from "@heroicons/react/solid"
 import "./CarTable.css"
-import EditCarForm from "../../../components/Car/EditCarForm/EditCarForm"
-import CarDetails from "../../../components/Car/CarDetails/CarDetails"
-import CreateCarForm from "../../../components/Car/CreateCarForm/CreateCarForm"
 import { useMediaQuery } from "../../../hooks/useMediaQuery"
+import EditCarForm from '../../../components/Car/EditCarForm/EditCarForm'
+import CarDetails  from '../../../components/Car/CarDetails/CarDetails'
+import CreateCarForm from '../../../components/Car/CreateCarForm/CreateCarForm'
+import CarAvailabilityCalendar from '../../../components/Car/CarAvailabilityCalendar/CarAvailabilityCalendar'
 
 
 const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
@@ -43,6 +44,8 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [viewMode, setViewMode] = useState("table") // "table" or "card"
+  const [showAvailabilityCalendar, setShowAvailabilityCalendar] = useState(false)
+  const [selectedCarForCalendar, setSelectedCarForCalendar] = useState(null)
 
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState("")
@@ -227,6 +230,16 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
     setSelectedCar(null)
   }
 
+  const handleViewAvailability = (car) => {
+    setSelectedCarForCalendar(car)
+    setShowAvailabilityCalendar(true)
+  }
+
+  const handleCloseAvailabilityCalendar = () => {
+    setShowAvailabilityCalendar(false)
+    setSelectedCarForCalendar(null)
+  }
+
   // Toggle view mode
   const toggleViewMode = () => {
     setViewMode(viewMode === "table" ? "card" : "table")
@@ -358,6 +371,12 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
             className="action-view"
           />
           <ActionButton
+            onClick={() => handleViewAvailability(car)}
+            icon={<CalendarIcon className="h-5 w-5" />}
+            label="Availability"
+            className="action-calendar"
+          />
+          <ActionButton
             onClick={() => setEditCar(car)}
             icon={<PencilIcon className="h-5 w-5" />}
             label="Edit"
@@ -381,7 +400,7 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       {editCar && (
         <div className="modal-overlay">
           <div className="modal-content">
-          <button className="modal-close" onClick={() => setEditCar(null)}>
+            <button className="modal-close" onClick={() => setEditCar(null)}>
               <XIcon className="h-5 w-5" />
             </button>
             <EditCarForm car={editCar} onSave={handleSave} onCancel={() => setEditCar(null)} />
@@ -415,6 +434,14 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
               }}
               onClose={handleCloseDetails}
             />
+          </div>
+        </div>
+      )}
+
+      {showAvailabilityCalendar && selectedCarForCalendar && (
+        <div className="modal-overlay">
+          <div className="modal-content modal-content-large">
+            <CarAvailabilityCalendar car={selectedCarForCalendar} onClose={handleCloseAvailabilityCalendar} />
           </div>
         </div>
       )}
@@ -574,6 +601,12 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
                                 className="action-view"
                               />
                               <ActionButton
+                                onClick={() => handleViewAvailability(car)}
+                                icon={<CalendarIcon className="h-5 w-5" />}
+                                label="Availability"
+                                className="action-calendar"
+                              />
+                              <ActionButton
                                 onClick={() => setEditCar(car)}
                                 icon={<PencilIcon className="h-5 w-5" />}
                                 label="Edit"
@@ -681,4 +714,3 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
 }
 
 export default CarTable
-
