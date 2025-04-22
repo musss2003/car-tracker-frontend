@@ -1,15 +1,32 @@
-"use client"
-import { PencilIcon, CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/solid"
-import "./CarDetails.css"
+"use client";
+import {
+  PencilIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/solid";
+import "./CarDetails.css";
+import { Car } from "../../../types/car";
 
-const CarDetails = ({ car, isBusy, onEdit, onClose }) => {
+interface CarDetailsProps {
+  car: Car;
+  isBusy: boolean;
+  onEdit: () => void;
+  onClose: () => void;
+}
+
+const CarDetails: React.FC<CarDetailsProps> = ({
+  car,
+  isBusy,
+  onEdit,
+  onClose,
+}) => {
   // Format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-    }).format(amount)
-  }
+    }).format(amount);
+  };
 
   return (
     <div className="car-details">
@@ -17,7 +34,11 @@ const CarDetails = ({ car, isBusy, onEdit, onClose }) => {
         <h2 className="car-details-title">
           {car.manufacturer} {car.model}
         </h2>
-        <div className={`car-status ${isBusy ? "car-status-busy" : "car-status-available"}`}>
+        <div
+          className={`car-status ${
+            isBusy ? "car-status-busy" : "car-status-available"
+          }`}
+        >
           {isBusy ? (
             <>
               <ExclamationCircleIcon className="h-5 w-5 mr-1" />
@@ -34,7 +55,11 @@ const CarDetails = ({ car, isBusy, onEdit, onClose }) => {
 
       <div className="car-image-container">
         {car.image ? (
-          <img src={car.image || "/placeholder.svg"} alt={`${car.manufacturer} ${car.model}`} className="car-image" />
+          <img
+            src={car.image || "/placeholder.svg"}
+            alt={`${car.manufacturer} ${car.model}`}
+            className="car-image"
+          />
         ) : (
           <div className="car-image-placeholder">
             <span>No Image Available</span>
@@ -61,7 +86,12 @@ const CarDetails = ({ car, isBusy, onEdit, onClose }) => {
             <div className="detail-item">
               <span className="detail-label">Color</span>
               <div className="color-display">
-                {car.color && <div className="color-swatch" style={{ backgroundColor: car.color }}></div>}
+                {car.color && (
+                  <div
+                    className="color-swatch"
+                    style={{ backgroundColor: car.color }}
+                  ></div>
+                )}
                 <span>{car.color || "N/A"}</span>
               </div>
             </div>
@@ -71,7 +101,9 @@ const CarDetails = ({ car, isBusy, onEdit, onClose }) => {
             </div>
             <div className="detail-item">
               <span className="detail-label">Price per Day</span>
-              <span className="detail-value">{car.price_per_day ? formatCurrency(car.price_per_day) : "N/A"}</span>
+              <span className="detail-value">
+                {car.price_per_day ? formatCurrency(Number(car.price_per_day)) : "N/A"}
+              </span>
             </div>
           </div>
         </div>
@@ -107,7 +139,7 @@ const CarDetails = ({ car, isBusy, onEdit, onClose }) => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CarDetails
+export default CarDetails;

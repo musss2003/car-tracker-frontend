@@ -2,9 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { getCars } from '../../services/carService';
 import CarTable from '../../containers/Car/CarTable/CarTable';
+import { Car } from '../../types/car';
+
 
 const CarList = () => {
-    const [cars, setCars] = useState([]);
+    const [cars, setCars] = useState<Car[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

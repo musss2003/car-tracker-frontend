@@ -1,9 +1,20 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo } from "react"
-import { getActiveContracts } from "../../../services/contractService"
-import { updateCar, getCars, deleteCar, addCar } from "../../../services/carService"
-import { toast } from "react-toastify"
+import {
+  useState,
+  useEffect,
+  useMemo,
+  MouseEventHandler,
+  ReactNode,
+} from "react";
+import { getActiveContracts } from "../../../services/contractService";
+import {
+  updateCar,
+  getCars,
+  deleteCar,
+  addCar,
+} from "../../../services/carService";
+import { toast } from "react-toastify";
 import {
   PencilIcon,
   TrashIcon,
@@ -25,230 +36,285 @@ import {
   ColorSwatchIcon,
   ViewGridIcon,
   ViewListIcon,
-} from "@heroicons/react/solid"
-import "./CarTable.css"
-import { useMediaQuery } from "../../../hooks/useMediaQuery"
-import EditCarForm from '../../../components/Car/EditCarForm/EditCarForm'
-import CarDetails  from '../../../components/Car/CarDetails/CarDetails'
-import CreateCarForm from '../../../components/Car/CreateCarForm/CreateCarForm'
-import CarAvailabilityCalendar from '../../../components/Car/CarAvailabilityCalendar/CarAvailabilityCalendar'
+} from "@heroicons/react/solid";
+import "./CarTable.css";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import EditCarForm from "../../../components/Car/EditCarForm/EditCarForm";
+import CarDetails from "../../../components/Car/CarDetails/CarDetails";
+import CreateCarForm from "../../../components/Car/CreateCarForm/CreateCarForm";
+import CarAvailabilityCalendar from "../../../components/Car/CarAvailabilityCalendar/CarAvailabilityCalendar";
+import { Car } from "../../../types/car";
+import { Contract } from "../../../types/Contract";
 
+interface CarTableProps {
+  cars: Car[];
+  setCars: React.Dispatch<React.SetStateAction<Car[]>>;
+}
 
-const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
+interface ActionButtonProps {
+  onClick: MouseEventHandler<HTMLButtonElement>;
+  icon: ReactNode;
+  label: string;
+  className?: string;
+  disabled?: boolean;
+}
+
+type SortableCarKey = keyof Pick<
+  Car,
+  "manufacturer" | "model" | "year" | "license_plate" | "price_per_day"
+>;
+
+type CarSortableKey =
+  | "manufacturer"
+  | "model"
+  | "year"
+  | "license_plate"
+  | "price_per_day";
+
+type CarStatus = "all" | "available" | "busy";
+
+interface SortConfig {
+  key: CarSortableKey | null;
+  direction: "asc" | "desc";
+}
+
+const CarTable: React.FC<CarTableProps> = ({
+  cars: initialCars,
+  setCars: setParentCars,
+}) => {
   // State management
-  const [cars, setCars] = useState(initialCars || [])
-  const [activeContracts, setActiveContracts] = useState([])
-  const [editCar, setEditCar] = useState(null)
-  const [selectedCar, setSelectedCar] = useState(null)
-  const [isCreatingCar, setIsCreatingCar] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [viewMode, setViewMode] = useState("table") // "table" or "card"
-  const [showAvailabilityCalendar, setShowAvailabilityCalendar] = useState(false)
-  const [selectedCarForCalendar, setSelectedCarForCalendar] = useState(null)
+  const [cars, setCars] = useState<Car[]>(initialCars || []);
+  const [activeContracts, setActiveContracts] = useState<Contract[]>([]);
+  const [editCar, setEditCar] = useState<Car>();
+  const [selectedCar, setSelectedCar] = useState<Car>();
+  const [isCreatingCar, setIsCreatingCar] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState("table"); // "table" or "card"
+  const [showAvailabilityCalendar, setShowAvailabilityCalendar] =
+    useState(false);
+  const [selectedCarForCalendar, setSelectedCarForCalendar] = useState<Car>();
 
   // Filtering and sorting state
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all") // 'all', 'available', 'busy'
-  const [sortConfig, setSortConfig] = useState({ key: "manufacturer", direction: "asc" })
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<CarStatus>("all");
+
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: null,
+    direction: "asc",
+  });
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Check if on mobile
-  const isMobile = useMediaQuery("(max-width: 768px)")
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   // Set view mode based on screen size
   useEffect(() => {
     if (isMobile) {
-      setViewMode("card")
+      setViewMode("card");
     } else {
-      setViewMode("table")
+      setViewMode("table");
     }
-  }, [isMobile])
+  }, [isMobile]);
 
   // Fetch active contracts
   useEffect(() => {
     const fetchActiveContracts = async () => {
       try {
-        setIsLoading(true)
-        const contracts = await getActiveContracts()
-        setActiveContracts(contracts)
-        setError(null)
+        setIsLoading(true);
+        const contracts = await getActiveContracts();
+        console.log(activeContracts);
+        setActiveContracts(contracts);
+        setError(null);
       } catch (error) {
-        console.error("Error fetching active contracts:", error)
-        setError("Failed to load contract data. Please try again later.")
-        toast.error("Failed to load contract data")
+        console.error("Error fetching active contracts:", error);
+        setError("Failed to load contract data. Please try again later.");
+        toast.error("Failed to load contract data");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchActiveContracts()
-  }, [])
+    fetchActiveContracts();
+  }, []);
 
   // Update local cars state when parent cars change
   useEffect(() => {
     if (initialCars) {
-      setCars(initialCars)
+      setCars(initialCars);
     }
-  }, [initialCars])
+  }, [initialCars]);
 
   // Create a set of busy car license plates for quick lookup
   const busyCarLicensePlates = useMemo(() => {
-    return new Set(activeContracts.map((contract) => contract.carLicensePlate))
-  }, [activeContracts])
+    return new Set(
+      activeContracts.map((contract: Contract) => contract.car.license_plate)
+    );
+  }, [activeContracts]);
 
   // Filter and sort cars
   const filteredAndSortedCars = useMemo(() => {
     // First, filter the cars
-    let result = [...cars]
+    let result = [...cars];
 
     // Apply search filter
     if (searchTerm) {
-      const lowerSearchTerm = searchTerm.toLowerCase()
+      const lowerSearchTerm = searchTerm.toLowerCase();
       result = result.filter(
         (car) =>
           car.manufacturer.toLowerCase().includes(lowerSearchTerm) ||
           car.model.toLowerCase().includes(lowerSearchTerm) ||
-          car.license_plate.toLowerCase().includes(lowerSearchTerm),
-      )
+          car.license_plate.toLowerCase().includes(lowerSearchTerm)
+      );
     }
 
     // Apply status filter
     if (statusFilter !== "all") {
-      const isBusy = statusFilter === "busy"
+      const isBusy = statusFilter === "busy";
       result = result.filter((car) =>
-        isBusy ? busyCarLicensePlates.has(car.license_plate) : !busyCarLicensePlates.has(car.license_plate),
-      )
+        isBusy
+          ? busyCarLicensePlates.has(car.license_plate)
+          : !busyCarLicensePlates.has(car.license_plate)
+      );
     }
 
     // Then, sort the filtered results
     if (sortConfig.key) {
+      const key = sortConfig.key; // This narrows it to non-null
+
       result.sort((a, b) => {
-        // Handle numeric values
-        if (sortConfig.key === "year" || sortConfig.key === "price_per_day") {
+        const aValue = a[key];
+        const bValue = b[key];
+
+        if (typeof aValue === "number" && typeof bValue === "number") {
           return sortConfig.direction === "asc"
-            ? (a[sortConfig.key] || 0) - (b[sortConfig.key] || 0)
-            : (b[sortConfig.key] || 0) - (a[sortConfig.key] || 0)
+            ? aValue - bValue
+            : bValue - aValue;
         }
 
-        // Handle string values
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? -1 : 1
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return sortConfig.direction === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? 1 : -1
-        }
-        return 0
-      })
+
+        return 0;
+      });
     }
 
-    return result
-  }, [cars, searchTerm, statusFilter, sortConfig, busyCarLicensePlates])
+    return result;
+  }, [cars, searchTerm, statusFilter, sortConfig, busyCarLicensePlates]);
 
   // Pagination logic
   const paginatedCars = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return filteredAndSortedCars.slice(startIndex, startIndex + itemsPerPage)
-  }, [filteredAndSortedCars, currentPage, itemsPerPage])
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedCars.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedCars, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredAndSortedCars.length / itemsPerPage)
+  const totalPages = Math.ceil(filteredAndSortedCars.length / itemsPerPage);
 
   // Event handlers
-  const handleSort = (key) => {
+  const handleSort = (key: SortableCarKey) => {
     setSortConfig((prevConfig) => ({
       key,
-      direction: prevConfig.key === key && prevConfig.direction === "asc" ? "desc" : "asc",
-    }))
-  }
+      direction:
+        prevConfig.key === key && prevConfig.direction === "asc"
+          ? "desc"
+          : "asc",
+    }));
+  };
 
-  const handleSave = async (updatedCar) => {
+  const handleSave = async (updatedCar: Car) => {
     try {
-      setIsLoading(true)
-      await updateCar(updatedCar.license_plate, updatedCar)
-      const updatedCars = await getCars()
-      setCars(updatedCars)
-      setParentCars(updatedCars)
-      setEditCar(null)
-      toast.success("Car updated successfully")
+      setIsLoading(true);
+      await updateCar(updatedCar.license_plate, updatedCar);
+      const updatedCars = await getCars();
+      setCars(updatedCars);
+      setParentCars(updatedCars);
+      setEditCar(undefined);
+      toast.success("Car updated successfully");
     } catch (error) {
-      console.error("Error saving car:", error)
-      toast.error("Failed to update car")
+      console.error("Error saving car:", error);
+      toast.error("Failed to update car");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const handleCreate = async (newCar) => {
+  const handleCreate = async (newCar: Car) => {
     try {
-      setIsLoading(true)
-      await addCar(newCar)
-      const updatedCars = await getCars()
-      setCars(updatedCars)
-      setParentCars(updatedCars)
-      setIsCreatingCar(false)
-      toast.success("Car added successfully")
+      setIsLoading(true);
+      await addCar(newCar);
+      const updatedCars = await getCars();
+      setCars(updatedCars);
+      setParentCars(updatedCars);
+      setIsCreatingCar(false);
+      toast.success("Car added successfully");
     } catch (error) {
-      console.error("Error creating car:", error)
-      toast.error("Failed to add car")
+      console.error("Error creating car:", error);
+      toast.error("Failed to add car");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const handleDelete = async (licensePlate) => {
+  const handleDelete = async (licensePlate: string) => {
     if (busyCarLicensePlates.has(licensePlate)) {
-      toast.error("Cannot delete a car that is currently in use")
-      return
+      toast.error("Cannot delete a car that is currently in use");
+      return;
     }
 
-    const confirmed = window.confirm("Are you sure you want to delete this car?")
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this car?"
+    );
     if (confirmed) {
       try {
-        setIsLoading(true)
-        await deleteCar(licensePlate)
-        const updatedCars = await getCars()
-        setCars(updatedCars)
-        setParentCars(updatedCars)
-        toast.success("Car deleted successfully")
+        setIsLoading(true);
+        await deleteCar(licensePlate);
+        const updatedCars = await getCars();
+        setCars(updatedCars);
+        setParentCars(updatedCars);
+        toast.success("Car deleted successfully");
       } catch (error) {
-        console.error("Error deleting car:", error)
-        toast.error("Failed to delete car")
+        console.error("Error deleting car:", error);
+        toast.error("Failed to delete car");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-  }
+  };
 
-  const handleViewDetails = (car) => {
-    setSelectedCar(car)
-  }
+  const handleViewDetails = (car: Car) => {
+    setSelectedCar(car);
+  };
 
   const handleCloseDetails = () => {
-    setSelectedCar(null)
-  }
+    setSelectedCar(undefined);
+  };
 
-  const handleViewAvailability = (car) => {
-    setSelectedCarForCalendar(car)
-    setShowAvailabilityCalendar(true)
-  }
+  const handleViewAvailability = (car: Car) => {
+    setSelectedCarForCalendar(car);
+    setShowAvailabilityCalendar(true);
+  };
 
   const handleCloseAvailabilityCalendar = () => {
-    setShowAvailabilityCalendar(false)
-    setSelectedCarForCalendar(null)
-  }
+    setShowAvailabilityCalendar(false);
+    setSelectedCarForCalendar(undefined);
+  };
 
   // Toggle view mode
   const toggleViewMode = () => {
-    setViewMode(viewMode === "table" ? "card" : "table")
-  }
+    setViewMode(viewMode === "table" ? "card" : "table");
+  };
 
   // Render table header with sort indicators
-  const renderTableHeader = (label, key) => {
-    const isSorted = sortConfig.key === key
-    const SortIcon = sortConfig.direction === "asc" ? SortAscendingIcon : SortDescendingIcon
+  const renderTableHeader = (label: string, key: CarSortableKey) => {
+    const isSorted = sortConfig.key === key;
+    const SortIcon =
+      sortConfig.direction === "asc" ? SortAscendingIcon : SortDescendingIcon;
 
     return (
       <th
@@ -264,14 +330,22 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
           )}
         </div>
       </th>
-    )
-  }
+    );
+  };
 
   // Render action buttons
-  const ActionButton = ({ onClick, icon, label, className, disabled = false }) => (
+  const ActionButton = ({
+    onClick,
+    icon,
+    label,
+    className = "",
+    disabled = false,
+  }: ActionButtonProps) => (
     <button
       onClick={onClick}
-      className={`action-button ${className} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      className={`action-button ${className} ${
+        disabled ? "opacity-50 cursor-not-allowed" : ""
+      }`}
       disabled={disabled}
       title={label}
       aria-label={label}
@@ -279,11 +353,19 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       {icon}
       <span className="action-label">{label}</span>
     </button>
-  )
+  );
 
   // Export to CSV
   const exportToCSV = () => {
-    const headers = ["Manufacturer", "Model", "Year", "Color", "License Plate", "Price per Day", "Status"]
+    const headers = [
+      "Manufacturer",
+      "Model",
+      "Year",
+      "Color",
+      "License Plate",
+      "Price per Day",
+      "Status",
+    ];
     const csvData = filteredAndSortedCars.map((car) => [
       car.manufacturer,
       car.model,
@@ -292,24 +374,27 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       car.license_plate,
       car.price_per_day ? `$${car.price_per_day}` : "N/A",
       busyCarLicensePlates.has(car.license_plate) ? "Busy" : "Available",
-    ])
+    ]);
 
-    const csvContent = [headers.join(","), ...csvData.map((row) => row.join(","))].join("\n")
+    const csvContent = [
+      headers.join(","),
+      ...csvData.map((row) => row.join(",")),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.setAttribute("href", url)
-    link.setAttribute("download", "cars.csv")
-    link.style.visibility = "hidden"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "cars.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Render car card for mobile view
-  const renderCarCard = (car) => {
-    const isBusy = busyCarLicensePlates.has(car.license_plate)
+  const renderCarCard = (car: Car) => {
+    const isBusy = busyCarLicensePlates.has(car.license_plate);
 
     return (
       <div key={car.license_plate} className="car-card">
@@ -318,7 +403,11 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
             <h3>
               {car.manufacturer} {car.model}
             </h3>
-            <span className={`car-card-status ${isBusy ? "status-busy" : "status-available"}`}>
+            <span
+              className={`car-card-status ${
+                isBusy ? "status-busy" : "status-available"
+              }`}
+            >
               {isBusy ? (
                 <>
                   <ExclamationCircleIcon className="h-4 w-4 mr-1" />
@@ -351,7 +440,12 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
             <ColorSwatchIcon className="car-card-icon" />
             <span className="car-card-label">Color:</span>
             <div className="car-card-color">
-              {car.color && <div className="color-dot" style={{ backgroundColor: car.color }}></div>}
+              {car.color && (
+                <div
+                  className="color-dot"
+                  style={{ backgroundColor: car.color }}
+                ></div>
+              )}
               <span>{car.color || "N/A"}</span>
             </div>
           </div>
@@ -359,7 +453,9 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
           <div className="car-card-detail">
             <CurrencyDollarIcon className="car-card-icon" />
             <span className="car-card-label">Price/Day:</span>
-            <span className="car-card-value">{car.price_per_day ? `$${car.price_per_day}` : "N/A"}</span>
+            <span className="car-card-value">
+              {car.price_per_day ? `$${car.price_per_day}` : "N/A"}
+            </span>
           </div>
         </div>
 
@@ -391,8 +487,8 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
           />
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="car-table-container">
@@ -400,10 +496,17 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       {editCar && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="modal-close" onClick={() => setEditCar(null)}>
+            <button
+              className="modal-close"
+              onClick={() => setEditCar(undefined)}
+            >
               <XIcon className="h-5 w-5" />
             </button>
-            <EditCarForm car={editCar} onSave={handleSave} onCancel={() => setEditCar(null)} />
+            <EditCarForm
+              car={editCar}
+              onSave={handleSave}
+              onCancel={() => setEditCar(undefined)}
+            />
           </div>
         </div>
       )}
@@ -411,10 +514,16 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       {isCreatingCar && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="modal-close" onClick={() => setIsCreatingCar(false)}>
+            <button
+              className="modal-close"
+              onClick={() => setIsCreatingCar(false)}
+            >
               <XIcon className="h-5 w-5" />
             </button>
-            <CreateCarForm onSave={handleCreate} onClose={() => setIsCreatingCar(false)} />
+            <CreateCarForm
+              onSave={handleCreate}
+              onClose={() => setIsCreatingCar(false)}
+            />
           </div>
         </div>
       )}
@@ -429,8 +538,8 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
               car={selectedCar}
               isBusy={busyCarLicensePlates.has(selectedCar.license_plate)}
               onEdit={() => {
-                setEditCar(selectedCar)
-                setSelectedCar(null)
+                setEditCar(selectedCar);
+                setSelectedCar(undefined);
               }}
               onClose={handleCloseDetails}
             />
@@ -441,7 +550,10 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
       {showAvailabilityCalendar && selectedCarForCalendar && (
         <div className="modal-overlay">
           <div className="modal-content modal-content-large">
-            <CarAvailabilityCalendar car={selectedCarForCalendar} onClose={handleCloseAvailabilityCalendar} />
+            <CarAvailabilityCalendar
+              car={selectedCarForCalendar}
+              onClose={handleCloseAvailabilityCalendar}
+            />
           </div>
         </div>
       )}
@@ -463,7 +575,9 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
             <button
               className="view-toggle-btn"
               onClick={toggleViewMode}
-              aria-label={`Switch to ${viewMode === "table" ? "card" : "table"} view`}
+              aria-label={`Switch to ${
+                viewMode === "table" ? "card" : "table"
+              } view`}
             >
               {viewMode === "table" ? (
                 <>
@@ -491,7 +605,11 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
               className="search-input"
             />
             {searchTerm && (
-              <button className="clear-search" onClick={() => setSearchTerm("")} aria-label="Clear search">
+              <button
+                className="clear-search"
+                onClick={() => setSearchTerm("")}
+                aria-label="Clear search"
+              >
                 <XIcon className="h-4 w-4" />
               </button>
             )}
@@ -499,7 +617,11 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
 
           <div className="filter-container">
             <FilterIcon className="filter-icon h-5 w-5 text-gray-400" />
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="filter-select">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as CarStatus)}
+              className="filter-select"
+            >
               <option value="all">All Status</option>
               <option value="available">Available</option>
               <option value="busy">Busy</option>
@@ -542,7 +664,9 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
                       License Plate
                     </th>
                     {renderTableHeader("Price/Day", "price_per_day")}
-                    <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Status
+                    </th>
                     <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider text-center">
                       Actions
                     </th>
@@ -551,7 +675,9 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
                 <tbody>
                   {paginatedCars.length > 0 ? (
                     paginatedCars.map((car) => {
-                      const isBusy = busyCarLicensePlates.has(car.license_plate)
+                      const isBusy = busyCarLicensePlates.has(
+                        car.license_plate
+                      );
 
                       return (
                         <tr key={car.license_plate} className="car-row">
@@ -559,15 +685,26 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
                             <div className="flex items-center">
                               <div className="car-icon-placeholder"></div>
                               <div className="ml-3">
-                                <div className="text-sm font-medium text-gray-900">{car.manufacturer}</div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {car.manufacturer}
+                                </div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{car.model}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{car.year}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {car.model}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {car.year}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 hide-on-small">
                             <div className="flex items-center">
-                              {car.color && <div className="color-dot" style={{ backgroundColor: car.color }}></div>}
+                              {car.color && (
+                                <div
+                                  className="color-dot"
+                                  style={{ backgroundColor: car.color }}
+                                ></div>
+                              )}
                               <span>{car.color || "N/A"}</span>
                             </div>
                           </td>
@@ -575,10 +712,16 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
                             {car.license_plate}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {car.price_per_day ? `$${car.price_per_day}` : "N/A"}
+                            {car.price_per_day
+                              ? `$${car.price_per_day}`
+                              : "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`status-badge ${isBusy ? "status-busy" : "status-available"}`}>
+                            <span
+                              className={`status-badge ${
+                                isBusy ? "status-busy" : "status-available"
+                              }`}
+                            >
                               {isBusy ? (
                                 <>
                                   <ExclamationCircleIcon className="h-4 w-4 mr-1" />
@@ -622,11 +765,14 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
                             </div>
                           </td>
                         </tr>
-                      )
+                      );
                     })
                   ) : (
                     <tr>
-                      <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
+                      <td
+                        colSpan={8}
+                        className="px-6 py-4 text-center text-gray-500"
+                      >
                         {searchTerm || statusFilter !== "all"
                           ? "No cars match your search criteria"
                           : "No cars available"}
@@ -642,7 +788,9 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
                 paginatedCars.map((car) => renderCarCard(car))
               ) : (
                 <div className="empty-message">
-                  {searchTerm || statusFilter !== "all" ? "No cars match your search criteria" : "No cars available"}
+                  {searchTerm || statusFilter !== "all"
+                    ? "No cars match your search criteria"
+                    : "No cars available"}
                 </div>
               )}
             </div>
@@ -655,11 +803,16 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
         <div className="pagination">
           <div className="pagination-info">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-            {Math.min(currentPage * itemsPerPage, filteredAndSortedCars.length)} of {filteredAndSortedCars.length} cars
+            {Math.min(currentPage * itemsPerPage, filteredAndSortedCars.length)}{" "}
+            of {filteredAndSortedCars.length} cars
           </div>
 
           <div className="pagination-controls">
-            <button className="pagination-button" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+            <button
+              className="pagination-button"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            >
               First
             </button>
             <button
@@ -676,7 +829,9 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
 
             <button
               className="pagination-button"
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
             >
               <ChevronRightIcon className="h-5 w-5" />
@@ -696,8 +851,8 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
               id="itemsPerPage"
               value={itemsPerPage}
               onChange={(e) => {
-                setItemsPerPage(Number(e.target.value))
-                setCurrentPage(1) // Reset to first page when changing items per page
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1); // Reset to first page when changing items per page
               }}
               className="items-per-page-select"
             >
@@ -710,7 +865,7 @@ const CarTable = ({ cars: initialCars, setCars: setParentCars }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CarTable
+export default CarTable;

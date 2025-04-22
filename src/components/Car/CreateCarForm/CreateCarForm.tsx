@@ -1,18 +1,33 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { toast } from "react-toastify"
-import { XIcon, ExclamationCircleIcon, PlusCircleIcon } from "@heroicons/react/solid"
-import "./CreateCarForm.css"
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import {
+  XIcon,
+  ExclamationCircleIcon,
+  PlusCircleIcon,
+} from "@heroicons/react/solid";
+import "./CreateCarForm.css";
+import { Car, CarFormErrors, Feature, RenderFieldOptions } from "../../../types/car";
 
-const CURRENT_YEAR = new Date().getFullYear()
-const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i)
-const LICENSE_PLATE_REGEX = /^[A-Z0-9]{1,10}$/i
-const CHASSIS_NUMBER_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/i
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
+const LICENSE_PLATE_REGEX = /^[A-Z0-9]{1,10}$/i;
+const CHASSIS_NUMBER_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/i;
 
-const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
+interface CreateCarFormProps {
+  onSave: (car: Car) => Promise<void>;
+  onClose: () => void;
+  manufacturers?: string[];
+}
+
+const CreateCarForm: React.FC<CreateCarFormProps> = ({
+  onSave,
+  onClose,
+  manufacturers = [],
+}) => {
   // Form state
-  const [car, setCar] = useState({
+  const [car, setCar] = useState<Car>({
     manufacturer: "",
     model: "",
     year: CURRENT_YEAR,
@@ -26,22 +41,33 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
     fuel_type: "gasoline",
     seats: 5,
     image: "",
-  })
+  });
 
   // Validation state
-  const [errors, setErrors] = useState({})
-  const [touched, setTouched] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [newFeature, setNewFeature] = useState("")
+  const [errors, setErrors] = useState<CarFormErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newFeature, setNewFeature] = useState("");
 
   // Common car manufacturers for suggestions
   const commonManufacturers =
     manufacturers.length > 0
       ? manufacturers
-      : ["Toyota", "Honda", "Ford", "Chevrolet", "BMW", "Mercedes-Benz", "Audi", "Volkswagen", "Nissan", "Hyundai"]
+      : [
+          "Toyota",
+          "Honda",
+          "Ford",
+          "Chevrolet",
+          "BMW",
+          "Mercedes-Benz",
+          "Audi",
+          "Volkswagen",
+          "Nissan",
+          "Hyundai",
+        ];
 
   // Common car features
-  const commonFeatures = [
+  const commonFeatures: Feature[] = [
     "Air Conditioning",
     "Bluetooth",
     "Navigation System",
@@ -50,97 +76,116 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
     "Leather Seats",
     "Heated Seats",
     "Cruise Control",
-  ]
+  ];
 
   // Handle form field changes
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value, type } = e.target;
 
-    // Handle different input types
-    const newValue = type === "checkbox" ? checked : value
+    const newValue =
+      type === "checkbox"
+        ? (e.target as HTMLInputElement).checked // 👈 cast only here
+        : value;
 
-    setCar((prev) => ({ ...prev, [name]: newValue }))
+    setCar((prev) => ({ ...prev, [name]: newValue }));
 
     // Mark field as touched
     if (!touched[name]) {
-      setTouched((prev) => ({ ...prev, [name]: true }))
+      setTouched((prev) => ({ ...prev, [name]: true }));
     }
-  }
+  };
 
   // Add a new feature to the car
   const handleAddFeature = () => {
-    if (newFeature.trim() && !car.features.includes(newFeature.trim())) {
-      setCar((prev) => ({
-        ...prev,
-        features: [...prev.features, newFeature.trim()],
-      }))
-      setNewFeature("")
+    const trimmed = newFeature.trim();
+  
+    // Check if it's a valid Feature
+    if (trimmed && commonFeatures.includes(trimmed as Feature)) {
+      const validFeature = trimmed as Feature;
+  
+      if (!car.features.includes(validFeature)) {
+        setCar((prev) => ({
+          ...prev,
+          features: [...prev.features, validFeature],
+        }));
+      }
+  
+      setNewFeature("");
+    } else {
+      // Optional: notify user if they enter an invalid feature
+      // toast.warning("Invalid feature entered.");
     }
-  }
+  };
 
   // Add a common feature to the car
-  const handleAddCommonFeature = (feature) => {
+  const handleAddCommonFeature = (feature: Feature) => {
     if (!car.features.includes(feature)) {
       setCar((prev) => ({
         ...prev,
         features: [...prev.features, feature],
-      }))
+      }));
     }
-  }
+  };
 
   // Remove a feature from the car
-  const handleRemoveFeature = (feature) => {
+  const handleRemoveFeature = (feature: Feature) => {
     setCar((prev) => ({
       ...prev,
       features: prev.features.filter((f) => f !== feature),
-    }))
-  }
+    }));
+  };
 
   // Validate the form
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors: CarFormErrors = {};
 
     // Required fields
-    if (!car.manufacturer) newErrors.manufacturer = "Manufacturer is required"
-    if (!car.model) newErrors.model = "Model is required"
-    if (!car.year) newErrors.year = "Year is required"
-    if (!car.license_plate) newErrors.license_plate = "License plate is required"
+    if (!car.manufacturer) newErrors.manufacturer = "Manufacturer is required";
+    if (!car.model) newErrors.model = "Model is required";
+    if (!car.year) newErrors.year = "Year is required";
+    if (!car.license_plate)
+      newErrors.license_plate = "License plate is required";
 
     // License plate format
     if (car.license_plate && !LICENSE_PLATE_REGEX.test(car.license_plate)) {
-      newErrors.license_plate = "License plate format is invalid"
+      newErrors.license_plate = "License plate format is invalid";
     }
 
     // Chassis number format (if provided)
     if (car.chassis_number && !CHASSIS_NUMBER_REGEX.test(car.chassis_number)) {
-      newErrors.chassis_number = "Chassis number must be 17 characters (excluding I, O, Q)"
+      newErrors.chassis_number =
+        "Chassis number must be 17 characters (excluding I, O, Q)";
     }
 
     // Price validation
     if (car.price_per_day) {
-      const price = Number.parseFloat(car.price_per_day)
+      const price = Number.parseFloat(String(car.price_per_day));
       if (isNaN(price) || price <= 0) {
-        newErrors.price_per_day = "Price must be a positive number"
+        newErrors.price_per_day = "Price must be a positive number";
       }
     } else {
-      newErrors.price_per_day = "Price per day is required"
+      newErrors.price_per_day = "Price per day is required";
     }
 
     // Seats validation
     if (car.seats) {
-      const seats = Number.parseInt(car.seats)
+      const seats = Number.parseInt(String(car.seats));
       if (isNaN(seats) || seats < 1 || seats > 10) {
-        newErrors.seats = "Seats must be between 1 and 10"
+        newErrors.seats = "Seats must be between 1 and 10";
       }
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     // Validate all fields
     setTouched({
@@ -152,60 +197,77 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
       chassis_number: true,
       price_per_day: true,
       seats: true,
-    })
+    });
 
     if (!validateForm()) {
-      toast.error("Please fix the errors in the form")
-      return
+      toast.error("Please fix the errors in the form");
+      return;
     }
 
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       // Format the data before saving
       const carData = {
         ...car,
-        year: Number.parseInt(car.year),
-        price_per_day: Number.parseFloat(car.price_per_day),
-        seats: Number.parseInt(car.seats),
-      }
+        year: Number.parseInt(car.year.toString()),
+        price_per_day: Number.parseFloat(String(car.price_per_day)),
+        seats: Number.parseInt(car.seats.toString()),
+      };
 
-      await onSave(carData)
-      toast.success("Car created successfully")
+      await onSave(carData);
+      toast.success("Car created successfully");
     } catch (error) {
-      console.error("Error creating car:", error)
-      toast.error("Failed to create car")
+      console.error("Error creating car:", error);
+      toast.error("Failed to create car");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Handle cancel with unsaved changes
   const handleCancel = () => {
     // Check if form has been modified
-    const hasChanges = Object.keys(touched).length > 0
+    const hasChanges = Object.keys(touched).length > 0;
 
     if (hasChanges) {
-      if (window.confirm("You have unsaved changes. Are you sure you want to cancel?")) {
-        onClose()
+      if (
+        window.confirm(
+          "You have unsaved changes. Are you sure you want to cancel?"
+        )
+      ) {
+        onClose();
       }
     } else {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   // Validate on field change
   useEffect(() => {
     if (Object.keys(touched).length > 0) {
-      validateForm()
+      validateForm();
     }
-  }, [car, touched])
+  }, [car, touched]);
 
   // Render form field with label and error message
-  const renderField = (label, name, type = "text", options = {}) => {
-    const { placeholder = "", min, max, step, list, autoComplete = "off", required = false } = options
+  const renderField = (
+    label: string,
+    name: keyof Car,
+    type: string = "text",
+    options: RenderFieldOptions = {}
+  ) => {
+    const {
+      placeholder = "",
+      min,
+      max,
+      step,
+      list,
+      autoComplete = "off",
+      required = false,
+    } = options;
 
-    const hasError = !!errors[name]
+    const hasError = !!errors[name];
 
     return (
       <div className={`form-field ${hasError ? "has-error" : ""}`}>
@@ -223,7 +285,7 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
             className={hasError ? "error" : ""}
             required={required}
           >
-            {options.options.map((option) => (
+            {options.options?.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -265,10 +327,12 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
           </div>
         )}
 
-        {options.helpText && !hasError && <div className="help-text">{options.helpText}</div>}
+        {options.helpText && !hasError && (
+          <div className="help-text">{options.helpText}</div>
+        )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="create-car-form-container">
@@ -306,7 +370,10 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
             <div className="form-row">
               {renderField("Year", "year", "select", {
                 required: true,
-                options: YEARS.map((year) => ({ value: year, label: year })),
+                options: YEARS.map((year) => ({
+                  value: year,
+                  label: year.toString(),
+                })),
               })}
 
               {renderField("Color", "color", "color", {
@@ -383,9 +450,16 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
                   value={newFeature}
                   onChange={(e) => setNewFeature(e.target.value)}
                   placeholder="Add a feature..."
-                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddFeature())}
+                  onKeyPress={(e) =>
+                    e.key === "Enter" &&
+                    (e.preventDefault(), handleAddFeature())
+                  }
                 />
-                <button type="button" className="add-feature-button" onClick={handleAddFeature}>
+                <button
+                  type="button"
+                  className="add-feature-button"
+                  onClick={handleAddFeature}
+                >
                   Add
                 </button>
               </div>
@@ -393,19 +467,26 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
               <div className="common-features">
                 <p className="common-features-label">Common features:</p>
                 <div className="common-features-list">
-                  {commonFeatures.map((feature) => (
-                    <button
-                      key={feature}
-                      type="button"
-                      className={`common-feature ${car.features.includes(feature) ? "selected" : ""}`}
-                      onClick={() =>
-                        car.features.includes(feature) ? handleRemoveFeature(feature) : handleAddCommonFeature(feature)
-                      }
-                    >
-                      {feature}
-                      {car.features.includes(feature) ? " ✓" : " +"}
-                    </button>
-                  ))}
+                  {commonFeatures.map((feature) => {
+                    const isSelected = car.features.includes(feature);
+
+                    return (
+                      <button
+                        key={feature}
+                        type="button"
+                        className={`common-feature ${
+                          isSelected ? "selected" : ""
+                        }`}
+                        onClick={() =>
+                          isSelected
+                            ? handleRemoveFeature(feature)
+                            : handleAddCommonFeature(feature)
+                        }
+                      >
+                        {feature} {isSelected ? "✓" : "+"}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -413,10 +494,16 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
                 <div className="selected-features">
                   <p className="selected-features-label">Selected features:</p>
                   <div className="features-list">
-                    {car.features.map((feature) => (
+                    {car.features.map((feature: Feature) => (
                       <div key={feature} className="feature-tag">
                         <span>{feature}</span>
-                        <button type="button" className="remove-feature" onClick={() => handleRemoveFeature(feature)}>
+                        <button
+                          type="button"
+                          className="remove-feature"
+                          onClick={() =>
+                            handleRemoveFeature(feature as Feature)
+                          }
+                        >
                           <XIcon className="icon" />
                         </button>
                       </div>
@@ -443,11 +530,20 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
         </div>
 
         <div className="form-actions">
-          <button type="button" className="cancel-button" onClick={handleCancel} disabled={isSubmitting}>
+          <button
+            type="button"
+            className="cancel-button"
+            onClick={handleCancel}
+            disabled={isSubmitting}
+          >
             Cancel
           </button>
 
-          <button type="submit" className="submit-button" disabled={isSubmitting}>
+          <button
+            type="submit"
+            className="submit-button"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <div className="spinner"></div>
@@ -463,8 +559,7 @@ const CreateCarForm = ({ onSave, onClose, manufacturers = [] }) => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default CreateCarForm
-
+export default CreateCarForm;
