@@ -111,4 +111,3 @@ const CarDetails = ({ car, isBusy, onEdit, onClose }) => {
 }
 
 export default CarDetails
-
