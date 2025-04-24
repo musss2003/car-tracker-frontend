@@ -1,124 +1,124 @@
-import { getAuthHeaders } from "../utils/getAuthHeaders"; // Ensure this utility function is correctly imported
+import { getAuthHeaders } from "../utils/getAuthHeaders";
+import { Customer } from "../types/Customer";
 
-const API_URL = process.env.REACT_APP_API_BASE_URL + '/api/customers/';
+const API_URL = import.meta.env.VITE_API_BASE_URL + `/api/customers/`; 
 
-export const getCustomer = async (customerId) => {
-    try {
-        const response = await fetch(`${API_URL}${customerId}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+// Get a single customer by ID
+export const getCustomer = async (customerId: string): Promise<Customer> => {
+  try {
+    const response = await fetch(`${API_URL}${customerId}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data; // Return the fetched customer data
-    } catch (error) {
-        console.error('Error fetching customer:', error);
-        throw error; // Propagate the error for further handling
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching customer:', error);
+    throw error;
+  }
 };
 
-export const getCustomers = async () => {
-    try {
-        const response = await fetch(`${API_URL}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+// Get all customers
+export const getCustomers = async (): Promise<Customer[]> => {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data; // Return the list of customers
-    } catch (error) {
-        console.error('Error fetching all customers:', error);
-        throw error; // Propagate the error for further handling
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching all customers:', error);
+    throw error;
+  }
 };
 
-// customerService.js
-export const searchCustomersByName = async (name) => {
-    try {
-        const response = await fetch(`${API_URL}search?name=${encodeURIComponent(name)}`, {
-            method: 'GET',
-            headers: getAuthHeaders(),
-        });
+// Search customers by name
+export const searchCustomersByName = async (name: string): Promise<Customer[]> => {
+  try {
+    const response = await fetch(`${API_URL}search?name=${encodeURIComponent(name)}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
 
-        if (!response.ok) {
-            throw new Error('Error searching for customers');
-        }
-
-        const customers = await response.json();
-        return customers;
-    } catch (error) {
-        console.error('Error fetching customers:', error);
-        throw error;
+    if (!response.ok) {
+      throw new Error('Error searching for customers');
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching customers:', error);
+    throw error;
+  }
 };
 
+// Update customer
+export const updateCustomer = async (customerId: string, updatedCustomer: Partial<Customer>): Promise<Customer> => {
+  try {
+    const response = await fetch(`${API_URL}${customerId}`, {
+      method: 'PUT',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedCustomer),
+    });
 
-export const updateCustomer = async (customerId, updatedCustomer) => {
-    try {
-        const response = await fetch(`${API_URL}${customerId}`, {
-            method: 'PUT',
-            headers: {
-                ...getAuthHeaders()
-            },
-            body: JSON.stringify(updatedCustomer), // Convert the updated customer object to JSON
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data; // Return the updated customer data
-    } catch (error) {
-        console.error('Error updating customer:', error);
-        throw error; // Propagate the error for further handling
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    throw error;
+  }
 };
 
-export const deleteCustomer = async (customerId) => {
-    try {
-        const response = await fetch(`${API_URL}${customerId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders(), // Include authorization headers if needed
-        });
+// Delete customer
+export const deleteCustomer = async (customerId: string): Promise<void> => {
+  try {
+    const response = await fetch(`${API_URL}${customerId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        return; // Simply return if the deletion was successful (no response data)
-    } catch (error) {
-        console.error('Error deleting customer:', error);
-        throw error; // Propagate the error for further handling
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+  } catch (error) {
+    console.error('Error deleting customer:', error);
+    throw error;
+  }
 };
 
-export const addCustomer = async (newCustomer) => {
-    try {
-        const response = await fetch(`${API_URL}`, {
-            method: 'POST',
-            headers: {
-                ...getAuthHeaders()
-            },
-            body: JSON.stringify(newCustomer), // Convert the new customer object to JSON
-        });
+// Add new customer
+export const addCustomer = async (newCustomer: Partial<Customer>): Promise<Customer> => {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newCustomer),
+    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data; // Return the added customer data
-    } catch (error) {
-        console.error('Error adding customer:', error);
-        throw error; // Propagate the error for further handling
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding customer:', error);
+    throw error;
+  }
 };

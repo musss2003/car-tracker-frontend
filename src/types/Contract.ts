@@ -1,5 +1,3 @@
-// types/contract.ts
-
 export interface Contract {
     _id?: string; // optional for newly created contracts before save
     customer: {

@@ -38,7 +38,7 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
   const checkSession = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/api/auth/session-check`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/session-check`,
         {
           method: "GET",
           credentials: "include",
@@ -116,7 +116,7 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/logout`, {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
         headers: getAuthHeaders(),

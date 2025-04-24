@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const NotificationContext = createContext();
 
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const NotificationProvider = ({ children, userId }) => {
     const [notifications, setNotifications] = useState([]);

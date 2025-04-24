@@ -1,74 +1,126 @@
-"use client"
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { getCars } from "../services/carService";
+import { getCustomers } from "../services/customerService";
+import {
+  getTotalRevenue,
+  getActiveContracts,
+} from "../services/contractService";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Contract } from "../types/Contract";
+import { Customer } from "../types/Customer";
+import { Car } from "../types/Car";
 
-import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
-import { getCars } from "../services/carService"
-import { getCustomers } from "../services/customerService"
-import { getTotalRevenue, getActiveContracts } from "../services/contractService"
-import { LineChart, Line } from "recharts";
-import { XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-
-
-// Custom hook for data fetching with loading and error states
-function useDataFetcher(fetchFn, initialValue = null) {
-  const [data, setData] = useState(initialValue)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+// Generic custom hook with typing
+function useDataFetcher<T>(fetchFn: () => Promise<T>, initialValue: T) {
+  const [data, setData] = useState<T>(initialValue);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
-        const result = await fetchFn()
-        setData(result)
-        setError(null)
-      } catch (err) {
-        setError(err.message || "An error occurred")
+        setLoading(true);
+        const result = await fetchFn();
+        setData(result);
+        setError(null);
+      } catch (err: any) {
+        setError(err.message || "An error occurred");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [fetchFn])
+    fetchData();
+  }, [fetchFn]);
 
-  return { data, loading, error }
+  return { data, loading, error };
 }
 
 function DashboardPage() {
   // Use the custom hook for each data fetch
-  const { data: cars, loading: carsLoading, error: carsError } = useDataFetcher(getCars, [])
+  const {
+    data: cars,
+    loading: carsLoading,
+    error: carsError,
+  } = useDataFetcher<Car[]>(getCars, []);
 
-  const { data: customers, loading: customersLoading, error: customersError } = useDataFetcher(getCustomers, [])
+  const {
+    data: customers,
+    loading: customersLoading,
+    error: customersError,
+  } = useDataFetcher<Customer[]>(getCustomers, []);
 
   const {
     data: revenueData,
     loading: revenueLoading,
     error: revenueError,
-  } = useDataFetcher(getTotalRevenue, { totalRevenue: 0 })
+  } = useDataFetcher<{ totalRevenue: number }>(getTotalRevenue, {
+    totalRevenue: 0,
+  });
 
-  const { data: contracts, loading: contractsLoading, error: contractsError } = useDataFetcher(getActiveContracts, [])
+  const {
+    data: contracts,
+    loading: contractsLoading,
+    error: contractsError,
+  } = useDataFetcher<Contract[]>(getActiveContracts, []);
 
   // Derived values
-  const numberOfCars = cars?.length || 0
-  const numberOfCustomers = customers?.length || 0
-  const numberOfContracts = contracts?.length || 0
-  const totalRevenue = revenueData?.totalRevenue || 0
+  const numberOfCars = cars.length;
+  const numberOfCustomers = customers.length;
+  const numberOfContracts = contracts.length;
+  const totalRevenue = revenueData.totalRevenue;
 
   // Mock data for charts and trends
-  const monthlyRevenue = [12500, 14000, 15800, 14200, 16500, 17800, 19200, 18500, 20100, 21500, 22800, totalRevenue]
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthlyRevenue = [
+    12500,
+    14000,
+    15800,
+    14200,
+    16500,
+    17800,
+    19200,
+    18500,
+    20100,
+    21500,
+    22800,
+    totalRevenue,
+  ];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   // Transform the data for Recharts
   const revenue = months.map((month, index) => ({
     name: month,
     revenue: monthlyRevenue[index],
   }));
-  const carUtilization = numberOfCars ? (numberOfContracts / numberOfCars) * 100 : 0
-  const revenueChange = 12.5 // Percentage change from last month
-  const customerChange = 8.3 // Percentage change from last month
+  const carUtilization = numberOfCars
+    ? (numberOfContracts / numberOfCars) * 100
+    : 0;
+  const revenueChange = 12.5; // Percentage change from last month
+  const customerChange = 8.3; // Percentage change from last month
 
   // Check if any errors occurred
-  const hasErrors = carsError || customersError || revenueError || contractsError
+  const hasErrors =
+    carsError || customersError || revenueError || contractsError;
 
   const RevenueLineChart = () => (
     <ResponsiveContainer width="100%" height={320}>
@@ -76,7 +128,12 @@ function DashboardPage() {
         <XAxis dataKey="name" />
         <YAxis />
         <Tooltip />
-        <Line type="monotone" dataKey="revenue" stroke="#82ca9d" strokeWidth={3} />
+        <Line
+          type="monotone"
+          dataKey="revenue"
+          stroke="#82ca9d"
+          strokeWidth={3}
+        />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -87,7 +144,9 @@ function DashboardPage() {
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-gray-500">Overview of your car rental business performance</p>
+          <p className="text-gray-500">
+            Overview of your car rental business performance
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button className="flex items-center px-3 py-1 text-sm border rounded-md hover:bg-gray-50">
@@ -148,7 +207,8 @@ function DashboardPage() {
             <span className="font-medium">Error</span>
           </div>
           <p className="mt-1 text-sm">
-            There was a problem loading some dashboard data. Please try refreshing the page.
+            There was a problem loading some dashboard data. Please try
+            refreshing the page.
           </p>
         </div>
       )}
@@ -158,7 +218,9 @@ function DashboardPage() {
         {/* Active Contracts Card */}
         <div className="p-6 bg-white border rounded-lg shadow-sm">
           <div className="flex items-center justify-between pb-2">
-            <h3 className="text-sm font-medium text-gray-500">Active Contracts</h3>
+            <h3 className="text-sm font-medium text-gray-500">
+              Active Contracts
+            </h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-5 h-5 text-blue-500"
@@ -180,7 +242,9 @@ function DashboardPage() {
             ) : (
               <div className="text-2xl font-bold">{numberOfContracts}</div>
             )}
-            <p className="text-xs text-gray-500">{carUtilization.toFixed(1)}% car utilization</p>
+            <p className="text-xs text-gray-500">
+              {carUtilization.toFixed(1)}% car utilization
+            </p>
             <div className="w-full h-1 mt-2 bg-gray-200 rounded-full">
               <div
                 className="h-1 bg-blue-500 rounded-full"
@@ -193,7 +257,9 @@ function DashboardPage() {
         {/* Available Cars Card */}
         <div className="p-6 bg-white border rounded-lg shadow-sm">
           <div className="flex items-center justify-between pb-2">
-            <h3 className="text-sm font-medium text-gray-500">Available Cars</h3>
+            <h3 className="text-sm font-medium text-gray-500">
+              Available Cars
+            </h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-5 h-5 text-green-500"
@@ -215,14 +281,18 @@ function DashboardPage() {
             ) : (
               <div className="text-2xl font-bold">{numberOfCars}</div>
             )}
-            <p className="text-xs text-gray-500">{numberOfCars - numberOfContracts} cars currently available</p>
+            <p className="text-xs text-gray-500">
+              {numberOfCars - numberOfContracts} cars currently available
+            </p>
           </div>
         </div>
 
         {/* Total Customers Card */}
         <div className="p-6 bg-white border rounded-lg shadow-sm">
           <div className="flex items-center justify-between pb-2">
-            <h3 className="text-sm font-medium text-gray-500">Total Customers</h3>
+            <h3 className="text-sm font-medium text-gray-500">
+              Total Customers
+            </h3>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-5 h-5 text-purple-500"
@@ -254,9 +324,16 @@ function DashboardPage() {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 10l7-7m0 0l7 7m-7-7v18"
+                    />
                   </svg>
-                  <span className="text-xs text-green-500">+{customerChange}%</span>
+                  <span className="text-xs text-green-500">
+                    +{customerChange}%
+                  </span>
                 </>
               ) : (
                 <>
@@ -267,12 +344,21 @@ function DashboardPage() {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                    />
                   </svg>
-                  <span className="text-xs text-red-500">{customerChange}%</span>
+                  <span className="text-xs text-red-500">
+                    {customerChange}%
+                  </span>
                 </>
               )}
-              <span className="text-xs text-gray-500 ml-1">from last month</span>
+              <span className="text-xs text-gray-500 ml-1">
+                from last month
+              </span>
             </div>
           </div>
         </div>
@@ -300,7 +386,9 @@ function DashboardPage() {
             {revenueLoading ? (
               <div className="h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
             ) : (
-              <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
+              <div className="text-2xl font-bold">
+                ${totalRevenue.toLocaleString()}
+              </div>
             )}
             <div className="flex items-center pt-1">
               {revenueChange > 0 ? (
@@ -312,9 +400,16 @@ function DashboardPage() {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 10l7-7m0 0l7 7m-7-7v18"
+                    />
                   </svg>
-                  <span className="text-xs text-green-500">+{revenueChange}%</span>
+                  <span className="text-xs text-green-500">
+                    +{revenueChange}%
+                  </span>
                 </>
               ) : (
                 <>
@@ -325,12 +420,19 @@ function DashboardPage() {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                    />
                   </svg>
                   <span className="text-xs text-red-500">{revenueChange}%</span>
                 </>
               )}
-              <span className="text-xs text-gray-500 ml-1">from last month</span>
+              <span className="text-xs text-gray-500 ml-1">
+                from last month
+              </span>
             </div>
           </div>
         </div>
@@ -340,10 +442,12 @@ function DashboardPage() {
       <div className="p-6 bg-white border rounded-lg shadow-sm">
         <div className="mb-4">
           <h3 className="text-lg font-medium">Revenue Overview</h3>
-          <p className="text-sm text-gray-500">Monthly revenue for the current year</p>
+          <p className="text-sm text-gray-500">
+            Monthly revenue for the current year
+          </p>
         </div>
         <div className="h-80">
-              <RevenueLineChart />
+          <RevenueLineChart />
         </div>
       </div>
 
@@ -353,11 +457,16 @@ function DashboardPage() {
         <div className="p-6 bg-white border rounded-lg shadow-sm">
           <div className="mb-4">
             <h3 className="text-lg font-medium">Quick Links</h3>
-            <p className="text-sm text-gray-500">Frequently used pages and actions</p>
+            <p className="text-sm text-gray-500">
+              Frequently used pages and actions
+            </p>
           </div>
           <div className="grid gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Link to="/contracts" className="flex items-start h-20 p-3 border rounded-md hover:bg-gray-50">
+              <Link
+                to="/contracts"
+                className="flex items-start h-20 p-3 border rounded-md hover:bg-gray-50"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-5 h-5 mr-2 text-blue-500"
@@ -374,11 +483,16 @@ function DashboardPage() {
                 </svg>
                 <div className="flex flex-col items-start">
                   <span className="font-medium">Manage Contracts</span>
-                  <span className="text-xs text-gray-500">{numberOfContracts} active contracts</span>
+                  <span className="text-xs text-gray-500">
+                    {numberOfContracts} active contracts
+                  </span>
                 </div>
               </Link>
 
-              <Link to="/customers" className="flex items-start h-20 p-3 border rounded-md hover:bg-gray-50">
+              <Link
+                to="/customers"
+                className="flex items-start h-20 p-3 border rounded-md hover:bg-gray-50"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-5 h-5 mr-2 text-purple-500"
@@ -395,11 +509,16 @@ function DashboardPage() {
                 </svg>
                 <div className="flex flex-col items-start">
                   <span className="font-medium">View Customers</span>
-                  <span className="text-xs text-gray-500">{numberOfCustomers} total customers</span>
+                  <span className="text-xs text-gray-500">
+                    {numberOfCustomers} total customers
+                  </span>
                 </div>
               </Link>
 
-              <Link to="/cars" className="flex items-start h-20 p-3 border rounded-md hover:bg-gray-50">
+              <Link
+                to="/cars"
+                className="flex items-start h-20 p-3 border rounded-md hover:bg-gray-50"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-5 h-5 mr-2 text-green-500"
@@ -416,11 +535,16 @@ function DashboardPage() {
                 </svg>
                 <div className="flex flex-col items-start">
                   <span className="font-medium">Available Cars</span>
-                  <span className="text-xs text-gray-500">{numberOfCars} in fleet</span>
+                  <span className="text-xs text-gray-500">
+                    {numberOfCars} in fleet
+                  </span>
                 </div>
               </Link>
 
-              <Link to="/rentals" className="flex items-start h-20 p-3 border rounded-md hover:bg-gray-50">
+              <Link
+                to="/rentals"
+                className="flex items-start h-20 p-3 border rounded-md hover:bg-gray-50"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-5 h-5 mr-2 text-yellow-500"
@@ -437,7 +561,9 @@ function DashboardPage() {
                 </svg>
                 <div className="flex flex-col items-start">
                   <span className="font-medium">Rental Details</span>
-                  <span className="text-xs text-gray-500">View all transactions</span>
+                  <span className="text-xs text-gray-500">
+                    View all transactions
+                  </span>
                 </div>
               </Link>
             </div>
@@ -448,29 +574,39 @@ function DashboardPage() {
         <div className="p-6 bg-white border rounded-lg shadow-sm">
           <div className="mb-4">
             <h3 className="text-lg font-medium">Recent Activity</h3>
-            <p className="text-sm text-gray-500">Latest transactions and events</p>
+            <p className="text-sm text-gray-500">
+              Latest transactions and events
+            </p>
           </div>
           <div className="space-y-4">
             {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-start gap-4 p-3 border rounded-lg">
-                <div className={`rounded-full p-2 ${activity.iconBg}`}>{activity.icon}</div>
+              <div
+                key={index}
+                className="flex items-start gap-4 p-3 border rounded-lg"
+              >
+                <div className={`rounded-full p-2 ${activity.iconBg}`}>
+                  {activity.icon}
+                </div>
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">{activity.title}</p>
-                  <p className="text-xs text-gray-500">{activity.description}</p>
+                  <p className="text-xs text-gray-500">
+                    {activity.description}
+                  </p>
                 </div>
                 <p className="text-xs text-gray-500">{activity.time}</p>
               </div>
             ))}
           </div>
           <div className="mt-4">
-            <button className="w-full px-4 py-2 text-sm border rounded-md hover:bg-gray-50">View All Activity</button>
+            <button className="w-full px-4 py-2 text-sm border rounded-md hover:bg-gray-50">
+              View All Activity
+            </button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-
 
 // Mock data for recent activities
 const recentActivities = [
@@ -562,7 +698,6 @@ const recentActivities = [
     description: "$350 payment for Contract #5678",
     time: "Yesterday",
   },
-]
+];
 
-export default DashboardPage
-
+export default DashboardPage;

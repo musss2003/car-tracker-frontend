@@ -43,6 +43,18 @@ export interface Car {
     features?: string;
   }
 
+  export interface BookingEvent {
+    id: string;
+    title: string;
+    start: Date;
+    end: Date;
+    contractId: string;
+    customerName: string;
+    customerPhone?: string;
+    totalAmount?: number;
+    status: string;
+  }
+
   export type Feature =
   | "Air Conditioning"
   | "Bluetooth"

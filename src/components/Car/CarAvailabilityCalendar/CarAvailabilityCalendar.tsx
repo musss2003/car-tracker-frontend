@@ -1,8 +1,14 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { Calendar, momentLocalizer } from "react-big-calendar"
-import moment from "moment"
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  Calendar,
+  View,
+  momentLocalizer,
+  ToolbarProps,
+  CalendarProps,
+} from "react-big-calendar";
+import moment from "moment";
 import {
   XIcon,
   ChevronLeftIcon,
@@ -14,131 +20,176 @@ import {
   DocumentTextIcon,
   StatusOnlineIcon,
   ClockIcon,
-} from "@heroicons/react/solid"
-import { getCarAvailability } from "../../../services/carService"
-import { toast } from "react-toastify"
-import "react-big-calendar/lib/css/react-big-calendar.css"
-import "./CarAvailabilityCalendar.css"
+} from "@heroicons/react/solid";
+import { getCarAvailability } from "../../../services/carService";
+import { toast } from "react-toastify";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "./CarAvailabilityCalendar.css";
+import { BookingEvent, Car } from "../../../types/car";
+
+interface CarAvailabilityCalendarProps {
+  car: Car;
+  onClose: () => void;
+}
 
 // Setup the localizer for react-big-calendar
-const localizer = momentLocalizer(moment)
+const localizer = momentLocalizer(moment);
 
-const CarAvailabilityCalendar = ({ car, onClose }) => {
-  const [bookings, setBookings] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [view, setView] = useState("month")
-  const [date, setDate] = useState(new Date())
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 })
-  const [selectedEvent, setSelectedEvent] = useState(null)
-  const tooltipRef = useRef(null)
+const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
+  car,
+  onClose,
+}) => {
+  const [bookings, setBookings] = useState<BookingEvent[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<BookingEvent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [view, setView] = useState<View>("month");
+  const [date, setDate] = useState(new Date());
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
 
   const fetchAvailabilityData = useCallback(async () => {
     try {
-      setIsLoading(true)
-      const availability = await getCarAvailability(car.license_plate)
+      setIsLoading(true);
+      const availability = await getCarAvailability(car.license_plate);
 
       // Transform the availability data into events for the calendar
-      const events = availability.map((booking) => ({
+      const events: BookingEvent[] = availability.map((booking): BookingEvent => ({
         id: booking.contractId,
         title: `Booked: ${booking.customerName}`,
-        start: new Date(booking.startDate),
-        end: new Date(booking.endDate),
+        start: new Date(booking.start),
+        end: new Date(booking.end),
         contractId: booking.contractId,
         customerName: booking.customerName,
         customerPhone: booking.customerPhone,
         totalAmount: booking.totalAmount,
         status: booking.status,
-      }))
+      }));
 
-      setBookings(events)
-      setError(null)
+      setBookings(events);
+      setError(null);
     } catch (error) {
-      console.error("Error fetching car availability:", error)
-      setError("Failed to load availability data. Please try again later.")
-      toast.error("Failed to load availability data")
+      console.error("Error fetching car availability:", error);
+      setError("Failed to load availability data. Please try again later.");
+      toast.error("Failed to load availability data");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [car.license_plate])
+  }, [car.license_plate]);
 
   useEffect(() => {
-    fetchAvailabilityData()
-  }, [fetchAvailabilityData])
+    fetchAvailabilityData();
+  }, [fetchAvailabilityData]);
 
   // Handle click outside tooltip to close it
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (tooltipRef.current && !tooltipRef.current.contains(event.target)) {
-        setSelectedEvent(null)
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        tooltipRef.current &&
+        !tooltipRef.current.contains(event.target as Node)
+      ) {
+        setSelectedEvent(null);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Custom toolbar component
-  const CustomToolbar = ({ label, onNavigate, onView }) => (
-    <div className="calendar-toolbar">
-      <div className="calendar-toolbar-left">
-        <div className="calendar-toolbar-nav">
-          <button onClick={() => onNavigate("PREV")} className="calendar-nav-button" aria-label="Previous">
-            <ChevronLeftIcon className="h-5 w-5" />
+  const CustomToolbar: React.FC<
+    ToolbarProps<BookingEvent> & { view: View }
+  > = ({ label, onNavigate, onView, view }) => {
+    return (
+      <div className="calendar-toolbar">
+        <div className="calendar-toolbar-left">
+          <div className="calendar-toolbar-nav">
+            <button
+              onClick={() => onNavigate("PREV")}
+              className="calendar-nav-button"
+              aria-label="Previous"
+            >
+              <ChevronLeftIcon className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => onNavigate("TODAY")}
+              className="calendar-today-button"
+            >
+              Today
+            </button>
+            <button
+              onClick={() => onNavigate("NEXT")}
+              className="calendar-nav-button"
+              aria-label="Next"
+            >
+              <ChevronRightIcon className="h-5 w-5" />
+            </button>
+          </div>
+          <h2 className="calendar-toolbar-label">{label}</h2>
+        </div>
+
+        <div className="calendar-toolbar-views">
+          <button
+            onClick={() => onView("month")}
+            className={`calendar-view-button ${
+              view === "month" ? "active" : ""
+            }`}
+          >
+            Month
           </button>
-          <button onClick={() => onNavigate("TODAY")} className="calendar-today-button">
-            Today
+          <button
+            onClick={() => onView("week")}
+            className={`calendar-view-button ${
+              view === "week" ? "active" : ""
+            }`}
+          >
+            Week
           </button>
-          <button onClick={() => onNavigate("NEXT")} className="calendar-nav-button" aria-label="Next">
-            <ChevronRightIcon className="h-5 w-5" />
+          <button
+            onClick={() => onView("day")}
+            className={`calendar-view-button ${view === "day" ? "active" : ""}`}
+          >
+            Day
+          </button>
+          <button
+            onClick={() => onView("agenda")}
+            className={`calendar-view-button ${
+              view === "agenda" ? "active" : ""
+            }`}
+          >
+            Agenda
           </button>
         </div>
-        <h2 className="calendar-toolbar-label">{label}</h2>
       </div>
-
-      <div className="calendar-toolbar-views">
-        <button onClick={() => onView("month")} className={`calendar-view-button ${view === "month" ? "active" : ""}`}>
-          Month
-        </button>
-        <button onClick={() => onView("week")} className={`calendar-view-button ${view === "week" ? "active" : ""}`}>
-          Week
-        </button>
-        <button onClick={() => onView("day")} className={`calendar-view-button ${view === "day" ? "active" : ""}`}>
-          Day
-        </button>
-        <button
-          onClick={() => onView("agenda")}
-          className={`calendar-view-button ${view === "agenda" ? "active" : ""}`}
-        >
-          Agenda
-        </button>
-      </div>
-    </div>
-  )
+    );
+  };
 
   // Custom event component to display booking details
-  const EventComponent = ({ event }) => (
+  const EventComponent: React.FC<{ event: BookingEvent }> = ({ event }) => (
     <div className="calendar-event">
       <div className="event-title">{event.title}</div>
     </div>
-  )
+  );
 
   // Handle event selection
-  const handleSelectEvent = (event, e) => {
-    // Calculate position for tooltip
-    const rect = e.currentTarget.getBoundingClientRect()
-    const scrollTop = window.scrollY || document.documentElement.scrollTop
-    const scrollLeft = window.scrollX || document.documentElement.scrollLeft
+  const handleSelectEvent = (
+    event: BookingEvent,
+    e: React.SyntheticEvent<HTMLElement>
+  ) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
 
     setTooltipPosition({
       top: rect.top + scrollTop,
       left: rect.right + scrollLeft + 10,
-    })
+    });
 
-    setSelectedEvent(event)
-  }
+    setSelectedEvent(event);
+  };
 
   return (
     <div className="car-availability-calendar">
@@ -152,7 +203,11 @@ const CarAvailabilityCalendar = ({ car, onClose }) => {
             </p>
           </div>
         </div>
-        <button className="calendar-close-button" onClick={onClose} aria-label="Close">
+        <button
+          className="calendar-close-button"
+          onClick={onClose}
+          aria-label="Close"
+        >
           <XIcon className="h-5 w-5" />
         </button>
       </div>
@@ -201,14 +256,16 @@ const CarAvailabilityCalendar = ({ car, onClose }) => {
                   moment(booking.start).startOf("day"),
                   moment(booking.end).endOf("day"),
                   null,
-                  "[]",
-                ),
-              )
+                  "[]"
+                )
+              );
 
               return {
                 className: hasBooking ? "booked-day" : "available-day",
-                style: hasBooking ? { backgroundColor: "#fee2e2" } : { backgroundColor: "#d1fae5" },
-              }
+                style: hasBooking
+                  ? { backgroundColor: "#fee2e2" }
+                  : { backgroundColor: "#d1fae5" },
+              };
             }}
           />
         </div>
@@ -253,14 +310,18 @@ const CarAvailabilityCalendar = ({ car, onClose }) => {
             <div className="tooltip-detail">
               <UserIcon className="tooltip-icon" />
               <span className="tooltip-label">Customer:</span>
-              <span className="tooltip-value">{selectedEvent.customerName}</span>
+              <span className="tooltip-value">
+                {selectedEvent.customerName}
+              </span>
             </div>
 
             {selectedEvent.customerPhone && (
               <div className="tooltip-detail">
                 <PhoneIcon className="tooltip-icon" />
                 <span className="tooltip-label">Phone:</span>
-                <span className="tooltip-value">{selectedEvent.customerPhone}</span>
+                <span className="tooltip-value">
+                  {selectedEvent.customerPhone}
+                </span>
               </div>
             )}
 
@@ -274,28 +335,33 @@ const CarAvailabilityCalendar = ({ car, onClose }) => {
               <div className="tooltip-detail">
                 <CurrencyDollarIcon className="tooltip-icon" />
                 <span className="tooltip-label">Amount:</span>
-                <span className="tooltip-value">${selectedEvent.totalAmount}</span>
+                <span className="tooltip-value">
+                  ${selectedEvent.totalAmount}
+                </span>
               </div>
             )}
 
             <div className="tooltip-detail">
               <StatusOnlineIcon className="tooltip-icon" />
               <span className="tooltip-label">Status:</span>
-              <span className="tooltip-value status-badge">{selectedEvent.status}</span>
+              <span className="tooltip-value status-badge">
+                {selectedEvent.status}
+              </span>
             </div>
 
             <div className="tooltip-detail">
               <ClockIcon className="tooltip-icon" />
               <span className="tooltip-label">Period:</span>
               <span className="tooltip-value">
-                {moment(selectedEvent.start).format("MMM D, YYYY")} - {moment(selectedEvent.end).format("MMM D, YYYY")}
+                {moment(selectedEvent.start).format("MMM D, YYYY")} -{" "}
+                {moment(selectedEvent.end).format("MMM D, YYYY")}
               </span>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CarAvailabilityCalendar
+export default CarAvailabilityCalendar;

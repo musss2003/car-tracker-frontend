@@ -1,223 +1,147 @@
+import { Contract } from "../types/Contract";
 import { getAuthHeaders } from "../utils/getAuthHeaders";
 
-const API_URL = process.env.REACT_APP_API_BASE_URL + '/api/contracts/';
+const API_URL = import.meta.env.VITE_API_BASE_URL + "/api/contracts/";
 
+// Expected by useDataFetcher:
+// const { data: revenueData } = useDataFetcher<{ totalRevenue: number }>(...)
+export const getTotalRevenue = async (): Promise<{ totalRevenue: number }> => {
+  try {
+    const response = await fetch(`${API_URL}revenue`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
 
-
-export const getTotalRevenue = async () => {
-    try {
-        const response = await fetch(`${API_URL}revenue`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching total revenue:', error);
-        throw error;
+    if (!response.ok) {
+      throw new Error(`Error fetching revenue: ${response.statusText}`);
     }
+
+    const totalRevenue: number = await response.json();
+    return { totalRevenue }; // wrap it in an object
+  } catch (error) {
+    console.error("Error fetching total revenue:", error);
+    throw error;
+  }
 };
 
-export const getContracts = async () => {
-    try {
-        const response = await fetch(`${API_URL}/`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+export const getContracts = async (): Promise<Contract[]> => {
+  const res = await fetch(`${API_URL}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching contracts:', error);
-        throw error;
-    }
+  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  return res.json();
 };
 
-export const getContractTemplate = async () => {
-    try {
-        const response = await fetch(`${API_URL}template`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+export const getContractTemplate = async (): Promise<Response> => {
+  const res = await fetch(`${API_URL}template`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = response;
-
-        return data;
-    } catch (error) {
-        console.error('Error fetching contracts:', error);
-        throw error;
-    }
+  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  return res;
 };
 
-export const getContractsPopulated = async () => {
-    try {
-        const response = await fetch(`${API_URL}populated`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+export const getContractsPopulated = async (): Promise<Contract[]> => {
+  const res = await fetch(`${API_URL}populated`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        return data;
-    } catch (error) {
-        console.error('Error fetching contracts:', error);
-        throw error;
-    }
+  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  return res.json();
 };
 
-export const getActiveContracts = async () => {
-    try {
-        const response = await fetch(`${API_URL}/active`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+export const getActiveContracts = async (): Promise<Contract[]> => {
+  const res = await fetch(`${API_URL}active`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching active contracts:', error);
-        throw error;
-    }
+  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  return res.json();
 };
 
-export const updateContract = async (contractId, updatedContract) => {
-    try {
-        const response = await fetch(`${API_URL}${contractId}`, {
-            method: 'PUT',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(updatedContract), // Convert the updated contract object to JSON
-        });
+export const updateContract = async (
+  contractId: string,
+  updatedContract: Partial<Contract>
+): Promise<Contract> => {
+  const res = await fetch(`${API_URL}${contractId}`, {
+    method: "PUT",
+    headers: {
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(updatedContract),
+  });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data; // Return the updated contract data
-    } catch (error) {
-        console.error('Error updating contract:', error);
-        throw error; // Propagate the error for further handling
-    }
+  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  return res.json();
 };
 
-export const deleteContract = async (contractId) => {
-    try {
-        const response = await fetch(`${API_URL}${contractId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders(), // Include authorization headers if needed
-        });
+export const deleteContract = async (contractId: string): Promise<void> => {
+  const res = await fetch(`${API_URL}${contractId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        return; // Simply return if the deletion was successful (no response data)
-    } catch (error) {
-        console.error('Error deleting contract:', error);
-        throw error; // Propagate the error for further handling
-    }
+  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 };
 
-export const createAndDownloadContract = async (contractData) => {
-    try {
-        const response = await fetch(`${API_URL}`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(contractData)
-        });
+export const createAndDownloadContract = async (
+  contractData: Partial<Contract>
+): Promise<Contract | undefined> => {
+  try {
+    const res = await fetch(`${API_URL}`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(contractData),
+    });
 
-        if (!response.ok) {
-            throw new Error(`Error creating contract: ${response.statusText}`);
-        }
+    if (!res.ok) throw new Error(`Error creating contract: ${res.statusText}`);
 
-        // Read the response as a Blob
-        const blob = await response.blob();
+    const text = await res.text();
+    const { contract, docx } = JSON.parse(text);
 
-        // Convert part of the Blob to JSON to get the contract data
-        const text = await blob.text();
-        const { contract, docx } = JSON.parse(text);
-
-        // Convert base64 string to a Blob
-        const docxBlob = await extractDocxBlobFromResponse(docx);
-
-        // Trigger the download of the generated DOCX file
-        triggerDownloadContract(docxBlob, contract._id);
-
-        return contract;
-    } catch (error) {
-        console.error('Error creating and downloading contract:', error);
-    }
+    const docxBlob = extractDocxBlobFromResponse(docx);
+    triggerDownloadContract(await docxBlob, contract._id);
+    return contract;
+  } catch (error) {
+    console.error("Error creating and downloading contract:", error);
+  }
 };
 
-export const downloadContract = async (contractId) => {
-    try {
-        const response = await fetch(`${API_URL}download/${contractId}`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
+export const downloadContract = async (contractId: string): Promise<void> => {
+  const res = await fetch(`${API_URL}download/${contractId}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
 
-        if (!response.ok) {
-            throw new Error(`Error downloading contract: ${response.statusText}`);
-        }
+  if (!res.ok) throw new Error(`Error downloading contract: ${res.statusText}`);
 
-        // Read the response as JSON
-        const data = await response.json();
+  const { docx } = await res.json();
+  const blob = await extractDocxBlobFromResponse(docx);
+  triggerDownloadContract(blob, contractId);
+};
 
-        // Extract the base64 string from the response
-        const { docx } = data;
+const extractDocxBlobFromResponse = async (docx: string): Promise<Blob> => {
+  const byteCharacters = atob(docx);
+  const byteNumbers = Array.from(byteCharacters).map((char) =>
+    char.charCodeAt(0)
+  );
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], {
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  });
+};
 
-        // Convert base64 string to a Blob
-        const blob = await extractDocxBlobFromResponse(docx);
-
-        // Trigger the download of the generated DOCX file
-        triggerDownloadContract(blob, contractId);
-    } catch (error) {
-        console.error('Error downloading contract:', error);
-    }
-}
-
-
-const extractDocxBlobFromResponse = async (docx) => {
-    // Convert base64 string to a Blob
-    const byteCharacters = atob(docx);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-
-    return blob;
-}
-
-const triggerDownloadContract = (blob, contractId) => {
-    // Trigger the download of the generated DOCX file
-    // Trigger the download of the generated DOCX file
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `contract_${contractId}.docx`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-}
-
-
-
+const triggerDownloadContract = (blob: Blob, contractId: string) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `contract_${contractId}.docx`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
