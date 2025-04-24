@@ -22,4 +22,5 @@ ReactDOM.createRoot(rootElement).render(
   </React.StrictMode>
 );
 
-reportWebVitals();
+// Log performance metrics to the console
+reportWebVitals(console.log);

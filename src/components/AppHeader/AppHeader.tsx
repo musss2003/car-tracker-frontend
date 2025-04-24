@@ -2,7 +2,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCar, faBars } from "@fortawesome/free-solid-svg-icons"
 import "./AppHeader.css"
 
-function AppHeader({ isLoggedIn, toggleSidebar, isSmallScreen }) {
+interface AppHeaderProps {
+  isLoggedIn: boolean;
+  toggleSidebar: () => void;
+  isSmallScreen: boolean;
+}
+
+function AppHeader({ isLoggedIn, toggleSidebar, isSmallScreen }: AppHeaderProps) {
   return (
     <header className="app-header">
       <div className="header-top">
