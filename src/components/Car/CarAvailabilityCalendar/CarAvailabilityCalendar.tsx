@@ -25,7 +25,7 @@ import { getCarAvailability } from "../../../services/carService";
 import { toast } from "react-toastify";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./CarAvailabilityCalendar.css";
-import { BookingEvent, Car } from "../../../types/car";
+import { BookingEvent, Car } from "../../../types/Car";
 
 interface CarAvailabilityCalendarProps {
   car: Car;

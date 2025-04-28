@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   XIcon,
   PencilIcon,
@@ -13,12 +13,28 @@ import {
   ClockIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
-} from "@heroicons/react/solid"
-import "./ContractDetails.css"
+} from "@heroicons/react/solid";
+import "./ContractDetails.css";
+import { Contract } from "../../../types/Contract";
+import { calculateDuration } from "../../../utils/contractUtils";
 
-const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => {
+interface ContractDetailsProps {
+  contract: Contract;
+  onEdit: () => void;
+  onBack: () => void;
+  onDelete: () => void;
+  onDownload: () => void;
+}
+
+const ContractDetails: React.FC<ContractDetailsProps> = ({
+  contract,
+  onEdit,
+  onBack,
+  onDelete,
+  onDownload,
+}) => {
   // Check if the contract is valid and has required data
-  if (!contract || Object.keys(contract).length === 0 || !contract._id) {
+  if (!contract || Object.keys(contract).length === 0 || !contract.id) {
     return (
       <div className="contract-error">
         <ExclamationCircleIcon className="error-icon" />
@@ -27,11 +43,11 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
           Go Back
         </button>
       </div>
-    )
+    );
   }
 
   // Helper function to handle empty values
-  const getValue = (value, defaultValue = "N/A") => {
+  const getValue = (value: unknown, defaultValue: string = "N/A") => {
     // More robust check for empty values
     if (
       value === undefined ||
@@ -39,101 +55,86 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
       value === "" ||
       (typeof value === "object" && Object.keys(value).length === 0)
     ) {
-      return defaultValue
+      return defaultValue;
     }
-    return value
-  }
+    return String(value);
+  };
 
   // Format currency
-  const formatCurrency = (amount) => {
-    if (amount === undefined || amount === null || amount === "" || isNaN(Number(amount))) return "N/A"
-    return `$${Number.parseFloat(amount).toFixed(2)}`
-  }
+  const formatCurrency = (amount: unknown) => {
+    if (
+      amount === undefined ||
+      amount === null ||
+      amount === "" ||
+      isNaN(Number(amount))
+    )
+      return "N/A";
+    return `$${Number.parseFloat(amount as string).toFixed(2)}`;
+  };
 
   // Format date
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A"
+  const formatDate = (dateInput: string | Date | null | undefined): string => {
+    if (!dateInput) return "N/A";
     try {
-      const date = new Date(dateString)
-      if (isNaN(date.getTime())) return "N/A"
+      const date =
+        typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+      if (isNaN(date.getTime())) return "N/A";
 
       return date.toLocaleDateString(undefined, {
         year: "numeric",
         month: "long",
         day: "numeric",
-      })
+      });
     } catch (error) {
-      return "N/A"
+      return "N/A";
     }
-  }
+  };
 
   // Calculate contract status
   const getContractStatus = () => {
-    const now = new Date()
+    const now = new Date();
 
     // Safely access dates with optional chaining and nullish coalescing
-    const startDateStr = contract?.rentalPeriod?.startDate
-    const endDateStr = contract?.rentalPeriod?.endDate
+    const startDateStr = contract?.rentalPeriod?.startDate;
+    const endDateStr = contract?.rentalPeriod?.endDate;
 
     if (!startDateStr || !endDateStr) {
       return {
         status: "Unknown",
         className: "status-unknown",
         icon: <ExclamationCircleIcon className="status-icon" />,
-      }
+      };
     }
 
-    const startDate = new Date(startDateStr)
-    const endDate = new Date(endDateStr)
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
 
     if (now < startDate) {
       return {
         status: "Confirmed",
         className: "status-confirmed",
         icon: <ClockIcon className="status-icon" />,
-      }
+      };
     } else if (now >= startDate && now <= endDate) {
       return {
         status: "Active",
         className: "status-active",
         icon: <CheckCircleIcon className="status-icon" />,
-      }
+      };
     } else {
       return {
         status: "Completed",
         className: "status-completed",
         icon: <CheckCircleIcon className="status-icon" />,
-      }
+      };
     }
-  }
+  };
 
-  // Calculate rental duration in days
-  const calculateDuration = () => {
-    try {
-      const startDateStr = contract?.rentalPeriod?.startDate
-      const endDateStr = contract?.rentalPeriod?.endDate
-
-      if (!startDateStr || !endDateStr) return "N/A"
-
-      const startDate = new Date(startDateStr)
-      const endDate = new Date(endDateStr)
-
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return "N/A"
-
-      // Use UTC dates to avoid timezone issues
-      const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-      return diffDays
-    } catch (error) {
-      return "N/A"
-    }
-  }
-
-  const { status, className, icon } = getContractStatus()
+  const { status, className, icon } = getContractStatus();
 
   // Destructure contract properties with defaults
   const {
-    _id,
+    id,
     createdAt,
     updatedAt,
     additionalNotes = "",
@@ -143,14 +144,58 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
     rentalPeriod = {},
     rentalPrice = {},
     paymentDetails = {},
-  } = contract
+  } = contract;
 
   // Destructure nested objects with defaults
-  const { name = "", passport_number = "", driver_license_number = "", address = "" } = customer
-  const { model = "", license_plate = "", manufacturer = "", year = "" } = car
-  const { startDate = "", endDate = "" } = rentalPeriod
-  const { dailyRate = 0, totalAmount = 0, deposit = 0 } = rentalPrice
-  const { paymentMethod = "", paymentStatus = "" } = paymentDetails
+  const {
+    name = "",
+    passport_number = "",
+    driver_license_number = "",
+    address = "",
+  }: {
+    name?: string;
+    passport_number?: string;
+    driver_license_number?: string;
+    address?: string;
+  } = customer ?? {};
+
+  const {
+    model = "",
+    license_plate = "",
+    manufacturer = "",
+    year = "",
+  }: {
+    model?: string;
+    license_plate?: string;
+    manufacturer?: string;
+    year?: string | number;
+  } = car ?? {};
+
+  const {
+    startDate = "",
+    endDate = "",
+  }: {
+    startDate?: string;
+    endDate?: string;
+  } = rentalPeriod ?? {};
+
+  const {
+    dailyRate = 0,
+    totalAmount = 0,
+    deposit = 0,
+  }: {
+    dailyRate?: number;
+    totalAmount?: number;
+    deposit?: number;
+  } = rentalPrice ?? {};
+
+  const {
+    paymentMethod = "",
+    paymentStatus = "",
+  }: {
+    paymentMethod?: string;
+    paymentStatus?: string;
+  } = paymentDetails ?? {};
 
   return (
     <div className="contract-details">
@@ -183,7 +228,9 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
               </div>
               <div className="info-item">
                 <span className="info-label">Driver License</span>
-                <span className="info-value">{getValue(driver_license_number)}</span>
+                <span className="info-value">
+                  {getValue(driver_license_number)}
+                </span>
               </div>
               <div className="info-item">
                 <span className="info-label">Address</span>
@@ -240,7 +287,15 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
               <div className="info-item">
                 <span className="info-label">Duration</span>
                 <span className="info-value">
-                  {calculateDuration() !== "N/A" ? `${calculateDuration()} days` : "N/A"}
+                  {calculateDuration(
+                    contract?.rentalPeriod?.startDate,
+                    contract?.rentalPeriod?.endDate
+                  ) > 0
+                    ? `${calculateDuration(
+                        contract?.rentalPeriod?.startDate,
+                        contract?.rentalPeriod?.endDate
+                      )} days`
+                    : "N/A"}
                 </span>
               </div>
             </div>
@@ -261,7 +316,9 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
               </div>
               <div className="info-item">
                 <span className="info-label">Total Amount</span>
-                <span className="info-value highlight">{formatCurrency(totalAmount)}</span>
+                <span className="info-value highlight">
+                  {formatCurrency(totalAmount)}
+                </span>
               </div>
               {deposit > 0 && (
                 <div className="info-item">
@@ -285,13 +342,17 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
                 {paymentMethod && (
                   <div className="info-item">
                     <span className="info-label">Payment Method</span>
-                    <span className="info-value">{getValue(paymentMethod)}</span>
+                    <span className="info-value">
+                      {getValue(paymentMethod)}
+                    </span>
                   </div>
                 )}
                 {paymentStatus && (
                   <div className="info-item">
                     <span className="info-label">Payment Status</span>
-                    <span className="info-value capitalize">{getValue(paymentStatus)}</span>
+                    <span className="info-value capitalize">
+                      {getValue(paymentStatus)}
+                    </span>
                   </div>
                 )}
               </div>
@@ -320,16 +381,22 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
               <h3 className="section-title">Contract Photo</h3>
             </div>
             <div className="section-content">
-              <div className="photo-container" title="Contract photo - click to view full size">
+              <div
+                className="photo-container"
+                title="Contract photo - click to view full size"
+              >
                 <img
                   src={contractPhoto || "/placeholder.svg"}
                   alt="Contract"
                   className="contract-photo"
-                  onClick={() => contractPhoto && window.open(contractPhoto, "_blank")}
+                  onClick={() =>
+                    contractPhoto && window.open(contractPhoto, "_blank")
+                  }
                   onError={(e) => {
-                    e.target.onerror = null
-                    e.target.src = "/placeholder.svg"
-                    e.target.classList.add("error-image")
+                    const target = e.target as HTMLImageElement; // 👈 cast correctly
+                    target.onerror = null;
+                    target.src = "/placeholder.svg";
+                    target.classList.add("error-image");
                   }}
                 />
                 {contractPhoto && (
@@ -352,7 +419,7 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
             <div className="info-grid">
               <div className="info-item">
                 <span className="info-label">Contract ID</span>
-                <span className="info-value">{getValue(_id)}</span>
+                <span className="info-value">{getValue(id)}</span>
               </div>
               <div className="info-item">
                 <span className="info-label">Created At</span>
@@ -391,8 +458,7 @@ const ContractDetails = ({ contract, onEdit, onBack, onDelete, onDownload }) => 
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ContractDetails
-
+export default ContractDetails;

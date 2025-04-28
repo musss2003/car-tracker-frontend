@@ -1,8 +1,11 @@
-"use client"
-
-import { useEffect, useState, useRef } from "react"
-import { getUser, updateUser, deleteUser, uploadProfilePhoto } from "../../../services/userService.js"
-import { toast } from "react-toastify"
+import { useEffect, useState, useRef, JSX } from "react";
+import {
+  getUser,
+  updateUser,
+  deleteUser,
+  uploadProfilePhoto,
+} from "../../../services/userService.js";
+import { toast } from "react-toastify";
 import {
   UserIcon,
   MailIcon,
@@ -18,245 +21,296 @@ import {
   XIcon,
   CheckIcon,
   ExclamationCircleIcon,
-} from "@heroicons/react/solid"
-import defaultAvatar from "../../../assets/default_avatar.png"
-import "./UserProfile.css"
+} from "@heroicons/react/solid";
+import defaultAvatar from "../../../assets/default_avatar.png";
+import "./UserProfile.css";
+import { User } from "../../../types/User.js";
 
-const UserProfile = ({ id }) => {
+const UserProfile = ({ id }: { id: string }) => {
   // State management
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [currentEdit, setCurrentEdit] = useState(null)
-  const [editValue, setEditValue] = useState("")
-  const [saving, setSaving] = useState(false)
-  const [activeTab, setActiveTab] = useState("profile")
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [photoFile, setPhotoFile] = useState(null)
-  const [photoPreview, setPhotoPreview] = useState(null)
-  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  // User or null
+  const [user, setUser] = useState<User | null>(null);
+
+  // Boolean
+  const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState<boolean>(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
+
+  // String or null
+  const [error, setError] = useState<string | null>(null);
+  const [currentEdit, setCurrentEdit] = useState<keyof User | null>(null);
+  const [editValue, setEditValue] = useState<string>("");
+
+  // Active tab (limit to specific string literals if possible)
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "settings" | "notifications" | "security"
+  >("profile");
+
+  // File handling
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   // Refs
-  const fileInputRef = useRef(null)
-  const editInputRef = useRef(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Fetch user data
   useEffect(() => {
     const fetchUser = async () => {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       try {
-        const data = await getUser(id)
-        setUser(data)
+        const data = await getUser(id);
+        setUser(data);
       } catch (error) {
-        console.error("Failed to fetch user:", error)
-        setError(error.message || "Failed to load user profile")
-        toast.error("Failed to load user profile")
+        console.error("Failed to fetch user:", error);
+        if (error instanceof Error) {
+          setError(error.message);
+          toast.error(error.message);
+        } else {
+          setError("Failed to load user profile");
+          toast.error("Failed to load user profile");
+        }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUser()
-  }, [id])
+    fetchUser();
+  }, [id]);
 
   // Focus input when editing
   useEffect(() => {
-    if (currentEdit && editInputRef.current) {
-      editInputRef.current.focus()
+    if (!currentEdit) return;
+
+    // Focus the correct input based on the field type
+    if (["name", "email", "phone"].includes(currentEdit)) {
+      inputRef.current?.focus();
+    } else if (["address", "bio"].includes(currentEdit)) {
+      textareaRef.current?.focus();
     }
-  }, [currentEdit])
+  }, [currentEdit]);
 
   // Handle edit mode
-  const handleEdit = (field) => {
-    setCurrentEdit(field)
-    setEditValue(user[field] || "")
-  }
+  const handleEdit = (field: keyof User) => {
+    setCurrentEdit(field);
+    setEditValue(user?.[field]?.toString() || "");
+  };
 
   // Handle save
   const handleSave = async () => {
+    if (!currentEdit) return;
+
     // Validate input
     if (!editValue.trim() && ["name", "email"].includes(currentEdit)) {
-      toast.error(`${currentEdit.charAt(0).toUpperCase() + currentEdit.slice(1)} cannot be empty`)
-      return
+      toast.error(
+        `${
+          currentEdit.charAt(0).toUpperCase() + currentEdit.slice(1)
+        } cannot be empty`
+      );
+      return;
     }
 
     if (currentEdit === "email" && !validateEmail(editValue)) {
-      toast.error("Please enter a valid email address")
-      return
+      toast.error("Please enter a valid email address");
+      return;
     }
 
-    if (currentEdit === "phone" && editValue.trim() && !validatePhone(editValue)) {
-      toast.error("Please enter a valid phone number")
-      return
+    if (
+      currentEdit === "phone" &&
+      editValue.trim() &&
+      !validatePhone(editValue)
+    ) {
+      toast.error("Please enter a valid phone number");
+      return;
     }
 
-    setSaving(true)
-    const updatedData = { [currentEdit]: editValue.trim() }
+    setSaving(true);
+    const updatedData: Partial<User> = {
+      [currentEdit]: editValue.trim(),
+    } as Partial<User>;
 
     try {
-      await updateUser(id, updatedData)
-      setUser((prevUser) => ({ ...prevUser, ...updatedData }))
-      toast.success(`Updated ${formatFieldName(currentEdit)}`)
-      setCurrentEdit(null)
+      await updateUser(id, updatedData);
+      setUser((prevUser) =>
+        prevUser ? { ...prevUser, ...updatedData } : prevUser
+      );
+      toast.success(`Updated ${formatFieldName(currentEdit)}`);
+      setCurrentEdit(null);
     } catch (error) {
-      console.error(`Update failed for ${currentEdit}:`, error)
-      toast.error(`Failed to update ${formatFieldName(currentEdit)}: ${error.message || "Unknown error"}`)
+      const message = (error as Error).message || "Unknown error";
+      console.error(`Update failed for ${currentEdit}:`, message);
+      toast.error(
+        `Failed to update ${formatFieldName(currentEdit)}: ${message}`
+      );
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   // Handle cancel edit
   const handleCancelEdit = () => {
-    setCurrentEdit(null)
-    setEditValue("")
-  }
+    setCurrentEdit(null);
+    setEditValue("");
+  };
 
   // Handle delete user
   const handleDeleteUser = async () => {
     try {
-      setLoading(true)
-      await deleteUser(id)
-      toast.warning("User account deleted")
+      setLoading(true);
+      await deleteUser(id);
+      toast.warning("User account deleted");
       // Redirect or handle post-deletion logic here
-      window.location.href = "/login" // Example redirect
+      window.location.href = "/login"; // Example redirect
     } catch (error) {
-      console.error("Failed to delete user", error)
-      toast.error(`Failed to delete user: ${error.message || "Unknown error"}`)
-      setLoading(false)
-      setShowDeleteConfirm(false)
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.error("Failed to delete user", message);
+      toast.error(`Failed to delete user: ${message}`);
+      setLoading(false);
+      setShowDeleteConfirm(false);
     }
-  }
+  };
 
   // Handle photo upload click
   const handlePhotoUploadClick = () => {
-    fileInputRef.current.click()
-  }
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   // Handle photo change
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
     // Validate file type
     if (!file.type.match("image.*")) {
-      toast.error("Please select an image file")
-      return
+      toast.error("Please select an image file");
+      return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB")
-      return
+      toast.error("Image size should be less than 5MB");
+      return;
     }
 
-    setPhotoFile(file)
+    setPhotoFile(file);
 
     // Create preview
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setPhotoPreview(e.target.result)
-    }
-    reader.readAsDataURL(file)
-  }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setPhotoPreview(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Handle photo upload
   const handlePhotoUpload = async () => {
-    if (!photoFile) return
+    if (!photoFile) return;
 
-    setUploadingPhoto(true)
+    setUploadingPhoto(true);
     try {
-      const formData = new FormData()
-      formData.append("photo", photoFile)
+      const response = await uploadProfilePhoto(id, photoFile);
+      setUser((prevUser) => {
+        if (!prevUser) return null;
 
-      const response = await uploadProfilePhoto(id, formData)
-      setUser((prevUser) => ({ ...prevUser, profilePhotoUrl: response.profilePhotoUrl }))
-      toast.success("Profile photo updated")
+        return {
+          ...prevUser,
+          profilePhotoUrl: response.profilePhotoUrl || prevUser.profilePhotoUrl,
+        };
+      });
+      toast.success("Profile photo updated");
 
       // Reset state
-      setPhotoFile(null)
-      setPhotoPreview(null)
+      setPhotoFile(null);
+      setPhotoPreview(null);
     } catch (error) {
-      console.error("Failed to upload photo:", error)
-      toast.error(`Failed to upload photo: ${error.message || "Unknown error"}`)
+      console.error("Failed to upload photo:", error);
+
+      if (error instanceof Error) {
+        toast.error(`Failed to upload photo: ${error.message}`);
+      } else {
+        toast.error("Failed to upload photo: Unknown error");
+      }
     } finally {
-      setUploadingPhoto(false)
+      setUploadingPhoto(false);
     }
-  }
+  };
 
   // Handle cancel photo upload
   const handleCancelPhotoUpload = () => {
-    setPhotoFile(null)
-    setPhotoPreview(null)
-  }
+    setPhotoFile(null);
+    setPhotoPreview(null);
+  };
 
   // Format field name for display
-  const formatFieldName = (field) => {
-    if (!field) return ""
+  const formatFieldName = (field: string): string => {
+    if (!field) return "";
     return field
       .replace(/([A-Z])/g, " $1") // Insert space before capital letters
-      .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
-  }
+      .replace(/^./, (str) => str.toUpperCase()); // Capitalize first letter
+  };
 
   // Format date
-  const formatDate = (date) => {
-    if (!date) return "N/A"
+  const formatDate = (date?: string | Date): string => {
+    if (!date) return "N/A";
     try {
       return new Date(date).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
-      })
-    } catch (e) {
-      return "Invalid date"
+      });
+    } catch {
+      return "Invalid date";
     }
-  }
+  };
 
-  // Format date with time
-  const formatDateTime = (date) => {
-    if (!date) return "N/A"
+  const formatDateTime = (date?: string | Date): string => {
+    if (!date) return "N/A";
     try {
-      return new Date(date).toLocaleDateString("en-US", {
+      return new Date(date).toLocaleString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    } catch (e) {
-      return "Invalid date"
+        hour: "numeric",
+        minute: "numeric",
+      });
+    } catch {
+      return "Invalid datetime";
     }
-  }
+  };
 
   // Validate email
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  }
+  const validateEmail = (email: string): boolean => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   // Validate phone
-  const validatePhone = (phone) => {
-    return /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/.test(phone)
-  }
+  const validatePhone = (phone: string): boolean => {
+    return /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/.test(phone);
+  };
 
   // Get field icon
-  const getFieldIcon = (field) => {
+  const getFieldIcon = (field: string): JSX.Element => {
     switch (field) {
       case "name":
-        return <UserIcon className="field-icon" />
+        return <UserIcon className="field-icon" />;
       case "email":
-        return <MailIcon className="field-icon" />
+        return <MailIcon className="field-icon" />;
       case "phone":
-        return <PhoneIcon className="field-icon" />
+        return <PhoneIcon className="field-icon" />;
       case "address":
-        return <LocationMarkerIcon className="field-icon" />
+        return <LocationMarkerIcon className="field-icon" />;
       case "birthdate":
-        return <CalendarIcon className="field-icon" />
+        return <CalendarIcon className="field-icon" />;
       default:
-        return <UserIcon className="field-icon" />
+        return <UserIcon className="field-icon" />;
     }
-  }
+  };
 
   // Render loading state
   if (loading && !user) {
@@ -265,7 +319,7 @@ const UserProfile = ({ id }) => {
         <div className="loading-spinner"></div>
         <p>Loading profile...</p>
       </div>
-    )
+    );
   }
 
   // Render error state
@@ -275,11 +329,14 @@ const UserProfile = ({ id }) => {
         <ExclamationCircleIcon className="error-icon" />
         <h3>Failed to load profile</h3>
         <p>{error}</p>
-        <button onClick={() => window.location.reload()} className="retry-button">
+        <button
+          onClick={() => window.location.reload()}
+          className="retry-button"
+        >
           Try Again
         </button>
       </div>
-    )
+    );
   }
 
   // Render profile
@@ -289,7 +346,11 @@ const UserProfile = ({ id }) => {
       <div className="user-profile-header">
         <div className="profile-photo-container">
           {photoPreview ? (
-            <img src={photoPreview || "/placeholder.svg"} className="user-profile-avatar" alt="Profile Preview" />
+            <img
+              src={photoPreview || "/placeholder.svg"}
+              className="user-profile-avatar"
+              alt="Profile Preview"
+            />
           ) : (
             <img
               src={user?.profilePhotoUrl || defaultAvatar}
@@ -299,7 +360,11 @@ const UserProfile = ({ id }) => {
           )}
 
           {!photoFile && (
-            <button onClick={handlePhotoUploadClick} className="photo-edit-button" aria-label="Change profile photo">
+            <button
+              onClick={handlePhotoUploadClick}
+              className="photo-edit-button"
+              aria-label="Change profile photo"
+            >
               <PhotographIcon className="button-icon" />
             </button>
           )}
@@ -319,7 +384,11 @@ const UserProfile = ({ id }) => {
 
           {photoFile && (
             <div className="photo-actions">
-              <button onClick={handlePhotoUpload} className="photo-save-button" disabled={uploadingPhoto}>
+              <button
+                onClick={handlePhotoUpload}
+                className="photo-save-button"
+                disabled={uploadingPhoto}
+              >
                 {uploadingPhoto ? (
                   <span className="loading-spinner-small"></span>
                 ) : (
@@ -329,7 +398,11 @@ const UserProfile = ({ id }) => {
                   </>
                 )}
               </button>
-              <button onClick={handleCancelPhotoUpload} className="photo-cancel-button" disabled={uploadingPhoto}>
+              <button
+                onClick={handleCancelPhotoUpload}
+                className="photo-cancel-button"
+                disabled={uploadingPhoto}
+              >
                 <XIcon className="button-icon-small" />
                 Cancel
               </button>
@@ -380,7 +453,11 @@ const UserProfile = ({ id }) => {
                   </div>
 
                   {currentEdit !== "name" && (
-                    <button onClick={() => handleEdit("name")} className="edit-button" aria-label="Edit name">
+                    <button
+                      onClick={() => handleEdit("name")}
+                      className="edit-button"
+                      aria-label="Edit name"
+                    >
                       <PencilIcon className="button-icon-small" />
                     </button>
                   )}
@@ -394,10 +471,14 @@ const UserProfile = ({ id }) => {
                       onChange={(e) => setEditValue(e.target.value)}
                       className="edit-input"
                       placeholder="Enter your full name"
-                      ref={editInputRef}
+                      ref={inputRef}
                     />
                     <div className="edit-actions">
-                      <button onClick={handleSave} className="save-button" disabled={saving}>
+                      <button
+                        onClick={handleSave}
+                        className="save-button"
+                        disabled={saving}
+                      >
                         {saving ? (
                           <span className="loading-spinner-small"></span>
                         ) : (
@@ -407,7 +488,11 @@ const UserProfile = ({ id }) => {
                           </>
                         )}
                       </button>
-                      <button onClick={handleCancelEdit} className="cancel-button" disabled={saving}>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="cancel-button"
+                        disabled={saving}
+                      >
                         <XIcon className="button-icon-small" />
                         Cancel
                       </button>
@@ -427,7 +512,11 @@ const UserProfile = ({ id }) => {
                   </div>
 
                   {currentEdit !== "email" && (
-                    <button onClick={() => handleEdit("email")} className="edit-button" aria-label="Edit email">
+                    <button
+                      onClick={() => handleEdit("email")}
+                      className="edit-button"
+                      aria-label="Edit email"
+                    >
                       <PencilIcon className="button-icon-small" />
                     </button>
                   )}
@@ -441,10 +530,14 @@ const UserProfile = ({ id }) => {
                       onChange={(e) => setEditValue(e.target.value)}
                       className="edit-input"
                       placeholder="Enter your email address"
-                      ref={editInputRef}
+                      ref={inputRef}
                     />
                     <div className="edit-actions">
-                      <button onClick={handleSave} className="save-button" disabled={saving}>
+                      <button
+                        onClick={handleSave}
+                        className="save-button"
+                        disabled={saving}
+                      >
                         {saving ? (
                           <span className="loading-spinner-small"></span>
                         ) : (
@@ -454,7 +547,11 @@ const UserProfile = ({ id }) => {
                           </>
                         )}
                       </button>
-                      <button onClick={handleCancelEdit} className="cancel-button" disabled={saving}>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="cancel-button"
+                        disabled={saving}
+                      >
                         <XIcon className="button-icon-small" />
                         Cancel
                       </button>
@@ -474,7 +571,11 @@ const UserProfile = ({ id }) => {
                   </div>
 
                   {currentEdit !== "phone" && (
-                    <button onClick={() => handleEdit("phone")} className="edit-button" aria-label="Edit phone">
+                    <button
+                      onClick={() => handleEdit("phone")}
+                      className="edit-button"
+                      aria-label="Edit phone"
+                    >
                       <PencilIcon className="button-icon-small" />
                     </button>
                   )}
@@ -488,10 +589,14 @@ const UserProfile = ({ id }) => {
                       onChange={(e) => setEditValue(e.target.value)}
                       className="edit-input"
                       placeholder="Enter your phone number"
-                      ref={editInputRef}
+                      ref={inputRef}
                     />
                     <div className="edit-actions">
-                      <button onClick={handleSave} className="save-button" disabled={saving}>
+                      <button
+                        onClick={handleSave}
+                        className="save-button"
+                        disabled={saving}
+                      >
                         {saving ? (
                           <span className="loading-spinner-small"></span>
                         ) : (
@@ -501,7 +606,11 @@ const UserProfile = ({ id }) => {
                           </>
                         )}
                       </button>
-                      <button onClick={handleCancelEdit} className="cancel-button" disabled={saving}>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="cancel-button"
+                        disabled={saving}
+                      >
                         <XIcon className="button-icon-small" />
                         Cancel
                       </button>
@@ -521,7 +630,11 @@ const UserProfile = ({ id }) => {
                   </div>
 
                   {currentEdit !== "address" && (
-                    <button onClick={() => handleEdit("address")} className="edit-button" aria-label="Edit address">
+                    <button
+                      onClick={() => handleEdit("address")}
+                      className="edit-button"
+                      aria-label="Edit address"
+                    >
                       <PencilIcon className="button-icon-small" />
                     </button>
                   )}
@@ -534,11 +647,15 @@ const UserProfile = ({ id }) => {
                       onChange={(e) => setEditValue(e.target.value)}
                       className="edit-textarea"
                       placeholder="Enter your address"
-                      ref={editInputRef}
+                      ref={textareaRef}
                       rows={3}
                     />
                     <div className="edit-actions">
-                      <button onClick={handleSave} className="save-button" disabled={saving}>
+                      <button
+                        onClick={handleSave}
+                        className="save-button"
+                        disabled={saving}
+                      >
                         {saving ? (
                           <span className="loading-spinner-small"></span>
                         ) : (
@@ -548,61 +665,20 @@ const UserProfile = ({ id }) => {
                           </>
                         )}
                       </button>
-                      <button onClick={handleCancelEdit} className="cancel-button" disabled={saving}>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="cancel-button"
+                        disabled={saving}
+                      >
                         <XIcon className="button-icon-small" />
                         Cancel
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="field-value">{user?.address || "Not set"}</div>
-                )}
-              </div>
-
-              {/* Bio Field */}
-              <div className="profile-field">
-                <div className="field-header">
-                  <div className="field-label">
-                    <UserIcon className="field-icon" />
-                    <span>Bio</span>
+                  <div className="field-value">
+                    {user?.address || "Not set"}
                   </div>
-
-                  {currentEdit !== "bio" && (
-                    <button onClick={() => handleEdit("bio")} className="edit-button" aria-label="Edit bio">
-                      <PencilIcon className="button-icon-small" />
-                    </button>
-                  )}
-                </div>
-
-                {currentEdit === "bio" ? (
-                  <div className="edit-field">
-                    <textarea
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      className="edit-textarea"
-                      placeholder="Tell us about yourself"
-                      ref={editInputRef}
-                      rows={4}
-                    />
-                    <div className="edit-actions">
-                      <button onClick={handleSave} className="save-button" disabled={saving}>
-                        {saving ? (
-                          <span className="loading-spinner-small"></span>
-                        ) : (
-                          <>
-                            <CheckIcon className="button-icon-small" />
-                            Save
-                          </>
-                        )}
-                      </button>
-                      <button onClick={handleCancelEdit} className="cancel-button" disabled={saving}>
-                        <XIcon className="button-icon-small" />
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="field-value bio-text">{user?.bio || "No bio available"}</div>
                 )}
               </div>
             </div>
@@ -613,11 +689,15 @@ const UserProfile = ({ id }) => {
               <div className="info-grid">
                 <div className="info-item">
                   <span className="info-label">Member Since</span>
-                  <span className="info-value">{formatDate(user?.createdAt)}</span>
+                  <span className="info-value">
+                    {formatDate(user?.createdAt)}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Last Updated</span>
-                  <span className="info-value">{formatDateTime(user?.updatedAt)}</span>
+                  <span className="info-value">
+                    {formatDateTime(user?.updatedAt)}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Account Status</span>
@@ -625,7 +705,7 @@ const UserProfile = ({ id }) => {
                 </div>
                 <div className="info-item">
                   <span className="info-label">Account Type</span>
-                  <span className="info-value">{user?.accountType || "Standard"}</span>
+                  <span className="info-value">{user?.role || "Standard"}</span>
                 </div>
               </div>
             </div>
@@ -705,7 +785,9 @@ const UserProfile = ({ id }) => {
                 <div className="danger-option">
                   <div className="option-info">
                     <h4>Log Out of All Devices</h4>
-                    <p>This will log you out from all devices except this one</p>
+                    <p>
+                      This will log you out from all devices except this one
+                    </p>
                   </div>
                   <button className="warning-button">
                     <LogoutIcon className="button-icon-small" />
@@ -718,7 +800,10 @@ const UserProfile = ({ id }) => {
                     <h4>Delete Account</h4>
                     <p>Permanently delete your account and all your data</p>
                   </div>
-                  <button className="danger-button" onClick={() => setShowDeleteConfirm(true)}>
+                  <button
+                    className="danger-button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                  >
                     <TrashIcon className="button-icon-small" />
                     Delete Account
                   </button>
@@ -735,7 +820,11 @@ const UserProfile = ({ id }) => {
           <div className="modal-container">
             <div className="modal-header">
               <h3 className="modal-title">Delete Account</h3>
-              <button className="modal-close" onClick={() => setShowDeleteConfirm(false)} aria-label="Close">
+              <button
+                className="modal-close"
+                onClick={() => setShowDeleteConfirm(false)}
+                aria-label="Close"
+              >
                 <XIcon className="button-icon" />
               </button>
             </div>
@@ -746,16 +835,24 @@ const UserProfile = ({ id }) => {
               </div>
 
               <p className="modal-message">
-                Are you sure you want to delete your account? This action cannot be undone and all your data will be
-                permanently deleted.
+                Are you sure you want to delete your account? This action cannot
+                be undone and all your data will be permanently deleted.
               </p>
 
               <div className="modal-actions">
-                <button className="cancel-modal-button" onClick={() => setShowDeleteConfirm(false)} disabled={loading}>
+                <button
+                  className="cancel-modal-button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={loading}
+                >
                   Cancel
                 </button>
 
-                <button className="delete-modal-button" onClick={handleDeleteUser} disabled={loading}>
+                <button
+                  className="delete-modal-button"
+                  onClick={handleDeleteUser}
+                  disabled={loading}
+                >
                   {loading ? (
                     <span className="loading-spinner-small"></span>
                   ) : (
@@ -771,8 +868,7 @@ const UserProfile = ({ id }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default UserProfile
-
+export default UserProfile;

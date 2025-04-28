@@ -43,7 +43,7 @@ import EditCarForm from "../../../components/Car/EditCarForm/EditCarForm";
 import CarDetails from "../../../components/Car/CarDetails/CarDetails";
 import CreateCarForm from "../../../components/Car/CreateCarForm/CreateCarForm";
 import CarAvailabilityCalendar from "../../../components/Car/CarAvailabilityCalendar/CarAvailabilityCalendar";
-import { Car } from "../../../types/car";
+import { Car } from "../../../types/Car";
 import { Contract } from "../../../types/Contract";
 
 interface CarTableProps {

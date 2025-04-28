@@ -8,7 +8,7 @@ import {
   CarFormErrors,
   Feature,
   RenderFieldOptions,
-} from "../../../types/car";
+} from "../../../types/Car";
 import "./EditCarForm.css";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -34,6 +34,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
   manufacturers = [],
 }) => {
   const initialData = {
+    id: car.id,
     manufacturer: car.manufacturer || "",
     model: car.model || "",
     year: car.year || CURRENT_YEAR,
@@ -106,31 +107,48 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
 
   const handleAddFeature = () => {
     const trimmed = newFeature.trim() as Feature;
-    if (trimmed && !formData.features.includes(trimmed)) {
-      setFormData((prev) => ({
-        ...prev,
-        features: [...prev.features, trimmed],
-      }));
+
+    if (trimmed && commonFeatures.includes(trimmed as Feature)) {
+      const validFeature = trimmed as Feature;
+
+      setFormData((prev) => {
+        const features = prev.features ?? [];
+        if (!features.includes(validFeature)) {
+          return {
+            ...prev,
+            features: [...features, validFeature],
+          };
+        }
+        return prev; // no change if already exists
+      });
       setNewFeature("");
     }
   };
 
   // Add a common feature to the car
   const handleAddCommonFeature = (feature: Feature) => {
-    if (!formData.features.includes(feature)) {
-      setFormData((prev) => ({
-        ...prev,
-        features: [...prev.features, feature],
-      }));
-    }
+    setFormData((prev) => {
+      const features = prev.features ?? []; // fallback to [] if undefined
+      if (!features.includes(feature)) {
+        return {
+          ...prev,
+          features: [...features, feature],
+        };
+      }
+      return prev; // no change needed
+    });
   };
 
   // Remove a feature from the car
   const handleRemoveFeature = (feature: Feature) => {
-    setFormData((prev) => ({
-      ...prev,
-      features: prev.features.filter((f) => f !== feature),
-    }));
+    setFormData((prev) => {
+      const features = prev.features ?? []; // fallback to [] if undefined
+
+      return {
+        ...prev,
+        features: features.filter((f) => f !== feature),
+      };
+    });
   };
 
   // Validate the form
@@ -371,7 +389,10 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             <div className="form-row">
               {renderField("Year", "year", "select", {
                 required: true,
-                options: YEARS.map((year) => ({ value: year, label: year.toString() })),
+                options: YEARS.map((year) => ({
+                  value: year,
+                  label: year.toString(),
+                })),
               })}
 
               {renderField("Color", "color", "color", {
@@ -470,26 +491,30 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                       key={feature}
                       type="button"
                       className={`common-feature ${
-                        formData.features.includes(feature) ? "selected" : ""
+                        (formData.features ?? []).includes(feature)
+                          ? "selected"
+                          : ""
                       }`}
                       onClick={() =>
-                        formData.features.includes(feature)
+                        (formData.features ?? []).includes(feature)
                           ? handleRemoveFeature(feature)
                           : handleAddCommonFeature(feature)
                       }
                     >
                       {feature}
-                      {formData.features.includes(feature) ? " ✓" : " +"}
+                      {(formData.features ?? []).includes(feature)
+                        ? " ✓"
+                        : " +"}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {formData.features.length > 0 && (
+              {(formData.features ?? []).length > 0 && (
                 <div className="selected-features">
                   <p className="selected-features-label">Selected features:</p>
                   <div className="features-list">
-                    {formData.features.map((feature) => (
+                    {(formData.features ?? []).map((feature) => (
                       <div key={feature} className="feature-tag">
                         <span>{feature}</span>
                         <button

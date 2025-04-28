@@ -1,28 +1,36 @@
-import React from "react"
+import React, { ReactNode } from "react"
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+interface ErrorBoundaryProps {
+  children: ReactNode
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: Error | null
+  errorInfo: React.ErrorInfo | null
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props)
-    this.state = { hasError: false, error: null, errorInfo: null }
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+    }
   }
 
-  static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI
-    return { hasError: true }
+  static getDerivedStateFromError(_: Error): ErrorBoundaryState {
+    return { hasError: true, error: null, errorInfo: null }
   }
 
-  componentDidCatch(error, errorInfo) {
-    // You can log the error to an error reporting service
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     console.error("Error caught by ErrorBoundary:", error, errorInfo)
-    this.setState({
-      error: error,
-      errorInfo: errorInfo,
-    })
+    this.setState({ error, errorInfo })
   }
 
   render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       return (
         <div className="error-boundary">
           <h2>Something went wrong.</h2>
@@ -30,12 +38,13 @@ class ErrorBoundary extends React.Component {
           <button onClick={() => window.location.reload()} className="refresh-button">
             Refresh Page
           </button>
-          {process.env.NODE_ENV === "development" && (
+
+          {import.meta.env.MODE === "development" && this.state.error && this.state.errorInfo && (
             <details style={{ whiteSpace: "pre-wrap", marginTop: "20px" }}>
               <summary>Error Details</summary>
-              <p>{this.state.error && this.state.error.toString()}</p>
+              <p>{this.state.error.toString()}</p>
               <p>Component Stack:</p>
-              <pre>{this.state.errorInfo && this.state.errorInfo.componentStack}</pre>
+              <pre>{this.state.errorInfo.componentStack}</pre>
             </details>
           )}
         </div>
@@ -47,4 +56,3 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary
-

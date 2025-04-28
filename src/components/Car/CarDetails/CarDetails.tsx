@@ -5,7 +5,8 @@ import {
   ExclamationCircleIcon,
 } from "@heroicons/react/solid";
 import "./CarDetails.css";
-import { Car } from "../../../types/car";
+import { Car } from "../../../types/Car";
+import { formatCurrency } from "../../../utils/contractUtils";
 
 interface CarDetailsProps {
   car: Car;
@@ -20,14 +21,6 @@ const CarDetails: React.FC<CarDetailsProps> = ({
   onEdit,
   onClose,
 }) => {
-  // Format currency
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
   return (
     <div className="car-details">
       <div className="car-details-header">

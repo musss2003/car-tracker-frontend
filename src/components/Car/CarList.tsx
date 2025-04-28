@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { getCars } from '../../services/carService';
 import CarTable from '../../containers/Car/CarTable/CarTable';
-import { Car } from '../../types/car';
+import { Car } from '../../types/Car';
 
 
 const CarList = () => {

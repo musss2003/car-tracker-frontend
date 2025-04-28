@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   XIcon,
   PencilIcon,
@@ -14,57 +14,81 @@ import {
   DocumentTextIcon,
   ClockIcon,
   ExclamationIcon,
-} from "@heroicons/react/solid"
-import "./CustomerDetails.css"
+} from "@heroicons/react/solid";
+import "./CustomerDetails.css";
+import { Customer } from "../../../types/Customer";
 
-const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [expandedImage, setExpandedImage] = useState(null)
+interface ExpandedImage {
+  url: string;
+  type: string;
+}
 
-  // Handle missing or null values
-  const getValue = (value, defaultValue = "N/A") => {
-    return value || defaultValue
-  }
+interface CustomerDetailsProps {
+  customer: Customer;
+  onEdit: () => void;
+  onDelete: () => void;
+  onClose: () => void;
+}
+
+const CustomerDetails: React.FC<CustomerDetailsProps> = ({
+  customer,
+  onEdit,
+  onDelete,
+  onClose,
+}) => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [expandedImage, setExpandedImage] = useState<ExpandedImage | null>();
+
+  // Get value or fallback
+  const getValue = (
+    value: string | number | null | undefined,
+    defaultValue = "N/A"
+  ): string | number => {
+    return value ?? defaultValue;
+  };
 
   // Format date
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A"
+  const formatDate = (dateString: string | Date | undefined | null): string => {
+    if (!dateString) return "N/A";
+
     try {
-      const date = new Date(dateString)
-      if (isNaN(date.getTime())) return "N/A"
+      const date =
+        typeof dateString === "string" ? new Date(dateString) : dateString;
+      if (isNaN(date.getTime())) return "N/A";
+
       return date.toLocaleDateString(undefined, {
         year: "numeric",
         month: "long",
         day: "numeric",
-      })
+      });
     } catch (error) {
-      return "N/A"
+      return "N/A";
     }
-  }
+  };
 
   // Handle delete confirmation
   const handleDeleteClick = () => {
-    setShowDeleteConfirm(true)
-  }
+    setShowDeleteConfirm(true);
+  };
 
   const confirmDelete = () => {
-    onDelete()
-    setShowDeleteConfirm(false)
-  }
+    onDelete();
+    setShowDeleteConfirm(false);
+  };
 
   const cancelDelete = () => {
-    setShowDeleteConfirm(false)
-  }
+    setShowDeleteConfirm(false);
+  };
 
   // Handle image expansion
-  const expandImage = (imageUrl, type) => {
-    if (!imageUrl) return
-    setExpandedImage({ url: imageUrl, type })
-  }
+  const expandImage = (imageUrl: string | null | undefined, type: string) => {
+    if (!imageUrl) return;
+    setExpandedImage({ url: imageUrl, type });
+  };
 
   const closeExpandedImage = () => {
-    setExpandedImage(null)
-  }
+    setExpandedImage(null);
+  };
 
   // Check if customer object is valid
   if (!customer || Object.keys(customer).length === 0) {
@@ -80,7 +104,7 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
           <p>No customer details available.</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -103,7 +127,9 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
 
       {/* Customer Avatar and Name */}
       <div className="customer-header">
-        <div className="customer-avatar">{customer.name ? customer.name.charAt(0).toUpperCase() : "?"}</div>
+        <div className="customer-avatar">
+          {customer.name ? customer.name.charAt(0).toUpperCase() : "?"}
+        </div>
         <h3 className="customer-name">{getValue(customer.name)}</h3>
       </div>
 
@@ -114,7 +140,10 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
             <ExclamationIcon className="warning-icon" />
             <div className="confirm-text">
               <h4>Confirm Deletion</h4>
-              <p>Are you sure you want to delete this customer? This action cannot be undone.</p>
+              <p>
+                Are you sure you want to delete this customer? This action
+                cannot be undone.
+              </p>
             </div>
             <div className="confirm-actions">
               <button className="confirm-button cancel" onClick={cancelDelete}>
@@ -143,9 +172,10 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
               alt={expandedImage.type}
               className="expanded-image"
               onError={(e) => {
-                e.target.onerror = null
-                e.target.src = "/placeholder.svg"
-                e.target.classList.add("error-image")
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = "/placeholder.svg";
+                target.classList.add("error-image");
               }}
             />
           </div>
@@ -167,21 +197,27 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
                   <MailIcon className="info-icon" />
                   <div className="info-content">
                     <span className="info-label">Email</span>
-                    <span className="info-value">{getValue(customer.email)}</span>
+                    <span className="info-value">
+                      {getValue(customer.email)}
+                    </span>
                   </div>
                 </div>
                 <div className="info-item">
                   <PhoneIcon className="info-icon" />
                   <div className="info-content">
                     <span className="info-label">Phone</span>
-                    <span className="info-value">{getValue(customer.phone_number || customer.phone)}</span>
+                    <span className="info-value">
+                      {getValue(customer.phone_number || customer.phone_number)}
+                    </span>
                   </div>
                 </div>
                 <div className="info-item full-width">
                   <LocationMarkerIcon className="info-icon" />
                   <div className="info-content">
                     <span className="info-label">Address</span>
-                    <span className="info-value">{getValue(customer.address)}</span>
+                    <span className="info-value">
+                      {getValue(customer.address)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -200,14 +236,18 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
                   <DocumentTextIcon className="info-icon" />
                   <div className="info-content">
                     <span className="info-label">Driver License</span>
-                    <span className="info-value">{getValue(customer.driver_license_number)}</span>
+                    <span className="info-value">
+                      {getValue(customer.driver_license_number)}
+                    </span>
                   </div>
                 </div>
                 <div className="info-item">
                   <DocumentTextIcon className="info-icon" />
                   <div className="info-content">
                     <span className="info-label">Passport Number</span>
-                    <span className="info-value">{getValue(customer.passport_number)}</span>
+                    <span className="info-value">
+                      {getValue(customer.passport_number)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -228,14 +268,23 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
                       <h4 className="document-title">Driver License</h4>
                       <div className="document-image-container">
                         <img
-                          src={customer.drivingLicensePhotoUrl || "/placeholder.svg"}
+                          src={
+                            customer.drivingLicensePhotoUrl ||
+                            "/placeholder.svg"
+                          }
                           alt="Driver License"
                           className="document-image"
-                          onClick={() => expandImage(customer.drivingLicensePhotoUrl, "Driver License")}
+                          onClick={() =>
+                            expandImage(
+                              customer.drivingLicensePhotoUrl,
+                              "Driver License"
+                            )
+                          }
                           onError={(e) => {
-                            e.target.onerror = null
-                            e.target.src = "/placeholder.svg"
-                            e.target.classList.add("error-image")
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = "/placeholder.svg";
+                            target.classList.add("error-image");
                           }}
                         />
                         <div className="image-overlay">
@@ -253,11 +302,14 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
                           src={customer.passportPhotoUrl || "/placeholder.svg"}
                           alt="Passport"
                           className="document-image"
-                          onClick={() => expandImage(customer.passportPhotoUrl, "Passport")}
+                          onClick={() =>
+                            expandImage(customer.passportPhotoUrl, "Passport")
+                          }
                           onError={(e) => {
-                            e.target.onerror = null
-                            e.target.src = "/placeholder.svg"
-                            e.target.classList.add("error-image")
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = "/placeholder.svg";
+                            target.classList.add("error-image");
                           }}
                         />
                         <div className="image-overlay">
@@ -267,19 +319,6 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* Notes Section */}
-          {customer.notes && (
-            <div className="details-section">
-              <div className="section-header">
-                <DocumentTextIcon className="section-icon" />
-                <h3 className="section-title">Notes</h3>
-              </div>
-              <div className="section-content">
-                <p className="notes-text">{customer.notes}</p>
               </div>
             </div>
           )}
@@ -300,8 +339,7 @@ const CustomerDetails = ({ customer, onEdit, onDelete, onClose }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CustomerDetails
-
+export default CustomerDetails;

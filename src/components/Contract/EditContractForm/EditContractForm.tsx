@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { getAvailableCarsForPeriod } from "../../../services/carService"
-import { searchCustomersByName } from "../../../services/customerService"
+import { useState, useEffect } from "react";
+import { getAvailableCarsForPeriod } from "../../../services/carService";
+import { searchCustomersByName } from "../../../services/customerService";
 import {
   XIcon,
   SaveIcon,
@@ -16,24 +16,84 @@ import {
   ExclamationCircleIcon,
   CheckCircleIcon,
   ClockIcon,
-} from "@heroicons/react/solid"
-import "./EditContractForm.css"
+} from "@heroicons/react/solid";
+import "./EditContractForm.css";
+import { Contract } from "../../../types/Contract";
+import { Customer } from "../../../types/Customer";
+import { Car } from "../../../types/Car";
+import {
+  calculateDuration,
+  formatCurrency,
+} from "../../../utils/contractUtils";
 
-const EditContractForm = ({ contract, onCancel, onSave }) => {
+type Option = {
+  value: string;
+  label: string;
+};
+
+interface RenderFieldOptions {
+  options?: Option[];
+}
+
+interface EditContractFormProps {
+  contract: Contract;
+  onCancel: () => void;
+  onSave: (updatedContract: Contract) => void;
+}
+
+interface FormData {
+  id: string;
+  customer: Customer;
+  car: Car;
+  paymentDetails: {
+    paymentMethod: string;
+    paymentStatus: "pending" | "paid";
+  };
+  rentalPeriod: {
+    startDate: string;
+    endDate: string;
+  };
+  rentalPrice: {
+    dailyRate: number;
+    totalAmount: number;
+  };
+  additionalNotes: string;
+  contractPhoto: string;
+  status: string;
+}
+
+const EditContractForm: React.FC<EditContractFormProps> = ({
+  contract,
+  onCancel,
+  onSave,
+}) => {
   // Define YEARS array for any year dropdowns
-  const YEARS = Array.from({ length: new Date().getFullYear() - 1950 + 1 }, (_, i) => ({
-    value: new Date().getFullYear() - i,
-    label: new Date().getFullYear() - i,
-  }))
+  const YEARS = Array.from(
+    { length: new Date().getFullYear() - 1950 + 1 },
+    (_, i) => ({
+      value: new Date().getFullYear() - i,
+      label: new Date().getFullYear() - i,
+    })
+  );
 
   // Form state
-  const [formData, setFormData] = useState({
-    _id: contract._id,
+  const [formData, setFormData] = useState<FormData>({
+    id: contract.id!,
     customer: contract.customer,
     car: contract.car,
     rentalPeriod: {
-      startDate: contract.rentalPeriod.startDate.split("T")[0],
-      endDate: contract.rentalPeriod.endDate.split("T")[0],
+      startDate:
+        typeof contract.rentalPeriod.startDate === "string"
+          ? contract.rentalPeriod.startDate.split("T")[0]
+          : contract.rentalPeriod.startDate.toISOString().split("T")[0],
+      endDate:
+        typeof contract.rentalPeriod.endDate === "string"
+          ? contract.rentalPeriod.endDate.split("T")[0]
+          : contract.rentalPeriod.endDate.toISOString().split("T")[0],
+    },
+    paymentDetails: {
+      paymentMethod: contract.paymentDetails.paymentMethod,
+      paymentStatus: contract.paymentDetails.paymentStatus,
     },
     rentalPrice: {
       dailyRate: contract.rentalPrice.dailyRate,
@@ -41,93 +101,94 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
     },
     additionalNotes: contract.additionalNotes || "",
     contractPhoto: contract.contractPhoto || "",
-  })
+    status: contract.status,
+  });
 
   // UI state
-  const [availableCars, setAvailableCars] = useState([])
-  const [loadingCars, setLoadingCars] = useState(false)
-  const [loadingCustomers, setLoadingCustomers] = useState(false)
-  const [customerSearch, setCustomerSearch] = useState(contract.customer.name || "")
-  const [customerResults, setCustomerResults] = useState([])
-  const [errors, setErrors] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showCarSelector, setShowCarSelector] = useState(true)
-  const [originalCarId, setOriginalCarId] = useState(contract.car._id)
-
-  // Calculate rental duration in days
-  const calculateDuration = (startDate, endDate) => {
-    try {
-      const start = new Date(startDate)
-      const end = new Date(endDate)
-      const differenceInTime = end.getTime() - start.getTime()
-      const differenceInDays = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24))
-      return differenceInDays > 0 ? differenceInDays : 0
-    } catch (error) {
-      return 0
-    }
-  }
-
-  // Format currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount)
-  }
+  const [availableCars, setAvailableCars] = useState<Car[]>([]);
+  const [loadingCars, setLoadingCars] = useState<boolean>(false);
+  const [loadingCustomers, setLoadingCustomers] = useState<boolean>(false);
+  const [customerSearch, setCustomerSearch] = useState<string>(
+    contract.customer?.name || ""
+  );
+  const [customerResults, setCustomerResults] = useState<Customer[]>([]);
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showCarSelector, setShowCarSelector] = useState<boolean>(true);
+  const [originalCarId, setOriginalCarId] = useState<string>(contract.car.id);
 
   // Fetch available cars when dates change
   useEffect(() => {
     if (formData.rentalPeriod.startDate && formData.rentalPeriod.endDate) {
-      fetchCarsForPeriod(formData.rentalPeriod.startDate, formData.rentalPeriod.endDate)
+      fetchCarsForPeriod(
+        formData.rentalPeriod.startDate,
+        formData.rentalPeriod.endDate
+      );
     }
-  }, [formData.rentalPeriod])
+  }, [formData.rentalPeriod]);
 
   // Handle form field changes
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    const path = name.split(".")
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    const path = name.split(".");
 
     // Clear error when field is edited
-    setErrors((prev) => ({ ...prev, [name]: null }))
+    setErrors((prev) => ({ ...prev, [name as keyof typeof prev]: null }));
 
     if (path.length === 1) {
-      setFormData((prev) => ({ ...prev, [name]: value }))
-    } else {
       setFormData((prev) => ({
         ...prev,
-        [path[0]]: {
-          ...prev[path[0]],
-          [path[1]]: value,
+        [path[0] as keyof typeof prev]: value,
+      }));
+    } else {
+      const [parentKey, childKey] = path;
+      setFormData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...(prev[parentKey as keyof typeof prev] as any), // safe cast
+          [childKey]: value,
         },
-      }))
+      }));
     }
-  }
+  };
 
   // Handle date changes with validation
-  const handleDateChange = (e) => {
-    const { name, value } = e.target
-    const field = name.split(".")[1]
-    const otherField = field === "startDate" ? "endDate" : "startDate"
-    const otherValue = formData.rentalPeriod[otherField]
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const field = name.split(".")[1];
+    const otherField = field === "startDate" ? "endDate" : "startDate";
+    const otherValue = formData.rentalPeriod[otherField];
 
     // Clear error when field is edited
-    setErrors((prev) => ({ ...prev, [name]: null }))
+    setErrors((prev) => ({ ...prev, [name]: null }));
 
     // Validate date selection
-    if (field === "endDate" && otherValue && new Date(value) < new Date(otherValue)) {
+    if (
+      field === "endDate" &&
+      otherValue &&
+      new Date(value) < new Date(otherValue)
+    ) {
       setErrors((prev) => ({
         ...prev,
         [name]: "End date cannot be earlier than start date",
-      }))
-      return
+      }));
+      return;
     }
 
-    if (field === "startDate" && otherValue && new Date(otherValue) < new Date(value)) {
+    if (
+      field === "startDate" &&
+      otherValue &&
+      new Date(otherValue) < new Date(value)
+    ) {
       setErrors((prev) => ({
         ...prev,
         [name]: "Start date cannot be later than end date",
-      }))
-      return
+      }));
+      return;
     }
 
     // Update form data
@@ -137,192 +198,247 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
         ...prev.rentalPeriod,
         [field]: value,
       },
-    }))
-  }
+    }));
+  };
 
   // Fetch available cars for the selected period
-  const fetchCarsForPeriod = async (startDate, endDate) => {
-    setLoadingCars(true)
+  const fetchCarsForPeriod = async (startDate: string, endDate: string) => {
+    setLoadingCars(true);
     try {
-      const cars = await getAvailableCarsForPeriod(startDate, endDate)
+      const cars: Car[] = await getAvailableCarsForPeriod(startDate, endDate);
 
       // Add the original car to the list if it's not already included
-      const originalCarIncluded = cars.some((car) => car._id === originalCarId)
+      const originalCarIncluded = cars.some((car) => car.id === originalCarId);
 
-      if (!originalCarIncluded) {
-        setAvailableCars([...cars, formData.car])
+      if (!originalCarIncluded && formData.car && formData.car.id) {
+        setAvailableCars([...cars, formData.car as Car]);
       } else {
-        setAvailableCars(cars)
+        setAvailableCars(cars);
       }
 
-      setShowCarSelector(true)
+      setShowCarSelector(true);
     } catch (error) {
-      console.error("Error fetching available cars:", error)
+      console.error("Error fetching available cars:", error);
       setErrors((prev) => ({
         ...prev,
         cars: "Failed to load available cars. Please try again.",
-      }))
+      }));
     } finally {
-      setLoadingCars(false)
+      setLoadingCars(false);
     }
-  }
+  };
 
   // Handle car selection
-  const handleCarSelect = (carId) => {
-    const selectedCar = availableCars.find((car) => car._id === carId)
+  const handleCarSelect = (carId: string) => {
+    const selectedCar = availableCars.find((car) => car.id === carId);
     if (selectedCar) {
-      const duration = calculateDuration(formData.rentalPeriod.startDate, formData.rentalPeriod.endDate)
+      const duration = calculateDuration(
+        formData.rentalPeriod.startDate,
+        formData.rentalPeriod.endDate
+      );
 
-      const totalAmount = duration * selectedCar.price_per_day
+      // Force price_per_day to number (even if it was string before)
+      const pricePerDay =
+        typeof selectedCar.price_per_day === "string"
+          ? parseFloat(selectedCar.price_per_day)
+          : selectedCar.price_per_day;
+
+      const totalAmount = duration * pricePerDay;
 
       setFormData((prev) => ({
         ...prev,
         car: selectedCar,
         rentalPrice: {
-          dailyRate: selectedCar.price_per_day,
+          dailyRate: pricePerDay,
           totalAmount: totalAmount,
         },
-      }))
+      }));
     }
-  }
+  };
 
   // Handle customer search
-  const handleCustomerSearch = async (e) => {
-    const query = e.target.value
-    setCustomerSearch(query)
+  const handleCustomerSearch = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const query = e.target.value;
+    setCustomerSearch(query);
 
     // Clear error when field is edited
-    setErrors((prev) => ({ ...prev, customer: null }))
+    setErrors((prev) => ({ ...prev, customer: null }));
 
     if (query.length > 2) {
-      setLoadingCustomers(true)
+      setLoadingCustomers(true);
       try {
-        const results = await searchCustomersByName(query)
-        setCustomerResults(results)
+        const results = await searchCustomersByName(query);
+        setCustomerResults(results);
       } catch (error) {
-        console.error("Error fetching customers:", error)
+        console.error("Error fetching customers:", error);
         setErrors((prev) => ({
           ...prev,
           customer: "Failed to search customers. Please try again.",
-        }))
+        }));
       } finally {
-        setLoadingCustomers(false)
+        setLoadingCustomers(false);
       }
     } else {
-      setCustomerResults([])
+      setCustomerResults([]);
     }
-  }
+  };
 
   // Handle customer selection
-  const handleCustomerSelect = (customer) => {
-    setFormData((prev) => ({ ...prev, customer }))
-    setCustomerSearch(customer.name)
-    setCustomerResults([])
-  }
+  const handleCustomerSelect = (customer: Customer) => {
+    setFormData((prev) => ({ ...prev, customer }));
+    setCustomerSearch(customer.name);
+    setCustomerResults([]);
+  };
 
   // Validate form before submission
-  const validateForm = () => {
-    const newErrors = {}
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
 
     // Check required fields
-    if (!formData.customer || !formData.customer._id) {
-      newErrors.customer = "Customer is required"
+    if (!formData.customer || !formData.customer.id) {
+      newErrors.customer = "Customer is required";
     }
 
-    if (!formData.car || !formData.car._id) {
-      newErrors.car = "Car selection is required"
+    if (!formData.car || !formData.car.id) {
+      newErrors.car = "Car selection is required";
     }
 
     if (!formData.rentalPeriod.startDate) {
-      newErrors["rentalPeriod.startDate"] = "Start date is required"
+      newErrors["rentalPeriod.startDate"] = "Start date is required";
     }
 
     if (!formData.rentalPeriod.endDate) {
-      newErrors["rentalPeriod.endDate"] = "End date is required"
+      newErrors["rentalPeriod.endDate"] = "End date is required";
     }
 
     // Validate dates
     if (formData.rentalPeriod.startDate && formData.rentalPeriod.endDate) {
-      const startDate = new Date(formData.rentalPeriod.startDate)
-      const endDate = new Date(formData.rentalPeriod.endDate)
+      const startDate = new Date(formData.rentalPeriod.startDate);
+      const endDate = new Date(formData.rentalPeriod.endDate);
 
       if (endDate < startDate) {
-        newErrors["rentalPeriod.endDate"] = "End date cannot be earlier than start date"
+        newErrors["rentalPeriod.endDate"] =
+          "End date cannot be earlier than start date";
       }
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      await onSave(formData)
+      // Build full contract from formData
+      const updatedContract: Contract = {
+        ...formData,
+        customer: {
+          id: formData.customer.id, // take _id and map it to id
+          name: formData.customer.name,
+          passport_number: formData.customer.passport_number,
+          driver_license_number: formData.customer.driver_license_number,
+          address: formData.customer.address,
+        },
+        car: {
+          id: formData.car.id ?? "", // map _id to id
+          manufacturer: formData.car.manufacturer,
+          model: formData.car.model,
+          license_plate: formData.car.license_plate,
+          price_per_day: formData.car.price_per_day,
+        },
+        paymentDetails: formData.paymentDetails ?? {
+          paymentMethod: "",
+          paymentStatus: "pending",
+        },
+        status: formData.status ?? "active",
+      };
+
+      await onSave(updatedContract);
     } catch (error) {
-      console.error("Error updating contract:", error)
+      console.error("Error updating contract:", error);
       setErrors((prev) => ({
         ...prev,
         submit: "Failed to update contract. Please try again.",
-      }))
+      }));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Get contract status
   const getContractStatus = () => {
-    const now = new Date()
-    const startDate = new Date(formData.rentalPeriod.startDate)
-    const endDate = new Date(formData.rentalPeriod.endDate)
+    const now = new Date();
+    const startDate = new Date(formData.rentalPeriod.startDate);
+    const endDate = new Date(formData.rentalPeriod.endDate);
 
     if (now < startDate) {
-      return { status: "Confirmed", className: "status-confirmed", icon: <ClockIcon className="status-icon" /> }
+      return {
+        status: "Confirmed",
+        className: "status-confirmed",
+        icon: <ClockIcon className="status-icon" />,
+      };
     } else if (now >= startDate && now <= endDate) {
-      return { status: "Active", className: "status-active", icon: <CheckCircleIcon className="status-icon" /> }
+      return {
+        status: "Active",
+        className: "status-active",
+        icon: <CheckCircleIcon className="status-icon" />,
+      };
     } else {
-      return { status: "Completed", className: "status-completed", icon: <CheckCircleIcon className="status-icon" /> }
+      return {
+        status: "Completed",
+        className: "status-completed",
+        icon: <CheckCircleIcon className="status-icon" />,
+      };
     }
-  }
+  };
 
-  const { status, className, icon } = getContractStatus()
+  const { status, className, icon } = getContractStatus();
 
-  const renderField = (label, name, type = "text", options = {}, required = false) => {
-    const hasError = errors[name]
+  const renderField = (
+    label: string,
+    name: keyof FormData,
+    type: "text" | "select" | "textarea" = "text",
+    options: RenderFieldOptions = {},
+    required = false
+  ) => {
+    const hasError = errors[name as keyof typeof errors]; // force correct indexing
+
     return (
       <div className="form-field">
         <label htmlFor={name} className="field-label">
           {label}
         </label>
+
         <div className={`field-input-wrapper ${hasError ? "has-error" : ""}`}>
           {type === "select" ? (
             <select
               id={name}
               name={name}
-              value={formData[name] || ""}
+              value={(formData[name] as string) || ""}
               onChange={handleChange}
               className={hasError ? "error" : ""}
               required={required}
             >
-              {options.options &&
-                options.options.map((option) => (
-                  <option key={`${name}-${option.value}`} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
+              {options.options?.map((option) => (
+                <option key={`${name}-${option.value}`} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           ) : type === "textarea" ? (
             <textarea
               id={name}
               name={name}
-              value={formData[name] || ""}
+              value={(formData[name] as string) || ""}
               onChange={handleChange}
               className="notes-textarea"
               rows={4}
@@ -333,22 +449,23 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
               type={type}
               id={name}
               name={name}
-              value={formData[name] || ""}
+              value={(formData[name] as string) || ""}
               onChange={handleChange}
               className="photo-input"
               required={required}
             />
           )}
         </div>
+
         {hasError && (
           <div className="field-error">
             <ExclamationCircleIcon className="error-icon-small" />
-            <span>{errors[name]}</span>
+            <span>{errors[name as keyof typeof errors]}</span>
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="edit-contract-form-container">
@@ -379,7 +496,11 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
             </div>
             <div className="section-content">
               <div className="customer-search-container">
-                <div className={`search-input-wrapper ${errors.customer ? "has-error" : ""}`}>
+                <div
+                  className={`search-input-wrapper ${
+                    errors.customer ? "has-error" : ""
+                  }`}
+                >
                   <SearchIcon className="search-icon" />
                   <input
                     type="text"
@@ -408,14 +529,18 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                   <ul className="customer-results">
                     {customerResults.map((customer) => (
                       <li
-                        key={customer._id}
+                        key={customer.id}
                         className="customer-result-item"
                         onClick={() => handleCustomerSelect(customer)}
                       >
-                        <div className="customer-avatar">{customer.name.charAt(0)}</div>
+                        <div className="customer-avatar">
+                          {customer.name.charAt(0)}
+                        </div>
                         <div className="customer-info">
                           <span className="customer-name">{customer.name}</span>
-                          <span className="customer-passport">{customer.passport_number}</span>
+                          <span className="customer-passport">
+                            {customer.passport_number}
+                          </span>
                         </div>
                       </li>
                     ))}
@@ -423,15 +548,27 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                 )}
               </div>
 
-              {formData.customer && formData.customer._id && (
+              {formData.customer && formData.customer.id && (
                 <div className="selected-customer">
                   <div className="customer-card">
-                    <div className="customer-avatar large">{formData.customer.name.charAt(0)}</div>
+                    <div className="customer-avatar large">
+                      {formData.customer.name.charAt(0)}
+                    </div>
                     <div className="customer-details">
                       <p className="customer-name">{formData.customer.name}</p>
-                      <p className="customer-passport">Passport: {formData.customer.passport_number}</p>
-                      {formData.customer.phone && <p className="customer-phone">Phone: {formData.customer.phone}</p>}
-                      {formData.customer.email && <p className="customer-email">Email: {formData.customer.email}</p>}
+                      <p className="customer-passport">
+                        Passport: {formData.customer.passport_number}
+                      </p>
+                      {formData.customer.phone_number && (
+                        <p className="customer-phone">
+                          Phone: {formData.customer.phone_number}
+                        </p>
+                      )}
+                      {formData.customer.email && (
+                        <p className="customer-email">
+                          Email: {formData.customer.email}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -451,7 +588,11 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                   <label htmlFor="startDate" className="field-label">
                     Start Date
                   </label>
-                  <div className={`field-input-wrapper ${errors["rentalPeriod.startDate"] ? "has-error" : ""}`}>
+                  <div
+                    className={`field-input-wrapper ${
+                      errors["rentalPeriod.startDate"] ? "has-error" : ""
+                    }`}
+                  >
                     <input
                       type="date"
                       id="startDate"
@@ -473,7 +614,11 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                   <label htmlFor="endDate" className="field-label">
                     End Date
                   </label>
-                  <div className={`field-input-wrapper ${errors["rentalPeriod.endDate"] ? "has-error" : ""}`}>
+                  <div
+                    className={`field-input-wrapper ${
+                      errors["rentalPeriod.endDate"] ? "has-error" : ""
+                    }`}
+                  >
                     <input
                       type="date"
                       id="endDate"
@@ -492,14 +637,19 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                 </div>
               </div>
 
-              {formData.rentalPeriod.startDate && formData.rentalPeriod.endDate && (
-                <div className="rental-duration">
-                  <span className="duration-label">Duration:</span>
-                  <span className="duration-value">
-                    {calculateDuration(formData.rentalPeriod.startDate, formData.rentalPeriod.endDate)} days
-                  </span>
-                </div>
-              )}
+              {formData.rentalPeriod.startDate &&
+                formData.rentalPeriod.endDate && (
+                  <div className="rental-duration">
+                    <span className="duration-label">Duration:</span>
+                    <span className="duration-value">
+                      {calculateDuration(
+                        formData.rentalPeriod.startDate,
+                        formData.rentalPeriod.endDate
+                      )}{" "}
+                      days
+                    </span>
+                  </div>
+                )}
             </div>
           </div>
 
@@ -524,22 +674,27 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                     </div>
                   )}
 
-                  <div className={`form-field ${errors.car ? "has-error" : ""}`}>
+                  <div
+                    className={`form-field ${errors.car ? "has-error" : ""}`}
+                  >
                     <label htmlFor="carSelect" className="field-label">
                       Select Vehicle
                     </label>
                     <select
                       id="carSelect"
-                      value={formData.car._id || ""}
+                      value={formData.car.id || ""}
                       onChange={(e) => handleCarSelect(e.target.value)}
                       className="car-select"
                     >
                       <option key="default-car-option" value="" disabled>
-                      {formData.car.manufacturer} {formData.car.model} - {formData.car.license_plate} (${formData.car.price_per_day}/day)
+                        {formData.car.manufacturer} {formData.car.model} -{" "}
+                        {formData.car.license_plate} ($
+                        {formData.car.price_per_day}/day)
                       </option>
                       {availableCars.map((car) => (
-                        <option key={`car-${car._id}`} value={car._id}>
-                          {car.manufacturer} {car.model} - {car.license_plate} (${car.price_per_day}/day)
+                        <option key={`car-${car.id}`} value={car.id}>
+                          {car.manufacturer} {car.model} - {car.license_plate}{" "}
+                          (${car.price_per_day}/day)
                         </option>
                       ))}
                     </select>
@@ -551,7 +706,7 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                     )}
                   </div>
 
-                  {formData.car && formData.car._id && (
+                  {formData.car && formData.car.id && (
                     <div className="selected-car">
                       <div className="car-card">
                         <div className="car-image">
@@ -570,9 +725,16 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                           <p className="car-model">
                             {formData.car.manufacturer} {formData.car.model}
                           </p>
-                          <p className="car-license">License: {formData.car.license_plate}</p>
-                          <p className="car-year">Year: {formData.car.year || "N/A"}</p>
-                          <p className="car-price">Daily Rate: {formatCurrency(formData.car.price_per_day)}</p>
+                          <p className="car-license">
+                            License: {formData.car.license_plate}
+                          </p>
+                          <p className="car-year">
+                            Year: {formData.car.year || "N/A"}
+                          </p>
+                          <p className="car-price">
+                            Daily Rate:{" "}
+                            {formatCurrency(Number(formData.car.price_per_day))}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -596,18 +758,26 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
               <div className="pricing-summary">
                 <div className="price-row">
                   <span className="price-label">Daily Rate:</span>
-                  <span className="price-value">{formatCurrency(formData.rentalPrice.dailyRate)}</span>
+                  <span className="price-value">
+                    {formatCurrency(formData.rentalPrice.dailyRate)}
+                  </span>
                 </div>
                 <div className="price-row">
                   <span className="price-label">Duration:</span>
                   <span className="price-value">
-                    {calculateDuration(formData.rentalPeriod.startDate, formData.rentalPeriod.endDate)} days
+                    {calculateDuration(
+                      formData.rentalPeriod.startDate,
+                      formData.rentalPeriod.endDate
+                    )}{" "}
+                    days
                   </span>
                 </div>
                 <div className="price-divider"></div>
                 <div className="price-row total">
                   <span className="price-label">Total:</span>
-                  <span className="price-value">{formatCurrency(formData.rentalPrice.totalAmount)}</span>
+                  <span className="price-value">
+                    {formatCurrency(formData.rentalPrice.totalAmount)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -664,9 +834,10 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
                       alt="Contract"
                       className="photo-preview"
                       onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = "/placeholder.svg"
-                        e.target.classList.add("error")
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = "/placeholder.svg";
+                        target.classList.add("error");
                       }}
                     />
                   </div>
@@ -677,7 +848,12 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
         </div>
 
         <div className="form-actions">
-          <button type="button" onClick={onCancel} className="cancel-button" disabled={isSubmitting}>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="cancel-button"
+            disabled={isSubmitting}
+          >
             <XIcon className="button-icon" />
             Cancel
           </button>
@@ -698,8 +874,7 @@ const EditContractForm = ({ contract, onCancel, onSave }) => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default EditContractForm
-
+export default EditContractForm;

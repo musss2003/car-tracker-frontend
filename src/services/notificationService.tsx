@@ -1,88 +1,95 @@
 import { getAuthHeaders } from "../utils/getAuthHeaders";
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/notifications/';
-
-
+const API_URL = import.meta.env.VITE_API_BASE_URL + "/api/notifications/";
 
 export const getNotifications = async () => {
-    try {
-        const notifications = await fetch(API_URL, {
-            method: "GET",
-            headers: getAuthHeaders(),
-        }).then((response) => response.json())
-        .then((data) => {
-            return data;
-        })
+  try {
+    const response = await fetch(API_URL, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
 
-        return notifications;
-    } catch (err) {
-        console.error(err.message || "Something went wrong");
+    if (!response.ok) {
+      throw new Error("Failed to fetch notifications");
     }
-}
 
-export const markAsSeen = async (notificationId) => {
-    try {
-        const response = await fetch(`${API_URL}${notificationId}/seen`, {
-            method: "PATCH",
-            headers: getAuthHeaders()
-        });
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error((err as Error).message || "Something went wrong");
+    throw err;
+  }
+};
 
-        if (!response.ok) {
-            throw new Error("Failed to mark notification as seen");
-        }
+export const markAsSeen = async (notificationId: string) => {
+  try {
+    const response = await fetch(`${API_URL}${notificationId}/seen`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+    });
 
-        // Update the notification status locally
-        return response.json();
-    } catch (err) {
-        console.error(err.message);
+    if (!response.ok) {
+      throw new Error("Failed to mark notification as seen");
     }
-}
+
+    return await response.json();
+  } catch (err) {
+    console.error((err as Error).message);
+    throw err;
+  }
+};
 
 export const markAllAsSeen = async () => {
-    try {
-        const response = await fetch(API_URL + "mark-all-seen", {
-            method: "PATCH",
-        });
+  try {
+    const response = await fetch(`${API_URL}mark-all-seen`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+    });
 
-        if (!response.ok) {
-            throw new Error("Failed to mark all notifications as seen");
-        }
-
-        return response.json();
-    } catch (err) {
-        console.error(err.message);
+    if (!response.ok) {
+      throw new Error("Failed to mark all notifications as seen");
     }
+
+    return await response.json();
+  } catch (err) {
+    console.error((err as Error).message);
+    throw err;
+  }
 };
 
 export const getUnreadNotifications = async () => {
-    try {
-        const unreadNotifications = await fetch(API_URL + 'unread', {
-            method: "GET",
-            headers: getAuthHeaders(),
-        }).then((response) => response.json())
-        .then((data) => {
-            return data.notifications;
-        });
+  try {
+    const response = await fetch(`${API_URL}unread`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
 
-
-        return unreadNotifications;
-    } catch (err) {
-        console.error(err.message || "Something went wrong");
+    if (!response.ok) {
+      throw new Error("Failed to fetch unread notifications");
     }
+
+    const data = await response.json();
+    return data.notifications;
+  } catch (err) {
+    console.error((err as Error).message || "Something went wrong");
+    throw err;
+  }
 };
-export const deleteNotification = async (notificationId) => {
-    try {
-        const response = await fetch(`${API_URL}${notificationId}`, {
-            method: "DELETE",
-            headers: getAuthHeaders()
-        });
 
-        if (!response.ok) {
-            throw new Error("Failed to delete notification");
-        }
+export const deleteNotification = async (notificationId: string) => {
+  try {
+    const response = await fetch(`${API_URL}${notificationId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
 
-        return response.json();
-    } catch (err) {
-        console.error(err.message);
+    if (!response.ok) {
+      throw new Error("Failed to delete notification");
     }
+
+    return await response.json();
+  } catch (err) {
+    console.error((err as Error).message);
+    throw err;
+  }
 };

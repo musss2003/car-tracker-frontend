@@ -1,58 +1,106 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { io } from 'socket.io-client';
-import axios from 'axios';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+} from "react";
+import { io, Socket } from "socket.io-client";
+import { Notification } from "../types/Notification";
 
-const NotificationContext = createContext();
+interface NotificationContextType {
+  notifications: Notification[];
+  fetchNotifications: () => Promise<void>;
+  markAsRead: (id: string) => Promise<void>;
+}
+
+const NotificationContext = createContext<NotificationContextType | undefined>(
+  undefined
+);
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const NotificationProvider = ({ children, userId }) => {
-    const [notifications, setNotifications] = useState([]);
-    const [socket, setSocket] = useState(null);
+interface Props {
+  children: ReactNode;
+  userId: string;
+}
 
-    useEffect(() => {
-        // Establish Socket.IO connection
-        const newSocket = io(API_URL); // Adjust to your server's URL
-        setSocket(newSocket);
+export const NotificationProvider = ({ children, userId }: Props) => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-        // Join the user's room
-        newSocket.emit('join', userId);
+  useEffect(() => {
+    const newSocket = io(API_URL);
+    setSocket(newSocket);
 
-        // Listen for new notifications
-        newSocket.on('new-notification', (notification) => {
-            setNotifications((prev) => [notification, ...prev]);
-        });
+    newSocket.emit("join", userId);
 
-        return () => newSocket.disconnect();
-    }, [userId]);
+    newSocket.on("new-notification", (notification: Notification) => {
+      setNotifications((prev) => [notification, ...prev]);
+    });
 
-    // Fetch notifications from the server
-    const fetchNotifications = async () => {
-        try {
-            const response = await axios.get(API_URL + `/api/notifications/${userId}`);
-            setNotifications(response.data);
-        } catch (error) {
-            console.error('Error fetching notifications:', error);
-        }
+    return () => {
+      newSocket.disconnect();
     };
+  }, [userId]);
 
-    // Mark a notification as read
-    const markAsRead = async (id) => {
-        try {
-            await axios.patch(API_URL + `/api/notifications/${id}`, { status: 'seen' });
-            setNotifications((prev) =>
-                prev.map((notif) => (notif._id === id ? { ...notif, status: 'seen' } : notif))
-            );
-        } catch (error) {
-            console.error('Error marking notification as read:', error);
-        }
-    };
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/notifications/${userId}`, {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
 
-    return (
-        <NotificationContext.Provider value={{ notifications, fetchNotifications, markAsRead }}>
-            {children}
-        </NotificationContext.Provider>
-    );
+      if (!response.ok) {
+        throw new Error("Failed to fetch notifications");
+      }
+
+      const data: Notification[] = await response.json();
+      setNotifications(data);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  const markAsRead = async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/notifications/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "seen" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to mark as read");
+      }
+
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif._id === id ? { ...notif, status: "seen" } : notif
+        )
+      );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  return (
+    <NotificationContext.Provider
+      value={{ notifications, fetchNotifications, markAsRead }}
+    >
+      {children}
+    </NotificationContext.Provider>
+  );
 };
 
-export const useNotifications = () => useContext(NotificationContext);
+export const useNotifications = (): NotificationContextType => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error(
+      "useNotifications must be used within a NotificationProvider"
+    );
+  }
+  return context;
+};

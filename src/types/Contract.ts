@@ -1,7 +1,7 @@
 export interface Contract {
-    _id?: string; // optional for newly created contracts before save
+    id?: string; // optional for newly created contracts before save
     customer: {
-      id: string;
+      id?: string;
       name: string;
       passport_number: string;
       driver_license_number: string;
@@ -12,6 +12,7 @@ export interface Contract {
       manufacturer: string;
       model: string;
       license_plate: string;
+      price_per_day: number | string;
     };
     rentalPeriod: {
       startDate: string | Date;
@@ -29,5 +30,6 @@ export interface Contract {
     createdAt?: string | Date;
     updatedAt?: string | Date;
     contractPhoto?: string;
+    status: string;
   }
   

@@ -1,18 +1,25 @@
-import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/uploads/';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/uploads/'; // Adjust based on your actual API URL
+export const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('image', file);
 
-export const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    const response = await axios.post(API_URL, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include', // include cookies if needed
     });
 
-    console.log(response.data.url);
+    if (!response.ok) {
+      throw new Error(`Failed to upload image: ${response.statusText}`);
+    }
 
-    return response.data.url;
+    const data: { url: string } = await response.json();
+
+    return data.url;
+  } catch (error) {
+    console.error('Error uploading image:', (error as Error).message);
+    throw error;
+  }
 };

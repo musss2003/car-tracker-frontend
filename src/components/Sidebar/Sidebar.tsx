@@ -1,6 +1,4 @@
-"use client"
-
-import { useEffect } from "react"
+import { JSX, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import {
   ChartBarIcon,
@@ -14,12 +12,24 @@ import {
 } from "@heroicons/react/solid"
 import "./Sidebar.css"
 
-const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
+interface SidebarProps {
+  isOpen: boolean
+  isSmallScreen: boolean
+  toggleSidebar: () => void
+}
+
+interface NavItem {
+  to: string
+  icon: JSX.Element
+  label: string
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, isSmallScreen, toggleSidebar }) => {
   const location = useLocation()
 
   // Close sidebar with Escape key on mobile
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen && isSmallScreen) {
         toggleSidebar()
       }
@@ -43,7 +53,7 @@ const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
   }, [isSmallScreen, isOpen])
 
   // Reusable NavLink component with active state
-  const NavLink = ({ to, icon, label }) => {
+  const NavLink: React.FC<NavItem> = ({ to, icon, label }) => {
     const isActive = location.pathname === to
 
     return (
@@ -60,8 +70,8 @@ const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
     )
   }
 
-  // Group navigation items by category
-  const navGroups = [
+  // Navigation structure
+  const navGroups: { title: string; items: NavItem[] }[] = [
     {
       title: "Main",
       items: [
@@ -79,21 +89,22 @@ const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
     {
       title: "Account",
       items: [
-        { to: "/notifications", icon: <BellIcon />, label: "Notification" },
+        { to: "/notifications", icon: <BellIcon />, label: "Notifikacije" },
         { to: "/profile", icon: <UserIcon />, label: "Profil" },
       ],
     },
   ]
 
-  // Create overlay for mobile
-  const Overlay =
-    isSmallScreen && isOpen ? <div className="sidebar-overlay" onClick={toggleSidebar} aria-hidden="true" /> : null
-
   return (
     <>
-      {Overlay}
+      {isSmallScreen && isOpen && (
+        <div className="sidebar-overlay" onClick={toggleSidebar} aria-hidden="true" />
+      )}
+
       <nav
-        className={`sidebar ${isOpen ? "sidebar-open" : "sidebar-closed"} ${isSmallScreen ? "sidebar-mobile" : "sidebar-desktop"}`}
+        className={`sidebar ${isOpen ? "sidebar-open" : "sidebar-closed"} ${
+          isSmallScreen ? "sidebar-mobile" : "sidebar-desktop"
+        }`}
         aria-label="Main Navigation"
         role="navigation"
       >
@@ -114,8 +125,8 @@ const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
             {navGroups.map((group, index) => (
               <div key={index} className="nav-group">
                 {isOpen && <h3 className="nav-group-title">{group.title}</h3>}
-                {group.items.map((item, itemIndex) => (
-                  <NavLink key={itemIndex} to={item.to} icon={item.icon} label={item.label} />
+                {group.items.map((item, idx) => (
+                  <NavLink key={idx} to={item.to} icon={item.icon} label={item.label} />
                 ))}
               </div>
             ))}
@@ -136,4 +147,3 @@ const Sidebar = ({ isOpen, isSmallScreen, toggleSidebar }) => {
 }
 
 export default Sidebar
-

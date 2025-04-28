@@ -8,7 +8,13 @@ import {
   PlusCircleIcon,
 } from "@heroicons/react/solid";
 import "./CreateCarForm.css";
-import { Car, CarFormErrors, Feature, RenderFieldOptions } from "../../../types/car";
+import {
+  Car,
+  CarFormErrors,
+  commonFeatures,
+  Feature,
+  RenderFieldOptions,
+} from "../../../types/Car";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
@@ -28,6 +34,7 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
 }) => {
   // Form state
   const [car, setCar] = useState<Car>({
+    id: "", //
     manufacturer: "",
     model: "",
     year: CURRENT_YEAR,
@@ -66,18 +73,6 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
           "Hyundai",
         ];
 
-  // Common car features
-  const commonFeatures: Feature[] = [
-    "Air Conditioning",
-    "Bluetooth",
-    "Navigation System",
-    "Backup Camera",
-    "Sunroof",
-    "Leather Seats",
-    "Heated Seats",
-    "Cruise Control",
-  ];
-
   // Handle form field changes
   const handleChange = (
     e: React.ChangeEvent<
@@ -102,41 +97,52 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
   // Add a new feature to the car
   const handleAddFeature = () => {
     const trimmed = newFeature.trim();
-  
+
     // Check if it's a valid Feature
     if (trimmed && commonFeatures.includes(trimmed as Feature)) {
       const validFeature = trimmed as Feature;
-  
-      if (!car.features.includes(validFeature)) {
-        setCar((prev) => ({
-          ...prev,
-          features: [...prev.features, validFeature],
-        }));
-      }
-  
+
+      setCar((prev) => {
+        const features = prev.features ?? [];
+        if (!features.includes(validFeature)) {
+          return {
+            ...prev,
+            features: [...features, validFeature],
+          };
+        }
+        return prev; // no change if already exists
+      });
+
       setNewFeature("");
     } else {
-      // Optional: notify user if they enter an invalid feature
-      // toast.warning("Invalid feature entered.");
+      toast.warning("Invalid feature entered.");
     }
   };
 
   // Add a common feature to the car
   const handleAddCommonFeature = (feature: Feature) => {
-    if (!car.features.includes(feature)) {
-      setCar((prev) => ({
-        ...prev,
-        features: [...prev.features, feature],
-      }));
-    }
+    setCar((prev) => {
+      const features = prev.features ?? []; // fallback to [] if undefined
+
+      if (!features.includes(feature)) {
+        return {
+          ...prev,
+          features: [...features, feature],
+        };
+      }
+      return prev; // no change needed
+    });
   };
 
-  // Remove a feature from the car
   const handleRemoveFeature = (feature: Feature) => {
-    setCar((prev) => ({
-      ...prev,
-      features: prev.features.filter((f) => f !== feature),
-    }));
+    setCar((prev) => {
+      const features = prev.features ?? []; // fallback to [] if undefined
+
+      return {
+        ...prev,
+        features: features.filter((f) => f !== feature),
+      };
+    });
   };
 
   // Validate the form
@@ -210,9 +216,12 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
       // Format the data before saving
       const carData = {
         ...car,
-        year: Number.parseInt(car.year.toString()),
-        price_per_day: Number.parseFloat(String(car.price_per_day)),
-        seats: Number.parseInt(car.seats.toString()),
+        year: car.year !== undefined ? parseInt(car.year.toString(), 10) : 0,
+        price_per_day:
+          car.price_per_day !== undefined
+            ? parseFloat(String(car.price_per_day))
+            : 0,
+        seats: car.seats !== undefined ? parseInt(car.seats.toString(), 10) : 5,
       };
 
       await onSave(carData);
@@ -468,8 +477,7 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
                 <p className="common-features-label">Common features:</p>
                 <div className="common-features-list">
                   {commonFeatures.map((feature) => {
-                    const isSelected = car.features.includes(feature);
-
+                    const isSelected = (car.features ?? []).includes(feature); // fallback to []
                     return (
                       <button
                         key={feature}
@@ -490,11 +498,11 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
                 </div>
               </div>
 
-              {car.features.length > 0 && (
+              {(car.features ?? []).length > 0 && (
                 <div className="selected-features">
                   <p className="selected-features-label">Selected features:</p>
                   <div className="features-list">
-                    {car.features.map((feature: Feature) => (
+                    {(car.features ?? []).map((feature: Feature) => ( // fallback to []
                       <div key={feature} className="feature-tag">
                         <span>{feature}</span>
                         <button

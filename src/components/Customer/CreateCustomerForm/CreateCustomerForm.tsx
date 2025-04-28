@@ -1,85 +1,109 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { XIcon, UserAddIcon, ExclamationCircleIcon } from "@heroicons/react/solid"
-import "./CreateCustomerForm.css"
+import { ChangeEvent, useState } from "react";
+import {
+  XIcon,
+  UserAddIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/solid";
+import "./CreateCustomerForm.css";
+import { Customer } from "../../../types/Customer";
 
-const CreateCustomerForm = ({ onSave, onCancel }) => {
+interface CreateCustomerFormProps {
+  onSave: (customerData: Customer) => void;
+  onCancel: () => void;
+}
+
+interface FormErrors {
+  [key: string]: string | null;
+}
+
+const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
+  onSave,
+  onCancel,
+}) => {
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Customer>({
     name: "",
     driver_license_number: "",
     passport_number: "",
     email: "",
-    phone: "",
+    phone_number: "",
     address: "",
-    notes: "",
-  })
+  });
 
   // Validation state
-  const [errors, setErrors] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle form field changes
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when field is edited
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }))
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
-  }
+  };
 
   // Validate form
-  const validateForm = () => {
-    const newErrors = {}
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
 
-    // Required fields
+    // Required name
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required"
+      newErrors.name = "Name is required";
     }
 
-    // At least one identification is required
-    if (!formData.driver_license_number && !formData.passport_number) {
-      newErrors.driver_license_number = "Either driver license or passport number is required"
+    // At least one identification
+    if (
+      !formData.driver_license_number?.trim() &&
+      !formData.passport_number?.trim()
+    ) {
+      newErrors.driver_license_number =
+        "Either driver license or passport number is required";
     }
 
     // Email validation
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address"
+      newErrors.email = "Please enter a valid email address";
     }
 
     // Phone validation
-    if (formData.phone && !/^\+?[0-9\s-()]{7,}$/.test(formData.phone)) {
-      newErrors.phone = "Please enter a valid phone number"
+    if (
+      formData.phone_number &&
+      !/^\+?[0-9\s-()]{7,}$/.test(formData.phone_number)
+    ) {
+      newErrors.phone_number = "Please enter a valid phone number";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
     try {
-      setIsSubmitting(true)
-      await onSave(formData)
+      setIsSubmitting(true);
+      await onSave(formData);
     } catch (error) {
-      console.error("Error creating customer:", error)
+      console.error("Error creating customer:", error);
       setErrors((prev) => ({
         ...prev,
         submit: "Failed to create customer. Please try again.",
-      }))
+      }));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="create-customer-form-container">
@@ -124,8 +148,14 @@ const CreateCustomerForm = ({ onSave, onCancel }) => {
             </div>
 
             <div className="form-row">
-              <div className={`form-field ${errors.driver_license_number ? "has-error" : ""}`}>
-                <label htmlFor="driver_license_number">Driver License Number</label>
+              <div
+                className={`form-field ${
+                  errors.driver_license_number ? "has-error" : ""
+                }`}
+              >
+                <label htmlFor="driver_license_number">
+                  Driver License Number
+                </label>
                 <input
                   type="text"
                   id="driver_license_number"
@@ -142,7 +172,11 @@ const CreateCustomerForm = ({ onSave, onCancel }) => {
                 )}
               </div>
 
-              <div className={`form-field ${errors.passport_number ? "has-error" : ""}`}>
+              <div
+                className={`form-field ${
+                  errors.passport_number ? "has-error" : ""
+                }`}
+              >
                 <label htmlFor="passport_number">Passport Number</label>
                 <input
                   type="text"
@@ -189,7 +223,7 @@ const CreateCustomerForm = ({ onSave, onCancel }) => {
                   type="tel"
                   id="phone"
                   name="phone"
-                  value={formData.phone}
+                  value={formData.phone_number}
                   onChange={handleChange}
                   placeholder="Enter phone number"
                 />
@@ -216,31 +250,23 @@ const CreateCustomerForm = ({ onSave, onCancel }) => {
               </div>
             </div>
           </div>
-
-          <div className="form-section">
-            <h3 className="section-title">Additional Information</h3>
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="notes">Notes</label>
-                <textarea
-                  id="notes"
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  placeholder="Enter any additional notes about this customer"
-                  rows={4}
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="form-actions">
-          <button type="button" className="cancel-button" onClick={onCancel} disabled={isSubmitting}>
+          <button
+            type="button"
+            className="cancel-button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             Cancel
           </button>
 
-          <button type="submit" className="submit-button" disabled={isSubmitting}>
+          <button
+            type="submit"
+            className="submit-button"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <div className="spinner-small"></div>
@@ -256,8 +282,7 @@ const CreateCustomerForm = ({ onSave, onCancel }) => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default CreateCustomerForm
-
+export default CreateCustomerForm;
