@@ -18,6 +18,6 @@ export interface User {
   export enum UserRole {
     ADMIN = "admin",
     EMPLOYEE = "employee",
-    CUSTOMER = "customer", // Add other roles if needed
+    USER = "user", // Add other roles if needed
   }
   
