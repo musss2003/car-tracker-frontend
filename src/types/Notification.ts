@@ -1,5 +1,5 @@
 export interface Notification {
-    id: string;
+    id?: string;
     recipient: string; // Assuming ID is string on frontend
     sender?: string;
     type: string;

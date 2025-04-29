@@ -78,7 +78,7 @@ export const NotificationProvider = ({ children, userId }: Props) => {
 
       setNotifications((prev) =>
         prev.map((notif) =>
-          notif._id === id ? { ...notif, status: "seen" } : notif
+          notif.id === id ? { ...notif, status: "seen" } : notif
         )
       );
     } catch (error) {

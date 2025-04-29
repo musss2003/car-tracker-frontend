@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   XIcon,
   SaveIcon,
@@ -10,156 +10,180 @@ import {
   MailIcon,
   LocationMarkerIcon,
   IdentificationIcon,
-} from "@heroicons/react/solid"
-import "./EditCustomerForm.css"
+} from "@heroicons/react/solid";
+import "./EditCustomerForm.css";
+import { Customer } from "../../../types/Customer";
 
-const EditCustomerForm = ({ customer, onSave, onCancel }) => {
+interface EditCarFormProps {
+  customer: Customer;
+  onSave: (updatedCustomer: Customer) => void;
+  onCancel: () => void;
+}
+
+const EditCustomerForm: React.FC<EditCarFormProps> = ({
+  customer,
+  onSave,
+  onCancel,
+}) => {
   // Form state
-  const [formData, setFormData] = useState({
-    _id: "",
+  const [formData, setFormData] = useState<Customer>({
+    id: "",
     name: "",
     email: "",
-    phone: "",
+    phone_number: "",
     address: "",
     driver_license_number: "",
     passport_number: "",
     drivingLicensePhotoUrl: "",
     passportPhotoUrl: "",
-    notes: "",
-  })
+  });
 
   // Original data for comparison
-  const [originalData, setOriginalData] = useState({})
+  const [originalData, setOriginalData] = useState({});
 
   // UI state
-  const [errors, setErrors] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showLicensePreview, setShowLicensePreview] = useState(false)
-  const [showPassportPreview, setShowPassportPreview] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLicensePreview, setShowLicensePreview] = useState(false);
+  const [showPassportPreview, setShowPassportPreview] = useState(false);
 
   // Initialize form data from customer prop
   useEffect(() => {
     if (customer) {
       const initialData = {
-        _id: customer._id || "",
+        id: customer.id || "",
         name: customer.name || "",
         email: customer.email || "",
-        phone: customer.phone_number || customer.phone || "",
+        phone: customer.phone_number || customer.phone_number || "",
         address: customer.address || "",
         driver_license_number: customer.driver_license_number || "",
         passport_number: customer.passport_number || "",
         drivingLicensePhotoUrl: customer.drivingLicensePhotoUrl || "",
         passportPhotoUrl: customer.passportPhotoUrl || "",
-        notes: customer.notes || "",
-      }
+      };
 
-      setFormData(initialData)
-      setOriginalData(initialData)
+      setFormData(initialData);
+      setOriginalData(initialData);
     }
-  }, [customer])
+  }, [customer]);
 
   // Handle form field changes
-  const handleChange = (e) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
+    }));
 
     // Clear error when field is edited
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }))
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
-  }
+  };
 
   // Validate form
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors: Record<string, string> = {};
 
     // Required fields
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required"
+      newErrors.name = "Name is required";
     }
 
     // At least one identification is required
     if (!formData.driver_license_number && !formData.passport_number) {
-      newErrors.driver_license_number = "Either driver license or passport number is required"
-      newErrors.passport_number = "Either driver license or passport number is required"
+      newErrors.driver_license_number =
+        "Either driver license or passport number is required";
+      newErrors.passport_number =
+        "Either driver license or passport number is required";
     }
 
     // Email validation
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address"
+      newErrors.email = "Please enter a valid email address";
     }
 
     // Phone validation
-    if (formData.phone && !/^\+?[0-9\s-()]{7,}$/.test(formData.phone)) {
-      newErrors.phone = "Please enter a valid phone number"
+    if (
+      formData.phone_number &&
+      !/^\+?[0-9\s-()]{7,}$/.test(formData.phone_number)
+    ) {
+      newErrors.phone = "Please enter a valid phone number";
     }
 
     // URL validation for photos
-    if (formData.drivingLicensePhotoUrl && !isValidUrl(formData.drivingLicensePhotoUrl)) {
-      newErrors.drivingLicensePhotoUrl = "Please enter a valid URL"
+    if (
+      formData.drivingLicensePhotoUrl &&
+      !isValidUrl(formData.drivingLicensePhotoUrl)
+    ) {
+      newErrors.drivingLicensePhotoUrl = "Please enter a valid URL";
     }
 
     if (formData.passportPhotoUrl && !isValidUrl(formData.passportPhotoUrl)) {
-      newErrors.passportPhotoUrl = "Please enter a valid URL"
+      newErrors.passportPhotoUrl = "Please enter a valid URL";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Check if URL is valid
-  const isValidUrl = (url) => {
+  const isValidUrl = (url: string) => {
     try {
-      new URL(url)
-      return true
+      new URL(url);
+      return true;
     } catch (e) {
-      return false
+      return false;
     }
-  }
+  };
 
   // Check if form has been modified
   const hasChanges = () => {
-    return JSON.stringify(formData) !== JSON.stringify(originalData)
-  }
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
+  };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
     try {
-      setIsSubmitting(true)
-      await onSave(formData)
+      setIsSubmitting(true);
+      await onSave(formData);
     } catch (error) {
-      console.error("Error saving customer:", error)
+      console.error("Error saving customer:", error);
       setErrors((prev) => ({
         ...prev,
         submit: "Failed to save customer. Please try again.",
-      }))
-      setIsSubmitting(false)
+      }));
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Handle cancel with unsaved changes
   const handleCancel = () => {
     if (hasChanges()) {
-      if (window.confirm("You have unsaved changes. Are you sure you want to cancel?")) {
-        onCancel()
+      if (
+        window.confirm(
+          "You have unsaved changes. Are you sure you want to cancel?"
+        )
+      ) {
+        onCancel();
       }
     } else {
-      onCancel()
+      onCancel();
     }
-  }
+  };
 
   // Toggle image previews
-  const toggleLicensePreview = () => setShowLicensePreview(!showLicensePreview)
-  const togglePassportPreview = () => setShowPassportPreview(!showPassportPreview)
+  const toggleLicensePreview = () => setShowLicensePreview(!showLicensePreview);
+  const togglePassportPreview = () =>
+    setShowPassportPreview(!showPassportPreview);
 
   return (
     <div className="edit-customer-form-container">
@@ -213,10 +237,16 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
               Identification
             </h3>
             <div className="form-row">
-              <div className={`form-field ${errors.driver_license_number ? "has-error" : ""}`}>
+              <div
+                className={`form-field ${
+                  errors.driver_license_number ? "has-error" : ""
+                }`}
+              >
                 <label htmlFor="driver_license_number">
                   Driver License Number
-                  {!formData.passport_number && <span className="required-mark">*</span>}
+                  {!formData.passport_number && (
+                    <span className="required-mark">*</span>
+                  )}
                 </label>
                 <input
                   type="text"
@@ -234,10 +264,16 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
                 )}
               </div>
 
-              <div className={`form-field ${errors.passport_number ? "has-error" : ""}`}>
+              <div
+                className={`form-field ${
+                  errors.passport_number ? "has-error" : ""
+                }`}
+              >
                 <label htmlFor="passport_number">
                   Passport Number
-                  {!formData.driver_license_number && <span className="required-mark">*</span>}
+                  {!formData.driver_license_number && (
+                    <span className="required-mark">*</span>
+                  )}
                 </label>
                 <input
                   type="text"
@@ -287,7 +323,7 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
                   type="tel"
                   id="phone"
                   name="phone"
-                  value={formData.phone}
+                  value={formData.phone_number}
                   onChange={handleChange}
                   placeholder="Enter phone number"
                 />
@@ -324,8 +360,14 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
               Document Photos
             </h3>
             <div className="form-row">
-              <div className={`form-field ${errors.drivingLicensePhotoUrl ? "has-error" : ""}`}>
-                <label htmlFor="drivingLicensePhotoUrl">Driver License Photo URL</label>
+              <div
+                className={`form-field ${
+                  errors.drivingLicensePhotoUrl ? "has-error" : ""
+                }`}
+              >
+                <label htmlFor="drivingLicensePhotoUrl">
+                  Driver License Photo URL
+                </label>
                 <div className="input-with-button">
                   <input
                     type="text"
@@ -340,7 +382,9 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
                       type="button"
                       className="preview-button"
                       onClick={toggleLicensePreview}
-                      title={showLicensePreview ? "Hide preview" : "Show preview"}
+                      title={
+                        showLicensePreview ? "Hide preview" : "Show preview"
+                      }
                     >
                       <PhotographIcon className="button-icon" />
                     </button>
@@ -355,19 +399,26 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
                 {showLicensePreview && formData.drivingLicensePhotoUrl && (
                   <div className="image-preview">
                     <img
-                      src={formData.drivingLicensePhotoUrl || "/placeholder.svg"}
+                      src={
+                        formData.drivingLicensePhotoUrl || "/placeholder.svg"
+                      }
                       alt="Driver License"
                       onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = "/placeholder.svg"
-                        e.target.classList.add("error-image")
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = "/placeholder.svg";
+                        target.classList.add("error-image");
                       }}
                     />
                   </div>
                 )}
               </div>
 
-              <div className={`form-field ${errors.passportPhotoUrl ? "has-error" : ""}`}>
+              <div
+                className={`form-field ${
+                  errors.passportPhotoUrl ? "has-error" : ""
+                }`}
+              >
                 <label htmlFor="passportPhotoUrl">Passport Photo URL</label>
                 <div className="input-with-button">
                   <input
@@ -383,7 +434,9 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
                       type="button"
                       className="preview-button"
                       onClick={togglePassportPreview}
-                      title={showPassportPreview ? "Hide preview" : "Show preview"}
+                      title={
+                        showPassportPreview ? "Hide preview" : "Show preview"
+                      }
                     >
                       <PhotographIcon className="button-icon" />
                     </button>
@@ -401,9 +454,10 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
                       src={formData.passportPhotoUrl || "/placeholder.svg"}
                       alt="Passport"
                       onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = "/placeholder.svg"
-                        e.target.classList.add("error-image")
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = "/placeholder.svg";
+                        target.classList.add("error-image");
                       }}
                     />
                   </div>
@@ -411,32 +465,24 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
               </div>
             </div>
           </div>
-
-          <div className="form-section">
-            <h3 className="section-title">Additional Information</h3>
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="notes">Notes</label>
-                <textarea
-                  id="notes"
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  placeholder="Enter any additional notes about this customer"
-                  rows={4}
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="form-actions">
-          <button type="button" className="cancel-button" onClick={handleCancel} disabled={isSubmitting}>
+          <button
+            type="button"
+            className="cancel-button"
+            onClick={handleCancel}
+            disabled={isSubmitting}
+          >
             <XIcon className="button-icon" />
             Cancel
           </button>
 
-          <button type="submit" className="save-button" disabled={isSubmitting || !hasChanges()}>
+          <button
+            type="submit"
+            className="save-button"
+            disabled={isSubmitting || !hasChanges()}
+          >
             {isSubmitting ? (
               <>
                 <div className="spinner"></div>
@@ -452,8 +498,7 @@ const EditCustomerForm = ({ customer, onSave, onCancel }) => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default EditCustomerForm
-
+export default EditCustomerForm;

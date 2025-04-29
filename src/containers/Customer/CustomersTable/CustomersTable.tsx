@@ -1,8 +1,13 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo } from "react"
-import { addCustomer, deleteCustomer, getCustomers, updateCustomer } from "../../../services/customerService"
-import { toast } from "react-toastify"
+import { useState, useEffect, useMemo } from "react";
+import {
+  addCustomer,
+  deleteCustomer,
+  getCustomers,
+  updateCustomer,
+} from "../../../services/customerService";
+import { toast } from "react-toastify";
 import {
   SearchIcon,
   SortAscendingIcon,
@@ -16,231 +21,278 @@ import {
   ExclamationCircleIcon,
   UserAddIcon,
   DownloadIcon,
-} from "@heroicons/react/solid"
-import "./CustomersTable.css"
-import CustomerDetails from "../../../components/Customer/CustomerDetails/CustomerDetails"
-import EditCustomerForm from "../../../components/Customer/EditCustomerForm/EditCustomerForm"
-import CreateCustomerForm from "../../../components/Customer/CreateCustomerForm/CreateCustomerForm"
-import * as XLSX from "xlsx"
+} from "@heroicons/react/solid";
+import "./CustomersTable.css";
+import CustomerDetails from "../../../components/Customer/CustomerDetails/CustomerDetails";
+import EditCustomerForm from "../../../components/Customer/EditCustomerForm/EditCustomerForm";
+import CreateCustomerForm from "../../../components/Customer/CreateCustomerForm/CreateCustomerForm";
+import * as XLSX from "xlsx";
+import { Customer } from "../../../types/Customer";
 
 const CustomersTable = () => {
   // State management
-  const [customers, setCustomers] = useState([])
-  const [selectedCustomer, setSelectedCustomer] = useState(null)
-  const [isEditing, setIsEditing] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
-  const [editCustomer, setEditCustomer] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  // State management
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Filtering and sorting state
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortConfig, setSortConfig] = useState({ key: "name", direction: "asc" })
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof Customer;
+    direction: "asc" | "desc";
+  }>({
+    key: "name",
+    direction: "asc",
+  });
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Fetch customers
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
-        const response = await getCustomers()
-        setCustomers(response)
-        setError(null)
+        setLoading(true);
+        const response = await getCustomers();
+        setCustomers(response);
+        setError(null);
       } catch (err) {
-        console.error("Failed to fetch customers:", err)
-        setError("Failed to load customers. Please try again later.")
-        toast.error("Failed to load customers")
+        console.error("Failed to fetch customers:", err);
+        setError("Failed to load customers. Please try again later.");
+        toast.error("Failed to load customers");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchData()
-  }, [])
+    };
+    fetchData();
+  }, []);
 
   // Filter and sort customers
   const filteredAndSortedCustomers = useMemo(() => {
     // First, filter the customers
-    let result = [...customers]
+    let result = [...customers];
 
     // Apply search filter
     if (searchTerm) {
-      const lowerSearchTerm = searchTerm.toLowerCase()
+      const lowerSearchTerm = searchTerm.toLowerCase();
       result = result.filter(
         (customer) =>
-          (customer.name && customer.name.toLowerCase().includes(lowerSearchTerm)) ||
-          (customer.driver_license_number && customer.driver_license_number.includes(searchTerm)) ||
-          (customer.passport_number && customer.passport_number.includes(searchTerm)) ||
-          (customer.email && customer.email.toLowerCase().includes(lowerSearchTerm)) ||
-          (customer.phone && customer.phone.includes(searchTerm)),
-      )
+          (customer.name &&
+            customer.name.toLowerCase().includes(lowerSearchTerm)) ||
+          (customer.driver_license_number &&
+            customer.driver_license_number.includes(searchTerm)) ||
+          (customer.passport_number &&
+            customer.passport_number.includes(searchTerm)) ||
+          (customer.email &&
+            customer.email.toLowerCase().includes(lowerSearchTerm)) ||
+          (customer.phone_number && customer.phone_number.includes(searchTerm))
+      );
     }
 
     // Then, sort the filtered results
     if (sortConfig.key) {
       result.sort((a, b) => {
+        const aValue = a[sortConfig.key as keyof typeof a];
+        const bValue = b[sortConfig.key as keyof typeof b];
+
         // Handle null or undefined values
-        if (!a[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1
-        if (!b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1
+        if (aValue == null) return sortConfig.direction === "asc" ? -1 : 1;
+        if (bValue == null) return sortConfig.direction === "asc" ? 1 : -1;
 
         // Handle string values
-        if (typeof a[sortConfig.key] === "string") {
+        if (typeof aValue === "string" && typeof bValue === "string") {
           return sortConfig.direction === "asc"
-            ? a[sortConfig.key].localeCompare(b[sortConfig.key])
-            : b[sortConfig.key].localeCompare(a[sortConfig.key])
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
         }
 
         // Handle numeric values
-        return sortConfig.direction === "asc"
-          ? a[sortConfig.key] - b[sortConfig.key]
-          : b[sortConfig.key] - a[sortConfig.key]
-      })
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return sortConfig.direction === "asc"
+            ? aValue - bValue
+            : bValue - aValue;
+        }
+
+        // Fallback if types mismatch
+        return 0;
+      });
     }
 
-    return result
-  }, [customers, searchTerm, sortConfig])
+    return result;
+  }, [customers, searchTerm, sortConfig]);
 
   // Pagination logic
   const paginatedCustomers = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return filteredAndSortedCustomers.slice(startIndex, startIndex + itemsPerPage)
-  }, [filteredAndSortedCustomers, currentPage, itemsPerPage])
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedCustomers.slice(
+      startIndex,
+      startIndex + itemsPerPage
+    );
+  }, [filteredAndSortedCustomers, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredAndSortedCustomers.length / itemsPerPage)
+  const totalPages = Math.ceil(
+    filteredAndSortedCustomers.length / itemsPerPage
+  );
 
   // Event handlers
-  const handleSort = (key) => {
+  const handleSort = (key: keyof Customer) => {
     setSortConfig((prevConfig) => ({
       key,
-      direction: prevConfig.key === key && prevConfig.direction === "asc" ? "desc" : "asc",
-    }))
-  }
+      direction:
+        prevConfig.key === key && prevConfig.direction === "asc"
+          ? "desc"
+          : "asc",
+    }));
+  };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this customer?")
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this customer?"
+    );
     if (!confirmDelete) {
-      return
+      return;
     }
 
     try {
-      setLoading(true)
-      await deleteCustomer(id)
-      setCustomers(customers.filter((c) => c._id !== id))
-      setSelectedCustomer(null)
-      toast.success("Customer deleted successfully")
+      setLoading(true);
+      await deleteCustomer(id);
+      setCustomers(customers.filter((c) => c.id !== id));
+      setSelectedCustomer(null);
+      toast.success("Customer deleted successfully");
     } catch (error) {
-      console.error("Error deleting customer:", error)
-      toast.error("Failed to delete customer")
+      console.error("Error deleting customer:", error);
+      toast.error("Failed to delete customer");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleSave = async (updatedCustomer) => {
+  const handleSave = async (updatedCustomer: Customer) => {
     try {
-      setLoading(true)
-      const response = await updateCustomer(updatedCustomer._id, updatedCustomer)
-      setCustomers(customers.map((c) => (c._id === response._id ? response : c)))
-      setIsEditing(false)
-      toast.success("Customer updated successfully")
+      setLoading(true);
+      const response = await updateCustomer(
+        updatedCustomer.id ?? "",
+        updatedCustomer
+      );
+      setCustomers(customers.map((c) => (c.id === response.id ? response : c)));
+      setIsEditing(false);
+      toast.success("Customer updated successfully");
     } catch (error) {
-      console.error("Error updating customer:", error)
-      toast.error("Failed to update customer")
+      console.error("Error updating customer:", error);
+      toast.error("Failed to update customer");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleCreate = async (newCustomer) => {
+  const handleCreate = async (newCustomer: Customer) => {
     try {
-      setLoading(true)
-      const response = await addCustomer(newCustomer)
-      setCustomers([...customers, response])
-      setIsCreating(false)
-      toast.success("Customer added successfully")
+      setLoading(true);
+      const response = await addCustomer(newCustomer);
+      setCustomers([...customers, response]);
+      setIsCreating(false);
+      toast.success("Customer added successfully");
     } catch (error) {
-      console.error("Error creating customer:", error)
-      toast.error("Failed to add customer")
+      console.error("Error creating customer:", error);
+      toast.error("Failed to add customer");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleEdit = (customer) => {
-    setIsEditing(true)
-    setEditCustomer(customer)
-    setSelectedCustomer(null)
-  }
+  const handleEdit = (customer: Customer) => {
+    setIsEditing(true);
+    setEditCustomer(customer);
+    setSelectedCustomer(null);
+  };
 
   const closeEditForm = () => {
-    setIsEditing(false)
-    setEditCustomer(null)
-  }
+    setIsEditing(false);
+    setEditCustomer(null);
+  };
 
   const closeCustomerDetails = () => {
-    setSelectedCustomer(null)
-  }
+    setSelectedCustomer(null);
+  };
 
   // Export to Excel
   const exportToExcel = () => {
     try {
-      const workbook = XLSX.utils.book_new()
+      const workbook = XLSX.utils.book_new();
 
       const worksheetData = filteredAndSortedCustomers.map((customer) => ({
         Name: customer.name || "N/A",
         "Driver License": customer.driver_license_number || "N/A",
         "Passport Number": customer.passport_number || "N/A",
         Email: customer.email || "N/A",
-        Phone: customer.phone || "N/A",
+        Phone: customer.phone_number || "N/A",
         Address: customer.address || "N/A",
-      }))
+      }));
 
-      const worksheet = XLSX.utils.json_to_sheet(worksheetData)
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Customers")
-      XLSX.writeFile(workbook, "customers.xlsx")
-      toast.success("Excel exported successfully")
+      const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
+      XLSX.writeFile(workbook, "customers.xlsx");
+      toast.success("Excel exported successfully");
     } catch (error) {
-      console.error("Error exporting to Excel:", error)
-      toast.error("Failed to export Excel")
+      console.error("Error exporting to Excel:", error);
+      toast.error("Failed to export Excel");
     }
-  }
+  };
 
   // Render table header with sort indicators
-  const renderTableHeader = (label, key) => {
-    const isSorted = sortConfig.key === key
-    const SortIcon = sortConfig.direction === "asc" ? SortAscendingIcon : SortDescendingIcon
+  const renderTableHeader = (label:string, key: keyof Customer) => {
+    const isSorted = sortConfig.key === key;
+    const SortIcon =
+      sortConfig.direction === "asc" ? SortAscendingIcon : SortDescendingIcon;
 
     return (
       <th className="customer-table-heading" onClick={() => handleSort(key)}>
         <div className="header-content">
           <span>{label}</span>
-          {isSorted ? <SortIcon className="sort-icon active" /> : <SortAscendingIcon className="sort-icon" />}
+          {isSorted ? (
+            <SortIcon className="sort-icon active" />
+          ) : (
+            <SortAscendingIcon className="sort-icon" />
+          )}
         </div>
       </th>
-    )
-  }
+    );
+  };
 
   // If a form or details view is active, show only that
   if (isCreating) {
     return (
       <div className="overlay-container">
         <div className="form-container">
-          <CreateCustomerForm onSave={handleCreate} onCancel={() => setIsCreating(false)} />
+          <CreateCustomerForm
+            onSave={handleCreate}
+            onCancel={() => setIsCreating(false)}
+          />
         </div>
       </div>
-    )
+    );
   }
 
   if (isEditing && editCustomer) {
     return (
       <div className="overlay-container">
         <div className="form-container">
-          <EditCustomerForm customer={editCustomer} onSave={handleSave} onCancel={closeEditForm} />
+          <EditCustomerForm
+            customer={editCustomer}
+            onSave={handleSave}
+            onCancel={closeEditForm}
+          />
         </div>
       </div>
-    )
+    );
   }
 
   if (selectedCustomer) {
@@ -250,12 +302,12 @@ const CustomersTable = () => {
           <CustomerDetails
             customer={selectedCustomer}
             onEdit={() => handleEdit(selectedCustomer)}
-            onDelete={() => handleDelete(selectedCustomer._id)}
+            onDelete={() => selectedCustomer?.id && handleDelete(selectedCustomer.id)}
             onClose={closeCustomerDetails}
           />
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -285,7 +337,10 @@ const CustomersTable = () => {
               className="search-input"
             />
             {searchTerm && (
-              <button className="clear-search" onClick={() => setSearchTerm("")}>
+              <button
+                className="clear-search"
+                onClick={() => setSearchTerm("")}
+              >
                 <XIcon className="clear-icon" />
               </button>
             )}
@@ -333,33 +388,45 @@ const CustomersTable = () => {
                 {renderTableHeader("Driver License", "driver_license_number")}
                 {renderTableHeader("Passport Number", "passport_number")}
                 {renderTableHeader("Email", "email")}
-                {renderTableHeader("Phone", "phone")}
-                <th className="customer-table-heading actions-column">Actions</th>
+                {renderTableHeader("Phone", "phone_number")}
+                <th className="customer-table-heading actions-column">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="customer-table-body">
               {paginatedCustomers.length > 0 ? (
                 paginatedCustomers.map((customer) => (
-                  <tr key={customer._id} className="customer-table-row">
+                  <tr key={customer.id} className="customer-table-row">
                     <td className="customer-table-cell">
                       <div className="customer-name-cell">
                         <div className="customer-avatar">
-                          {customer.name ? customer.name.charAt(0).toUpperCase() : "?"}
+                          {customer.name
+                            ? customer.name.charAt(0).toUpperCase()
+                            : "?"}
                         </div>
                         <span>{customer.name || "N/A"}</span>
                       </div>
                     </td>
-                    <td className="customer-table-cell">{customer.driver_license_number || "N/A"}</td>
-                    <td className="customer-table-cell">{customer.passport_number || "N/A"}</td>
-                    <td className="customer-table-cell">{customer.email || "N/A"}</td>
-                    <td className="customer-table-cell">{customer.phone || "N/A"}</td>
+                    <td className="customer-table-cell">
+                      {customer.driver_license_number || "N/A"}
+                    </td>
+                    <td className="customer-table-cell">
+                      {customer.passport_number || "N/A"}
+                    </td>
+                    <td className="customer-table-cell">
+                      {customer.email || "N/A"}
+                    </td>
+                    <td className="customer-table-cell">
+                      {customer.phone_number || "N/A"}
+                    </td>
                     <td className="customer-table-cell actions-cell">
                       <div className="action-buttons">
                         <button
                           className="action-btn view"
                           onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedCustomer(customer)
+                            e.stopPropagation();
+                            setSelectedCustomer(customer);
                           }}
                           title="View Details"
                           aria-label="View customer details"
@@ -369,8 +436,8 @@ const CustomersTable = () => {
                         <button
                           className="action-btn edit"
                           onClick={(e) => {
-                            e.stopPropagation()
-                            handleEdit(customer)
+                            e.stopPropagation();
+                            handleEdit(customer);
                           }}
                           title="Edit Customer"
                           aria-label="Edit customer"
@@ -380,8 +447,8 @@ const CustomersTable = () => {
                         <button
                           className="action-btn delete"
                           onClick={(e) => {
-                            e.stopPropagation()
-                            handleDelete(customer._id)
+                            e.stopPropagation();
+                            handleDelete(customer.id ?? "");
                           }}
                           title="Delete Customer"
                           aria-label="Delete customer"
@@ -394,7 +461,7 @@ const CustomersTable = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="empty-table-message">
+                  <td colSpan={6} className="empty-table-message">
                     No customers match your search criteria
                   </td>
                 </tr>
@@ -409,12 +476,19 @@ const CustomersTable = () => {
         <div className="pagination">
           <div className="pagination-info">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-            {Math.min(currentPage * itemsPerPage, filteredAndSortedCustomers.length)} of{" "}
-            {filteredAndSortedCustomers.length} customers
+            {Math.min(
+              currentPage * itemsPerPage,
+              filteredAndSortedCustomers.length
+            )}{" "}
+            of {filteredAndSortedCustomers.length} customers
           </div>
 
           <div className="pagination-controls">
-            <button className="pagination-btn" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            >
               First
             </button>
             <button
@@ -431,7 +505,9 @@ const CustomersTable = () => {
 
             <button
               className="pagination-btn"
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
             >
               <ChevronRightIcon className="pagination-icon" />
@@ -451,8 +527,8 @@ const CustomersTable = () => {
               id="itemsPerPage"
               value={itemsPerPage}
               onChange={(e) => {
-                setItemsPerPage(Number(e.target.value))
-                setCurrentPage(1) // Reset to first page when changing items per page
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1); // Reset to first page when changing items per page
               }}
               className="items-per-page-select"
             >
@@ -465,8 +541,7 @@ const CustomersTable = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CustomersTable
-
+export default CustomersTable;

@@ -50,7 +50,7 @@ const Notification: React.FC<NotificationProps> = ({
           {notifications.length > 0 ? (
             notifications.map((notification) => (
               <div
-                key={notification._id}
+                key={notification.id}
                 className={`dropdown-item ${
                   notification.status === "new" ? "new-alert" : ""
                 }`}

@@ -1,6 +1,4 @@
-"use client"
-
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback } from "react";
 import {
   BellIcon,
   CheckIcon,
@@ -12,10 +10,18 @@ import {
   FilterIcon,
   RefreshIcon,
   DotsVerticalIcon,
-} from "@heroicons/react/solid"
-import { getNotifications, markAllAsSeen, markAsSeen, deleteNotification } from "../../../services/notificationService"
-import { toast } from "react-toastify"
-import "./NotificationList.css"
+} from "@heroicons/react/solid";
+import {
+  getNotifications,
+  markAllAsSeen,
+  markAsSeen,
+  deleteNotification,
+} from "../../../services/notificationService";
+import { toast } from "react-toastify";
+import "./NotificationList.css";
+import { Notification } from "../../../types/Notification";
+
+type NotificationType = "info" | "warning" | "error" | "default";
 
 // Notification type icons mapping
 const typeIcons = {
@@ -23,144 +29,172 @@ const typeIcons = {
   success: <CheckCircleIcon className="notification-icon success" />,
   warning: <ExclamationIcon className="notification-icon warning" />,
   error: <ExclamationIcon className="notification-icon error" />,
+  alert: <ExclamationIcon className="notification-icon alert" />,
   default: <BellIcon className="notification-icon default" />,
-}
+};
 
 function NotificationList() {
-  const [notifications, setNotifications] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [filter, setFilter] = useState("all") // 'all', 'new', 'seen'
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [expandedNotification, setExpandedNotification] = useState(null)
-  const [actionInProgress, setActionInProgress] = useState(null)
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "new" | "seen">("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [expandedNotification, setExpandedNotification] =
+    useState<Notification | null>(null);
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null); // assuming it's an id or similar
 
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      const notificationsData = await getNotifications()
-      setNotifications(notificationsData)
+      const notificationsData = await getNotifications();
+      setNotifications(notificationsData);
     } catch (err) {
-      setError(err.message || "Failed to load notifications")
-      toast.error("Failed to load notifications")
+      setError(
+        err instanceof Error ? err.message : "Failed to load notifications"
+      );
+      toast.error("Failed to load notifications");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    fetchNotifications()
-  }, [fetchNotifications])
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   // Handle refresh
   const handleRefresh = async () => {
-    setIsRefreshing(true)
+    setIsRefreshing(true);
     try {
-      await fetchNotifications()
-      toast.success("Notifications refreshed")
+      await fetchNotifications();
+      toast.success("Notifications refreshed");
     } catch (error) {
       // Error is already handled in fetchNotifications
     } finally {
-      setIsRefreshing(false)
+      setIsRefreshing(false);
     }
-  }
+  };
 
   // Mark notification as seen
-  const handleMarkAsSeen = async (notificationId) => {
-    setActionInProgress(notificationId)
+  const handleMarkAsSeen = async (notificationId: string) => {
+    setActionInProgress(notificationId);
     try {
-      await markAsSeen(notificationId)
+      await markAsSeen(notificationId);
 
       // Update the notification status locally (optimistic update)
       setNotifications((prev) =>
-        prev.map((notif) => (notif._id === notificationId ? { ...notif, status: "seen" } : notif)),
-      )
-      toast.success("Notification marked as read")
+        prev.map((notif) =>
+          notif.id === notificationId ? { ...notif, status: "seen" } : notif
+        )
+      );
+      toast.success("Notification marked as read");
     } catch (err) {
-      console.error(err.message)
-      toast.error("Failed to mark notification as read")
+      if (err instanceof Error) {
+        console.error(err.message);
+      } else {
+        console.error("An unknown error occurred");
+      }
+      toast.error("Failed to mark notification as read");
     } finally {
-      setActionInProgress(null)
+      setActionInProgress(null);
     }
-  }
+  };
 
   // Mark all notifications as seen
   const handleMarkAllAsSeen = async () => {
     if (notifications.filter((n) => n.status === "new").length === 0) {
-      toast.info("No new notifications to mark as read")
-      return
+      toast.info("No new notifications to mark as read");
+      return;
     }
 
-    setActionInProgress("all")
+    setActionInProgress("all");
     try {
-      await markAllAsSeen()
+      await markAllAsSeen();
 
       // Update all notifications locally
-      setNotifications((prev) => prev.map((notif) => ({ ...notif, status: "seen" })))
-      toast.success("All notifications marked as read")
+      setNotifications((prev) =>
+        prev.map((notif) => ({ ...notif, status: "seen" }))
+      );
+      toast.success("All notifications marked as read");
     } catch (err) {
-      console.error(err.message)
-      toast.error("Failed to mark all notifications as read")
+      if (err instanceof Error) {
+        console.error(err.message);
+      } else {
+        console.error("An unknown error occurred");
+      }
+      toast.error("Failed to mark all notifications as read");
     } finally {
-      setActionInProgress(null)
+      setActionInProgress(null);
     }
-  }
+  };
 
   // Delete notification
-  const handleDeleteNotification = async (notificationId) => {
+  const handleDeleteNotification = async (notificationId: string) => {
     if (!window.confirm("Are you sure you want to delete this notification?")) {
-      return
+      return;
     }
 
-    setActionInProgress(notificationId)
+    setActionInProgress(notificationId);
     try {
-      await deleteNotification(notificationId)
+      await deleteNotification(notificationId);
 
       // Remove the notification locally
-      setNotifications((prev) => prev.filter((notif) => notif._id !== notificationId))
-      toast.success("Notification deleted")
+      setNotifications((prev) =>
+        prev.filter((notif) => notif.id !== notificationId)
+      );
+      toast.success("Notification deleted");
     } catch (err) {
-      console.error(err.message)
-      toast.error("Failed to delete notification")
+      if (err instanceof Error) {
+        console.error(err.message);
+      } else {
+        console.error("An unknown error occurred");
+      }
+      toast.error("Failed to delete notification");
     } finally {
-      setActionInProgress(null)
+      setActionInProgress(null);
     }
-  }
+  };
 
   // Toggle expanded notification
-  const toggleExpandNotification = (notificationId) => {
-    setExpandedNotification(expandedNotification === notificationId ? null : notificationId)
-  }
+  const toggleExpandNotification = (notificationId: string) => {
+    setExpandedNotification(
+      expandedNotification?.id === notificationId
+        ? null
+        : notifications.find((notif) => notif.id === notificationId) || null
+    );
+  };
 
   // Format date
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now - date
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMins / 60)
-    const diffDays = Math.floor(diffHours / 24)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return "Just now"
-    if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? "s" : ""} ago`
-    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`
-    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins !== 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
 
     return date.toLocaleDateString(undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   // Filter and search notifications
   const filteredNotifications = notifications.filter((notif) => {
     // Apply status filter
-    if (filter !== "all" && notif.status !== filter) return false
+    if (filter !== "all" && notif.status !== filter) return false;
 
     // Apply search filter
     if (
@@ -168,55 +202,61 @@ function NotificationList() {
       !notif.message.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !notif.type.toLowerCase().includes(searchTerm.toLowerCase())
     ) {
-      return false
+      return false;
     }
 
-    return true
-  })
+    return true;
+  });
 
   // Group notifications by date
-  const groupedNotifications = filteredNotifications.reduce((groups, notification) => {
-    const date = new Date(notification.createdAt)
-    const today = new Date()
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
+  const groupedNotifications = filteredNotifications.reduce<
+    Record<string, Notification[]>
+  >((groups, notification) => {
+    const createdAt = new Date(notification.createdAt);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
 
-    let groupKey
+    let groupKey: string;
 
-    if (date.toDateString() === today.toDateString()) {
-      groupKey = "Today"
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      groupKey = "Yesterday"
+    if (createdAt.toDateString() === today.toDateString()) {
+      groupKey = "Today";
+    } else if (createdAt.toDateString() === yesterday.toDateString()) {
+      groupKey = "Yesterday";
     } else {
-      groupKey = date.toLocaleDateString(undefined, {
+      groupKey = createdAt.toLocaleDateString(undefined, {
         year: "numeric",
         month: "long",
         day: "numeric",
-      })
+      });
     }
 
     if (!groups[groupKey]) {
-      groups[groupKey] = []
+      groups[groupKey] = [];
     }
 
-    groups[groupKey].push(notification)
-    return groups
-  }, {})
+    groups[groupKey].push(notification);
+    return groups;
+  }, {});
 
   // Get notification icon based on type
-  const getNotificationIcon = (type) => {
-    return typeIcons[type.toLowerCase()] || typeIcons.default
-  }
+  const getNotificationIcon = (type: NotificationType) => {
+    return typeIcons[type] || typeIcons.default;
+  };
 
   // Count new notifications
-  const newNotificationsCount = notifications.filter((n) => n.status === "new").length
+  const newNotificationsCount = notifications.filter(
+    (n) => n.status === "new"
+  ).length;
 
   return (
     <div className="notifications-container">
       <div className="notifications-header">
         <div className="notifications-title">
           <h1>Notifications</h1>
-          {newNotificationsCount > 0 && <span className="new-badge">{newNotificationsCount} new</span>}
+          {newNotificationsCount > 0 && (
+            <span className="new-badge">{newNotificationsCount} new</span>
+          )}
         </div>
 
         <div className="notifications-actions">
@@ -233,7 +273,9 @@ function NotificationList() {
             className="mark-all-button"
             onClick={handleMarkAllAsSeen}
             disabled={
-              actionInProgress === "all" || loading || notifications.filter((n) => n.status === "new").length === 0
+              actionInProgress === "all" ||
+              loading ||
+              notifications.filter((n) => n.status === "new").length === 0
             }
             aria-label="Mark all as read"
           >
@@ -260,7 +302,11 @@ function NotificationList() {
             className="search-input"
           />
           {searchTerm && (
-            <button className="clear-search" onClick={() => setSearchTerm("")} aria-label="Clear search">
+            <button
+              className="clear-search"
+              onClick={() => setSearchTerm("")}
+              aria-label="Clear search"
+            >
               <XIcon className="icon-small" />
             </button>
           )}
@@ -268,7 +314,13 @@ function NotificationList() {
 
         <div className="filter-container">
           <FilterIcon className="filter-icon" />
-          <select value={filter} onChange={(e) => setFilter(e.target.value)} className="filter-select">
+          <select
+            value={filter}
+            onChange={(e) =>
+              setFilter(e.target.value as "all" | "new" | "seen")
+            }
+            className="filter-select"
+          >
             <option value="all">All Notifications</option>
             <option value="new">Unread</option>
             <option value="seen">Read</option>
@@ -315,29 +367,40 @@ function NotificationList() {
             <ul className="notifications-list">
               {notifs.map((notif) => (
                 <li
-                  key={notif._id}
-                  className={`notification-item ${notif.status === "new" ? "unread" : ""} ${expandedNotification === notif._id ? "expanded" : ""}`}
+                  key={notif.id}
+                  className={`notification-item ${
+                    notif.status === "new" ? "unread" : ""
+                  } ${expandedNotification?.id === notif.id ? "expanded" : ""}`}
                 >
-                  <div className="notification-main" onClick={() => toggleExpandNotification(notif._id)}>
-                    <div className="notification-icon-container">{getNotificationIcon(notif.type)}</div>
+                  <div
+                    className="notification-main"
+                    onClick={() => toggleExpandNotification(notif.id ?? "")}
+                  >
+                    <div className="notification-icon-container">
+                      {getNotificationIcon(notif.type as NotificationType)}
+                    </div>
 
                     <div className="notification-content">
                       <div className="notification-header">
                         <span className="notification-type">{notif.type}</span>
-                        <span className="notification-time">{formatDate(notif.createdAt)}</span>
+                        <span className="notification-time">
+                          {formatDate(notif.createdAt)}
+                        </span>
                       </div>
 
                       <p className="notification-message">{notif.message}</p>
 
-                      {notif.status === "new" && <span className="status-indicator"></span>}
+                      {notif.status === "new" && (
+                        <span className="status-indicator"></span>
+                      )}
                     </div>
 
                     <div className="notification-actions">
                       <button
                         className="action-menu-button"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          toggleExpandNotification(notif._id)
+                          e.stopPropagation();
+                          toggleExpandNotification(notif.id ?? "");
                         }}
                         aria-label="Toggle notification details"
                       >
@@ -346,20 +409,21 @@ function NotificationList() {
                     </div>
                   </div>
 
-                  {expandedNotification === notif._id && (
+                  {expandedNotification?.id === notif.id && (
                     <div className="notification-details">
                       <div className="notification-meta">
                         <p>
-                          <strong>Created:</strong> {new Date(notif.createdAt).toLocaleString()}
+                          <strong>Created:</strong>{" "}
+                          {new Date(notif.createdAt).toLocaleString()}
                         </p>
-                        {notif.entityType && (
+                        {notif.type && (
                           <p>
-                            <strong>Related to:</strong> {notif.entityType}
+                            <strong>Related to:</strong> {notif.type}
                           </p>
                         )}
-                        {notif.entityId && (
+                        {notif.id && (
                           <p>
-                            <strong>ID:</strong> {notif.entityId}
+                            <strong>ID:</strong> {notif.id}
                           </p>
                         )}
                       </div>
@@ -368,13 +432,13 @@ function NotificationList() {
                         {notif.status === "new" && (
                           <button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              handleMarkAsSeen(notif._id)
+                              e.stopPropagation();
+                              handleMarkAsSeen(notif.id ?? "");
                             }}
                             className="mark-button"
-                            disabled={actionInProgress === notif._id}
+                            disabled={actionInProgress === notif.id}
                           >
-                            {actionInProgress === notif._id ? (
+                            {actionInProgress === notif.id ? (
                               <span className="loading-spinner small"></span>
                             ) : (
                               <>
@@ -387,13 +451,13 @@ function NotificationList() {
 
                         <button
                           onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteNotification(notif._id)
+                            e.stopPropagation();
+                            handleDeleteNotification(notif.id ?? "");
                           }}
                           className="delete-button"
-                          disabled={actionInProgress === notif._id}
+                          disabled={actionInProgress === notif.id}
                         >
-                          {actionInProgress === notif._id ? (
+                          {actionInProgress === notif.id ? (
                             <span className="loading-spinner small"></span>
                           ) : (
                             <>
@@ -412,8 +476,7 @@ function NotificationList() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default NotificationList
-
+export default NotificationList;
