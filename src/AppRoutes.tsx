@@ -2,9 +2,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 
-const LoginPage = lazy(() => import("./pages/LoginPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
-const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const CarsPage = lazy(() => import("./pages/CarsPage"));
 const ContractsPage = lazy(() => import("./pages/ContractsPage"));
 const CustomersPage = lazy(() => import("./pages/CustomersPage"));
@@ -14,6 +13,7 @@ const UserProfile = lazy(() => import("./components/User/UserProfile/UserProfile
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { useAuth } from "./contexts/useAuth";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import DashboardPage from "./pages/DashboardPage/DashboardPage";
 
 export function AppRoutes() {
   const { isLoggedIn, user } = useAuth();

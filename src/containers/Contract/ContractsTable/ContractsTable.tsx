@@ -1,3 +1,4 @@
+import "./ContractsTable.css";
 import { useEffect, useState, useMemo } from "react";
 import {
   createAndDownloadContract,
@@ -25,10 +26,17 @@ import {
   ClockIcon,
   CheckIcon,
 } from "@heroicons/react/solid";
-import { autoTable, RowInput } from "jspdf-autotable";
 import { jsPDF } from "jspdf";
+import 'jspdf-autotable'; // This augments jsPDF prototype
 import * as XLSX from "xlsx";
-import "./ContractsTable.css";
+
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
+
+
 
 import EditContractForm from "../../../components/Contract/EditContractForm/EditContractForm";
 import ContractDetails from "../../../components/Contract/ContractDetails/ContractDetails";
@@ -312,7 +320,7 @@ const ContractsTable = () => {
     try {
       const doc = new jsPDF();
       doc.text("Contracts List", 20, 10);
-
+  
       const tableColumn = [
         "Customer Name",
         "Passport Number",
@@ -326,7 +334,7 @@ const ContractsTable = () => {
         const now = new Date();
         const startDate = new Date(contract.rentalPeriod.startDate);
         const endDate = new Date(contract.rentalPeriod.endDate);
-
+  
         let status;
         if (now < startDate) {
           status = "Confirmed";
@@ -335,7 +343,7 @@ const ContractsTable = () => {
         } else {
           status = "Completed";
         }
-
+  
         return [
           contract.customer?.name || "N/A",
           contract.customer?.passport_number || "N/A",
@@ -346,15 +354,15 @@ const ContractsTable = () => {
           status,
         ];
       });
-
-      (doc as jsPDF & { autoTable: autoTable }).autoTable({
+  
+      doc.autoTable({
         head: [tableColumn],
         body: tableRows,
         startY: 20,
         styles: { fontSize: 10, cellPadding: 3 },
         headStyles: { fillColor: [66, 135, 245] },
       });
-
+  
       doc.save("contracts.pdf");
       toast.success("PDF exported successfully");
     } catch (error) {
@@ -362,6 +370,7 @@ const ContractsTable = () => {
       toast.error("Failed to export PDF");
     }
   };
+  
 
   const exportToExcel = () => {
     try {
@@ -578,11 +587,11 @@ const ContractsTable = () => {
           </thead>
           <tbody>
             {paginatedContracts.length > 0 ? (
-              paginatedContracts.map((contract) => {
+              paginatedContracts.map((contract, index) => {
                 const { status, className } = getContractStatus(contract);
 
                 return (
-                  <tr key={contract.id} className="contract-row">
+                  <tr key={contract.id || index} className="contract-row">
                     <td className="table-cell">
                       <div className="customer-info">
                         <div className="customer-avatar">

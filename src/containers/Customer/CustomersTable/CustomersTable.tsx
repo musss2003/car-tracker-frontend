@@ -396,8 +396,8 @@ const CustomersTable = () => {
             </thead>
             <tbody className="customer-table-body">
               {paginatedCustomers.length > 0 ? (
-                paginatedCustomers.map((customer) => (
-                  <tr key={customer.id} className="customer-table-row">
+                paginatedCustomers.map((customer, index) => (
+                  <tr key={customer.id || index} className="customer-table-row">
                     <td className="customer-table-cell">
                       <div className="customer-name-cell">
                         <div className="customer-avatar">

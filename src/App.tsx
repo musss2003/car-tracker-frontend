@@ -9,6 +9,7 @@ import Sidebar from "./components/Sidebar/Sidebar";
 import Navbar from "./components/Navbar/Navbar";
 import AppHeader from "./components/AppHeader/AppHeader";
 import { AppRoutes } from "./AppRoutes";
+import './App.css'
 
 
 function App() {

@@ -1,5 +1,5 @@
 {
-  "name": "grade-tracker-app",
+  "name": "car-tracker-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,6 +13,7 @@
     "@headlessui/react": "^2.1.9",
     "@heroicons/react": "^1.0.6",
     "@hookform/resolvers": "^3.3.4",
+    "@mui/material": "^7.1.0",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "docx": "^9.0.2",
@@ -67,10 +68,11 @@
   "devDependencies": {
     "@babel/plugin-transform-json-strings": "^7.18.6",
     "@babel/plugin-transform-optional-catch-binding": "^7.18.6",
-    "@tailwindcss/postcss": "^4.1.4",
+    "@tailwindcss/postcss": "^4.1.5",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@types/moment": "^2.11.29",
+    "@types/node": "^22.15.14",
     "@types/react": "^19.1.2",
     "@types/react-big-calendar": "^1.16.1",
     "@types/react-dom": "^19.1.2",
@@ -78,7 +80,7 @@
     "autoprefixer": "^10.4.21",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.4",
+    "tailwindcss": "^4.1.5",
     "typescript": "^5.8.3",
     "vite": "^6.3.2",
     "vitest": "^3.1.2"
