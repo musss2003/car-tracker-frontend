@@ -1,8 +1,5 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-
-// ✅ Add this import
-import { configDefaults } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
@@ -10,6 +7,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
     globals: true,
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    include: ['src/**/*.test.{ts,tsx}'],
+    coverage: {
+      reporter: ['text', 'json', 'lcov'], // lcov is needed for Codecov
+    },
   },
-});
+})

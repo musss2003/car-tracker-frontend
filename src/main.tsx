@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { UserProvider } from './contexts/useAuth'; // ✅ remove .js extension if using TypeScript
+import UserProvider from './contexts/useAuth'; // ✅ remove .js extension if using TypeScript
 
 const rootElement = document.getElementById('root');
 
