@@ -1,14 +1,14 @@
-import { Contract } from "../types/Contract";
-import { getAuthHeaders } from "../utils/getAuthHeaders";
+import { Contract } from '../types/Contract';
+import { getAuthHeaders } from '../utils/getAuthHeaders';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + "/api/contracts/";
+const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/contracts/';
 
 // Expected by useDataFetcher:
 // const { data: revenueData } = useDataFetcher<{ totalRevenue: number }>(...)
 export const getTotalRevenue = async (): Promise<{ totalRevenue: number }> => {
   try {
     const response = await fetch(`${API_URL}revenue`, {
-      method: "GET",
+      method: 'GET',
       headers: getAuthHeaders(),
     });
 
@@ -19,14 +19,14 @@ export const getTotalRevenue = async (): Promise<{ totalRevenue: number }> => {
     const totalRevenue: number = await response.json();
     return { totalRevenue }; // wrap it in an object
   } catch (error) {
-    console.error("Error fetching total revenue:", error);
+    console.error('Error fetching total revenue:', error);
     throw error;
   }
 };
 
 export const getContracts = async (): Promise<Contract[]> => {
   const res = await fetch(`${API_URL}`, {
-    method: "GET",
+    method: 'GET',
     headers: getAuthHeaders(),
   });
 
@@ -36,7 +36,7 @@ export const getContracts = async (): Promise<Contract[]> => {
 
 export const getContractTemplate = async (): Promise<Response> => {
   const res = await fetch(`${API_URL}template`, {
-    method: "GET",
+    method: 'GET',
     headers: getAuthHeaders(),
   });
 
@@ -46,7 +46,7 @@ export const getContractTemplate = async (): Promise<Response> => {
 
 export const getContractsPopulated = async (): Promise<Contract[]> => {
   const res = await fetch(`${API_URL}populated`, {
-    method: "GET",
+    method: 'GET',
     headers: getAuthHeaders(),
   });
 
@@ -56,7 +56,7 @@ export const getContractsPopulated = async (): Promise<Contract[]> => {
 
 export const getActiveContracts = async (): Promise<Contract[]> => {
   const res = await fetch(`${API_URL}active`, {
-    method: "GET",
+    method: 'GET',
     headers: getAuthHeaders(),
   });
 
@@ -69,7 +69,7 @@ export const updateContract = async (
   updatedContract: Partial<Contract>
 ): Promise<Contract> => {
   const res = await fetch(`${API_URL}${contractId}`, {
-    method: "PUT",
+    method: 'PUT',
     headers: {
       ...getAuthHeaders(),
     },
@@ -82,7 +82,7 @@ export const updateContract = async (
 
 export const deleteContract = async (contractId: string): Promise<void> => {
   const res = await fetch(`${API_URL}${contractId}`, {
-    method: "DELETE",
+    method: 'DELETE',
     headers: getAuthHeaders(),
   });
 
@@ -94,7 +94,7 @@ export const createAndDownloadContract = async (
 ): Promise<Contract | undefined> => {
   try {
     const res = await fetch(`${API_URL}`, {
-      method: "POST",
+      method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(contractData),
     });
@@ -108,13 +108,13 @@ export const createAndDownloadContract = async (
     triggerDownloadContract(await docxBlob, contract._id);
     return contract;
   } catch (error) {
-    console.error("Error creating and downloading contract:", error);
+    console.error('Error creating and downloading contract:', error);
   }
 };
 
 export const downloadContract = async (contractId: string): Promise<void> => {
   const res = await fetch(`${API_URL}download/${contractId}`, {
-    method: "GET",
+    method: 'GET',
     headers: getAuthHeaders(),
   });
 
@@ -132,13 +132,13 @@ const extractDocxBlobFromResponse = async (docx: string): Promise<Blob> => {
   );
   const byteArray = new Uint8Array(byteNumbers);
   return new Blob([byteArray], {
-    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   });
 };
 
 const triggerDownloadContract = (blob: Blob, contractId: string) => {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   a.download = `contract_${contractId}.docx`;
   document.body.appendChild(a);

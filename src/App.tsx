@@ -1,21 +1,18 @@
-import React, { useState } from "react";
-
-import { useAuth } from "./contexts/useAuth";
-import useScreenSize from "./hooks/useScreenSize";
-
-import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
-import { ToastContainer } from "react-toastify";
-import Sidebar from "./components/Sidebar/Sidebar";
-import Navbar from "./components/Navbar/Navbar";
-import AppHeader from "./components/AppHeader/AppHeader";
-import { AppRoutes } from "./routes/AppRoutes";
-import './App.css'
-
+import React, { useState } from 'react';
+import { useAuth } from './contexts/useAuth';
+import useScreenSize from './hooks/useScreenSize';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import { ToastContainer } from 'react-toastify';
+import Sidebar from './components/Sidebar/Sidebar';
+import Navbar from './components/Navbar/Navbar';
+import AppHeader from './components/AppHeader/AppHeader';
+import { AppRoutes } from './routes/AppRoutes';
+import './App.css';
 
 function App() {
   const { isLoggedIn } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const isSmallScreen = useScreenSize("(max-width: 768px)");
+  const isSmallScreen = useScreenSize('(max-width: 768px)');
 
   React.useEffect(() => {
     setSidebarOpen(!isSmallScreen);
@@ -31,20 +28,39 @@ function App() {
         <ToastContainer position="bottom-right" />
 
         {isLoggedIn() && (
-          <Sidebar isOpen={isSidebarOpen} isSmallScreen={isSmallScreen} toggleSidebar={toggleSidebar} />
+          <Sidebar
+            isOpen={isSidebarOpen}
+            isSmallScreen={isSmallScreen}
+            toggleSidebar={toggleSidebar}
+          />
         )}
 
+        {/* Main Content Area */}
         <main
-          className={`main-content ${isLoggedIn() && !isSmallScreen && isSidebarOpen ? "with-sidebar-open" : isLoggedIn() && !isSmallScreen && !isSidebarOpen ? "with-sidebar-closed" : ""}`}
+          role="main"
+          aria-label="Main Content Area"
+          className={`main-content ${
+            isLoggedIn() && !isSmallScreen && isSidebarOpen
+              ? 'with-sidebar-open'
+              : isLoggedIn() && !isSmallScreen && !isSidebarOpen
+                ? 'with-sidebar-closed'
+                : ''
+          }`}
+          data-testid="main-content"
         >
           {isLoggedIn() && !isSmallScreen && <Navbar />}
 
           {isSmallScreen && (
-            <AppHeader isLoggedIn={isLoggedIn()} toggleSidebar={toggleSidebar} isSmallScreen={isSmallScreen} />
+            <AppHeader
+              isLoggedIn={isLoggedIn()}
+              toggleSidebar={toggleSidebar}
+              isSmallScreen={isSmallScreen}
+            />
           )}
 
+          {/* Page Content */}
           <div className="page-content">
-            <AppRoutes /> {/* much cleaner! */}
+            <AppRoutes />
           </div>
         </main>
       </div>

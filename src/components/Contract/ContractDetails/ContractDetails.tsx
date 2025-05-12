@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   XIcon,
   PencilIcon,
@@ -13,10 +13,10 @@ import {
   ClockIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
-} from "@heroicons/react/solid";
-import "./ContractDetails.css";
-import { Contract } from "../../../types/Contract";
-import { calculateDuration } from "../../../utils/contractUtils";
+} from '@heroicons/react/solid';
+import './ContractDetails.css';
+import { Contract } from '../../../types/Contract';
+import { calculateDuration } from '../../../utils/contractUtils';
 
 interface ContractDetailsProps {
   contract: Contract;
@@ -47,13 +47,13 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
   }
 
   // Helper function to handle empty values
-  const getValue = (value: unknown, defaultValue: string = "N/A") => {
+  const getValue = (value: unknown, defaultValue: string = 'N/A') => {
     // More robust check for empty values
     if (
       value === undefined ||
       value === null ||
-      value === "" ||
-      (typeof value === "object" && Object.keys(value).length === 0)
+      value === '' ||
+      (typeof value === 'object' && Object.keys(value).length === 0)
     ) {
       return defaultValue;
     }
@@ -65,28 +65,28 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
     if (
       amount === undefined ||
       amount === null ||
-      amount === "" ||
+      amount === '' ||
       isNaN(Number(amount))
     )
-      return "N/A";
+      return 'N/A';
     return `$${Number.parseFloat(amount as string).toFixed(2)}`;
   };
 
   // Format date
   const formatDate = (dateInput: string | Date | null | undefined): string => {
-    if (!dateInput) return "N/A";
+    if (!dateInput) return 'N/A';
     try {
       const date =
-        typeof dateInput === "string" ? new Date(dateInput) : dateInput;
-      if (isNaN(date.getTime())) return "N/A";
+        typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+      if (isNaN(date.getTime())) return 'N/A';
 
       return date.toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
     } catch (error) {
-      return "N/A";
+      return 'N/A';
     }
   };
 
@@ -100,8 +100,8 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
 
     if (!startDateStr || !endDateStr) {
       return {
-        status: "Unknown",
-        className: "status-unknown",
+        status: 'Unknown',
+        className: 'status-unknown',
         icon: <ExclamationCircleIcon className="status-icon" />,
       };
     }
@@ -111,20 +111,20 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
 
     if (now < startDate) {
       return {
-        status: "Confirmed",
-        className: "status-confirmed",
+        status: 'Confirmed',
+        className: 'status-confirmed',
         icon: <ClockIcon className="status-icon" />,
       };
     } else if (now >= startDate && now <= endDate) {
       return {
-        status: "Active",
-        className: "status-active",
+        status: 'Active',
+        className: 'status-active',
         icon: <CheckCircleIcon className="status-icon" />,
       };
     } else {
       return {
-        status: "Completed",
-        className: "status-completed",
+        status: 'Completed',
+        className: 'status-completed',
         icon: <CheckCircleIcon className="status-icon" />,
       };
     }
@@ -137,8 +137,8 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
     id,
     createdAt,
     updatedAt,
-    additionalNotes = "",
-    contractPhoto = "",
+    additionalNotes = '',
+    contractPhoto = '',
     customer = {},
     car = {},
     rentalPeriod = {},
@@ -148,10 +148,10 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
 
   // Destructure nested objects with defaults
   const {
-    name = "",
-    passport_number = "",
-    driver_license_number = "",
-    address = "",
+    name = '',
+    passport_number = '',
+    driver_license_number = '',
+    address = '',
   }: {
     name?: string;
     passport_number?: string;
@@ -160,10 +160,10 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
   } = customer ?? {};
 
   const {
-    model = "",
-    license_plate = "",
-    manufacturer = "",
-    year = "",
+    model = '',
+    license_plate = '',
+    manufacturer = '',
+    year = '',
   }: {
     model?: string;
     license_plate?: string;
@@ -172,8 +172,8 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
   } = car ?? {};
 
   const {
-    startDate = "",
-    endDate = "",
+    startDate = '',
+    endDate = '',
   }: {
     startDate?: string;
     endDate?: string;
@@ -190,8 +190,8 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
   } = rentalPrice ?? {};
 
   const {
-    paymentMethod = "",
-    paymentStatus = "",
+    paymentMethod = '',
+    paymentStatus = '',
   }: {
     paymentMethod?: string;
     paymentStatus?: string;
@@ -295,7 +295,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                         contract?.rentalPeriod?.startDate,
                         contract?.rentalPeriod?.endDate
                       )} days`
-                    : "N/A"}
+                    : 'N/A'}
                 </span>
               </div>
             </div>
@@ -386,17 +386,17 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                 title="Contract photo - click to view full size"
               >
                 <img
-                  src={contractPhoto || "/placeholder.svg"}
+                  src={contractPhoto || '/placeholder.svg'}
                   alt="Contract"
                   className="contract-photo"
                   onClick={() =>
-                    contractPhoto && window.open(contractPhoto, "_blank")
+                    contractPhoto && window.open(contractPhoto, '_blank')
                   }
                   onError={(e) => {
                     const target = e.target as HTMLImageElement; // 👈 cast correctly
                     target.onerror = null;
-                    target.src = "/placeholder.svg";
-                    target.classList.add("error-image");
+                    target.src = '/placeholder.svg';
+                    target.classList.add('error-image');
                   }}
                 />
                 {contractPhoto && (

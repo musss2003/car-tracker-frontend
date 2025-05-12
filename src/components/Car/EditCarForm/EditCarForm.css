@@ -1,7 +1,9 @@
 .edit-car-form-container {
   background-color: white;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   width: 100%;
   max-width: 800px;
   max-height: 85vh; /* Limit height to 85% of viewport height */
@@ -40,7 +42,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .close-button:hover {
@@ -116,7 +120,9 @@
   font-size: 0.875rem;
   color: #1f2937;
   background-color: #ffffff;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .form-field input:focus,
@@ -139,7 +145,7 @@
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
 }
 
-.form-field input[type="color"] {
+.form-field input[type='color'] {
   height: 2.5rem;
   padding: 0.25rem;
   cursor: pointer;
@@ -375,4 +381,3 @@
     width: 100%;
   }
 }
-

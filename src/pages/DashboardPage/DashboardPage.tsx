@@ -1,12 +1,12 @@
-import "./DashboardPage.css";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getCars } from "../../services/carService";
-import { getCustomers } from "../../services/customerService";
+import './DashboardPage.css';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getCars } from '../../services/carService';
+import { getCustomers } from '../../services/customerService';
 import {
   getTotalRevenue,
   getActiveContracts,
-} from "../../services/contractService";
+} from '../../services/contractService';
 import {
   LineChart,
   Line,
@@ -14,7 +14,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
 
 // Generic custom hook with typing
 function useDataFetcher<T>(fetchFn: () => Promise<T>, initialValue: T) {
@@ -31,7 +31,7 @@ function useDataFetcher<T>(fetchFn: () => Promise<T>, initialValue: T) {
         setError(null);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "An error occurred";
+          err instanceof Error ? err.message : 'An error occurred';
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -78,7 +78,7 @@ function DashboardPage() {
   const numberOfContracts = contracts.length;
   const totalRevenue = revenueData.totalRevenue;
 
-  console.log(totalRevenue)
+  console.log(totalRevenue);
 
   // Mock data for charts and trends
   const monthlyRevenue = [
@@ -96,18 +96,18 @@ function DashboardPage() {
     totalRevenue,
   ];
   const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
   // Transform the data for Recharts
   const revenue = months.map((month, index) => ({
@@ -586,10 +586,10 @@ const recentActivities = [
         />
       </svg>
     ),
-    iconClass: "blue",
-    title: "New customer registered",
-    description: "John Doe created a new account",
-    time: "2 hours ago",
+    iconClass: 'blue',
+    title: 'New customer registered',
+    description: 'John Doe created a new account',
+    time: '2 hours ago',
   },
   {
     icon: (
@@ -608,10 +608,10 @@ const recentActivities = [
         />
       </svg>
     ),
-    iconClass: "green",
-    title: "Car rental started",
-    description: "Toyota Camry rented by Maria Garcia",
-    time: "5 hours ago",
+    iconClass: 'green',
+    title: 'Car rental started',
+    description: 'Toyota Camry rented by Maria Garcia',
+    time: '5 hours ago',
   },
   {
     icon: (
@@ -630,10 +630,10 @@ const recentActivities = [
         />
       </svg>
     ),
-    iconClass: "purple",
-    title: "Contract completed",
-    description: "Contract #1234 has been completed",
-    time: "Yesterday",
+    iconClass: 'purple',
+    title: 'Contract completed',
+    description: 'Contract #1234 has been completed',
+    time: 'Yesterday',
   },
   {
     icon: (
@@ -652,10 +652,10 @@ const recentActivities = [
         />
       </svg>
     ),
-    iconClass: "yellow",
-    title: "Payment received",
-    description: "$350 payment for Contract #5678",
-    time: "Yesterday",
+    iconClass: 'yellow',
+    title: 'Payment received',
+    description: '$350 payment for Contract #5678',
+    time: 'Yesterday',
   },
 ];
 

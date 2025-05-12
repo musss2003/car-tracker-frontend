@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Calendar,
   View,
   momentLocalizer,
   ToolbarProps,
   CalendarProps,
-} from "react-big-calendar";
-import moment from "moment";
+} from 'react-big-calendar';
+import moment from 'moment';
 import {
   XIcon,
   ChevronLeftIcon,
@@ -20,12 +20,12 @@ import {
   DocumentTextIcon,
   StatusOnlineIcon,
   ClockIcon,
-} from "@heroicons/react/solid";
-import { getCarAvailability } from "../../../services/carService";
-import { toast } from "react-toastify";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import "./CarAvailabilityCalendar.css";
-import { BookingEvent, Car } from "../../../types/Car";
+} from '@heroicons/react/solid';
+import { getCarAvailability } from '../../../services/carService';
+import { toast } from 'react-toastify';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import './CarAvailabilityCalendar.css';
+import { BookingEvent, Car } from '../../../types/Car';
 
 interface CarAvailabilityCalendarProps {
   car: Car;
@@ -43,7 +43,7 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<BookingEvent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [view, setView] = useState<View>("month");
+  const [view, setView] = useState<View>('month');
   const [date, setDate] = useState(new Date());
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 
@@ -55,24 +55,26 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
       const availability = await getCarAvailability(car.license_plate);
 
       // Transform the availability data into events for the calendar
-      const events: BookingEvent[] = availability.map((booking): BookingEvent => ({
-        id: booking.contractId,
-        title: `Booked: ${booking.customerName}`,
-        start: new Date(booking.start),
-        end: new Date(booking.end),
-        contractId: booking.contractId,
-        customerName: booking.customerName,
-        customerPhone: booking.customerPhone,
-        totalAmount: booking.totalAmount,
-        status: booking.status,
-      }));
+      const events: BookingEvent[] = availability.map(
+        (booking): BookingEvent => ({
+          id: booking.contractId,
+          title: `Booked: ${booking.customerName}`,
+          start: new Date(booking.start),
+          end: new Date(booking.end),
+          contractId: booking.contractId,
+          customerName: booking.customerName,
+          customerPhone: booking.customerPhone,
+          totalAmount: booking.totalAmount,
+          status: booking.status,
+        })
+      );
 
       setBookings(events);
       setError(null);
     } catch (error) {
-      console.error("Error fetching car availability:", error);
-      setError("Failed to load availability data. Please try again later.");
-      toast.error("Failed to load availability data");
+      console.error('Error fetching car availability:', error);
+      setError('Failed to load availability data. Please try again later.');
+      toast.error('Failed to load availability data');
     } finally {
       setIsLoading(false);
     }
@@ -93,9 +95,9 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -108,20 +110,20 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
         <div className="calendar-toolbar-left">
           <div className="calendar-toolbar-nav">
             <button
-              onClick={() => onNavigate("PREV")}
+              onClick={() => onNavigate('PREV')}
               className="calendar-nav-button"
               aria-label="Previous"
             >
               <ChevronLeftIcon className="h-5 w-5" />
             </button>
             <button
-              onClick={() => onNavigate("TODAY")}
+              onClick={() => onNavigate('TODAY')}
               className="calendar-today-button"
             >
               Today
             </button>
             <button
-              onClick={() => onNavigate("NEXT")}
+              onClick={() => onNavigate('NEXT')}
               className="calendar-nav-button"
               aria-label="Next"
             >
@@ -133,31 +135,31 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
 
         <div className="calendar-toolbar-views">
           <button
-            onClick={() => onView("month")}
+            onClick={() => onView('month')}
             className={`calendar-view-button ${
-              view === "month" ? "active" : ""
+              view === 'month' ? 'active' : ''
             }`}
           >
             Month
           </button>
           <button
-            onClick={() => onView("week")}
+            onClick={() => onView('week')}
             className={`calendar-view-button ${
-              view === "week" ? "active" : ""
+              view === 'week' ? 'active' : ''
             }`}
           >
             Week
           </button>
           <button
-            onClick={() => onView("day")}
-            className={`calendar-view-button ${view === "day" ? "active" : ""}`}
+            onClick={() => onView('day')}
+            className={`calendar-view-button ${view === 'day' ? 'active' : ''}`}
           >
             Day
           </button>
           <button
-            onClick={() => onView("agenda")}
+            onClick={() => onView('agenda')}
             className={`calendar-view-button ${
-              view === "agenda" ? "active" : ""
+              view === 'agenda' ? 'active' : ''
             }`}
           >
             Agenda
@@ -231,7 +233,7 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
             events={bookings}
             startAccessor="start"
             endAccessor="end"
-            views={["month", "week", "day", "agenda"]}
+            views={['month', 'week', 'day', 'agenda']}
             view={view}
             onView={setView}
             date={date}
@@ -243,28 +245,28 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
             tooltipAccessor={null}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={(event) => ({
-              className: "calendar-event",
+              className: 'calendar-event',
               style: {
-                backgroundColor: "#ef4444",
-                borderColor: "#dc2626",
+                backgroundColor: '#ef4444',
+                borderColor: '#dc2626',
               },
             })}
             dayPropGetter={(date) => {
               // Check if the day has any bookings
               const hasBooking = bookings.some((booking) =>
                 moment(date).isBetween(
-                  moment(booking.start).startOf("day"),
-                  moment(booking.end).endOf("day"),
+                  moment(booking.start).startOf('day'),
+                  moment(booking.end).endOf('day'),
                   null,
-                  "[]"
+                  '[]'
                 )
               );
 
               return {
-                className: hasBooking ? "booked-day" : "available-day",
+                className: hasBooking ? 'booked-day' : 'available-day',
                 style: hasBooking
-                  ? { backgroundColor: "#fee2e2" }
-                  : { backgroundColor: "#d1fae5" },
+                  ? { backgroundColor: '#fee2e2' }
+                  : { backgroundColor: '#d1fae5' },
               };
             }}
           />
@@ -353,8 +355,8 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
               <ClockIcon className="tooltip-icon" />
               <span className="tooltip-label">Period:</span>
               <span className="tooltip-value">
-                {moment(selectedEvent.start).format("MMM D, YYYY")} -{" "}
-                {moment(selectedEvent.end).format("MMM D, YYYY")}
+                {moment(selectedEvent.start).format('MMM D, YYYY')} -{' '}
+                {moment(selectedEvent.end).format('MMM D, YYYY')}
               </span>
             </div>
           </div>

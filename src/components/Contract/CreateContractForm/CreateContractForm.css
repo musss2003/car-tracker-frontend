@@ -1,675 +1,681 @@
 .create-contract-form-container {
-    background-color: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    width: 100%;
-    max-width: 1000px;
-    display: flex;
-    flex-direction: column;
-    max-height: 90vh;
-    overflow: hidden;
-    margin: 0 auto;
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+/* Header */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.form-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.close-button:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Global error */
+.global-error {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.error-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Form */
+.create-contract-form {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Grid layout for form sections */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+/* Make certain sections span full width */
+.customer-section {
+  grid-column: span 2;
+}
+
+.notes-section,
+.photo-section {
+  grid-column: span 1;
+}
+
+/* Form sections */
+.form-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease;
+}
+
+.form-section:hover {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.section-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #4b5563;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.section-content {
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Customer Search */
+.customer-search-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.customer-search-input {
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.customer-search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.customer-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  margin-top: 0.25rem;
+  z-index: 50; /* Increased z-index to ensure it appears above other elements */
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 0;
+  list-style: none;
+  width: 100%; /* Ensure full width */
+}
+
+.customer-result-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f3f4f6;
+  width: 100%; /* Ensure full width */
+}
+
+.customer-result-item:last-child {
+  border-bottom: none;
+}
+
+.customer-result-item:hover {
+  background-color: #f9fafb;
+}
+
+.customer-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.customer-avatar.large {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.5rem;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.customer-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.customer-passport {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.selected-customer {
+  margin-top: 1rem;
+}
+
+.customer-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s ease;
+}
+
+.customer-card:hover {
+  transform: translateY(-2px);
+}
+
+.customer-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.customer-details p {
+  margin: 0;
+}
+
+.customer-phone,
+.customer-email {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+/* Date Fields */
+.date-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.field-input-wrapper {
+  position: relative;
+}
+
+.date-input,
+.car-select,
+.notes-textarea,
+.photo-input,
+.payment-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.date-input:focus,
+.car-select:focus,
+.notes-textarea:focus,
+.photo-input:focus,
+.payment-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.rental-duration {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.duration-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.duration-value {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Car Selection */
+.car-select,
+.payment-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.selected-car {
+  margin-top: 1rem;
+}
+
+.car-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s ease;
+}
+
+.car-card:hover {
+  transform: translateY(-2px);
+}
+
+.car-image {
+  width: 100px;
+  height: 80px;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.car-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.car-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #9ca3af;
+}
+
+.car-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.car-details p {
+  margin: 0;
+}
+
+.car-model {
+  font-weight: 600;
+  color: #111827;
+}
+
+.car-license,
+.car-year {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.car-price {
+  font-weight: 500;
+  color: #3b82f6;
+  margin-top: 0.25rem;
+}
+
+.no-dates-message {
+  padding: 1rem;
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+/* Pricing Section */
+.pricing-summary {
+  padding: 1.25rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.price-label {
+  color: #6b7280;
+}
+
+.price-value {
+  font-weight: 500;
+  color: #111827;
+}
+
+.price-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 0.75rem 0;
+}
+
+.price-row.total {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #111827;
+}
+
+/* Notes and Photo */
+.notes-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.contract-photo-preview {
+  margin-top: 1rem;
+}
+
+.photo-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.photo-preview {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+.photo-preview.error {
+  height: 150px;
+  object-fit: contain;
+  background-color: #f3f4f6;
+}
+
+/* Error Messages */
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 0.25rem;
+}
+
+.error-icon-small {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* Loading Indicators */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: #6b7280;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-small {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  /* Header */
-  .form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-    background-color: #f9fafb;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  
-  .form-title {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #111827;
-  }
-  
-  .close-button {
-    background: none;
-    border: none;
-    color: #6b7280;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s, color 0.2s;
-  }
-  
-  .close-button:hover {
-    background-color: #f3f4f6;
-    color: #1f2937;
-  }
-  
-  .icon {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-  
-  /* Global error */
-  .global-error {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    background-color: #fee2e2;
-    color: #b91c1c;
-    gap: 0.5rem;
-    margin: 0;
-  }
-  
-  .error-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    flex-shrink: 0;
-  }
-  
-  /* Form */
-  .create-contract-form {
-    padding: 1.5rem;
-    overflow-y: auto;
-    flex: 1;
-  }
-  
-  /* Grid layout for form sections */
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cancel-button,
+.save-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cancel-button {
+  background-color: white;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.save-button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.save-button:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.cancel-button:disabled,
+.save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
   .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr;
   }
-  
-  /* Make certain sections span full width */
+
   .customer-section {
     grid-column: span 2;
   }
-  
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .customer-section,
+  .period-section,
+  .car-section,
+  .pricing-section,
   .notes-section,
   .photo-section {
     grid-column: span 1;
   }
-  
-  /* Form sections */
-  .form-section {
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    background-color: white;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    transition: box-shadow 0.3s ease;
-  }
-  
-  .form-section:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-  
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background-color: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .section-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    color: #4b5563;
-  }
-  
-  .section-title {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #374151;
-  }
-  
-  .section-content {
-    padding: 1rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Customer Search */
-  .customer-search-container {
-    position: relative;
-    margin-bottom: 1rem;
-  }
-  
-  .search-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  
-  .search-icon {
-    position: absolute;
-    left: 0.75rem;
-    width: 1.25rem;
-    height: 1.25rem;
-    color: #9ca3af;
-    pointer-events: none;
-  }
-  
-  .customer-search-input {
-    width: 100%;
-    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-  }
-  
-  .customer-search-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-  }
-  
-  .customer-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: white;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    margin-top: 0.25rem;
-    z-index: 50; /* Increased z-index to ensure it appears above other elements */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    padding: 0;
-    list-style: none;
-    width: 100%; /* Ensure full width */
-  }
-  
-  .customer-result-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border-bottom: 1px solid #f3f4f6;
-    width: 100%; /* Ensure full width */
-  }
-  
-  .customer-result-item:last-child {
-    border-bottom: none;
-  }
-  
-  .customer-result-item:hover {
-    background-color: #f9fafb;
-  }
-  
-  .customer-avatar {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background-color: #3b82f6;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    flex-shrink: 0;
-    font-size: 1rem;
-  }
-  
-  .customer-avatar.large {
-    width: 3.5rem;
-    height: 3.5rem;
-    font-size: 1.5rem;
-  }
-  
-  .customer-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  
-  .customer-name {
-    font-weight: 600;
-    color: #111827;
-  }
-  
-  .customer-passport {
-    font-size: 0.75rem;
-    color: #6b7280;
-  }
-  
-  .selected-customer {
-    margin-top: 1rem;
-  }
-  
-  .customer-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
-    transition: transform 0.2s ease;
-  }
-  
-  .customer-card:hover {
-    transform: translateY(-2px);
-  }
-  
-  .customer-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  
-  .customer-details p {
-    margin: 0;
-  }
-  
-  .customer-phone,
-  .customer-email {
-    font-size: 0.875rem;
-    color: #4b5563;
-  }
-  
-  /* Date Fields */
+
   .date-fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    grid-template-columns: 1fr;
   }
-  
-  .form-field {
-    display: flex;
+}
+
+@media (max-width: 640px) {
+  .create-contract-form-container {
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .form-header {
     flex-direction: column;
-    gap: 0.375rem;
-    margin-bottom: 1rem;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
-  
-  .field-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-  }
-  
-  .field-input-wrapper {
-    position: relative;
-  }
-  
-  .date-input,
-  .car-select,
-  .notes-textarea,
-  .photo-input,
-  .payment-select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-  }
-  
-  .date-input:focus,
-  .car-select:focus,
-  .notes-textarea:focus,
-  .photo-input:focus,
-  .payment-select:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-  }
-  
-  .rental-duration {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    background-color: #f3f4f6;
-    border-radius: 0.5rem;
-    margin-top: 0.5rem;
-  }
-  
-  .duration-label {
-    font-size: 0.875rem;
-    color: #6b7280;
-  }
-  
-  .duration-value {
-    font-weight: 600;
-    color: #111827;
-  }
-  
-  /* Car Selection */
-  .car-select,
-  .payment-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.75rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-  }
-  
-  .selected-car {
-    margin-top: 1rem;
-  }
-  
-  .car-card {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
-    transition: transform 0.2s ease;
-  }
-  
-  .car-card:hover {
-    transform: translateY(-2px);
-  }
-  
-  .car-image {
-    width: 100px;
-    height: 80px;
-    border-radius: 0.375rem;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-  
-  .car-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .car-placeholder {
-    width: 100%;
-    height: 100%;
-    background-color: #e5e7eb;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .placeholder-icon {
-    width: 2rem;
-    height: 2rem;
-    color: #9ca3af;
-  }
-  
-  .car-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-  }
-  
-  .car-details p {
-    margin: 0;
-  }
-  
-  .car-model {
-    font-weight: 600;
-    color: #111827;
-  }
-  
-  .car-license,
-  .car-year {
-    font-size: 0.875rem;
-    color: #4b5563;
-  }
-  
-  .car-price {
-    font-weight: 500;
-    color: #3b82f6;
-    margin-top: 0.25rem;
-  }
-  
-  .no-dates-message {
-    padding: 1rem;
-    text-align: center;
-    color: #6b7280;
-    font-style: italic;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
-  }
-  
-  /* Pricing Section */
-  .pricing-summary {
-    padding: 1.25rem;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 1rem;
-  }
-  
-  .price-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-  }
-  
-  .price-label {
-    color: #6b7280;
-  }
-  
-  .price-value {
-    font-weight: 500;
-    color: #111827;
-  }
-  
-  .price-divider {
-    height: 1px;
-    background-color: #e5e7eb;
-    margin: 0.75rem 0;
-  }
-  
-  .price-row.total {
-    font-weight: 600;
-    font-size: 1.125rem;
-    color: #111827;
-  }
-  
-  /* Notes and Photo */
-  .notes-textarea {
-    resize: vertical;
-    min-height: 120px;
-  }
-  
-  .contract-photo-preview {
-    margin-top: 1rem;
-  }
-  
-  .photo-container {
-    border-radius: 0.5rem;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
-    background-color: #f9fafb;
-  }
-  
-  .photo-preview {
-    width: 100%;
-    height: auto;
-    display: block;
-    max-height: 200px;
-    object-fit: contain;
-  }
-  
-  .photo-preview.error {
-    height: 150px;
-    object-fit: contain;
-    background-color: #f3f4f6;
-  }
-  
-  /* Error Messages */
-  .field-error {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    color: #ef4444;
-    margin-top: 0.25rem;
-  }
-  
-  .error-icon-small {
-    width: 0.875rem;
-    height: 0.875rem;
-    flex-shrink: 0;
-  }
-  
-  /* Loading Indicators */
-  .loading-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    color: #6b7280;
-    gap: 0.5rem;
-  }
-  
-  .spinner {
-    width: 1.5rem;
-    height: 1.5rem;
-    border: 2px solid rgba(59, 130, 246, 0.1);
-    border-radius: 50%;
-    border-top-color: #3b82f6;
-    animation: spin 1s linear infinite;
-  }
-  
-  .spinner-small {
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid rgba(59, 130, 246, 0.1);
-    border-radius: 50%;
-    border-top-color: #3b82f6;
-    animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  /* Form Actions */
+
   .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    flex-direction: column-reverse;
   }
-  
+
   .cancel-button,
   .save-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    width: 100%;
   }
-  
-  .button-icon {
-    width: 1rem;
-    height: 1rem;
-  }
-  
-  .cancel-button {
-    background-color: white;
-    color: #4b5563;
-    border: 1px solid #d1d5db;
-  }
-  
-  .cancel-button:hover:not(:disabled) {
-    background-color: #f9fafb;
-    border-color: #9ca3af;
-  }
-  
-  .save-button {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-  }
-  
-  .save-button:hover:not(:disabled) {
-    background-color: #2563eb;
-  }
-  
-  .cancel-button:disabled,
-  .save-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  /* Responsive Styles */
-  @media (max-width: 1024px) {
-    .form-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  
-    .customer-section {
-      grid-column: span 2;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
-  
-    .customer-section,
-    .period-section,
-    .car-section,
-    .pricing-section,
-    .notes-section,
-    .photo-section {
-      grid-column: span 1;
-    }
-  
-    .date-fields {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  @media (max-width: 640px) {
-    .create-contract-form-container {
-      max-width: 100%;
-      border-radius: 0;
-    }
-  
-    .form-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
-    }
-  
-    .form-actions {
-      flex-direction: column-reverse;
-    }
-  
-    .cancel-button,
-    .save-button {
-      width: 100%;
-    }
-  }
-  
-  
+}

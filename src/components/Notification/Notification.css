@@ -1,114 +1,114 @@
 /* Dropdown Styles */
 .dropdown {
-    position: relative;
+  position: relative;
 }
 
 .dropdown-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 .dropdown-toggle .badge {
-    background-color: #ff0000;
-    color: white;
-    font-size: 0.8rem;
-    padding: 4px 8px;
-    border-radius: 50%;
-    position: absolute;
-    top: -5px;
-    right: -10px;
+  background-color: #ff0000;
+  color: white;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 50%;
+  position: absolute;
+  top: -5px;
+  right: -10px;
 }
 
 .bell-icon {
-    font-size: 1.5rem;
-    color: #555;
+  font-size: 1.5rem;
+  color: #555;
 }
 
 .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 300px;
-    z-index: 10;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 300px;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .dropdown-header {
-    font-size: 1rem;
-    font-weight: bold;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    background-color: #f8f9fa;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  background-color: #f8f9fa;
 }
 
 .dropdown-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #f1f1f1;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f1f1;
 }
 
 .dropdown-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .icon-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
-    color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  color: white;
 }
 
 .icon-circle.info {
-    background-color: #007bff;
+  background-color: #007bff;
 }
 
 .icon-circle.warning {
-    background-color: #ffc107;
+  background-color: #ffc107;
 }
 
 .icon-circle.danger {
-    background-color: #dc3545;
+  background-color: #dc3545;
 }
 
 .notification-content {
-    flex: 1;
+  flex: 1;
 }
 
 .dropdown-time {
-    font-size: 0.8rem;
-    color: #888;
-    margin-bottom: 5px;
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 5px;
 }
 
 .dropdown-no-alerts {
-    padding: 20px;
-    text-align: center;
-    color: #888;
+  padding: 20px;
+  text-align: center;
+  color: #888;
 }
 
 .dropdown-footer {
-    width: 100%;
-    text-align: center;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-top: 1px solid #ddd;
-    cursor: pointer;
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #ddd;
+  cursor: pointer;
 }
 
 .new-alert {
-    background-color: #f8f9fa;
-    font-weight: bold;
+  background-color: #f8f9fa;
+  font-weight: bold;
 }

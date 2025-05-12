@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { getUnreadNotifications } from "../../services/notificationService";
-import "./Notification.css";
-import { Notification } from "../../types/Notification";
+import React, { useEffect, useState } from 'react';
+import { getUnreadNotifications } from '../../services/notificationService';
+import './Notification.css';
+import { Notification } from '../../types/Notification';
 
 interface NotificationProps {
   openDropdown: string | null;
@@ -17,7 +17,7 @@ const Notification: React.FC<NotificationProps> = ({
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    if (openDropdown === "alerts") {
+    if (openDropdown === 'alerts') {
       fetchUnreadNotifications();
     }
   }, [openDropdown]);
@@ -28,12 +28,12 @@ const Notification: React.FC<NotificationProps> = ({
       setNotifications(data);
       setUnreadCount(data.length);
     } catch (err) {
-      console.error("Error fetching unread notifications:", err);
+      console.error('Error fetching unread notifications:', err);
     }
   };
 
   const handleToggle = () => {
-    toggleDropdown("alerts");
+    toggleDropdown('alerts');
   };
 
   return (
@@ -43,7 +43,7 @@ const Notification: React.FC<NotificationProps> = ({
         <i className="fas fa-bell"></i>
       </button>
 
-      {openDropdown === "alerts" && (
+      {openDropdown === 'alerts' && (
         <div className="dropdown-menu">
           <h6 className="dropdown-header">Alerts Center</h6>
 
@@ -52,16 +52,16 @@ const Notification: React.FC<NotificationProps> = ({
               <div
                 key={notification.id}
                 className={`dropdown-item ${
-                  notification.status === "new" ? "new-alert" : ""
+                  notification.status === 'new' ? 'new-alert' : ''
                 }`}
               >
                 <div
                   className={`icon-circle ${
-                    notification.type === "info"
-                      ? "info"
-                      : notification.type === "warning"
-                      ? "warning"
-                      : "danger"
+                    notification.type === 'info'
+                      ? 'info'
+                      : notification.type === 'warning'
+                        ? 'warning'
+                        : 'danger'
                   }`}
                 >
                   <i className="icon"></i>

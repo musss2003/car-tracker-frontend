@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from 'react';
 import {
   XIcon,
   UserAddIcon,
   ExclamationCircleIcon,
-} from "@heroicons/react/solid";
-import "./CreateCustomerForm.css";
-import { Customer } from "../../../types/Customer";
+} from '@heroicons/react/solid';
+import './CreateCustomerForm.css';
+import { Customer } from '../../../types/Customer';
 
 interface CreateCustomerFormProps {
   onSave: (customerData: Customer) => void;
@@ -24,12 +24,12 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 }) => {
   // Form state
   const [formData, setFormData] = useState<Customer>({
-    name: "",
-    driver_license_number: "",
-    passport_number: "",
-    email: "",
-    phone_number: "",
-    address: "",
+    name: '',
+    driver_license_number: '',
+    passport_number: '',
+    email: '',
+    phone_number: '',
+    address: '',
   });
 
   // Validation state
@@ -54,7 +54,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 
     // Required name
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = 'Name is required';
     }
 
     // At least one identification
@@ -63,12 +63,12 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
       !formData.passport_number?.trim()
     ) {
       newErrors.driver_license_number =
-        "Either driver license or passport number is required";
+        'Either driver license or passport number is required';
     }
 
     // Email validation
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = 'Please enter a valid email address';
     }
 
     // Phone validation
@@ -76,7 +76,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
       formData.phone_number &&
       !/^\+?[0-9\s-()]{7,}$/.test(formData.phone_number)
     ) {
-      newErrors.phone_number = "Please enter a valid phone number";
+      newErrors.phone_number = 'Please enter a valid phone number';
     }
 
     setErrors(newErrors);
@@ -95,10 +95,10 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
       setIsSubmitting(true);
       await onSave(formData);
     } catch (error) {
-      console.error("Error creating customer:", error);
+      console.error('Error creating customer:', error);
       setErrors((prev) => ({
         ...prev,
-        submit: "Failed to create customer. Please try again.",
+        submit: 'Failed to create customer. Please try again.',
       }));
     } finally {
       setIsSubmitting(false);
@@ -126,7 +126,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
           <div className="form-section">
             <h3 className="section-title">Basic Information</h3>
             <div className="form-row">
-              <div className={`form-field ${errors.name ? "has-error" : ""}`}>
+              <div className={`form-field ${errors.name ? 'has-error' : ''}`}>
                 <label htmlFor="name">
                   Full Name <span className="required-mark">*</span>
                 </label>
@@ -150,7 +150,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
             <div className="form-row">
               <div
                 className={`form-field ${
-                  errors.driver_license_number ? "has-error" : ""
+                  errors.driver_license_number ? 'has-error' : ''
                 }`}
               >
                 <label htmlFor="driver_license_number">
@@ -174,7 +174,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 
               <div
                 className={`form-field ${
-                  errors.passport_number ? "has-error" : ""
+                  errors.passport_number ? 'has-error' : ''
                 }`}
               >
                 <label htmlFor="passport_number">Passport Number</label>
@@ -199,7 +199,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
           <div className="form-section">
             <h3 className="section-title">Contact Information</h3>
             <div className="form-row">
-              <div className={`form-field ${errors.email ? "has-error" : ""}`}>
+              <div className={`form-field ${errors.email ? 'has-error' : ''}`}>
                 <label htmlFor="email">Email Address</label>
                 <input
                   type="email"
@@ -217,7 +217,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                 )}
               </div>
 
-              <div className={`form-field ${errors.phone ? "has-error" : ""}`}>
+              <div className={`form-field ${errors.phone ? 'has-error' : ''}`}>
                 <label htmlFor="phone">Phone Number</label>
                 <input
                   type="tel"

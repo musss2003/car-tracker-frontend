@@ -1,9 +1,9 @@
-import React from "react";
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/useAuth";
+import React from 'react';
+import * as Yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/useAuth';
 
 interface FormInputs {
   email: string;
@@ -12,11 +12,11 @@ interface FormInputs {
 }
 
 const validation = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  username: Yup.string().required("Username is required"),
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  username: Yup.string().required('Username is required'),
   password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
 });
 
 const RegisterPage: React.FC = () => {
@@ -59,7 +59,7 @@ const RegisterPage: React.FC = () => {
                   id="email"
                   className="form-input"
                   placeholder="Email"
-                  {...register("email")}
+                  {...register('email')}
                 />
                 {errors.email && (
                   <p className="text-red-600 text-sm">{errors.email.message}</p>
@@ -78,7 +78,7 @@ const RegisterPage: React.FC = () => {
                   id="username"
                   className="form-input"
                   placeholder="Username"
-                  {...register("username")}
+                  {...register('username')}
                 />
                 {errors.username && (
                   <p className="text-red-600 text-sm">
@@ -99,7 +99,7 @@ const RegisterPage: React.FC = () => {
                   id="password"
                   placeholder="••••••••"
                   className="form-input"
-                  {...register("password")}
+                  {...register('password')}
                 />
                 {errors.password && (
                   <p className="text-red-600 text-sm">
@@ -116,11 +116,11 @@ const RegisterPage: React.FC = () => {
               </button>
 
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Already have an account?{" "}
+                Already have an account?{' '}
                 <button
                   type="button"
                   className="text-primary-600 hover:underline dark:text-primary-500"
-                  onClick={() => handleNavigate("/login")}
+                  onClick={() => handleNavigate('/login')}
                 >
                   Sign in
                 </button>

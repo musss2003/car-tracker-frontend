@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   XIcon,
   SaveIcon,
@@ -10,9 +10,9 @@ import {
   MailIcon,
   LocationMarkerIcon,
   IdentificationIcon,
-} from "@heroicons/react/solid";
-import "./EditCustomerForm.css";
-import { Customer } from "../../../types/Customer";
+} from '@heroicons/react/solid';
+import './EditCustomerForm.css';
+import { Customer } from '../../../types/Customer';
 
 interface EditCarFormProps {
   customer: Customer;
@@ -27,15 +27,15 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
 }) => {
   // Form state
   const [formData, setFormData] = useState<Customer>({
-    id: "",
-    name: "",
-    email: "",
-    phone_number: "",
-    address: "",
-    driver_license_number: "",
-    passport_number: "",
-    drivingLicensePhotoUrl: "",
-    passportPhotoUrl: "",
+    id: '',
+    name: '',
+    email: '',
+    phone_number: '',
+    address: '',
+    driver_license_number: '',
+    passport_number: '',
+    drivingLicensePhotoUrl: '',
+    passportPhotoUrl: '',
   });
 
   // Original data for comparison
@@ -51,15 +51,15 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
   useEffect(() => {
     if (customer) {
       const initialData = {
-        id: customer.id || "",
-        name: customer.name || "",
-        email: customer.email || "",
-        phone: customer.phone_number || customer.phone_number || "",
-        address: customer.address || "",
-        driver_license_number: customer.driver_license_number || "",
-        passport_number: customer.passport_number || "",
-        drivingLicensePhotoUrl: customer.drivingLicensePhotoUrl || "",
-        passportPhotoUrl: customer.passportPhotoUrl || "",
+        id: customer.id || '',
+        name: customer.name || '',
+        email: customer.email || '',
+        phone: customer.phone_number || customer.phone_number || '',
+        address: customer.address || '',
+        driver_license_number: customer.driver_license_number || '',
+        passport_number: customer.passport_number || '',
+        drivingLicensePhotoUrl: customer.drivingLicensePhotoUrl || '',
+        passportPhotoUrl: customer.passportPhotoUrl || '',
       };
 
       setFormData(initialData);
@@ -89,20 +89,20 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
 
     // Required fields
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = 'Name is required';
     }
 
     // At least one identification is required
     if (!formData.driver_license_number && !formData.passport_number) {
       newErrors.driver_license_number =
-        "Either driver license or passport number is required";
+        'Either driver license or passport number is required';
       newErrors.passport_number =
-        "Either driver license or passport number is required";
+        'Either driver license or passport number is required';
     }
 
     // Email validation
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = 'Please enter a valid email address';
     }
 
     // Phone validation
@@ -110,7 +110,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
       formData.phone_number &&
       !/^\+?[0-9\s-()]{7,}$/.test(formData.phone_number)
     ) {
-      newErrors.phone = "Please enter a valid phone number";
+      newErrors.phone = 'Please enter a valid phone number';
     }
 
     // URL validation for photos
@@ -118,11 +118,11 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
       formData.drivingLicensePhotoUrl &&
       !isValidUrl(formData.drivingLicensePhotoUrl)
     ) {
-      newErrors.drivingLicensePhotoUrl = "Please enter a valid URL";
+      newErrors.drivingLicensePhotoUrl = 'Please enter a valid URL';
     }
 
     if (formData.passportPhotoUrl && !isValidUrl(formData.passportPhotoUrl)) {
-      newErrors.passportPhotoUrl = "Please enter a valid URL";
+      newErrors.passportPhotoUrl = 'Please enter a valid URL';
     }
 
     setErrors(newErrors);
@@ -156,10 +156,10 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
       setIsSubmitting(true);
       await onSave(formData);
     } catch (error) {
-      console.error("Error saving customer:", error);
+      console.error('Error saving customer:', error);
       setErrors((prev) => ({
         ...prev,
-        submit: "Failed to save customer. Please try again.",
+        submit: 'Failed to save customer. Please try again.',
       }));
       setIsSubmitting(false);
     }
@@ -170,7 +170,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
     if (hasChanges()) {
       if (
         window.confirm(
-          "You have unsaved changes. Are you sure you want to cancel?"
+          'You have unsaved changes. Are you sure you want to cancel?'
         )
       ) {
         onCancel();
@@ -209,7 +209,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
               Basic Information
             </h3>
             <div className="form-row">
-              <div className={`form-field ${errors.name ? "has-error" : ""}`}>
+              <div className={`form-field ${errors.name ? 'has-error' : ''}`}>
                 <label htmlFor="name">
                   Full Name <span className="required-mark">*</span>
                 </label>
@@ -239,7 +239,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
             <div className="form-row">
               <div
                 className={`form-field ${
-                  errors.driver_license_number ? "has-error" : ""
+                  errors.driver_license_number ? 'has-error' : ''
                 }`}
               >
                 <label htmlFor="driver_license_number">
@@ -266,7 +266,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
 
               <div
                 className={`form-field ${
-                  errors.passport_number ? "has-error" : ""
+                  errors.passport_number ? 'has-error' : ''
                 }`}
               >
                 <label htmlFor="passport_number">
@@ -299,7 +299,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
               Contact Information
             </h3>
             <div className="form-row">
-              <div className={`form-field ${errors.email ? "has-error" : ""}`}>
+              <div className={`form-field ${errors.email ? 'has-error' : ''}`}>
                 <label htmlFor="email">Email Address</label>
                 <input
                   type="email"
@@ -317,7 +317,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                 )}
               </div>
 
-              <div className={`form-field ${errors.phone ? "has-error" : ""}`}>
+              <div className={`form-field ${errors.phone ? 'has-error' : ''}`}>
                 <label htmlFor="phone">Phone Number</label>
                 <input
                   type="tel"
@@ -362,7 +362,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
             <div className="form-row">
               <div
                 className={`form-field ${
-                  errors.drivingLicensePhotoUrl ? "has-error" : ""
+                  errors.drivingLicensePhotoUrl ? 'has-error' : ''
                 }`}
               >
                 <label htmlFor="drivingLicensePhotoUrl">
@@ -383,7 +383,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                       className="preview-button"
                       onClick={toggleLicensePreview}
                       title={
-                        showLicensePreview ? "Hide preview" : "Show preview"
+                        showLicensePreview ? 'Hide preview' : 'Show preview'
                       }
                     >
                       <PhotographIcon className="button-icon" />
@@ -400,14 +400,14 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                   <div className="image-preview">
                     <img
                       src={
-                        formData.drivingLicensePhotoUrl || "/placeholder.svg"
+                        formData.drivingLicensePhotoUrl || '/placeholder.svg'
                       }
                       alt="Driver License"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
-                        target.src = "/placeholder.svg";
-                        target.classList.add("error-image");
+                        target.src = '/placeholder.svg';
+                        target.classList.add('error-image');
                       }}
                     />
                   </div>
@@ -416,7 +416,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
 
               <div
                 className={`form-field ${
-                  errors.passportPhotoUrl ? "has-error" : ""
+                  errors.passportPhotoUrl ? 'has-error' : ''
                 }`}
               >
                 <label htmlFor="passportPhotoUrl">Passport Photo URL</label>
@@ -435,7 +435,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                       className="preview-button"
                       onClick={togglePassportPreview}
                       title={
-                        showPassportPreview ? "Hide preview" : "Show preview"
+                        showPassportPreview ? 'Hide preview' : 'Show preview'
                       }
                     >
                       <PhotographIcon className="button-icon" />
@@ -451,13 +451,13 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                 {showPassportPreview && formData.passportPhotoUrl && (
                   <div className="image-preview">
                     <img
-                      src={formData.passportPhotoUrl || "/placeholder.svg"}
+                      src={formData.passportPhotoUrl || '/placeholder.svg'}
                       alt="Passport"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
-                        target.src = "/placeholder.svg";
-                        target.classList.add("error-image");
+                        target.src = '/placeholder.svg';
+                        target.classList.add('error-image');
                       }}
                     />
                   </div>

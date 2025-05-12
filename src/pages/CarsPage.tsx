@@ -2,11 +2,11 @@
 import CarList from '../components/Car/CarList';
 
 const CarsPage = () => {
-    return (
-        <div>
-            <CarList />
-        </div>
-    );
+  return (
+    <div>
+      <CarList />
+    </div>
+  );
 };
 
 export default CarsPage;

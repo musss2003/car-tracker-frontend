@@ -1,10 +1,10 @@
-import React from "react";
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuth } from "../../contexts/useAuth";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import "./LoginPage.css";
+import React from 'react';
+import * as Yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useAuth } from '../../contexts/useAuth';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import './LoginPage.css';
 
 interface LoginFormInputs {
   username: string;
@@ -12,8 +12,8 @@ interface LoginFormInputs {
 }
 
 const validation = Yup.object().shape({
-  username: Yup.string().required("Username is required"),
-  password: Yup.string().required("Password is required"),
+  username: Yup.string().required('Username is required'),
+  password: Yup.string().required('Password is required'),
 });
 
 const LoginPage: React.FC = () => {
@@ -40,38 +40,51 @@ const LoginPage: React.FC = () => {
             <h1 className="login-title">Sign in to your account</h1>
             <form className="login-form" onSubmit={handleSubmit(handleLogin)}>
               <div>
-                <label htmlFor="username" className="login-label">Username</label>
+                <label htmlFor="username" className="login-label">
+                  Username
+                </label>
                 <input
                   type="text"
                   id="username"
                   className="login-input"
                   placeholder="Username"
-                  {...register("username")}
+                  {...register('username')}
                 />
-                {errors.username && <p className="login-error">{errors.username.message}</p>}
+                {errors.username && (
+                  <p className="login-error">{errors.username.message}</p>
+                )}
               </div>
 
               <div>
-                <label htmlFor="password" className="login-label">Password</label>
+                <label htmlFor="password" className="login-label">
+                  Password
+                </label>
                 <input
                   type="password"
                   id="password"
                   placeholder="••••••••"
                   className="login-input"
-                  {...register("password")}
+                  {...register('password')}
                 />
-                {errors.password && <p className="login-error">{errors.password.message}</p>}
+                {errors.password && (
+                  <p className="login-error">{errors.password.message}</p>
+                )}
               </div>
 
               <div className="login-links">
                 <a href="#">Forgot password?</a>
               </div>
 
-              <button type="submit" className="login-button">Sign in</button>
+              <button type="submit" className="login-button">
+                Sign in
+              </button>
 
               <p className="login-register">
-                Don’t have an account yet?{" "}
-                <span className="register-link" onClick={() => navigate("/register")}>
+                Don’t have an account yet?{' '}
+                <span
+                  className="register-link"
+                  onClick={() => navigate('/register')}
+                >
                   Sign up
                 </span>
               </p>

@@ -1,6 +1,6 @@
-import React from "react";
-import { PencilIcon } from "@heroicons/react/solid";
-import { User } from "../../types/User";
+import React from 'react';
+import { PencilIcon } from '@heroicons/react/solid';
+import { User } from '../../types/User';
 
 interface UserEditFieldsProps {
   user: User;
@@ -27,19 +27,19 @@ const UserEditFields: React.FC<UserEditFieldsProps> = ({
     <div className="space-y-4">
       {Object.keys(user).map((key) => {
         if (
-          key === "__v" ||
-          key === "_id" ||
-          key === "password" ||
-          key === "profilePhotoUrl" ||
-          key === "privacySettings"
+          key === '__v' ||
+          key === '_id' ||
+          key === 'password' ||
+          key === 'profilePhotoUrl' ||
+          key === 'privacySettings'
         ) {
           return null;
         }
 
         const displayValue =
-          key === "lastLogin"
+          key === 'lastLogin'
             ? formatDate(user[key as keyof User])
-            : user[key as keyof User] || "N/A";
+            : user[key as keyof User] || 'N/A';
 
         return (
           <div
@@ -56,7 +56,7 @@ const UserEditFields: React.FC<UserEditFieldsProps> = ({
                   : displayValue}
               </span>
             </div>
-            {!["createdAt", "lastLogin", "role"].includes(key) && (
+            {!['createdAt', 'lastLogin', 'role'].includes(key) && (
               <button
                 onClick={() => handleEdit(key)}
                 className="ml-4 user-profile-edit-icon"

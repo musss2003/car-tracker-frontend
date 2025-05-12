@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { XIcon, ExclamationCircleIcon, SaveIcon } from "@heroicons/react/solid";
+import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { XIcon, ExclamationCircleIcon, SaveIcon } from '@heroicons/react/solid';
 import {
   Car,
   CarFormErrors,
   Feature,
   RenderFieldOptions,
-} from "../../../types/Car";
-import "./EditCarForm.css";
+} from '../../../types/Car';
+import './EditCarForm.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
@@ -35,24 +35,24 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
 }) => {
   const initialData = {
     id: car.id,
-    manufacturer: car.manufacturer || "",
-    model: car.model || "",
+    manufacturer: car.manufacturer || '',
+    model: car.model || '',
     year: car.year || CURRENT_YEAR,
-    color: car.color || "#000000",
-    license_plate: car.license_plate || "",
-    chassis_number: car.chassis_number || "",
-    price_per_day: car.price_per_day || "",
-    description: car.description || "",
+    color: car.color || '#000000',
+    license_plate: car.license_plate || '',
+    chassis_number: car.chassis_number || '',
+    price_per_day: car.price_per_day || '',
+    description: car.description || '',
     features: car.features || [],
-    transmission: car.transmission || "automatic",
-    fuel_type: car.fuel_type || "gasoline",
+    transmission: car.transmission || 'automatic',
+    fuel_type: car.fuel_type || 'gasoline',
     seats: car.seats || 5,
-    image: car.image || "",
+    image: car.image || '',
   };
   // Form state
   const [formData, setFormData] = useState<Car>(initialData);
   const [originalData, setOriginalData] = useState<Car>(initialData);
-  const [newFeature, setNewFeature] = useState<string>("");
+  const [newFeature, setNewFeature] = useState<string>('');
 
   const [errors, setErrors] = useState<CarFormErrors>({});
   const [touched, setTouched] = useState<CarTouchedFields>({});
@@ -63,28 +63,28 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     manufacturers.length > 0
       ? manufacturers
       : [
-          "Toyota",
-          "Honda",
-          "Ford",
-          "Chevrolet",
-          "BMW",
-          "Mercedes-Benz",
-          "Audi",
-          "Volkswagen",
-          "Nissan",
-          "Hyundai",
+          'Toyota',
+          'Honda',
+          'Ford',
+          'Chevrolet',
+          'BMW',
+          'Mercedes-Benz',
+          'Audi',
+          'Volkswagen',
+          'Nissan',
+          'Hyundai',
         ];
 
   // Common car features
   const commonFeatures: Feature[] = [
-    "Air Conditioning",
-    "Bluetooth",
-    "Navigation System",
-    "Backup Camera",
-    "Sunroof",
-    "Leather Seats",
-    "Heated Seats",
-    "Cruise Control",
+    'Air Conditioning',
+    'Bluetooth',
+    'Navigation System',
+    'Backup Camera',
+    'Sunroof',
+    'Leather Seats',
+    'Heated Seats',
+    'Cruise Control',
   ];
 
   // Handle form field changes
@@ -96,7 +96,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     const { name, value, type } = e.target;
 
     const newValue =
-      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+      type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
 
     setFormData((prev) => ({ ...prev, [name]: newValue }));
 
@@ -121,7 +121,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
         }
         return prev; // no change if already exists
       });
-      setNewFeature("");
+      setNewFeature('');
     }
   };
 
@@ -157,18 +157,18 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
 
     // Required fields
     if (!formData.manufacturer)
-      newErrors.manufacturer = "Manufacturer is required";
-    if (!formData.model) newErrors.model = "Model is required";
-    if (!formData.year) newErrors.year = "Year is required";
+      newErrors.manufacturer = 'Manufacturer is required';
+    if (!formData.model) newErrors.model = 'Model is required';
+    if (!formData.year) newErrors.year = 'Year is required';
     if (!formData.license_plate)
-      newErrors.license_plate = "License plate is required";
+      newErrors.license_plate = 'License plate is required';
 
     // License plate format
     if (
       formData.license_plate &&
       !LICENSE_PLATE_REGEX.test(formData.license_plate)
     ) {
-      newErrors.license_plate = "License plate format is invalid";
+      newErrors.license_plate = 'License plate format is invalid';
     }
 
     // Chassis number format (if provided)
@@ -177,24 +177,24 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
       !CHASSIS_NUMBER_REGEX.test(formData.chassis_number)
     ) {
       newErrors.chassis_number =
-        "Chassis number must be 17 characters (excluding I, O, Q)";
+        'Chassis number must be 17 characters (excluding I, O, Q)';
     }
 
     // Price validation
     if (formData.price_per_day) {
       const price = Number.parseFloat(String(formData.price_per_day));
       if (isNaN(price) || price <= 0) {
-        newErrors.price_per_day = "Price must be a positive number";
+        newErrors.price_per_day = 'Price must be a positive number';
       }
     } else {
-      newErrors.price_per_day = "Price per day is required";
+      newErrors.price_per_day = 'Price per day is required';
     }
 
     // Seats validation
     if (formData.seats) {
       const seats = Number.parseInt(formData.seats.toString());
       if (isNaN(seats) || seats < 1 || seats > 10) {
-        newErrors.seats = "Seats must be between 1 and 10";
+        newErrors.seats = 'Seats must be between 1 and 10';
       }
     }
 
@@ -223,7 +223,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     });
 
     if (!validateForm() || !formData) {
-      toast.error("Please fix the errors in the form");
+      toast.error('Please fix the errors in the form');
       return;
     }
 
@@ -239,10 +239,10 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
       };
 
       await onSave(carData);
-      toast.success("Car updated successfully");
+      toast.success('Car updated successfully');
     } catch (error) {
-      console.error("Error updating car:", error);
-      toast.error("Failed to update car");
+      console.error('Error updating car:', error);
+      toast.error('Failed to update car');
     } finally {
       setIsSubmitting(false);
     }
@@ -253,7 +253,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     if (hasChanges()) {
       if (
         window.confirm(
-          "You have unsaved changes. Are you sure you want to cancel?"
+          'You have unsaved changes. Are you sure you want to cancel?'
         )
       ) {
         onCancel();
@@ -274,35 +274,35 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
   const renderField = (
     label: string,
     name: keyof Car,
-    type: string = "text",
+    type: string = 'text',
     options: RenderFieldOptions = {}
   ) => {
     const {
-      placeholder = "",
+      placeholder = '',
       min,
       max,
       step,
       list,
-      autoComplete = "off",
+      autoComplete = 'off',
       required = false,
     } = options;
 
     const hasError = !!errors[name];
 
     return (
-      <div className={`form-field ${hasError ? "has-error" : ""}`}>
+      <div className={`form-field ${hasError ? 'has-error' : ''}`}>
         <label htmlFor={name}>
           {label}
           {required && <span className="required-mark">*</span>}
         </label>
 
-        {type === "select" ? (
+        {type === 'select' ? (
           <select
             id={name}
             name={name}
-            value={formData[name] || ""}
+            value={formData[name] || ''}
             onChange={handleChange}
-            className={hasError ? "error" : ""}
+            className={hasError ? 'error' : ''}
             required={required}
           >
             {options.options?.map((option) => (
@@ -311,14 +311,14 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
               </option>
             ))}
           </select>
-        ) : type === "textarea" ? (
+        ) : type === 'textarea' ? (
           <textarea
             id={name}
             name={name}
-            value={formData[name] || ""}
+            value={formData[name] || ''}
             onChange={handleChange}
             placeholder={placeholder}
-            className={hasError ? "error" : ""}
+            className={hasError ? 'error' : ''}
             rows={options.rows || 3}
             required={required}
           />
@@ -327,7 +327,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             type={type}
             id={name}
             name={name}
-            value={formData[name] || ""}
+            value={formData[name] || ''}
             onChange={handleChange}
             placeholder={placeholder}
             min={min}
@@ -335,7 +335,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             step={step}
             list={list}
             autoComplete={autoComplete}
-            className={hasError ? "error" : ""}
+            className={hasError ? 'error' : ''}
             required={required}
           />
         )}
@@ -368,15 +368,15 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             <h3 className="section-title">Basic Information</h3>
 
             <div className="form-row">
-              {renderField("Manufacturer", "manufacturer", "text", {
+              {renderField('Manufacturer', 'manufacturer', 'text', {
                 required: true,
-                list: "manufacturers",
-                placeholder: "e.g. Toyota",
+                list: 'manufacturers',
+                placeholder: 'e.g. Toyota',
               })}
 
-              {renderField("Model", "model", "text", {
+              {renderField('Model', 'model', 'text', {
                 required: true,
-                placeholder: "e.g. Camry",
+                placeholder: 'e.g. Camry',
               })}
             </div>
 
@@ -387,7 +387,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             </datalist>
 
             <div className="form-row">
-              {renderField("Year", "year", "select", {
+              {renderField('Year', 'year', 'select', {
                 required: true,
                 options: YEARS.map((year) => ({
                   value: year,
@@ -395,36 +395,36 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                 })),
               })}
 
-              {renderField("Color", "color", "color", {
+              {renderField('Color', 'color', 'color', {
                 required: true,
-                helpText: "Select the car color",
+                helpText: 'Select the car color',
               })}
             </div>
 
             <div className="form-row">
-              {renderField("Transmission", "transmission", "select", {
+              {renderField('Transmission', 'transmission', 'select', {
                 options: [
-                  { value: "automatic", label: "Automatic" },
-                  { value: "manual", label: "Manual" },
-                  { value: "semi-automatic", label: "Semi-Automatic" },
+                  { value: 'automatic', label: 'Automatic' },
+                  { value: 'manual', label: 'Manual' },
+                  { value: 'semi-automatic', label: 'Semi-Automatic' },
                 ],
               })}
 
-              {renderField("Fuel Type", "fuel_type", "select", {
+              {renderField('Fuel Type', 'fuel_type', 'select', {
                 options: [
-                  { value: "gasoline", label: "Gasoline" },
-                  { value: "diesel", label: "Diesel" },
-                  { value: "electric", label: "Electric" },
-                  { value: "hybrid", label: "Hybrid" },
+                  { value: 'gasoline', label: 'Gasoline' },
+                  { value: 'diesel', label: 'Diesel' },
+                  { value: 'electric', label: 'Electric' },
+                  { value: 'hybrid', label: 'Hybrid' },
                 ],
               })}
             </div>
 
             <div className="form-row">
-              {renderField("Number of Seats", "seats", "number", {
+              {renderField('Number of Seats', 'seats', 'number', {
                 min: 1,
                 max: 10,
-                helpText: "Number of passenger seats",
+                helpText: 'Number of passenger seats',
               })}
             </div>
           </div>
@@ -433,15 +433,15 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             <h3 className="section-title">Registration Details</h3>
 
             <div className="form-row">
-              {renderField("License Plate", "license_plate", "text", {
+              {renderField('License Plate', 'license_plate', 'text', {
                 required: true,
-                placeholder: "e.g. ABC123",
-                helpText: "Enter the license plate number",
+                placeholder: 'e.g. ABC123',
+                helpText: 'Enter the license plate number',
               })}
 
-              {renderField("Chassis Number", "chassis_number", "text", {
-                placeholder: "e.g. 1HGCM82633A123456",
-                helpText: "17-character VIN (Vehicle Identification Number)",
+              {renderField('Chassis Number', 'chassis_number', 'text', {
+                placeholder: 'e.g. 1HGCM82633A123456',
+                helpText: '17-character VIN (Vehicle Identification Number)',
               })}
             </div>
           </div>
@@ -450,11 +450,11 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             <h3 className="section-title">Pricing</h3>
 
             <div className="form-row">
-              {renderField("Price Per Day ($)", "price_per_day", "number", {
+              {renderField('Price Per Day ($)', 'price_per_day', 'number', {
                 required: true,
                 min: 0,
-                step: "0.01",
-                placeholder: "e.g. 49.99",
+                step: '0.01',
+                placeholder: 'e.g. 49.99',
               })}
             </div>
           </div>
@@ -470,7 +470,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                   onChange={(e) => setNewFeature(e.target.value)}
                   placeholder="Add a feature..."
                   onKeyPress={(e) =>
-                    e.key === "Enter" &&
+                    e.key === 'Enter' &&
                     (e.preventDefault(), handleAddFeature())
                   }
                 />
@@ -492,8 +492,8 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                       type="button"
                       className={`common-feature ${
                         (formData.features ?? []).includes(feature)
-                          ? "selected"
-                          : ""
+                          ? 'selected'
+                          : ''
                       }`}
                       onClick={() =>
                         (formData.features ?? []).includes(feature)
@@ -503,8 +503,8 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                     >
                       {feature}
                       {(formData.features ?? []).includes(feature)
-                        ? " ✓"
-                        : " +"}
+                        ? ' ✓'
+                        : ' +'}
                     </button>
                   ))}
                 </div>
@@ -535,14 +535,14 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
           <div className="form-section">
             <h3 className="section-title">Additional Information</h3>
 
-            {renderField("Description", "description", "textarea", {
+            {renderField('Description', 'description', 'textarea', {
               rows: 3,
-              placeholder: "Enter a description of the car...",
+              placeholder: 'Enter a description of the car...',
             })}
 
-            {renderField("Image URL", "image", "text", {
-              placeholder: "https://example.com/car-image.jpg",
-              helpText: "Enter a URL for the car image (optional)",
+            {renderField('Image URL', 'image', 'text', {
+              placeholder: 'https://example.com/car-image.jpg',
+              helpText: 'Enter a URL for the car image (optional)',
             })}
           </div>
         </div>

@@ -1,47 +1,47 @@
 /** @type {import('tailwindcss').Config} */
-export const darkMode = ["class"];
+export const darkMode = ['class'];
 export const content = [
-  "./src/**/*.{js,jsx,ts,tsx}",
-  "./public/index.html",
-  "*.{js,ts,jsx,tsx,mdx}",
-  "app/**/*.{ts,tsx}",
-  "components/**/*.{ts,tsx}",
+  './src/**/*.{js,jsx,ts,tsx}',
+  './public/index.html',
+  '*.{js,ts,jsx,tsx,mdx}',
+  'app/**/*.{ts,tsx}',
+  'components/**/*.{ts,tsx}',
 ];
 export const theme = {
   extend: {
     colors: {
-      border: "hsl(var(--border))",
-      input: "hsl(var(--input))",
-      ring: "hsl(var(--ring))",
-      background: "hsl(var(--background))",
-      foreground: "hsl(var(--foreground))",
+      border: 'hsl(var(--border))',
+      input: 'hsl(var(--input))',
+      ring: 'hsl(var(--ring))',
+      background: 'hsl(var(--background))',
+      foreground: 'hsl(var(--foreground))',
       primary: {
-        DEFAULT: "hsl(var(--primary))",
-        foreground: "hsl(var(--primary-foreground))",
+        DEFAULT: 'hsl(var(--primary))',
+        foreground: 'hsl(var(--primary-foreground))',
       },
       secondary: {
-        DEFAULT: "hsl(var(--secondary))",
-        foreground: "hsl(var(--secondary-foreground))",
+        DEFAULT: 'hsl(var(--secondary))',
+        foreground: 'hsl(var(--secondary-foreground))',
       },
       destructive: {
-        DEFAULT: "hsl(var(--destructive))",
-        foreground: "hsl(var(--destructive-foreground))",
+        DEFAULT: 'hsl(var(--destructive))',
+        foreground: 'hsl(var(--destructive-foreground))',
       },
       muted: {
-        DEFAULT: "hsl(var(--muted))",
-        foreground: "hsl(var(--muted-foreground))",
+        DEFAULT: 'hsl(var(--muted))',
+        foreground: 'hsl(var(--muted-foreground))',
       },
       accent: {
-        DEFAULT: "hsl(var(--accent))",
-        foreground: "hsl(var(--accent-foreground))",
+        DEFAULT: 'hsl(var(--accent))',
+        foreground: 'hsl(var(--accent-foreground))',
       },
       popover: {
-        DEFAULT: "hsl(var(--popover))",
-        foreground: "hsl(var(--popover-foreground))",
+        DEFAULT: 'hsl(var(--popover))',
+        foreground: 'hsl(var(--popover-foreground))',
       },
       card: {
-        DEFAULT: "hsl(var(--card))",
-        foreground: "hsl(var(--card-foreground))",
+        DEFAULT: 'hsl(var(--card))',
+        foreground: 'hsl(var(--card-foreground))',
       },
       // primary: {
       //   DEFAULT: "#3b82f6", // blue-500
@@ -74,21 +74,21 @@ export const theme = {
       // ring: "#3b82f6", // blue-500
     },
     borderRadius: {
-      lg: "var(--radius)",
-      md: "calc(var(--radius) - 2px)",
-      sm: "calc(var(--radius) - 4px)",
+      lg: 'var(--radius)',
+      md: 'calc(var(--radius) - 2px)',
+      sm: 'calc(var(--radius) - 4px)',
       // lg: "0.5rem",
       // md: "0.375rem",
       // sm: "0.25rem",
     },
     keyframes: {
       pulse: {
-        "0%, 100%": { opacity: 1 },
-        "50%": { opacity: 0.5 },
+        '0%, 100%': { opacity: 1 },
+        '50%': { opacity: 0.5 },
       },
     },
     animation: {
-      pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
     },
   },
 };
@@ -96,6 +96,3 @@ export const plugins = [
   // Remove this line or comment it out:
   // require("tailwindcss-animate")
 ];
-
-
-

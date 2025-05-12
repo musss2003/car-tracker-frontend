@@ -1,18 +1,18 @@
 export interface Car {
-  id: string
-  manufacturer: string
-  model: string
-  year?: number
-  color?: string
-  license_plate: string
-  chassis_number?: string
-  price_per_day: string | number
-  description?: string
-  features?: Feature[]
-  transmission?: "automatic" | "manual" | "semi-automatic"
-  fuel_type?: "gasoline" | "diesel" | "electric" | "hybrid"
-  seats?: number
-  image?: string
+  id: string;
+  manufacturer: string;
+  model: string;
+  year?: number;
+  color?: string;
+  license_plate: string;
+  chassis_number?: string;
+  price_per_day: string | number;
+  description?: string;
+  features?: Feature[];
+  transmission?: 'automatic' | 'manual' | 'semi-automatic';
+  fuel_type?: 'gasoline' | 'diesel' | 'electric' | 'hybrid';
+  seats?: number;
+  image?: string;
 }
 
 export interface RenderFieldOptions {
@@ -58,23 +58,23 @@ export interface BookingEvent {
 }
 
 export type Feature =
-  | "Air Conditioning"
-  | "Bluetooth"
-  | "Navigation System"
-  | "Backup Camera"
-  | "Sunroof"
-  | "Leather Seats"
-  | "Heated Seats"
-  | "Cruise Control";
+  | 'Air Conditioning'
+  | 'Bluetooth'
+  | 'Navigation System'
+  | 'Backup Camera'
+  | 'Sunroof'
+  | 'Leather Seats'
+  | 'Heated Seats'
+  | 'Cruise Control';
 
-    // Common car features
-    export const commonFeatures: Feature[] = [
-      "Air Conditioning",
-      "Bluetooth",
-      "Navigation System",
-      "Backup Camera",
-      "Sunroof",
-      "Leather Seats",
-      "Heated Seats",
-      "Cruise Control",
-    ];
+// Common car features
+export const commonFeatures: Feature[] = [
+  'Air Conditioning',
+  'Bluetooth',
+  'Navigation System',
+  'Backup Camera',
+  'Sunroof',
+  'Leather Seats',
+  'Heated Seats',
+  'Cruise Control',
+];

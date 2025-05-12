@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
-import NotificationList from "../containers/Notification/NotificationList/NotificationList";
-
-
+import React, { useEffect, useState } from 'react';
+import NotificationList from '../containers/Notification/NotificationList/NotificationList';
 
 const NotificationsPage = () => {
-   return(
+  return (
     <>
-        <NotificationList />
+      <NotificationList />
     </>
-   )
+  );
 };
 
 export default NotificationsPage;

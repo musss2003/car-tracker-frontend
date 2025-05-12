@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { getAvailableCarsForPeriod } from "../../../services/carService";
-import { searchCustomersByName } from "../../../services/customerService";
+import { useState } from 'react';
+import { getAvailableCarsForPeriod } from '../../../services/carService';
+import { searchCustomersByName } from '../../../services/customerService';
 import {
   XIcon,
   UserIcon,
@@ -14,11 +14,11 @@ import {
   SearchIcon,
   ExclamationCircleIcon,
   PlusCircleIcon,
-} from "@heroicons/react/solid";
-import "./CreateContractForm.css";
-import { Car } from "../../../types/Car";
-import { Customer } from "../../../types/Customer";
-import { calculateDuration } from "../../../utils/contractUtils";
+} from '@heroicons/react/solid';
+import './CreateContractForm.css';
+import { Car } from '../../../types/Car';
+import { Customer } from '../../../types/Customer';
+import { calculateDuration } from '../../../utils/contractUtils';
 
 interface CreateContractFormProps {
   onSave: (formData: any) => void; // or replace `any` with a more specific type if you know it
@@ -42,19 +42,19 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
   }>({
     customer: null,
     car: null,
-    rentalPeriod: { startDate: "", endDate: "" },
+    rentalPeriod: { startDate: '', endDate: '' },
     rentalPrice: { dailyRate: 0, totalAmount: 0 },
-    status: "",
-    paymentDetails: { paymentMethod: "", paymentStatus: "" },
-    additionalNotes: "",
-    contractPhoto: "",
+    status: '',
+    paymentDetails: { paymentMethod: '', paymentStatus: '' },
+    additionalNotes: '',
+    contractPhoto: '',
   });
 
   // UI state
   const [availableCars, setAvailableCars] = useState<Car[]>([]); // array of cars, not a single car
   const [loadingCars, setLoadingCars] = useState<boolean>(false);
   const [loadingCustomers, setLoadingCustomers] = useState<boolean>(false);
-  const [customerSearch, setCustomerSearch] = useState<string>("");
+  const [customerSearch, setCustomerSearch] = useState<string>('');
   const [customerResults, setCustomerResults] = useState<Customer[]>([]); // assume you have a Customer interface
   const [errors, setErrors] = useState<Record<string, string | null>>({}); // key-value error messages
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -65,12 +65,12 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
     amount: number | string | null | undefined
   ): string => {
     if (amount === null || amount === undefined || isNaN(Number(amount))) {
-      return "$0.00"; // or "N/A" if you prefer
+      return '$0.00'; // or "N/A" if you prefer
     }
 
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(Number(amount));
   };
 
@@ -81,7 +81,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
     >
   ) => {
     const { name, value } = e.target;
-    const path = name.split(".");
+    const path = name.split('.');
 
     // Clear error when field is edited
     setErrors((prev) => ({ ...prev, [name]: null }));
@@ -98,7 +98,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
 
         const section = prev[firstKey as keyof typeof prev];
 
-        if (typeof section === "object" && section !== null) {
+        if (typeof section === 'object' && section !== null) {
           return {
             ...prev,
             [firstKey]: {
@@ -116,8 +116,8 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
   // Handle date changes with validation
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const field = name.split(".")[1] as "startDate" | "endDate"; // constrain field to known keys
-    const otherField = field === "startDate" ? "endDate" : "startDate";
+    const field = name.split('.')[1] as 'startDate' | 'endDate'; // constrain field to known keys
+    const otherField = field === 'startDate' ? 'endDate' : 'startDate';
     const otherValue = formData.rentalPeriod[otherField];
 
     // Clear error when field is edited
@@ -125,25 +125,25 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
 
     // Validate date selection
     if (
-      field === "endDate" &&
+      field === 'endDate' &&
       otherValue &&
       new Date(value) < new Date(otherValue)
     ) {
       setErrors((prev) => ({
         ...prev,
-        [name]: "End date cannot be earlier than start date",
+        [name]: 'End date cannot be earlier than start date',
       }));
       return;
     }
 
     if (
-      field === "startDate" &&
+      field === 'startDate' &&
       otherValue &&
       new Date(otherValue) < new Date(value)
     ) {
       setErrors((prev) => ({
         ...prev,
-        [name]: "Start date cannot be later than end date",
+        [name]: 'Start date cannot be later than end date',
       }));
       return;
     }
@@ -176,10 +176,10 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
       setAvailableCars(cars);
       setShowCarSelector(true);
     } catch (error) {
-      console.error("Error fetching available cars:", error);
+      console.error('Error fetching available cars:', error);
       setErrors((prev) => ({
         ...prev,
-        cars: "Failed to load available cars. Please try again.",
+        cars: 'Failed to load available cars. Please try again.',
       }));
     } finally {
       setLoadingCars(false);
@@ -196,13 +196,13 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
       );
 
       const pricePerDay =
-        typeof selectedCar.price_per_day === "string"
+        typeof selectedCar.price_per_day === 'string'
           ? parseFloat(selectedCar.price_per_day)
           : selectedCar.price_per_day;
 
       const totalAmount =
-        (typeof duration === "number" ? duration : 0) *
-        (typeof pricePerDay === "number" ? pricePerDay : 0);
+        (typeof duration === 'number' ? duration : 0) *
+        (typeof pricePerDay === 'number' ? pricePerDay : 0);
 
       setFormData((prev) => ({
         ...prev,
@@ -232,19 +232,19 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
         setCustomerResults(results);
         // Ensure the dropdown is visible by scrolling to it if needed
         setTimeout(() => {
-          const resultsElement = document.querySelector(".customer-results");
+          const resultsElement = document.querySelector('.customer-results');
           if (resultsElement) {
             resultsElement.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
+              behavior: 'smooth',
+              block: 'nearest',
             });
           }
         }, 100);
       } catch (error) {
-        console.error("Error fetching customers:", error);
+        console.error('Error fetching customers:', error);
         setErrors((prev) => ({
           ...prev,
-          customer: "Failed to search customers. Please try again.",
+          customer: 'Failed to search customers. Please try again.',
         }));
       } finally {
         setLoadingCustomers(false);
@@ -268,19 +268,19 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
 
     // Check required fields
     if (!formData.customer || !formData.customer.id) {
-      newErrors.customer = "Customer is required";
+      newErrors.customer = 'Customer is required';
     }
 
     if (!formData.car || !formData.car.id) {
-      newErrors.car = "Car selection is required";
+      newErrors.car = 'Car selection is required';
     }
 
     if (!formData.rentalPeriod.startDate) {
-      newErrors["rentalPeriod.startDate"] = "Start date is required";
+      newErrors['rentalPeriod.startDate'] = 'Start date is required';
     }
 
     if (!formData.rentalPeriod.endDate) {
-      newErrors["rentalPeriod.endDate"] = "End date is required";
+      newErrors['rentalPeriod.endDate'] = 'End date is required';
     }
 
     // Validate dates
@@ -289,14 +289,14 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
       const endDate = new Date(formData.rentalPeriod.endDate);
 
       if (endDate < startDate) {
-        newErrors["rentalPeriod.endDate"] =
-          "End date cannot be earlier than start date";
+        newErrors['rentalPeriod.endDate'] =
+          'End date cannot be earlier than start date';
       }
     }
 
     // Validate payment method
     if (!formData.paymentDetails.paymentMethod) {
-      newErrors["paymentDetails.paymentMethod"] = "Payment method is required";
+      newErrors['paymentDetails.paymentMethod'] = 'Payment method is required';
     }
 
     setErrors(newErrors);
@@ -316,10 +316,10 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
     try {
       await onSave(formData);
     } catch (error) {
-      console.error("Error creating contract:", error);
+      console.error('Error creating contract:', error);
       setErrors((prev) => ({
         ...prev,
-        submit: "Failed to create contract. Please try again.",
+        submit: 'Failed to create contract. Please try again.',
       }));
     } finally {
       setIsSubmitting(false);
@@ -327,7 +327,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
   };
 
   // Set minimum date for date inputs (today)
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className="create-contract-form-container">
@@ -357,7 +357,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
               <div className="customer-search-container">
                 <div
                   className={`search-input-wrapper ${
-                    errors.customer ? "has-error" : ""
+                    errors.customer ? 'has-error' : ''
                   }`}
                 >
                   <SearchIcon className="search-icon" />
@@ -449,7 +449,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                   </label>
                   <div
                     className={`field-input-wrapper ${
-                      errors["rentalPeriod.startDate"] ? "has-error" : ""
+                      errors['rentalPeriod.startDate'] ? 'has-error' : ''
                     }`}
                   >
                     <input
@@ -462,10 +462,10 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                       min={today}
                     />
                   </div>
-                  {errors["rentalPeriod.startDate"] && (
+                  {errors['rentalPeriod.startDate'] && (
                     <div className="field-error">
                       <ExclamationCircleIcon className="error-icon-small" />
-                      <span>{errors["rentalPeriod.startDate"]}</span>
+                      <span>{errors['rentalPeriod.startDate']}</span>
                     </div>
                   )}
                 </div>
@@ -476,7 +476,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                   </label>
                   <div
                     className={`field-input-wrapper ${
-                      errors["rentalPeriod.endDate"] ? "has-error" : ""
+                      errors['rentalPeriod.endDate'] ? 'has-error' : ''
                     }`}
                   >
                     <input
@@ -489,10 +489,10 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                       min={formData.rentalPeriod.startDate || today}
                     />
                   </div>
-                  {errors["rentalPeriod.endDate"] && (
+                  {errors['rentalPeriod.endDate'] && (
                     <div className="field-error">
                       <ExclamationCircleIcon className="error-icon-small" />
-                      <span>{errors["rentalPeriod.endDate"]}</span>
+                      <span>{errors['rentalPeriod.endDate']}</span>
                     </div>
                   )}
                 </div>
@@ -506,7 +506,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                       {calculateDuration(
                         formData.rentalPeriod.startDate,
                         formData.rentalPeriod.endDate
-                      )}{" "}
+                      )}{' '}
                       days
                     </span>
                   </div>
@@ -536,14 +536,14 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                   )}
 
                   <div
-                    className={`form-field ${errors.car ? "has-error" : ""}`}
+                    className={`form-field ${errors.car ? 'has-error' : ''}`}
                   >
                     <label htmlFor="carSelect" className="field-label">
                       Select Vehicle
                     </label>
                     <select
                       id="carSelect"
-                      value={formData.car?.id || ""}
+                      value={formData.car?.id || ''}
                       onChange={(e) => handleCarSelect(e.target.value)}
                       className="car-select"
                     >
@@ -553,7 +553,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                       {availableCars.length > 0 ? (
                         availableCars.map((car) => (
                           <option key={`car-${car.id}`} value={car.id}>
-                            {car.manufacturer} {car.model} - {car.license_plate}{" "}
+                            {car.manufacturer} {car.model} - {car.license_plate}{' '}
                             (${car.price_per_day}/day)
                           </option>
                         ))
@@ -577,7 +577,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                         <div className="car-image">
                           {formData.car.image ? (
                             <img
-                              src={formData.car.image || "/placeholder.svg"}
+                              src={formData.car.image || '/placeholder.svg'}
                               alt={`${formData.car.manufacturer} ${formData.car.model}`}
                             />
                           ) : (
@@ -594,10 +594,10 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                             License: {formData.car.license_plate}
                           </p>
                           <p className="car-year">
-                            Year: {formData.car.year || "N/A"}
+                            Year: {formData.car.year || 'N/A'}
                           </p>
                           <p className="car-price">
-                            Daily Rate:{" "}
+                            Daily Rate:{' '}
                             {formatCurrency(formData.car.price_per_day)}
                           </p>
                         </div>
@@ -633,7 +633,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                     {calculateDuration(
                       formData.rentalPeriod.startDate,
                       formData.rentalPeriod.endDate
-                    )}{" "}
+                    )}{' '}
                     days
                   </span>
                 </div>
@@ -652,7 +652,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                 </label>
                 <div
                   className={`field-input-wrapper ${
-                    errors["paymentDetails.paymentMethod"] ? "has-error" : ""
+                    errors['paymentDetails.paymentMethod'] ? 'has-error' : ''
                   }`}
                 >
                   <select
@@ -676,10 +676,10 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                     </option>
                   </select>
                 </div>
-                {errors["paymentDetails.paymentMethod"] && (
+                {errors['paymentDetails.paymentMethod'] && (
                   <div className="field-error">
                     <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors["paymentDetails.paymentMethod"]}</span>
+                    <span>{errors['paymentDetails.paymentMethod']}</span>
                   </div>
                 )}
               </div>
@@ -758,14 +758,14 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                 <div className="contract-photo-preview">
                   <div className="photo-container">
                     <img
-                      src={formData.contractPhoto || "/placeholder.svg"}
+                      src={formData.contractPhoto || '/placeholder.svg'}
                       alt="Contract"
                       className="photo-preview"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
-                        target.src = "/placeholder.svg";
-                        target.classList.add("error");
+                        target.src = '/placeholder.svg';
+                        target.classList.add('error');
                       }}
                     />
                   </div>

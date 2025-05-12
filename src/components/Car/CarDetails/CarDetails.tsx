@@ -1,12 +1,12 @@
-"use client";
+'use client';
 import {
   PencilIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
-} from "@heroicons/react/solid";
-import "./CarDetails.css";
-import { Car } from "../../../types/Car";
-import { formatCurrency } from "../../../utils/contractUtils";
+} from '@heroicons/react/solid';
+import './CarDetails.css';
+import { Car } from '../../../types/Car';
+import { formatCurrency } from '../../../utils/contractUtils';
 
 interface CarDetailsProps {
   car: Car;
@@ -29,7 +29,7 @@ const CarDetails: React.FC<CarDetailsProps> = ({
         </h2>
         <div
           className={`car-status ${
-            isBusy ? "car-status-busy" : "car-status-available"
+            isBusy ? 'car-status-busy' : 'car-status-available'
           }`}
         >
           {isBusy ? (
@@ -49,7 +49,7 @@ const CarDetails: React.FC<CarDetailsProps> = ({
       <div className="car-image-container">
         {car.image ? (
           <img
-            src={car.image || "/placeholder.svg"}
+            src={car.image || '/placeholder.svg'}
             alt={`${car.manufacturer} ${car.model}`}
             className="car-image"
           />
@@ -85,7 +85,7 @@ const CarDetails: React.FC<CarDetailsProps> = ({
                     style={{ backgroundColor: car.color }}
                   ></div>
                 )}
-                <span>{car.color || "N/A"}</span>
+                <span>{car.color || 'N/A'}</span>
               </div>
             </div>
             <div className="detail-item">
@@ -95,7 +95,9 @@ const CarDetails: React.FC<CarDetailsProps> = ({
             <div className="detail-item">
               <span className="detail-label">Price per Day</span>
               <span className="detail-value">
-                {car.price_per_day ? formatCurrency(Number(car.price_per_day)) : "N/A"}
+                {car.price_per_day
+                  ? formatCurrency(Number(car.price_per_day))
+                  : 'N/A'}
               </span>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from 'react';
 import {
   BellIcon,
   CheckIcon,
@@ -10,18 +10,18 @@ import {
   FilterIcon,
   RefreshIcon,
   DotsVerticalIcon,
-} from "@heroicons/react/solid";
+} from '@heroicons/react/solid';
 import {
   getNotifications,
   markAllAsSeen,
   markAsSeen,
   deleteNotification,
-} from "../../../services/notificationService";
-import { toast } from "react-toastify";
-import "./NotificationList.css";
-import { Notification } from "../../../types/Notification";
+} from '../../../services/notificationService';
+import { toast } from 'react-toastify';
+import './NotificationList.css';
+import { Notification } from '../../../types/Notification';
 
-type NotificationType = "info" | "warning" | "error" | "default";
+type NotificationType = 'info' | 'warning' | 'error' | 'default';
 
 // Notification type icons mapping
 const typeIcons = {
@@ -37,8 +37,8 @@ function NotificationList() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "new" | "seen">("all");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filter, setFilter] = useState<'all' | 'new' | 'seen'>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [expandedNotification, setExpandedNotification] =
     useState<Notification | null>(null);
@@ -54,9 +54,9 @@ function NotificationList() {
       setNotifications(notificationsData);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to load notifications"
+        err instanceof Error ? err.message : 'Failed to load notifications'
       );
-      toast.error("Failed to load notifications");
+      toast.error('Failed to load notifications');
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ function NotificationList() {
     setIsRefreshing(true);
     try {
       await fetchNotifications();
-      toast.success("Notifications refreshed");
+      toast.success('Notifications refreshed');
     } catch (error) {
       // Error is already handled in fetchNotifications
     } finally {
@@ -88,17 +88,17 @@ function NotificationList() {
       // Update the notification status locally (optimistic update)
       setNotifications((prev) =>
         prev.map((notif) =>
-          notif.id === notificationId ? { ...notif, status: "seen" } : notif
+          notif.id === notificationId ? { ...notif, status: 'seen' } : notif
         )
       );
-      toast.success("Notification marked as read");
+      toast.success('Notification marked as read');
     } catch (err) {
       if (err instanceof Error) {
         console.error(err.message);
       } else {
-        console.error("An unknown error occurred");
+        console.error('An unknown error occurred');
       }
-      toast.error("Failed to mark notification as read");
+      toast.error('Failed to mark notification as read');
     } finally {
       setActionInProgress(null);
     }
@@ -106,27 +106,27 @@ function NotificationList() {
 
   // Mark all notifications as seen
   const handleMarkAllAsSeen = async () => {
-    if (notifications.filter((n) => n.status === "new").length === 0) {
-      toast.info("No new notifications to mark as read");
+    if (notifications.filter((n) => n.status === 'new').length === 0) {
+      toast.info('No new notifications to mark as read');
       return;
     }
 
-    setActionInProgress("all");
+    setActionInProgress('all');
     try {
       await markAllAsSeen();
 
       // Update all notifications locally
       setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, status: "seen" }))
+        prev.map((notif) => ({ ...notif, status: 'seen' }))
       );
-      toast.success("All notifications marked as read");
+      toast.success('All notifications marked as read');
     } catch (err) {
       if (err instanceof Error) {
         console.error(err.message);
       } else {
-        console.error("An unknown error occurred");
+        console.error('An unknown error occurred');
       }
-      toast.error("Failed to mark all notifications as read");
+      toast.error('Failed to mark all notifications as read');
     } finally {
       setActionInProgress(null);
     }
@@ -134,7 +134,7 @@ function NotificationList() {
 
   // Delete notification
   const handleDeleteNotification = async (notificationId: string) => {
-    if (!window.confirm("Are you sure you want to delete this notification?")) {
+    if (!window.confirm('Are you sure you want to delete this notification?')) {
       return;
     }
 
@@ -146,14 +146,14 @@ function NotificationList() {
       setNotifications((prev) =>
         prev.filter((notif) => notif.id !== notificationId)
       );
-      toast.success("Notification deleted");
+      toast.success('Notification deleted');
     } catch (err) {
       if (err instanceof Error) {
         console.error(err.message);
       } else {
-        console.error("An unknown error occurred");
+        console.error('An unknown error occurred');
       }
-      toast.error("Failed to delete notification");
+      toast.error('Failed to delete notification');
     } finally {
       setActionInProgress(null);
     }
@@ -177,24 +177,24 @@ function NotificationList() {
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return "Just now";
+    if (diffMins < 1) return 'Just now';
     if (diffMins < 60)
-      return `${diffMins} minute${diffMins !== 1 ? "s" : ""} ago`;
+      return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
     if (diffHours < 24)
-      return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+      return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
 
     return date.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
   // Filter and search notifications
   const filteredNotifications = notifications.filter((notif) => {
     // Apply status filter
-    if (filter !== "all" && notif.status !== filter) return false;
+    if (filter !== 'all' && notif.status !== filter) return false;
 
     // Apply search filter
     if (
@@ -220,14 +220,14 @@ function NotificationList() {
     let groupKey: string;
 
     if (createdAt.toDateString() === today.toDateString()) {
-      groupKey = "Today";
+      groupKey = 'Today';
     } else if (createdAt.toDateString() === yesterday.toDateString()) {
-      groupKey = "Yesterday";
+      groupKey = 'Yesterday';
     } else {
       groupKey = createdAt.toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
     }
 
@@ -246,7 +246,7 @@ function NotificationList() {
 
   // Count new notifications
   const newNotificationsCount = notifications.filter(
-    (n) => n.status === "new"
+    (n) => n.status === 'new'
   ).length;
 
   return (
@@ -266,20 +266,20 @@ function NotificationList() {
             disabled={isRefreshing || loading}
             aria-label="Refresh notifications"
           >
-            <RefreshIcon className={`icon ${isRefreshing ? "spinning" : ""}`} />
+            <RefreshIcon className={`icon ${isRefreshing ? 'spinning' : ''}`} />
           </button>
 
           <button
             className="mark-all-button"
             onClick={handleMarkAllAsSeen}
             disabled={
-              actionInProgress === "all" ||
+              actionInProgress === 'all' ||
               loading ||
-              notifications.filter((n) => n.status === "new").length === 0
+              notifications.filter((n) => n.status === 'new').length === 0
             }
             aria-label="Mark all as read"
           >
-            {actionInProgress === "all" ? (
+            {actionInProgress === 'all' ? (
               <span className="loading-spinner small"></span>
             ) : (
               <>
@@ -304,7 +304,7 @@ function NotificationList() {
           {searchTerm && (
             <button
               className="clear-search"
-              onClick={() => setSearchTerm("")}
+              onClick={() => setSearchTerm('')}
               aria-label="Clear search"
             >
               <XIcon className="icon-small" />
@@ -317,7 +317,7 @@ function NotificationList() {
           <select
             value={filter}
             onChange={(e) =>
-              setFilter(e.target.value as "all" | "new" | "seen")
+              setFilter(e.target.value as 'all' | 'new' | 'seen')
             }
             className="filter-select"
           >
@@ -350,8 +350,8 @@ function NotificationList() {
           <BellIcon className="empty-icon" />
           <h3>No notifications found</h3>
           <p>
-            {searchTerm || filter !== "all"
-              ? "Try changing your search or filter settings"
+            {searchTerm || filter !== 'all'
+              ? 'Try changing your search or filter settings'
               : "You don't have any notifications yet"}
           </p>
         </div>
@@ -369,12 +369,12 @@ function NotificationList() {
                 <li
                   key={notif.id}
                   className={`notification-item ${
-                    notif.status === "new" ? "unread" : ""
-                  } ${expandedNotification?.id === notif.id ? "expanded" : ""}`}
+                    notif.status === 'new' ? 'unread' : ''
+                  } ${expandedNotification?.id === notif.id ? 'expanded' : ''}`}
                 >
                   <div
                     className="notification-main"
-                    onClick={() => toggleExpandNotification(notif.id ?? "")}
+                    onClick={() => toggleExpandNotification(notif.id ?? '')}
                   >
                     <div className="notification-icon-container">
                       {getNotificationIcon(notif.type as NotificationType)}
@@ -390,7 +390,7 @@ function NotificationList() {
 
                       <p className="notification-message">{notif.message}</p>
 
-                      {notif.status === "new" && (
+                      {notif.status === 'new' && (
                         <span className="status-indicator"></span>
                       )}
                     </div>
@@ -400,7 +400,7 @@ function NotificationList() {
                         className="action-menu-button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleExpandNotification(notif.id ?? "");
+                          toggleExpandNotification(notif.id ?? '');
                         }}
                         aria-label="Toggle notification details"
                       >
@@ -413,7 +413,7 @@ function NotificationList() {
                     <div className="notification-details">
                       <div className="notification-meta">
                         <p>
-                          <strong>Created:</strong>{" "}
+                          <strong>Created:</strong>{' '}
                           {new Date(notif.createdAt).toLocaleString()}
                         </p>
                         {notif.type && (
@@ -429,11 +429,11 @@ function NotificationList() {
                       </div>
 
                       <div className="notification-buttons">
-                        {notif.status === "new" && (
+                        {notif.status === 'new' && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleMarkAsSeen(notif.id ?? "");
+                              handleMarkAsSeen(notif.id ?? '');
                             }}
                             className="mark-button"
                             disabled={actionInProgress === notif.id}
@@ -452,7 +452,7 @@ function NotificationList() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteNotification(notif.id ?? "");
+                            handleDeleteNotification(notif.id ?? '');
                           }}
                           className="delete-button"
                           disabled={actionInProgress === notif.id}

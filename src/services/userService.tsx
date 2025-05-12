@@ -1,14 +1,14 @@
-import { getAuthHeaders } from "../utils/getAuthHeaders";
-import type { User } from "../types/User";
+import { getAuthHeaders } from '../utils/getAuthHeaders';
+import type { User } from '../types/User';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + "/api/";
+const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
 // Get user by ID
 export const getUser = async (userId: string): Promise<User> => {
   try {
     const response = await fetch(`${API_URL}users/${userId}`, {
-      method: "GET",
-      credentials: "include",
+      method: 'GET',
+      credentials: 'include',
       headers: getAuthHeaders(),
     });
 
@@ -30,8 +30,8 @@ export const updateUser = async (
 ): Promise<User> => {
   try {
     const response = await fetch(`${API_URL}users/${userId}`, {
-      method: "PUT",
-      credentials: "include",
+      method: 'PUT',
+      credentials: 'include',
       headers: getAuthHeaders(),
       body: JSON.stringify(userData),
     });
@@ -53,8 +53,8 @@ export const deleteUser = async (
 ): Promise<{ message: string }> => {
   try {
     const response = await fetch(`${API_URL}users/${userId}`, {
-      method: "DELETE",
-      credentials: "include",
+      method: 'DELETE',
+      credentials: 'include',
       headers: getAuthHeaders(),
     });
 
@@ -73,11 +73,11 @@ export const deleteUser = async (
 // Function accepts a File, creates FormData inside
 export const uploadProfilePhoto = async (userId: string, photoFile: File) => {
   const formData = new FormData();
-  formData.append("photo", photoFile);
+  formData.append('photo', photoFile);
 
   const response = await fetch(`${API_URL}users/${userId}/photo`, {
-    method: "POST",
-    credentials: "include",
+    method: 'POST',
+    credentials: 'include',
     headers: {
       ...getAuthHeaders(),
     },
@@ -85,7 +85,7 @@ export const uploadProfilePhoto = async (userId: string, photoFile: File) => {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to upload profile photo");
+    throw new Error('Failed to upload profile photo');
   }
 
   return response.json();

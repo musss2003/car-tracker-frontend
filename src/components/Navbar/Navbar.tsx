@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   useState,
@@ -6,17 +6,17 @@ import React, {
   useRef,
   useCallback,
   RefObject,
-} from "react";
-import { Link } from "react-router-dom";
-import { useAuth } from "../../contexts/useAuth";
-import Notification from "../Notification/Notification";
-import "./Navbar.css";
+} from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/useAuth';
+import Notification from '../Notification/Notification';
+import './Navbar.css';
 
-type DropdownKey = "notifications" | "messages" | "profile" | null;
+type DropdownKey = 'notifications' | 'messages' | 'profile' | null;
 
 const Navbar: React.FC = () => {
   const [openDropdown, setOpenDropdown] = useState<DropdownKey>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const { user, logout } = useAuth();
 
   // Correctly type dropdownRefs
@@ -41,23 +41,26 @@ const Navbar: React.FC = () => {
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery);
+    console.log('Searching for:', searchQuery);
   };
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to log out?")) {
+    if (window.confirm('Are you sure you want to log out?')) {
       logout();
     }
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener('mousedown', handleOutsideClick);
     return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [handleOutsideClick]);
 
-  const registerDropdownRef = (name: DropdownKey, element: HTMLLIElement | null) => {
+  const registerDropdownRef = (
+    name: DropdownKey,
+    element: HTMLLIElement | null
+  ) => {
     if (element) {
       dropdownRefs.current[name as string] = element;
     }
@@ -77,7 +80,11 @@ const Navbar: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="Search"
             />
-            <button className="search-btn" type="submit" aria-label="Submit search">
+            <button
+              className="search-btn"
+              type="submit"
+              aria-label="Submit search"
+            >
               <i className="fas fa-search" aria-hidden="true"></i>
             </button>
           </div>
@@ -85,26 +92,33 @@ const Navbar: React.FC = () => {
 
         {/* Navbar Items */}
         <ul className="navbar-items">
-           
-
           {/* Messages */}
-          <li className="dropdown" ref={(el) => registerDropdownRef("messages", el)}>
+          <li
+            className="dropdown"
+            ref={(el) => registerDropdownRef('messages', el)}
+          >
             <button
               className="dropdown-toggle"
-              onClick={() => toggleDropdown("messages")}
-              aria-expanded={openDropdown === "messages"}
+              onClick={() => toggleDropdown('messages')}
+              aria-expanded={openDropdown === 'messages'}
               aria-haspopup="true"
               aria-label="Messages"
             >
-              <span className="badge" aria-label="7 unread messages">7</span>
+              <span className="badge" aria-label="7 unread messages">
+                7
+              </span>
               <i className="fas fa-envelope" aria-hidden="true"></i>
             </button>
 
-            {openDropdown === "messages" && (
+            {openDropdown === 'messages' && (
               <div className="dropdown-menu" role="menu">
                 <h6 className="dropdown-header">Message Center</h6>
                 <button className="dropdown-item" type="button">
-                  <img className="dropdown-avatar" src="avatars/avatar4.jpeg" alt="Emily Fowler" />
+                  <img
+                    className="dropdown-avatar"
+                    src="avatars/avatar4.jpeg"
+                    alt="Emily Fowler"
+                  />
                   <div>
                     <p className="text-truncate">
                       Hi there! Can you help me with a problem I've been having?
@@ -120,26 +134,29 @@ const Navbar: React.FC = () => {
           </li>
 
           {/* User Profile */}
-          <li className="dropdown user-dropdown" ref={(el) => registerDropdownRef("profile", el)}>
+          <li
+            className="dropdown user-dropdown"
+            ref={(el) => registerDropdownRef('profile', el)}
+          >
             <button
               className="dropdown-toggle"
-              onClick={() => toggleDropdown("profile")}
-              aria-expanded={openDropdown === "profile"}
+              onClick={() => toggleDropdown('profile')}
+              aria-expanded={openDropdown === 'profile'}
               aria-haspopup="true"
               aria-label="User profile"
             >
-              <span className="user-name">{user?.username || "User"}</span>
+              <span className="user-name">{user?.username || 'User'}</span>
               <img
                 className="user-avatar"
                 src={
                   user?.avatar ||
-                  "https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg"
+                  'https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg'
                 }
                 alt="Profile"
               />
             </button>
 
-            {openDropdown === "profile" && (
+            {openDropdown === 'profile' && (
               <div className="dropdown-menu" role="menu">
                 <Link to="/profile" className="dropdown-item">
                   <i className="fas fa-user" aria-hidden="true"></i>
@@ -150,7 +167,11 @@ const Navbar: React.FC = () => {
                   <span>Settings</span>
                 </Link>
                 <div className="dropdown-divider"></div>
-                <button className="dropdown-item logout-item" type="button" onClick={handleLogout}>
+                <button
+                  className="dropdown-item logout-item"
+                  type="button"
+                  onClick={handleLogout}
+                >
                   <i className="fas fa-sign-out-alt" aria-hidden="true"></i>
                   <span>Logout</span>
                 </button>

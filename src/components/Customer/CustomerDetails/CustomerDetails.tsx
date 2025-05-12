@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   XIcon,
   PencilIcon,
@@ -14,9 +14,9 @@ import {
   DocumentTextIcon,
   ClockIcon,
   ExclamationIcon,
-} from "@heroicons/react/solid";
-import "./CustomerDetails.css";
-import { Customer } from "../../../types/Customer";
+} from '@heroicons/react/solid';
+import './CustomerDetails.css';
+import { Customer } from '../../../types/Customer';
 
 interface ExpandedImage {
   url: string;
@@ -42,27 +42,27 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
   // Get value or fallback
   const getValue = (
     value: string | number | null | undefined,
-    defaultValue = "N/A"
+    defaultValue = 'N/A'
   ): string | number => {
     return value ?? defaultValue;
   };
 
   // Format date
   const formatDate = (dateString: string | Date | undefined | null): string => {
-    if (!dateString) return "N/A";
+    if (!dateString) return 'N/A';
 
     try {
       const date =
-        typeof dateString === "string" ? new Date(dateString) : dateString;
-      if (isNaN(date.getTime())) return "N/A";
+        typeof dateString === 'string' ? new Date(dateString) : dateString;
+      if (isNaN(date.getTime())) return 'N/A';
 
       return date.toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
     } catch (error) {
-      return "N/A";
+      return 'N/A';
     }
   };
 
@@ -128,7 +128,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
       {/* Customer Avatar and Name */}
       <div className="customer-header">
         <div className="customer-avatar">
-          {customer.name ? customer.name.charAt(0).toUpperCase() : "?"}
+          {customer.name ? customer.name.charAt(0).toUpperCase() : '?'}
         </div>
         <h3 className="customer-name">{getValue(customer.name)}</h3>
       </div>
@@ -168,14 +168,14 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
           </div>
           <div className="expanded-image-content">
             <img
-              src={expandedImage.url || "/placeholder.svg"}
+              src={expandedImage.url || '/placeholder.svg'}
               alt={expandedImage.type}
               className="expanded-image"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
-                target.src = "/placeholder.svg";
-                target.classList.add("error-image");
+                target.src = '/placeholder.svg';
+                target.classList.add('error-image');
               }}
             />
           </div>
@@ -270,21 +270,21 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                         <img
                           src={
                             customer.drivingLicensePhotoUrl ||
-                            "/placeholder.svg"
+                            '/placeholder.svg'
                           }
                           alt="Driver License"
                           className="document-image"
                           onClick={() =>
                             expandImage(
                               customer.drivingLicensePhotoUrl,
-                              "Driver License"
+                              'Driver License'
                             )
                           }
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.onerror = null;
-                            target.src = "/placeholder.svg";
-                            target.classList.add("error-image");
+                            target.src = '/placeholder.svg';
+                            target.classList.add('error-image');
                           }}
                         />
                         <div className="image-overlay">
@@ -299,17 +299,17 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                       <h4 className="document-title">Passport</h4>
                       <div className="document-image-container">
                         <img
-                          src={customer.passportPhotoUrl || "/placeholder.svg"}
+                          src={customer.passportPhotoUrl || '/placeholder.svg'}
                           alt="Passport"
                           className="document-image"
                           onClick={() =>
-                            expandImage(customer.passportPhotoUrl, "Passport")
+                            expandImage(customer.passportPhotoUrl, 'Passport')
                           }
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.onerror = null;
-                            target.src = "/placeholder.svg";
-                            target.classList.add("error-image");
+                            target.src = '/placeholder.svg';
+                            target.classList.add('error-image');
                           }}
                         />
                         <div className="image-overlay">

@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from 'react';
 import {
   addCustomer,
   deleteCustomer,
   getCustomers,
   updateCustomer,
-} from "../../../services/customerService";
-import { toast } from "react-toastify";
+} from '../../../services/customerService';
+import { toast } from 'react-toastify';
 import {
   SearchIcon,
   SortAscendingIcon,
@@ -21,13 +21,13 @@ import {
   ExclamationCircleIcon,
   UserAddIcon,
   DownloadIcon,
-} from "@heroicons/react/solid";
-import "./CustomersTable.css";
-import CustomerDetails from "../../../components/Customer/CustomerDetails/CustomerDetails";
-import EditCustomerForm from "../../../components/Customer/EditCustomerForm/EditCustomerForm";
-import CreateCustomerForm from "../../../components/Customer/CreateCustomerForm/CreateCustomerForm";
-import * as XLSX from "xlsx";
-import { Customer } from "../../../types/Customer";
+} from '@heroicons/react/solid';
+import './CustomersTable.css';
+import CustomerDetails from '../../../components/Customer/CustomerDetails/CustomerDetails';
+import EditCustomerForm from '../../../components/Customer/EditCustomerForm/EditCustomerForm';
+import CreateCustomerForm from '../../../components/Customer/CreateCustomerForm/CreateCustomerForm';
+import * as XLSX from 'xlsx';
+import { Customer } from '../../../types/Customer';
 
 const CustomersTable = () => {
   // State management
@@ -43,13 +43,13 @@ const CustomersTable = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Filtering and sorting state
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Customer;
-    direction: "asc" | "desc";
+    direction: 'asc' | 'desc';
   }>({
-    key: "name",
-    direction: "asc",
+    key: 'name',
+    direction: 'asc',
   });
 
   // Pagination state
@@ -65,9 +65,9 @@ const CustomersTable = () => {
         setCustomers(response);
         setError(null);
       } catch (err) {
-        console.error("Failed to fetch customers:", err);
-        setError("Failed to load customers. Please try again later.");
-        toast.error("Failed to load customers");
+        console.error('Failed to fetch customers:', err);
+        setError('Failed to load customers. Please try again later.');
+        toast.error('Failed to load customers');
       } finally {
         setLoading(false);
       }
@@ -104,19 +104,19 @@ const CustomersTable = () => {
         const bValue = b[sortConfig.key as keyof typeof b];
 
         // Handle null or undefined values
-        if (aValue == null) return sortConfig.direction === "asc" ? -1 : 1;
-        if (bValue == null) return sortConfig.direction === "asc" ? 1 : -1;
+        if (aValue == null) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (bValue == null) return sortConfig.direction === 'asc' ? 1 : -1;
 
         // Handle string values
-        if (typeof aValue === "string" && typeof bValue === "string") {
-          return sortConfig.direction === "asc"
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return sortConfig.direction === 'asc'
             ? aValue.localeCompare(bValue)
             : bValue.localeCompare(aValue);
         }
 
         // Handle numeric values
-        if (typeof aValue === "number" && typeof bValue === "number") {
-          return sortConfig.direction === "asc"
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return sortConfig.direction === 'asc'
             ? aValue - bValue
             : bValue - aValue;
         }
@@ -147,15 +147,15 @@ const CustomersTable = () => {
     setSortConfig((prevConfig) => ({
       key,
       direction:
-        prevConfig.key === key && prevConfig.direction === "asc"
-          ? "desc"
-          : "asc",
+        prevConfig.key === key && prevConfig.direction === 'asc'
+          ? 'desc'
+          : 'asc',
     }));
   };
 
   const handleDelete = async (id: string) => {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this customer?"
+      'Are you sure you want to delete this customer?'
     );
     if (!confirmDelete) {
       return;
@@ -166,10 +166,10 @@ const CustomersTable = () => {
       await deleteCustomer(id);
       setCustomers(customers.filter((c) => c.id !== id));
       setSelectedCustomer(null);
-      toast.success("Customer deleted successfully");
+      toast.success('Customer deleted successfully');
     } catch (error) {
-      console.error("Error deleting customer:", error);
-      toast.error("Failed to delete customer");
+      console.error('Error deleting customer:', error);
+      toast.error('Failed to delete customer');
     } finally {
       setLoading(false);
     }
@@ -179,15 +179,15 @@ const CustomersTable = () => {
     try {
       setLoading(true);
       const response = await updateCustomer(
-        updatedCustomer.id ?? "",
+        updatedCustomer.id ?? '',
         updatedCustomer
       );
       setCustomers(customers.map((c) => (c.id === response.id ? response : c)));
       setIsEditing(false);
-      toast.success("Customer updated successfully");
+      toast.success('Customer updated successfully');
     } catch (error) {
-      console.error("Error updating customer:", error);
-      toast.error("Failed to update customer");
+      console.error('Error updating customer:', error);
+      toast.error('Failed to update customer');
     } finally {
       setLoading(false);
     }
@@ -199,10 +199,10 @@ const CustomersTable = () => {
       const response = await addCustomer(newCustomer);
       setCustomers([...customers, response]);
       setIsCreating(false);
-      toast.success("Customer added successfully");
+      toast.success('Customer added successfully');
     } catch (error) {
-      console.error("Error creating customer:", error);
-      toast.error("Failed to add customer");
+      console.error('Error creating customer:', error);
+      toast.error('Failed to add customer');
     } finally {
       setLoading(false);
     }
@@ -229,29 +229,29 @@ const CustomersTable = () => {
       const workbook = XLSX.utils.book_new();
 
       const worksheetData = filteredAndSortedCustomers.map((customer) => ({
-        Name: customer.name || "N/A",
-        "Driver License": customer.driver_license_number || "N/A",
-        "Passport Number": customer.passport_number || "N/A",
-        Email: customer.email || "N/A",
-        Phone: customer.phone_number || "N/A",
-        Address: customer.address || "N/A",
+        Name: customer.name || 'N/A',
+        'Driver License': customer.driver_license_number || 'N/A',
+        'Passport Number': customer.passport_number || 'N/A',
+        Email: customer.email || 'N/A',
+        Phone: customer.phone_number || 'N/A',
+        Address: customer.address || 'N/A',
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
-      XLSX.writeFile(workbook, "customers.xlsx");
-      toast.success("Excel exported successfully");
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Customers');
+      XLSX.writeFile(workbook, 'customers.xlsx');
+      toast.success('Excel exported successfully');
     } catch (error) {
-      console.error("Error exporting to Excel:", error);
-      toast.error("Failed to export Excel");
+      console.error('Error exporting to Excel:', error);
+      toast.error('Failed to export Excel');
     }
   };
 
   // Render table header with sort indicators
-  const renderTableHeader = (label:string, key: keyof Customer) => {
+  const renderTableHeader = (label: string, key: keyof Customer) => {
     const isSorted = sortConfig.key === key;
     const SortIcon =
-      sortConfig.direction === "asc" ? SortAscendingIcon : SortDescendingIcon;
+      sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
 
     return (
       <th className="customer-table-heading" onClick={() => handleSort(key)}>
@@ -302,7 +302,9 @@ const CustomersTable = () => {
           <CustomerDetails
             customer={selectedCustomer}
             onEdit={() => handleEdit(selectedCustomer)}
-            onDelete={() => selectedCustomer?.id && handleDelete(selectedCustomer.id)}
+            onDelete={() =>
+              selectedCustomer?.id && handleDelete(selectedCustomer.id)
+            }
             onClose={closeCustomerDetails}
           />
         </div>
@@ -339,7 +341,7 @@ const CustomersTable = () => {
             {searchTerm && (
               <button
                 className="clear-search"
-                onClick={() => setSearchTerm("")}
+                onClick={() => setSearchTerm('')}
               >
                 <XIcon className="clear-icon" />
               </button>
@@ -384,11 +386,11 @@ const CustomersTable = () => {
           <table className="customer-table">
             <thead className="customer-table-header">
               <tr>
-                {renderTableHeader("Name", "name")}
-                {renderTableHeader("Driver License", "driver_license_number")}
-                {renderTableHeader("Passport Number", "passport_number")}
-                {renderTableHeader("Email", "email")}
-                {renderTableHeader("Phone", "phone_number")}
+                {renderTableHeader('Name', 'name')}
+                {renderTableHeader('Driver License', 'driver_license_number')}
+                {renderTableHeader('Passport Number', 'passport_number')}
+                {renderTableHeader('Email', 'email')}
+                {renderTableHeader('Phone', 'phone_number')}
                 <th className="customer-table-heading actions-column">
                   Actions
                 </th>
@@ -403,22 +405,22 @@ const CustomersTable = () => {
                         <div className="customer-avatar">
                           {customer.name
                             ? customer.name.charAt(0).toUpperCase()
-                            : "?"}
+                            : '?'}
                         </div>
-                        <span>{customer.name || "N/A"}</span>
+                        <span>{customer.name || 'N/A'}</span>
                       </div>
                     </td>
                     <td className="customer-table-cell">
-                      {customer.driver_license_number || "N/A"}
+                      {customer.driver_license_number || 'N/A'}
                     </td>
                     <td className="customer-table-cell">
-                      {customer.passport_number || "N/A"}
+                      {customer.passport_number || 'N/A'}
                     </td>
                     <td className="customer-table-cell">
-                      {customer.email || "N/A"}
+                      {customer.email || 'N/A'}
                     </td>
                     <td className="customer-table-cell">
-                      {customer.phone_number || "N/A"}
+                      {customer.phone_number || 'N/A'}
                     </td>
                     <td className="customer-table-cell actions-cell">
                       <div className="action-buttons">
@@ -448,7 +450,7 @@ const CustomersTable = () => {
                           className="action-btn delete"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDelete(customer.id ?? "");
+                            handleDelete(customer.id ?? '');
                           }}
                           title="Delete Customer"
                           aria-label="Delete customer"
@@ -475,11 +477,11 @@ const CustomersTable = () => {
       {filteredAndSortedCustomers.length > 0 && (
         <div className="pagination">
           <div className="pagination-info">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
             {Math.min(
               currentPage * itemsPerPage,
               filteredAndSortedCustomers.length
-            )}{" "}
+            )}{' '}
             of {filteredAndSortedCustomers.length} customers
           </div>
 

@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef, JSX } from "react";
+import { useEffect, useState, useRef, JSX } from 'react';
 import {
   getUser,
   updateUser,
   deleteUser,
   uploadProfilePhoto,
-} from "../../../services/userService.js";
-import { toast } from "react-toastify";
+} from '../../../services/userService.js';
+import { toast } from 'react-toastify';
 import {
   UserIcon,
   MailIcon,
@@ -21,10 +21,10 @@ import {
   XIcon,
   CheckIcon,
   ExclamationCircleIcon,
-} from "@heroicons/react/solid";
-import defaultAvatar from "../../../assets/default_avatar.png";
-import "./UserProfile.css";
-import { User } from "../../../types/User.js";
+} from '@heroicons/react/solid';
+import defaultAvatar from '../../../assets/default_avatar.png';
+import './UserProfile.css';
+import { User } from '../../../types/User.js';
 
 const UserProfile = ({ id }: { id: string }) => {
   // State management
@@ -40,12 +40,12 @@ const UserProfile = ({ id }: { id: string }) => {
   // String or null
   const [error, setError] = useState<string | null>(null);
   const [currentEdit, setCurrentEdit] = useState<keyof User | null>(null);
-  const [editValue, setEditValue] = useState<string>("");
+  const [editValue, setEditValue] = useState<string>('');
 
   // Active tab (limit to specific string literals if possible)
   const [activeTab, setActiveTab] = useState<
-    "profile" | "settings" | "notifications" | "security"
-  >("profile");
+    'profile' | 'settings' | 'notifications' | 'security'
+  >('profile');
 
   // File handling
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -66,13 +66,13 @@ const UserProfile = ({ id }: { id: string }) => {
         const data = await getUser(id);
         setUser(data);
       } catch (error) {
-        console.error("Failed to fetch user:", error);
+        console.error('Failed to fetch user:', error);
         if (error instanceof Error) {
           setError(error.message);
           toast.error(error.message);
         } else {
-          setError("Failed to load user profile");
-          toast.error("Failed to load user profile");
+          setError('Failed to load user profile');
+          toast.error('Failed to load user profile');
         }
       } finally {
         setLoading(false);
@@ -87,9 +87,9 @@ const UserProfile = ({ id }: { id: string }) => {
     if (!currentEdit) return;
 
     // Focus the correct input based on the field type
-    if (["name", "email", "phone"].includes(currentEdit)) {
+    if (['name', 'email', 'phone'].includes(currentEdit)) {
       inputRef.current?.focus();
-    } else if (["address", "bio"].includes(currentEdit)) {
+    } else if (['address', 'bio'].includes(currentEdit)) {
       textareaRef.current?.focus();
     }
   }, [currentEdit]);
@@ -97,7 +97,7 @@ const UserProfile = ({ id }: { id: string }) => {
   // Handle edit mode
   const handleEdit = (field: keyof User) => {
     setCurrentEdit(field);
-    setEditValue(user?.[field]?.toString() || "");
+    setEditValue(user?.[field]?.toString() || '');
   };
 
   // Handle save
@@ -105,7 +105,7 @@ const UserProfile = ({ id }: { id: string }) => {
     if (!currentEdit) return;
 
     // Validate input
-    if (!editValue.trim() && ["name", "email"].includes(currentEdit)) {
+    if (!editValue.trim() && ['name', 'email'].includes(currentEdit)) {
       toast.error(
         `${
           currentEdit.charAt(0).toUpperCase() + currentEdit.slice(1)
@@ -114,17 +114,17 @@ const UserProfile = ({ id }: { id: string }) => {
       return;
     }
 
-    if (currentEdit === "email" && !validateEmail(editValue)) {
-      toast.error("Please enter a valid email address");
+    if (currentEdit === 'email' && !validateEmail(editValue)) {
+      toast.error('Please enter a valid email address');
       return;
     }
 
     if (
-      currentEdit === "phone" &&
+      currentEdit === 'phone' &&
       editValue.trim() &&
       !validatePhone(editValue)
     ) {
-      toast.error("Please enter a valid phone number");
+      toast.error('Please enter a valid phone number');
       return;
     }
 
@@ -141,7 +141,7 @@ const UserProfile = ({ id }: { id: string }) => {
       toast.success(`Updated ${formatFieldName(currentEdit)}`);
       setCurrentEdit(null);
     } catch (error) {
-      const message = (error as Error).message || "Unknown error";
+      const message = (error as Error).message || 'Unknown error';
       console.error(`Update failed for ${currentEdit}:`, message);
       toast.error(
         `Failed to update ${formatFieldName(currentEdit)}: ${message}`
@@ -154,7 +154,7 @@ const UserProfile = ({ id }: { id: string }) => {
   // Handle cancel edit
   const handleCancelEdit = () => {
     setCurrentEdit(null);
-    setEditValue("");
+    setEditValue('');
   };
 
   // Handle delete user
@@ -162,12 +162,12 @@ const UserProfile = ({ id }: { id: string }) => {
     try {
       setLoading(true);
       await deleteUser(id);
-      toast.warning("User account deleted");
+      toast.warning('User account deleted');
       // Redirect or handle post-deletion logic here
-      window.location.href = "/login"; // Example redirect
+      window.location.href = '/login'; // Example redirect
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      console.error("Failed to delete user", message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Failed to delete user', message);
       toast.error(`Failed to delete user: ${message}`);
       setLoading(false);
       setShowDeleteConfirm(false);
@@ -187,14 +187,14 @@ const UserProfile = ({ id }: { id: string }) => {
     if (!file) return;
 
     // Validate file type
-    if (!file.type.match("image.*")) {
-      toast.error("Please select an image file");
+    if (!file.type.match('image.*')) {
+      toast.error('Please select an image file');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
+      toast.error('Image size should be less than 5MB');
       return;
     }
 
@@ -223,18 +223,18 @@ const UserProfile = ({ id }: { id: string }) => {
           profilePhotoUrl: response.profilePhotoUrl || prevUser.profilePhotoUrl,
         };
       });
-      toast.success("Profile photo updated");
+      toast.success('Profile photo updated');
 
       // Reset state
       setPhotoFile(null);
       setPhotoPreview(null);
     } catch (error) {
-      console.error("Failed to upload photo:", error);
+      console.error('Failed to upload photo:', error);
 
       if (error instanceof Error) {
         toast.error(`Failed to upload photo: ${error.message}`);
       } else {
-        toast.error("Failed to upload photo: Unknown error");
+        toast.error('Failed to upload photo: Unknown error');
       }
     } finally {
       setUploadingPhoto(false);
@@ -249,38 +249,38 @@ const UserProfile = ({ id }: { id: string }) => {
 
   // Format field name for display
   const formatFieldName = (field: string): string => {
-    if (!field) return "";
+    if (!field) return '';
     return field
-      .replace(/([A-Z])/g, " $1") // Insert space before capital letters
+      .replace(/([A-Z])/g, ' $1') // Insert space before capital letters
       .replace(/^./, (str) => str.toUpperCase()); // Capitalize first letter
   };
 
   // Format date
   const formatDate = (date?: string | Date): string => {
-    if (!date) return "N/A";
+    if (!date) return 'N/A';
     try {
-      return new Date(date).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
     } catch {
-      return "Invalid date";
+      return 'Invalid date';
     }
   };
 
   const formatDateTime = (date?: string | Date): string => {
-    if (!date) return "N/A";
+    if (!date) return 'N/A';
     try {
-      return new Date(date).toLocaleString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
+      return new Date(date).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
       });
     } catch {
-      return "Invalid datetime";
+      return 'Invalid datetime';
     }
   };
 
@@ -297,15 +297,15 @@ const UserProfile = ({ id }: { id: string }) => {
   // Get field icon
   const getFieldIcon = (field: string): JSX.Element => {
     switch (field) {
-      case "name":
+      case 'name':
         return <UserIcon className="field-icon" />;
-      case "email":
+      case 'email':
         return <MailIcon className="field-icon" />;
-      case "phone":
+      case 'phone':
         return <PhoneIcon className="field-icon" />;
-      case "address":
+      case 'address':
         return <LocationMarkerIcon className="field-icon" />;
-      case "birthdate":
+      case 'birthdate':
         return <CalendarIcon className="field-icon" />;
       default:
         return <UserIcon className="field-icon" />;
@@ -347,7 +347,7 @@ const UserProfile = ({ id }: { id: string }) => {
         <div className="profile-photo-container">
           {photoPreview ? (
             <img
-              src={photoPreview || "/placeholder.svg"}
+              src={photoPreview || '/placeholder.svg'}
               className="user-profile-avatar"
               alt="Profile Preview"
             />
@@ -355,7 +355,7 @@ const UserProfile = ({ id }: { id: string }) => {
             <img
               src={user?.profilePhotoUrl || defaultAvatar}
               className="user-profile-avatar"
-              alt={`${user?.name || "User"}'s Avatar`}
+              alt={`${user?.name || 'User'}'s Avatar`}
             />
           )}
 
@@ -379,8 +379,8 @@ const UserProfile = ({ id }: { id: string }) => {
         </div>
 
         <div className="profile-header-info">
-          <h2 className="profile-name">{user?.name || "User"}</h2>
-          <p className="profile-role">{user?.role || "Member"}</p>
+          <h2 className="profile-name">{user?.name || 'User'}</h2>
+          <p className="profile-role">{user?.role || 'Member'}</p>
 
           {photoFile && (
             <div className="photo-actions">
@@ -414,22 +414,22 @@ const UserProfile = ({ id }: { id: string }) => {
       {/* Profile Tabs */}
       <div className="profile-tabs">
         <button
-          className={`profile-tab ${activeTab === "profile" ? "active" : ""}`}
-          onClick={() => setActiveTab("profile")}
+          className={`profile-tab ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profile')}
         >
           <UserIcon className="tab-icon" />
           <span className="tab-text">Profile</span>
         </button>
         <button
-          className={`profile-tab ${activeTab === "security" ? "active" : ""}`}
-          onClick={() => setActiveTab("security")}
+          className={`profile-tab ${activeTab === 'security' ? 'active' : ''}`}
+          onClick={() => setActiveTab('security')}
         >
           <ShieldCheckIcon className="tab-icon" />
           <span className="tab-text">Security</span>
         </button>
         <button
-          className={`profile-tab ${activeTab === "settings" ? "active" : ""}`}
-          onClick={() => setActiveTab("settings")}
+          className={`profile-tab ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
         >
           <CogIcon className="tab-icon" />
           <span className="tab-text">Settings</span>
@@ -439,7 +439,7 @@ const UserProfile = ({ id }: { id: string }) => {
       {/* Profile Content */}
       <div className="profile-content">
         {/* Profile Tab */}
-        {activeTab === "profile" && (
+        {activeTab === 'profile' && (
           <div className="profile-section">
             <h3 className="section-title">Personal Information</h3>
 
@@ -448,13 +448,13 @@ const UserProfile = ({ id }: { id: string }) => {
               <div className="profile-field">
                 <div className="field-header">
                   <div className="field-label">
-                    {getFieldIcon("name")}
+                    {getFieldIcon('name')}
                     <span>Full Name</span>
                   </div>
 
-                  {currentEdit !== "name" && (
+                  {currentEdit !== 'name' && (
                     <button
-                      onClick={() => handleEdit("name")}
+                      onClick={() => handleEdit('name')}
                       className="edit-button"
                       aria-label="Edit name"
                     >
@@ -463,7 +463,7 @@ const UserProfile = ({ id }: { id: string }) => {
                   )}
                 </div>
 
-                {currentEdit === "name" ? (
+                {currentEdit === 'name' ? (
                   <div className="edit-field">
                     <input
                       type="text"
@@ -499,7 +499,7 @@ const UserProfile = ({ id }: { id: string }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className="field-value">{user?.name || "Not set"}</div>
+                  <div className="field-value">{user?.name || 'Not set'}</div>
                 )}
               </div>
 
@@ -507,13 +507,13 @@ const UserProfile = ({ id }: { id: string }) => {
               <div className="profile-field">
                 <div className="field-header">
                   <div className="field-label">
-                    {getFieldIcon("email")}
+                    {getFieldIcon('email')}
                     <span>Email Address</span>
                   </div>
 
-                  {currentEdit !== "email" && (
+                  {currentEdit !== 'email' && (
                     <button
-                      onClick={() => handleEdit("email")}
+                      onClick={() => handleEdit('email')}
                       className="edit-button"
                       aria-label="Edit email"
                     >
@@ -522,7 +522,7 @@ const UserProfile = ({ id }: { id: string }) => {
                   )}
                 </div>
 
-                {currentEdit === "email" ? (
+                {currentEdit === 'email' ? (
                   <div className="edit-field">
                     <input
                       type="email"
@@ -558,7 +558,7 @@ const UserProfile = ({ id }: { id: string }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className="field-value">{user?.email || "Not set"}</div>
+                  <div className="field-value">{user?.email || 'Not set'}</div>
                 )}
               </div>
 
@@ -566,13 +566,13 @@ const UserProfile = ({ id }: { id: string }) => {
               <div className="profile-field">
                 <div className="field-header">
                   <div className="field-label">
-                    {getFieldIcon("phone")}
+                    {getFieldIcon('phone')}
                     <span>Phone Number</span>
                   </div>
 
-                  {currentEdit !== "phone" && (
+                  {currentEdit !== 'phone' && (
                     <button
-                      onClick={() => handleEdit("phone")}
+                      onClick={() => handleEdit('phone')}
                       className="edit-button"
                       aria-label="Edit phone"
                     >
@@ -581,7 +581,7 @@ const UserProfile = ({ id }: { id: string }) => {
                   )}
                 </div>
 
-                {currentEdit === "phone" ? (
+                {currentEdit === 'phone' ? (
                   <div className="edit-field">
                     <input
                       type="tel"
@@ -617,7 +617,7 @@ const UserProfile = ({ id }: { id: string }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className="field-value">{user?.phone || "Not set"}</div>
+                  <div className="field-value">{user?.phone || 'Not set'}</div>
                 )}
               </div>
 
@@ -625,13 +625,13 @@ const UserProfile = ({ id }: { id: string }) => {
               <div className="profile-field">
                 <div className="field-header">
                   <div className="field-label">
-                    {getFieldIcon("address")}
+                    {getFieldIcon('address')}
                     <span>Address</span>
                   </div>
 
-                  {currentEdit !== "address" && (
+                  {currentEdit !== 'address' && (
                     <button
-                      onClick={() => handleEdit("address")}
+                      onClick={() => handleEdit('address')}
                       className="edit-button"
                       aria-label="Edit address"
                     >
@@ -640,7 +640,7 @@ const UserProfile = ({ id }: { id: string }) => {
                   )}
                 </div>
 
-                {currentEdit === "address" ? (
+                {currentEdit === 'address' ? (
                   <div className="edit-field">
                     <textarea
                       value={editValue}
@@ -677,7 +677,7 @@ const UserProfile = ({ id }: { id: string }) => {
                   </div>
                 ) : (
                   <div className="field-value">
-                    {user?.address || "Not set"}
+                    {user?.address || 'Not set'}
                   </div>
                 )}
               </div>
@@ -705,7 +705,7 @@ const UserProfile = ({ id }: { id: string }) => {
                 </div>
                 <div className="info-item">
                   <span className="info-label">Account Type</span>
-                  <span className="info-value">{user?.role || "Standard"}</span>
+                  <span className="info-value">{user?.role || 'Standard'}</span>
                 </div>
               </div>
             </div>
@@ -713,7 +713,7 @@ const UserProfile = ({ id }: { id: string }) => {
         )}
 
         {/* Security Tab */}
-        {activeTab === "security" && (
+        {activeTab === 'security' && (
           <div className="profile-section">
             <h3 className="section-title">Security Settings</h3>
 
@@ -746,7 +746,7 @@ const UserProfile = ({ id }: { id: string }) => {
         )}
 
         {/* Settings Tab */}
-        {activeTab === "settings" && (
+        {activeTab === 'settings' && (
           <div className="profile-section">
             <h3 className="section-title">Account Settings</h3>
 

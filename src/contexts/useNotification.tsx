@@ -4,9 +4,9 @@ import React, {
   useEffect,
   useContext,
   ReactNode,
-} from "react";
-import { io, Socket } from "socket.io-client";
-import { Notification } from "../types/Notification";
+} from 'react';
+import { io, Socket } from 'socket.io-client';
+import { Notification } from '../types/Notification';
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -33,9 +33,9 @@ export const NotificationProvider = ({ children, userId }: Props) => {
     const newSocket = io(API_URL);
     setSocket(newSocket);
 
-    newSocket.emit("join", userId);
+    newSocket.emit('join', userId);
 
-    newSocket.on("new-notification", (notification: Notification) => {
+    newSocket.on('new-notification', (notification: Notification) => {
       setNotifications((prev) => [notification, ...prev]);
     });
 
@@ -47,42 +47,42 @@ export const NotificationProvider = ({ children, userId }: Props) => {
   const fetchNotifications = async () => {
     try {
       const response = await fetch(`${API_URL}/api/notifications/${userId}`, {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch notifications");
+        throw new Error('Failed to fetch notifications');
       }
 
       const data: Notification[] = await response.json();
       setNotifications(data);
     } catch (error) {
-      console.error("Error fetching notifications:", error);
+      console.error('Error fetching notifications:', error);
     }
   };
 
   const markAsRead = async (id: string) => {
     try {
       const response = await fetch(`${API_URL}/api/notifications/${id}`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "seen" }),
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'seen' }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to mark as read");
+        throw new Error('Failed to mark as read');
       }
 
       setNotifications((prev) =>
         prev.map((notif) =>
-          notif.id === id ? { ...notif, status: "seen" } : notif
+          notif.id === id ? { ...notif, status: 'seen' } : notif
         )
       );
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      console.error('Error marking notification as read:', error);
     }
   };
 
@@ -99,7 +99,7 @@ export const useNotifications = (): NotificationContextType => {
   const context = useContext(NotificationContext);
   if (!context) {
     throw new Error(
-      "useNotifications must be used within a NotificationProvider"
+      'useNotifications must be used within a NotificationProvider'
     );
   }
   return context;

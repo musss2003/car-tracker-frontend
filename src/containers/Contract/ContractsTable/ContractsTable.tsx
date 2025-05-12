@@ -1,13 +1,13 @@
-import "./ContractsTable.css";
-import { useEffect, useState, useMemo } from "react";
+import './ContractsTable.css';
+import { useEffect, useState, useMemo } from 'react';
 import {
   createAndDownloadContract,
   deleteContract,
   downloadContract,
   getContractsPopulated,
   updateContract,
-} from "../../../services/contractService";
-import { toast } from "react-toastify";
+} from '../../../services/contractService';
+import { toast } from 'react-toastify';
 import {
   PlusCircleIcon,
   SearchIcon,
@@ -25,10 +25,10 @@ import {
   CheckCircleIcon,
   ClockIcon,
   CheckIcon,
-} from "@heroicons/react/solid";
-import { jsPDF } from "jspdf";
+} from '@heroicons/react/solid';
+import { jsPDF } from 'jspdf';
 import 'jspdf-autotable'; // This augments jsPDF prototype
-import * as XLSX from "xlsx";
+import * as XLSX from 'xlsx';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -36,12 +36,10 @@ declare module 'jspdf' {
   }
 }
 
-
-
-import EditContractForm from "../../../components/Contract/EditContractForm/EditContractForm";
-import ContractDetails from "../../../components/Contract/ContractDetails/ContractDetails";
-import CreateContractForm from "../../../components/Contract/CreateContractForm/CreateContractForm";
-import { Contract } from "../../../types/Contract";
+import EditContractForm from '../../../components/Contract/EditContractForm/EditContractForm';
+import ContractDetails from '../../../components/Contract/ContractDetails/ContractDetails';
+import CreateContractForm from '../../../components/Contract/CreateContractForm/CreateContractForm';
+import { Contract } from '../../../types/Contract';
 
 const ContractsTable = () => {
   // State management
@@ -56,14 +54,14 @@ const ContractsTable = () => {
   const [isViewingDetails, setIsViewingDetails] = useState<boolean>(false);
 
   // Filtering and sorting state
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [sortConfig, setSortConfig] = useState<{
     key: string;
-    direction: "asc" | "desc";
+    direction: 'asc' | 'desc';
   }>({
-    key: "rentalPeriod.startDate",
-    direction: "desc",
+    key: 'rentalPeriod.startDate',
+    direction: 'desc',
   });
 
   // Pagination state
@@ -78,9 +76,9 @@ const ContractsTable = () => {
       setContracts(data);
       setError(null);
     } catch (err) {
-      console.error("Failed to fetch contracts:", err);
-      setError("Failed to load contracts. Please try again later.");
-      toast.error("Failed to load contracts");
+      console.error('Failed to fetch contracts:', err);
+      setError('Failed to load contracts. Please try again later.');
+      toast.error('Failed to load contracts');
     } finally {
       setLoading(false);
     }
@@ -108,18 +106,18 @@ const ContractsTable = () => {
     }
 
     // Apply status filter
-    if (filterStatus !== "all") {
+    if (filterStatus !== 'all') {
       const now = new Date();
       result = result.filter((contract) => {
         const startDate = new Date(contract.rentalPeriod.startDate);
         const endDate = new Date(contract.rentalPeriod.endDate);
 
         switch (filterStatus) {
-          case "confirmed":
+          case 'confirmed':
             return now < startDate;
-          case "active":
+          case 'active':
             return now >= startDate && now <= endDate;
-          case "completed":
+          case 'completed':
             return now > endDate;
           default:
             return true;
@@ -130,39 +128,39 @@ const ContractsTable = () => {
     // Then, sort the filtered results
     if (sortConfig.key) {
       result.sort((a, b) => {
-        let aValue: string | number | Date = "";
-        let bValue: string | number | Date = "";
+        let aValue: string | number | Date = '';
+        let bValue: string | number | Date = '';
 
         // Handle nested properties
-        if (sortConfig.key.includes(".")) {
-          const [obj, prop] = sortConfig.key.split(".");
+        if (sortConfig.key.includes('.')) {
+          const [obj, prop] = sortConfig.key.split('.');
 
-          if (obj === "customer" && a.customer && b.customer) {
-            aValue = (a.customer as any)[prop] ?? "";
-            bValue = (b.customer as any)[prop] ?? "";
-          } else if (obj === "car" && a.car && b.car) {
-            aValue = (a.car as any)[prop] ?? "";
-            bValue = (b.car as any)[prop] ?? "";
-          } else if (obj === "rentalPeriod") {
+          if (obj === 'customer' && a.customer && b.customer) {
+            aValue = (a.customer as any)[prop] ?? '';
+            bValue = (b.customer as any)[prop] ?? '';
+          } else if (obj === 'car' && a.car && b.car) {
+            aValue = (a.car as any)[prop] ?? '';
+            bValue = (b.car as any)[prop] ?? '';
+          } else if (obj === 'rentalPeriod') {
             aValue = new Date((a.rentalPeriod as any)[prop]);
             bValue = new Date((b.rentalPeriod as any)[prop]);
           }
         } else {
-          aValue = (a as any)[sortConfig.key] ?? "";
-          bValue = (b as any)[sortConfig.key] ?? "";
+          aValue = (a as any)[sortConfig.key] ?? '';
+          bValue = (b as any)[sortConfig.key] ?? '';
         }
 
         // Handle string values
-        if (typeof aValue === "string" && typeof bValue === "string") {
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
           aValue = aValue.toLowerCase();
           bValue = bValue.toLowerCase();
         }
 
         if (aValue < bValue) {
-          return sortConfig.direction === "asc" ? -1 : 1;
+          return sortConfig.direction === 'asc' ? -1 : 1;
         }
         if (aValue > bValue) {
-          return sortConfig.direction === "asc" ? 1 : -1;
+          return sortConfig.direction === 'asc' ? 1 : -1;
         }
         return 0;
       });
@@ -189,9 +187,9 @@ const ContractsTable = () => {
     setSortConfig((prevConfig) => ({
       key,
       direction:
-        prevConfig.key === key && prevConfig.direction === "asc"
-          ? "desc"
-          : "asc",
+        prevConfig.key === key && prevConfig.direction === 'asc'
+          ? 'desc'
+          : 'asc',
     }));
   };
 
@@ -224,15 +222,15 @@ const ContractsTable = () => {
       if (updatedContract.id) {
         await updateContract(updatedContract.id, updatedContract);
       } else {
-        throw new Error("Contract ID is undefined");
+        throw new Error('Contract ID is undefined');
       }
       await fetchContracts();
-      toast.success("Contract updated successfully");
+      toast.success('Contract updated successfully');
       setIsEditing(false);
       setSelectedContract(null);
     } catch (error) {
-      console.error("Error updating contract:", error);
-      toast.error("Failed to update contract");
+      console.error('Error updating contract:', error);
+      toast.error('Failed to update contract');
     } finally {
       setLoading(false);
     }
@@ -243,18 +241,18 @@ const ContractsTable = () => {
       setLoading(true);
       const createdContract = await createAndDownloadContract(newContractData);
       await fetchContracts();
-      toast.success("Contract created successfully");
+      toast.success('Contract created successfully');
       setIsCreating(false);
     } catch (error) {
-      console.error("Error creating contract:", error);
-      toast.error("Failed to create contract");
+      console.error('Error creating contract:', error);
+      toast.error('Failed to create contract');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteContract = async () => {
-    if (!window.confirm("Are you sure you want to delete this contract?")) {
+    if (!window.confirm('Are you sure you want to delete this contract?')) {
       return;
     }
 
@@ -263,15 +261,15 @@ const ContractsTable = () => {
       if (selectedContract?.id) {
         await deleteContract(selectedContract.id);
       } else {
-        toast.error("No contract selected or contract ID is missing.");
+        toast.error('No contract selected or contract ID is missing.');
       }
       await fetchContracts();
-      toast.success("Contract deleted successfully");
+      toast.success('Contract deleted successfully');
       setSelectedContract(null);
       setIsViewingDetails(false);
     } catch (error) {
-      console.error("Error deleting contract:", error);
-      toast.error("Failed to delete contract");
+      console.error('Error deleting contract:', error);
+      toast.error('Failed to delete contract');
     } finally {
       setLoading(false);
     }
@@ -288,7 +286,7 @@ const ContractsTable = () => {
 
     // Calculate the total price
     const dailyRate =
-      typeof contract.car.price_per_day === "string"
+      typeof contract.car.price_per_day === 'string'
         ? parseFloat(contract.car.price_per_day)
         : contract.car.price_per_day;
 
@@ -300,12 +298,12 @@ const ContractsTable = () => {
       if (selectedContract?.id) {
         await downloadContract(selectedContract.id);
       } else {
-        toast.error("No contract selected or contract ID is missing.");
+        toast.error('No contract selected or contract ID is missing.');
       }
-      toast.success("Contract download initiated");
+      toast.success('Contract download initiated');
     } catch (error) {
-      console.error("Error downloading contract:", error);
-      toast.error("Failed to download contract");
+      console.error('Error downloading contract:', error);
+      toast.error('Failed to download contract');
     }
   };
 
@@ -319,42 +317,42 @@ const ContractsTable = () => {
   const exportToPDF = () => {
     try {
       const doc = new jsPDF();
-      doc.text("Contracts List", 20, 10);
-  
+      doc.text('Contracts List', 20, 10);
+
       const tableColumn = [
-        "Customer Name",
-        "Passport Number",
-        "Car Model",
-        "License Plate",
-        "Start Date",
-        "End Date",
-        "Status",
+        'Customer Name',
+        'Passport Number',
+        'Car Model',
+        'License Plate',
+        'Start Date',
+        'End Date',
+        'Status',
       ];
       const tableRows = filteredAndSortedContracts.map((contract) => {
         const now = new Date();
         const startDate = new Date(contract.rentalPeriod.startDate);
         const endDate = new Date(contract.rentalPeriod.endDate);
-  
+
         let status;
         if (now < startDate) {
-          status = "Confirmed";
+          status = 'Confirmed';
         } else if (now >= startDate && now <= endDate) {
-          status = "Active";
+          status = 'Active';
         } else {
-          status = "Completed";
+          status = 'Completed';
         }
-  
+
         return [
-          contract.customer?.name || "N/A",
-          contract.customer?.passport_number || "N/A",
-          contract.car?.model || "N/A",
-          contract.car?.license_plate || "N/A",
+          contract.customer?.name || 'N/A',
+          contract.customer?.passport_number || 'N/A',
+          contract.car?.model || 'N/A',
+          contract.car?.license_plate || 'N/A',
           startDate.toLocaleDateString(),
           endDate.toLocaleDateString(),
           status,
         ];
       });
-  
+
       doc.autoTable({
         head: [tableColumn],
         body: tableRows,
@@ -362,15 +360,14 @@ const ContractsTable = () => {
         styles: { fontSize: 10, cellPadding: 3 },
         headStyles: { fillColor: [66, 135, 245] },
       });
-  
-      doc.save("contracts.pdf");
-      toast.success("PDF exported successfully");
+
+      doc.save('contracts.pdf');
+      toast.success('PDF exported successfully');
     } catch (error) {
-      console.error("Error exporting to PDF:", error);
-      toast.error("Failed to export PDF");
+      console.error('Error exporting to PDF:', error);
+      toast.error('Failed to export PDF');
     }
   };
-  
 
   const exportToExcel = () => {
     try {
@@ -383,32 +380,32 @@ const ContractsTable = () => {
 
         let status;
         if (now < startDate) {
-          status = "Confirmed";
+          status = 'Confirmed';
         } else if (now >= startDate && now <= endDate) {
-          status = "Active";
+          status = 'Active';
         } else {
-          status = "Completed";
+          status = 'Completed';
         }
 
         return {
-          "Customer Name": contract.customer?.name || "N/A",
-          "Passport Number": contract.customer?.passport_number || "N/A",
-          "Car Model": contract.car?.model || "N/A",
-          "License Plate": contract.car?.license_plate || "N/A",
-          "Start Date": startDate.toLocaleDateString(),
-          "End Date": endDate.toLocaleDateString(),
-          "Total Price": contract ? `$${calculateTotalPrice(contract)}` : "N/A",
+          'Customer Name': contract.customer?.name || 'N/A',
+          'Passport Number': contract.customer?.passport_number || 'N/A',
+          'Car Model': contract.car?.model || 'N/A',
+          'License Plate': contract.car?.license_plate || 'N/A',
+          'Start Date': startDate.toLocaleDateString(),
+          'End Date': endDate.toLocaleDateString(),
+          'Total Price': contract ? `$${calculateTotalPrice(contract)}` : 'N/A',
           Status: status,
         };
       });
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Contracts");
-      XLSX.writeFile(workbook, "contracts.xlsx");
-      toast.success("Excel exported successfully");
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Contracts');
+      XLSX.writeFile(workbook, 'contracts.xlsx');
+      toast.success('Excel exported successfully');
     } catch (error) {
-      console.error("Error exporting to Excel:", error);
-      toast.error("Failed to export Excel");
+      console.error('Error exporting to Excel:', error);
+      toast.error('Failed to export Excel');
     }
   };
 
@@ -419,11 +416,11 @@ const ContractsTable = () => {
     const endDate = new Date(contract.rentalPeriod.endDate);
 
     if (now < startDate) {
-      return { status: "confirmed", className: "status-confirmed" };
+      return { status: 'confirmed', className: 'status-confirmed' };
     } else if (now >= startDate && now <= endDate) {
-      return { status: "active", className: "status-active" };
+      return { status: 'active', className: 'status-active' };
     } else {
-      return { status: "completed", className: "status-completed" };
+      return { status: 'completed', className: 'status-completed' };
     }
   };
 
@@ -431,11 +428,11 @@ const ContractsTable = () => {
   const renderTableHeader = (
     label: string,
     key: string,
-    additionalClass = ""
+    additionalClass = ''
   ) => {
     const isSorted = sortConfig.key === key;
     const SortIcon =
-      sortConfig.direction === "asc" ? SortAscendingIcon : SortDescendingIcon;
+      sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
 
     return (
       <th
@@ -458,13 +455,13 @@ const ContractsTable = () => {
   const renderStatusBadge = (status: string, className: string) => {
     let icon;
     switch (status) {
-      case "confirmed":
+      case 'confirmed':
         icon = <ClockIcon className="status-icon" />;
         break;
-      case "active":
+      case 'active':
         icon = <CheckCircleIcon className="status-icon" />;
         break;
-      case "completed":
+      case 'completed':
         icon = <CheckIcon className="status-icon" />;
         break;
       default:
@@ -515,7 +512,7 @@ const ContractsTable = () => {
             {searchTerm && (
               <button
                 className="clear-search"
-                onClick={() => setSearchTerm("")}
+                onClick={() => setSearchTerm('')}
               >
                 <XIcon className="clear-icon" />
               </button>
@@ -559,29 +556,29 @@ const ContractsTable = () => {
         <table className="contracts-table">
           <thead>
             <tr>
-              {renderTableHeader("Customer", "customer.name")}
+              {renderTableHeader('Customer', 'customer.name')}
               {renderTableHeader(
-                "Passport",
-                "customer.passport_number",
-                "hide-on-small"
+                'Passport',
+                'customer.passport_number',
+                'hide-on-small'
               )}
-              {renderTableHeader("Car", "car.model")}
+              {renderTableHeader('Car', 'car.model')}
               {renderTableHeader(
-                "License Plate",
-                "car.license_plate",
-                "hide-on-small"
-              )}
-              {renderTableHeader(
-                "Start Date",
-                "rentalPeriod.startDate",
-                "hide-on-small"
+                'License Plate',
+                'car.license_plate',
+                'hide-on-small'
               )}
               {renderTableHeader(
-                "End Date",
-                "rentalPeriod.endDate",
-                "hide-on-small"
+                'Start Date',
+                'rentalPeriod.startDate',
+                'hide-on-small'
               )}
-              {renderTableHeader("Status", "status")}
+              {renderTableHeader(
+                'End Date',
+                'rentalPeriod.endDate',
+                'hide-on-small'
+              )}
+              {renderTableHeader('Status', 'status')}
               <th className="table-header-cell">Actions</th>
             </tr>
           </thead>
@@ -595,35 +592,35 @@ const ContractsTable = () => {
                     <td className="table-cell">
                       <div className="customer-info">
                         <div className="customer-avatar">
-                          {contract.customer?.name?.charAt(0) || "?"}
+                          {contract.customer?.name?.charAt(0) || '?'}
                         </div>
                         <div className="customer-name">
-                          {contract.customer?.name || "N/A"}
+                          {contract.customer?.name || 'N/A'}
                         </div>
                       </div>
                     </td>
                     <td className="table-cell hide-on-small">
-                      {contract.customer?.passport_number || "N/A"}
+                      {contract.customer?.passport_number || 'N/A'}
                     </td>
                     <td className="table-cell">
-                      {contract.car?.model || "N/A"}
+                      {contract.car?.model || 'N/A'}
                     </td>
                     <td className="table-cell hide-on-small">
-                      {contract.car?.license_plate || "N/A"}
+                      {contract.car?.license_plate || 'N/A'}
                     </td>
                     <td className="table-cell hide-on-small">
                       {contract.rentalPeriod.startDate
                         ? new Date(
                             contract.rentalPeriod.startDate
                           ).toLocaleDateString()
-                        : "N/A"}
+                        : 'N/A'}
                     </td>
                     <td className="table-cell hide-on-small">
                       {contract.rentalPeriod.endDate
                         ? new Date(
                             contract.rentalPeriod.endDate
                           ).toLocaleDateString()
-                        : "N/A"}
+                        : 'N/A'}
                     </td>
                     <td className="table-cell">
                       {renderStatusBadge(status, className)}
@@ -675,9 +672,9 @@ const ContractsTable = () => {
             ) : (
               <tr>
                 <td colSpan={8} className="empty-table-message">
-                  {searchTerm || filterStatus !== "all"
-                    ? "No contracts match your search criteria"
-                    : "No contracts available"}
+                  {searchTerm || filterStatus !== 'all'
+                    ? 'No contracts match your search criteria'
+                    : 'No contracts available'}
                 </td>
               </tr>
             )}
@@ -689,11 +686,11 @@ const ContractsTable = () => {
       {filteredAndSortedContracts.length > 0 && (
         <div className="pagination">
           <div className="pagination-info">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
             {Math.min(
               currentPage * itemsPerPage,
               filteredAndSortedContracts.length
-            )}{" "}
+            )}{' '}
             of {filteredAndSortedContracts.length} contracts
           </div>
 
