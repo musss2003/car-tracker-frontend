@@ -1,4 +1,32 @@
-import { expect } from 'vitest' // ✅ Vitest's own expect
-import * as matchers from '@testing-library/jest-dom/matchers'
+import { vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
+import '@testing-library/jest-dom';
 
-expect.extend(matchers)
+vi.mock("react-router-dom", async () => {
+    const original = await import("react-router-dom");
+    return {
+      ...original,
+      MemoryRouter,
+    };
+  });
+
+// Mock window.matchMedia
+Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: (query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(), // Deprecated
+        removeListener: vi.fn(), // Deprecated
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+    }),
+});
+global.ResizeObserver = class {
+    observe() { }
+    unobserve() { }
+    disconnect() { }
+};
+

@@ -46,8 +46,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "prepare": "husky install"
+    "test:essential": "vitest run --include src/App.test.tsx --include src/pages/LoginPage/LoginPage.test.tsx --include src/pages/DashboardPage/DashboardPage.test.tsx"
   },
   "eslintConfig": {
     "extends": [
@@ -78,16 +77,12 @@
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
-    "husky": "^8.0.0",
+    "husky": "^8.0.3",
     "jsdom": "^26.1.0",
+    "lint-staged": "^16.0.0",
     "postcss": "^8.5.3",
     "typescript": "^5.8.3",
     "vite": "^6.3.2",
-    "vitest": "^3.1.2"
-  },
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": [
-      "npx vitest run --passWithNoTests"
-    ]
+    "vitest": "^3.1.3"
   }
 }

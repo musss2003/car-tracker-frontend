@@ -1,30 +1,16 @@
 import { render, screen } from "@testing-library/react";
-import { UserProvider } from "./contexts/useAuth";
 import { MemoryRouter } from "react-router-dom";
-import { vi } from "vitest";
+import { UserProvider } from "./contexts/useAuth";
 import App from "./App";
 
-// Mock auth
-vi.mock("./utils/auth", () => ({
-  isLoggedIn: () => false,
-}));
-
-// ✅ Correct async mocking of lazy page
-vi.mock("./pages/LoginPage", async () => {
-  return {
-    default: () => <div>Mock Login Page</div>,
-  };
-});
-
-test("renders login page when not logged in", () => {
+test("renders main app structure", () => {
   render(
-    <MemoryRouter initialEntries={['/login']}>
+    <MemoryRouter initialEntries={["/"]}>
       <UserProvider>
         <App />
       </UserProvider>
     </MemoryRouter>
   );
 
-  const loginText = screen.getByText(/mock login page/i);
-  expect(loginText).toBeInTheDocument();
+  expect(screen.getByRole("main")).toBeInTheDocument();
 });

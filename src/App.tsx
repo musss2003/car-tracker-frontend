@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Navbar from "./components/Navbar/Navbar";
 import AppHeader from "./components/AppHeader/AppHeader";
-import { AppRoutes } from "./AppRoutes";
+import { AppRoutes } from "./routes/AppRoutes";
 import './App.css'
 
 
