@@ -41,8 +41,8 @@ const UserProvider: React.FC<Props> = ({ children }) => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const isDevelopment = import.meta.env.MODE === 'development';
-
+  const isDevelopment = false; // import.meta.env.MODE === 'development';
+  
   const checkSession = useCallback(async () => {
     if (isDevelopment) {
       console.warn('Development Mode: Mock session data loaded.');
