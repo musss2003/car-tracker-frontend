@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/contracts/';
 
 // Expected by useDataFetcher:
 // const { data: revenueData } = useDataFetcher<{ totalRevenue: number }>(...)
-export const getTotalRevenue = async (): Promise<{ totalRevenue: number }> => {
+export const getTotalRevenue = async (): Promise<number> => {
   try {
     const response = await fetch(`${API_URL}revenue`, {
       method: 'GET',
@@ -17,7 +17,8 @@ export const getTotalRevenue = async (): Promise<{ totalRevenue: number }> => {
     }
 
     const totalRevenue: number = await response.json();
-    return { totalRevenue }; // wrap it in an object
+
+    return totalRevenue;
   } catch (error) {
     console.error('Error fetching total revenue:', error);
     throw error;

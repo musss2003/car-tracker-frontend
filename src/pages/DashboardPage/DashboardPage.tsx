@@ -62,9 +62,7 @@ function DashboardPage() {
     data: revenueData,
     loading: revenueLoading,
     error: revenueError,
-  } = useDataFetcher(getTotalRevenue, {
-    totalRevenue: 0,
-  });
+  } = useDataFetcher(getTotalRevenue, 0);
 
   const {
     data: contracts,
@@ -76,7 +74,7 @@ function DashboardPage() {
   const numberOfCars = cars.length;
   const numberOfCustomers = customers.length;
   const numberOfContracts = contracts.length;
-  const totalRevenue = revenueData.totalRevenue;
+  const totalRevenue = revenueData;
 
   console.log(totalRevenue);
 
