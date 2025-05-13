@@ -1,70 +1,151 @@
-# Getting Started with Create React App
+# 🚗 Car Tracker Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive frontend application for managing car rental contracts, customers, and vehicles. Built with **React**, **TypeScript**, and **Vite**, and styled using **Chakra UI** and **TailwindCSS**.
 
-## Available Scripts
+> This is the **frontend only**. You’ll need to run the [backend repository](#backend-api) alongside it for full functionality.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 📦 Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- ⚛️ **React** with TypeScript
+- ⚡ **Vite** (for fast builds and dev experience)
+- 🎨 **Chakra UI** (UI and animation)
+- 🌐 **Axios** (HTTP client)
+- ⚙️ **React Router v6**
+- 📅 **React Big Calendar**
+- 📊 **Recharts**
+- 🔐 **JWT Authentication** (via custom backend)
+- ✅ **React Hook Form** + **Yup** for validation
+- 🔬 **Vitest** & **@testing-library/react** for testing
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 🚀 Getting Started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 1. Clone the repository
 
-### `npm run build`
+```bash
+git clone https://github.com/your-username/car-tracker-frontend.git
+cd car-tracker-frontend
+2. Install dependencies
+bash
+Copy
+Edit
+npm install
+3. Configure environment variables
+Create a .env file in the root directory and add the following:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+env
+Copy
+Edit
+VITE_API_URL=http://localhost:5001/api
+Change the URL to your backend’s actual API if needed.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Run the development server
+bash
+Copy
+Edit
+npm run dev
+This will start the app at: http://localhost:5173
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+📁 Project Structure
+bash
+Copy
+Edit
+├── public/
+├── src/
+│   ├── assets/            # Images and icons
+│   ├── components/        # Reusable UI components
+│   ├── features/          # Feature-specific modules (e.g. contracts, customers)
+│   ├── hooks/             # Custom React hooks
+│   ├── pages/             # Page views
+│   ├── routes/            # Route configuration
+│   ├── services/          # Axios API wrappers
+│   ├── types/             # TypeScript types
+│   ├── utils/             # Utility functions
+│   ├── App.tsx            # App entry point
+│   └── main.tsx           # Vite entry
+├── .env
+├── package.json
+└── README.md
+🧪 Running Tests
+We use Vitest for unit and integration testing.
 
-### `npm run eject`
+bash
+Copy
+Edit
+# Run all tests
+npm run test
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Watch mode
+npm run test:watch
+📚 Key Features
+🔐 Login/Logout with session-checking
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+📄 Create, edit, and manage rental contracts
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+👤 View and edit customer profiles
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+🚘 Manage car details and availability
 
-## Learn More
+🧾 Generate contract PDFs (docx and PDF)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+📊 Dashboard with charts and summaries
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+🔔 Notifications grouped by date (Today, Yesterday, etc.)
 
-### Code Splitting
+🔍 Search, filter, and sort functionality on tables
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+☁️ File upload (e.g., customer documents, contract photos)
 
-### Analyzing the Bundle Size
+📦 Available Scripts
+Command	Description
+npm run dev	Start the development server
+npm run build	Build the app for production
+npm run preview	Preview the production build
+npm run test	Run all tests using Vitest
+npm run test:watch	Run tests in watch mode
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+🔧 Backend API
+The frontend expects an API running on http://localhost:5001/api. You can configure this via .env.
 
-### Making a Progressive Web App
+Backend endpoints expected:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+/auth/login
 
-### Advanced Configuration
+/auth/session-check
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+/customers
 
-### Deployment
+/contracts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+/cars
 
-### `npm run build` fails to minify
+/notifications
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+/upload
+
+Please refer to the backend repository for details and setup.
+
+✅ To-Do / Improvements
+ Add role-based access (admin vs user)
+
+ Dark mode toggle
+
+ Offline support (PWA)
+
+ Integration with cloud storage (e.g., S3)
+
+ Unit tests for more components
+
+🤝 Contributing
+Pull requests are welcome. For major changes, open an issue first to discuss what you’d like to change.
+
+📄 License
+MIT
+
+👨‍💻 Author
+Mustafa Sinanović
+GitHub: @mustafa-s-2003
+
