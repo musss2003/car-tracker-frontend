@@ -50,7 +50,6 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
     contractPhoto: '',
   });
 
-
   // UI state
   const [availableCars, setAvailableCars] = useState<Car[]>([]); // array of cars, not a single car
   const [loadingCars, setLoadingCars] = useState<boolean>(false);
@@ -315,7 +314,6 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
 
     setIsSubmitting(true);
     try {
-
       const payload = {
         customer: formData.customer?.id,
         car: formData.car?.id,
@@ -328,7 +326,6 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
       };
 
       await onSave(payload);
-      
     } catch (error) {
       console.error('Error creating contract:', error);
       setErrors((prev) => ({
@@ -566,10 +563,7 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                       </option>
                       {availableCars.length > 0 ? (
                         availableCars.map((car) => (
-                          <option
-                            key={`car-${car.id}`}
-                            value={car.id}
-                          >
+                          <option key={`car-${car.id}`} value={car.id}>
                             {car.manufacturer} {car.model} - {car.license_plate}{' '}
                             (${car.price_per_day}/day)
                           </option>

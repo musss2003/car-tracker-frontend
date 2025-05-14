@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from './contexts/useAuth';
 import useScreenSize from './hooks/useScreenSize';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Sidebar from './components/Sidebar/Sidebar';
 import { AppRoutes } from './routes/AppRoutes';
@@ -47,7 +47,6 @@ function App() {
           }`}
           data-testid="main-content"
         >
-
           {/* Page Content */}
           <div className="page-content">
             <AppRoutes />

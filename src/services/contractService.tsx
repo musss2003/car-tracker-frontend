@@ -38,7 +38,7 @@ export const getContracts = async (): Promise<Contract[]> => {
 export const getContract = async (id: string): Promise<Contract> => {
   const res = await fetch(`${API_URL}${encodeURIComponent(id)}`, {
     method: 'GET',
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 
   if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -154,9 +154,10 @@ const triggerDownloadContract = async (blob: Blob, contractId: string) => {
   const contractData = await getContract(contractId);
 
   console.log(contractData);
-  
-  const contract = (a.download = `contract_${contractData.customer.name.replace(/\s+/g, '_')}_${contractData.car.license_plate}_${new Date(contractData.rentalPeriod.startDate).toISOString().split('T')[0]}_${new Date(contractData.rentalPeriod.endDate).toISOString().split('T')[0]}.docx`);
-  
+
+  const contract =
+    (a.download = `contract_${contractData.customer.name.replace(/\s+/g, '_')}_${contractData.car.license_plate}_${new Date(contractData.rentalPeriod.startDate).toISOString().split('T')[0]}_${new Date(contractData.rentalPeriod.endDate).toISOString().split('T')[0]}.docx`);
+
   document.body.appendChild(a);
   a.click();
   a.remove();
