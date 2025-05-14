@@ -2,7 +2,7 @@
 
 A modern, responsive frontend application for managing car rental contracts, customers, and vehicles. Built with **React**, **TypeScript**, and **Vite**, and styled using **Chakra UI** and **TailwindCSS**.
 
-> This is the **frontend only**. You’ll need to run the [backend repository](#backend-api) alongside it for full functionality.
+> This is the **frontend only**. You’ll need to run the [backend repository](#musss2003/car-tracker-backend) alongside it for full functionality.
 
 ---
 
@@ -147,6 +147,6 @@ MIT
 
 👨‍💻 Author
 Mustafa Sinanović
-GitHub: @mustafa-s-2003
+GitHub: @musss2003
 
 ```

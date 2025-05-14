@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getAvailableCarsForPeriod } from '../../../services/carService';
 import { searchCustomersByName } from '../../../services/customerService';
 import {
@@ -45,10 +45,11 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
     rentalPeriod: { startDate: '', endDate: '' },
     rentalPrice: { dailyRate: 0, totalAmount: 0 },
     status: '',
-    paymentDetails: { paymentMethod: '', paymentStatus: '' },
+    paymentDetails: { paymentMethod: 'cash', paymentStatus: 'paid' },
     additionalNotes: '',
     contractPhoto: '',
   });
+
 
   // UI state
   const [availableCars, setAvailableCars] = useState<Car[]>([]); // array of cars, not a single car
@@ -314,7 +315,20 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
 
     setIsSubmitting(true);
     try {
-      await onSave(formData);
+
+      const payload = {
+        customer: formData.customer?.id,
+        car: formData.car?.id,
+        rentalPeriod: formData.rentalPeriod,
+        rentalPrice: formData.rentalPrice,
+        status: formData.status,
+        paymentDetails: formData.paymentDetails,
+        additionalNotes: formData.additionalNotes,
+        contractPhoto: formData.contractPhoto,
+      };
+
+      await onSave(payload);
+      
     } catch (error) {
       console.error('Error creating contract:', error);
       setErrors((prev) => ({
@@ -552,7 +566,10 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                       </option>
                       {availableCars.length > 0 ? (
                         availableCars.map((car) => (
-                          <option key={`car-${car.id}`} value={car.id}>
+                          <option
+                            key={`car-${car.id}`}
+                            value={car.id}
+                          >
                             {car.manufacturer} {car.model} - {car.license_plate}{' '}
                             (${car.price_per_day}/day)
                           </option>

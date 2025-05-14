@@ -628,6 +628,7 @@
   animation: slideUp 0.3s ease-out;
   scrollbar-width: thin;
   scrollbar-color: #d1d5db #f3f4f6;
+  margin-left: 250px;
 }
 
 .modal-content::-webkit-scrollbar {
@@ -657,11 +658,6 @@
     transform: translateY(0);
     opacity: 1;
   }
-}
-
-.modal-content-large {
-  max-width: 1000px;
-  height: 85vh;
 }
 
 .modal-close {
@@ -1020,12 +1016,7 @@
   .modal-content {
     width: 95%;
     max-height: 90vh;
-  }
-
-  .modal-content-large {
-    height: 90vh;
-    max-height: 90vh;
-    width: 95%;
+    margin-left: 0px;
   }
 
   .calendar-toolbar {
@@ -1053,10 +1044,6 @@
 
   .car-cards-container {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .modal-content-large {
-    width: 90%;
   }
 }
 

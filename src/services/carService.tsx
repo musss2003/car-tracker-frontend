@@ -95,18 +95,14 @@ export const getAvailableCarsForPeriod = async (
 export const getCarAvailability = async (
   licensePlate: string
 ): Promise<BookingEvent[]> => {
-  // Replace with actual API logic when ready
-  return mockAvailability;
-};
+  const response = await fetch(`${API_URL}cars/${licensePlate}/availability`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+  });
 
-const mockAvailability: BookingEvent[] = [
-  {
-    id: '1', // ✅ Add this line
-    start: new Date(2025, 3, 24),
-    end: new Date(2025, 3, 26),
-    title: 'Reserved by Customer A',
-    contractId: '1',
-    customerName: 'Customer A',
-    status: 'confirmed',
-  },
-];
+  if (!response.ok)
+    throw new Error(`Error fetching car availability: ${response.statusText}`);
+
+  return await response.json();
+};

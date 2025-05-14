@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from './contexts/useAuth';
 import useScreenSize from './hooks/useScreenSize';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from 'react-toastify';
 import Sidebar from './components/Sidebar/Sidebar';
-import Navbar from './components/Navbar/Navbar';
-import AppHeader from './components/AppHeader/AppHeader';
 import { AppRoutes } from './routes/AppRoutes';
 import './App.css';
 
@@ -48,15 +47,6 @@ function App() {
           }`}
           data-testid="main-content"
         >
-          {isLoggedIn() && !isSmallScreen && <Navbar />}
-
-          {isSmallScreen && (
-            <AppHeader
-              isLoggedIn={isLoggedIn()}
-              toggleSidebar={toggleSidebar}
-              isSmallScreen={isSmallScreen}
-            />
-          )}
 
           {/* Page Content */}
           <div className="page-content">

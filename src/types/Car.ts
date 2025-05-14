@@ -46,15 +46,14 @@ export interface CarFormErrors {
 }
 
 export interface BookingEvent {
-  id: string;
   title: string;
   start: Date;
   end: Date;
   contractId: string;
   customerName: string;
-  customerPhone?: string;
+  customerPassportNumber?: string;
   totalAmount?: number;
-  status: string;
+  status: 'active' | 'confirmed' | 'completed';
 }
 
 export type Feature =
