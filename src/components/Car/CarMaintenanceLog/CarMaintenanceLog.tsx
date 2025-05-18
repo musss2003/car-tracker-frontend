@@ -1,117 +1,137 @@
-import React, { JSX } from "react"
-import { useState, useEffect, type FC } from "react"
-import { PlusIcon, TrashIcon, ExclamationCircleIcon, ClockIcon } from "@heroicons/react/solid"
-import { maintenanceService } from "../../../services/maintenanceService"
+import React, { JSX } from 'react';
+import { useState, useEffect, type FC } from 'react';
+import {
+  PlusIcon,
+  TrashIcon,
+  ExclamationCircleIcon,
+  ClockIcon,
+} from '@heroicons/react/solid';
+import { maintenanceService } from '../../../services/maintenanceService';
 import { Car } from '../../../types/Car';
-import { MaintenanceFormData, MaintenanceRecord } from "../../../types/Maintenance";
+import {
+  MaintenanceFormData,
+  MaintenanceRecord,
+} from '../../../types/Maintenance';
 
 interface CarMaintenanceLogProps {
   car: Car;
-};
-
+}
 
 const CarMaintenanceLog: FC<CarMaintenanceLogProps> = ({ car }) => {
-  const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [showForm, setShowForm] = useState<boolean>(false)
+  const [maintenanceRecords, setMaintenanceRecords] = useState<
+    MaintenanceRecord[]
+  >([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState<boolean>(false);
   const [formData, setFormData] = useState<MaintenanceFormData>({
-    type: "",
-    mileage: "",
-    date: new Date().toISOString().split("T")[0],
-    description: "",
-    nextDueDate: "",
-    nextDueMileage: "",
-  })
+    type: '',
+    mileage: '',
+    date: new Date().toISOString().split('T')[0],
+    description: '',
+    nextDueDate: '',
+    nextDueMileage: '',
+  });
 
   useEffect(() => {
     if (car && car.license_plate) {
-      fetchMaintenanceRecords()
+      fetchMaintenanceRecords();
     }
-  }, [car])
+  }, [car]);
 
   const fetchMaintenanceRecords = async (): Promise<void> => {
     try {
-      setLoading(true)
-      const records = await maintenanceService.getCarMaintenanceRecords(car.license_plate)
-      setMaintenanceRecords(records)
-      setError(null)
+      setLoading(true);
+      const records = await maintenanceService.getCarMaintenanceRecords(
+        car.license_plate
+      );
+      setMaintenanceRecords(records);
+      setError(null);
     } catch (err) {
-      console.error("Error fetching maintenance records:", err)
-      setError("Failed to load maintenance records. Please try again later.")
+      console.error('Error fetching maintenance records:', err);
+      setError('Failed to load maintenance records. Please try again later.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ): void => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
-    })
-  }
+    });
+  };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault()
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
     try {
-      setLoading(true)
-      await maintenanceService.addMaintenanceRecord(car.license_plate, formData)
+      setLoading(true);
+      await maintenanceService.addMaintenanceRecord(
+        car.license_plate,
+        formData
+      );
       // Reset form
       setFormData({
-        type: "",
-        mileage: "",
-        date: new Date().toISOString().split("T")[0],
-        description: "",
-        nextDueDate: "",
-        nextDueMileage: "",
-      })
-      setShowForm(false)
+        type: '',
+        mileage: '',
+        date: new Date().toISOString().split('T')[0],
+        description: '',
+        nextDueDate: '',
+        nextDueMileage: '',
+      });
+      setShowForm(false);
       // Refresh records
-      await fetchMaintenanceRecords()
+      await fetchMaintenanceRecords();
     } catch (err) {
-      console.error("Error adding maintenance record:", err)
-      setError("Failed to add maintenance record. Please try again.")
+      console.error('Error adding maintenance record:', err);
+      setError('Failed to add maintenance record. Please try again.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async (id: string): Promise<void> => {
-    if (window.confirm("Are you sure you want to delete this maintenance record?")) {
+    if (
+      window.confirm('Are you sure you want to delete this maintenance record?')
+    ) {
       try {
-        setLoading(true)
-        await maintenanceService.deleteMaintenanceRecord(id)
+        setLoading(true);
+        await maintenanceService.deleteMaintenanceRecord(id);
         // Refresh records
-        await fetchMaintenanceRecords()
+        await fetchMaintenanceRecords();
       } catch (err) {
-        console.error("Error deleting maintenance record:", err)
-        setError("Failed to delete maintenance record. Please try again.")
+        console.error('Error deleting maintenance record:', err);
+        setError('Failed to delete maintenance record. Please try again.');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-  }
+  };
 
   const isOverdue = (record: MaintenanceRecord): boolean => {
-    if (!record.nextDueDate) return false
+    if (!record.nextDueDate) return false;
 
-    const today = new Date()
-    const nextDue = new Date(record.nextDueDate)
-    return nextDue < today
-  }
+    const today = new Date();
+    const nextDue = new Date(record.nextDueDate);
+    return nextDue < today;
+  };
 
   const formatDate = (dateString: string | null): string => {
-    if (!dateString) return "N/A"
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
-  }
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
 
   const renderMaintenanceForm = (): JSX.Element => (
     <div className="maintenance-form-container">
@@ -206,7 +226,7 @@ const CarMaintenanceLog: FC<CarMaintenanceLogProps> = ({ car }) => {
               type="number"
               id="cost"
               name="cost"
-              value={formData.cost || ""}
+              value={formData.cost || ''}
               onChange={handleInputChange}
               className="form-input"
               min="0"
@@ -233,19 +253,26 @@ const CarMaintenanceLog: FC<CarMaintenanceLogProps> = ({ car }) => {
           <button type="submit" className="submit-button">
             Save Record
           </button>
-          <button type="button" className="cancel-button" onClick={() => setShowForm(false)}>
+          <button
+            type="button"
+            className="cancel-button"
+            onClick={() => setShowForm(false)}
+          >
             Cancel
           </button>
         </div>
       </form>
     </div>
-  )
+  );
 
   const renderMaintenanceTable = (): JSX.Element => (
     <div className="maintenance-table-container">
       <div className="maintenance-header">
         <h3 className="maintenance-title">Maintenance History</h3>
-        <button className="add-maintenance-button" onClick={() => setShowForm(true)}>
+        <button
+          className="add-maintenance-button"
+          onClick={() => setShowForm(true)}
+        >
           <PlusIcon className="h-5 w-5 mr-1" />
           Add Record
         </button>
@@ -270,7 +297,10 @@ const CarMaintenanceLog: FC<CarMaintenanceLogProps> = ({ car }) => {
             </thead>
             <tbody>
               {maintenanceRecords.map((record) => (
-                <tr key={record.id} className={isOverdue(record) ? "overdue-row" : ""}>
+                <tr
+                  key={record.id}
+                  className={isOverdue(record) ? 'overdue-row' : ''}
+                >
                   <td>{record.type}</td>
                   <td>{formatDate(record.date)}</td>
                   <td>{record.mileage.toLocaleString()} mi</td>
@@ -285,15 +315,21 @@ const CarMaintenanceLog: FC<CarMaintenanceLogProps> = ({ car }) => {
                       <div>
                         <div>{formatDate(record.nextDueDate)}</div>
                         {record.nextDueMileage && (
-                          <div className="next-due-mileage">{record.nextDueMileage.toLocaleString()} mi</div>
+                          <div className="next-due-mileage">
+                            {record.nextDueMileage.toLocaleString()} mi
+                          </div>
                         )}
                       </div>
                     ) : (
-                      "N/A"
+                      'N/A'
                     )}
                   </td>
                   <td>
-                    <button className="delete-button" onClick={() => handleDelete(record.id)} title="Delete record">
+                    <button
+                      className="delete-button"
+                      onClick={() => handleDelete(record.id)}
+                      title="Delete record"
+                    >
                       <TrashIcon className="h-5 w-5" />
                     </button>
                   </td>
@@ -317,20 +353,25 @@ const CarMaintenanceLog: FC<CarMaintenanceLogProps> = ({ car }) => {
         <div className="next-maintenance-info">
           <ClockIcon className="h-5 w-5 mr-2" />
           <span>
-            Next scheduled maintenance: {(() => {
+            Next scheduled maintenance:{' '}
+            {(() => {
               const upcomingMaintenance = maintenanceRecords
                 .filter((r) => r.nextDueDate && !isOverdue(r))
-                .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime())[0]
+                .sort(
+                  (a, b) =>
+                    new Date(a.nextDueDate!).getTime() -
+                    new Date(b.nextDueDate!).getTime()
+                )[0];
 
               return upcomingMaintenance
                 ? `${upcomingMaintenance.type} on ${formatDate(upcomingMaintenance.nextDueDate)}`
-                : "None scheduled"
+                : 'None scheduled';
             })()}
           </span>
         </div>
       )}
     </div>
-  )
+  );
 
   return (
     <div className="car-maintenance-log">
@@ -342,7 +383,7 @@ const CarMaintenanceLog: FC<CarMaintenanceLogProps> = ({ car }) => {
         <>{showForm ? renderMaintenanceForm() : renderMaintenanceTable()}</>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CarMaintenanceLog
+export default CarMaintenanceLog;

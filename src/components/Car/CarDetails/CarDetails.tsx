@@ -5,7 +5,7 @@ import {
   ClipboardListIcon,
 } from '@heroicons/react/solid';
 import './CarDetails.css';
-import CarMaintenanceLog from "../CarMaintenanceLog/CarMaintenanceLog"
+import CarMaintenanceLog from '../CarMaintenanceLog/CarMaintenanceLog';
 import { Car } from '../../../types/Car';
 import { formatCurrency } from '../../../utils/contractUtils';
 import { useState } from 'react';
@@ -23,7 +23,7 @@ const CarDetails: React.FC<CarDetailsProps> = ({
   onEdit,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState("details")
+  const [activeTab, setActiveTab] = useState('details');
 
   return (
     <div className="car-details">
@@ -31,7 +31,9 @@ const CarDetails: React.FC<CarDetailsProps> = ({
         <h2 className="car-details-title">
           {car.manufacturer} {car.model}
         </h2>
-        <div className={`car-status ${isBusy ? "car-status-busy" : "car-status-available"}`}>
+        <div
+          className={`car-status ${isBusy ? 'car-status-busy' : 'car-status-available'}`}
+        >
           {isBusy ? (
             <>
               <ExclamationCircleIcon className="h-5 w-5 mr-1" />
@@ -48,7 +50,11 @@ const CarDetails: React.FC<CarDetailsProps> = ({
 
       <div className="car-image-container">
         {car.image ? (
-          <img src={car.image || "/placeholder.svg"} alt={`${car.manufacturer} ${car.model}`} className="car-image" />
+          <img
+            src={car.image || '/placeholder.svg'}
+            alt={`${car.manufacturer} ${car.model}`}
+            className="car-image"
+          />
         ) : (
           <div className="car-image-placeholder">
             <span>No Image Available</span>
@@ -59,14 +65,14 @@ const CarDetails: React.FC<CarDetailsProps> = ({
       {/* Tabs Navigation */}
       <div className="car-details-tabs">
         <button
-          className={`tab-button ${activeTab === "details" ? "active" : ""}`}
-          onClick={() => setActiveTab("details")}
+          className={`tab-button ${activeTab === 'details' ? 'active' : ''}`}
+          onClick={() => setActiveTab('details')}
         >
           Vehicle Details
         </button>
         <button
-          className={`tab-button ${activeTab === "maintenance" ? "active" : ""}`}
-          onClick={() => setActiveTab("maintenance")}
+          className={`tab-button ${activeTab === 'maintenance' ? 'active' : ''}`}
+          onClick={() => setActiveTab('maintenance')}
         >
           <ClipboardListIcon className="h-5 w-5 mr-1" />
           Maintenance Log
@@ -74,7 +80,7 @@ const CarDetails: React.FC<CarDetailsProps> = ({
       </div>
 
       {/* Tab Content */}
-      {activeTab === "details" ? (
+      {activeTab === 'details' ? (
         <div className="car-details-content">
           <div className="car-details-section">
             <h3 className="section-title">Vehicle Information</h3>
@@ -94,8 +100,13 @@ const CarDetails: React.FC<CarDetailsProps> = ({
               <div className="detail-item">
                 <span className="detail-label">Color</span>
                 <div className="color-display">
-                  {car.color && <div className="color-swatch" style={{ backgroundColor: car.color }}></div>}
-                  <span>{car.color || "N/A"}</span>
+                  {car.color && (
+                    <div
+                      className="color-swatch"
+                      style={{ backgroundColor: car.color }}
+                    ></div>
+                  )}
+                  <span>{car.color || 'N/A'}</span>
                 </div>
               </div>
               <div className="detail-item">
@@ -104,7 +115,11 @@ const CarDetails: React.FC<CarDetailsProps> = ({
               </div>
               <div className="detail-item">
                 <span className="detail-label">Price per Day</span>
-                <span className="detail-value">{car.price_per_day ? formatCurrency(Number(car.price_per_day)) : "N/A"}</span>
+                <span className="detail-value">
+                  {car.price_per_day
+                    ? formatCurrency(Number(car.price_per_day))
+                    : 'N/A'}
+                </span>
               </div>
             </div>
           </div>
