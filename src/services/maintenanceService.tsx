@@ -135,7 +135,7 @@ export const maintenanceService = {
       console.error('Error in getAllMaintenanceRecords:', error);
       throw error;
     }
-  }
+  },
 };
 
 export default maintenanceService;

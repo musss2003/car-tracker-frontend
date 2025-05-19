@@ -6,10 +6,10 @@ const MaintenancePage = () => {
   return (
     <div className="main-content">
       <div className="page-content">
-          <MaintenanceDashboard />
+        <MaintenanceDashboard />
       </div>
     </div>
-  )
+  );
 };
 
 export default MaintenancePage;
