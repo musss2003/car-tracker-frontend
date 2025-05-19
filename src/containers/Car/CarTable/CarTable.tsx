@@ -440,7 +440,18 @@ const CarTable: React.FC<CarTableProps> = ({
               {car.color && (
                 <div
                   className="color-dot"
-                  style={{ backgroundColor: car.color }}
+                  style={{
+                  backgroundColor: car.color
+                    ? {
+                      crvena: 'red',
+                      plava: 'blue',
+                      zelena: 'green',
+                      žuta: 'yellow',
+                      crna: 'black',
+                      bijela: 'white',
+                    }[car.color.toLowerCase()] || 'gray'
+                    : 'gray',
+                  }}
                 ></div>
               )}
               <span>{car.color || 'N/A'}</span>

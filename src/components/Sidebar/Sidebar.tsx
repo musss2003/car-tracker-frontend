@@ -88,6 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       items: [
         { to: '/contracts', icon: <ClipboardListIcon />, label: 'Ugovori' },
         { to: '/customers', icon: <UserCircleIcon />, label: 'Korisnici' },
+        { to: '/maintenance', icon: <ClipboardListIcon />, label: 'Održavanje' },
       ],
     },
     {

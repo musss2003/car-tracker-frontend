@@ -76,8 +76,6 @@ function DashboardPage() {
   const numberOfContracts = contracts.length;
   const totalRevenue = revenueData;
 
-  console.log(totalRevenue);
-
   // Mock data for charts and trends
   const monthlyRevenue = [
     12500,

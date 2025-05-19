@@ -16,6 +16,7 @@ import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../contexts/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
 import DashboardPage from '../pages/DashboardPage/DashboardPage';
+import MaintenancePage from '../pages/MaintenancePage';
 
 export function AppRoutes() {
   const { isLoggedIn, user } = useAuth();
@@ -40,6 +41,7 @@ export function AppRoutes() {
           <Route path="/contracts" element={<ContractsPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/maintenance" element={<MaintenancePage />} />
           {user && (
             <Route path="/profile" element={<UserProfile id={user.id} />} />
           )}

@@ -4,6 +4,8 @@ import type {
   MaintenanceRecordWithCar,
 } from '../types/Maintenance';
 
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+
 /**
  * Service for handling car maintenance-related API calls
  */
@@ -17,7 +19,9 @@ export const maintenanceService = {
     licensePlate: string
   ): Promise<MaintenanceRecord[]> {
     try {
-      const response = await fetch(`/api/cars/${licensePlate}/maintenance`);
+      const response = await fetch(
+        API_URL + `/api/cars/${licensePlate}/maintenance`
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -40,11 +44,10 @@ export const maintenanceService = {
    * @returns Promise with the created maintenance record
    */
   async addMaintenanceRecord(
-    licensePlate: string,
     maintenanceData: MaintenanceFormData
   ): Promise<MaintenanceRecord> {
     try {
-      const response = await fetch(`/api/cars/${licensePlate}/maintenance`, {
+      const response = await fetch(API_URL + `/api/cars/maintenance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +76,7 @@ export const maintenanceService = {
    */
   async deleteMaintenanceRecord(id: string): Promise<{ message: string }> {
     try {
-      const response = await fetch(`/api/maintenance/${id}`, {
+      const response = await fetch(API_URL + `/api/cars/maintenance/${id}`, {
         method: 'DELETE',
       });
 
@@ -97,7 +100,7 @@ export const maintenanceService = {
    */
   async getUpcomingMaintenance(): Promise<MaintenanceRecordWithCar[]> {
     try {
-      const response = await fetch('/api/maintenance/upcoming');
+      const response = await fetch(API_URL + '/api/cars/maintenance/upcoming');
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -112,6 +115,27 @@ export const maintenanceService = {
       throw error;
     }
   },
+  /**
+   * Get all maintenance records
+   * @returns Promise with array of all maintenance records
+   */
+  async getAllMaintenanceRecords(): Promise<MaintenanceRecordWithCar[]> {
+    try {
+      const response = await fetch(API_URL + '/api/cars/maintenance/all');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || 'Failed to fetch all maintenance records'
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error in getAllMaintenanceRecords:', error);
+      throw error;
+    }
+  }
 };
 
 export default maintenanceService;

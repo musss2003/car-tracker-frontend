@@ -34,7 +34,6 @@ export interface MaintenanceFormData {
   mileage: string;
   date: string;
   description: string;
-  nextDueDate: string;
   nextDueMileage: string;
   cost?: string;
   performedBy?: string;
