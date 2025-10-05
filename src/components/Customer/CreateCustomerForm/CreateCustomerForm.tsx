@@ -24,12 +24,18 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 }) => {
   // Form state
   const [formData, setFormData] = useState<Customer>({
+    id: '',
     name: '',
-    driver_license_number: '',
-    passport_number: '',
+    driverLicenseNumber: '',
+    passportNumber: '',
     email: '',
-    phone_number: '',
+    phoneNumber: '',
     address: '',
+    countryOfOrigin: '',
+    drivingLicensePhotoUrl: '',
+    passportPhotoUrl: '',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
   // Validation state
@@ -57,13 +63,14 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
       newErrors.name = 'Name is required';
     }
 
-    // At least one identification
-    if (
-      !formData.driver_license_number?.trim() &&
-      !formData.passport_number?.trim()
-    ) {
-      newErrors.driver_license_number =
-        'Either driver license or passport number is required';
+    // Required driver license number
+    if (!formData.driverLicenseNumber?.trim()) {
+      newErrors.driverLicenseNumber = 'Driver license number is required';
+    }
+
+    // Required passport number
+    if (!formData.passportNumber?.trim()) {
+      newErrors.passportNumber = 'Passport number is required';
     }
 
     // Email validation
@@ -73,10 +80,10 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 
     // Phone validation
     if (
-      formData.phone_number &&
-      !/^\+?[0-9\s-()]{7,}$/.test(formData.phone_number)
+      formData.phoneNumber &&
+      !/^\+?[0-9\s-()]{7,}$/.test(formData.phoneNumber)
     ) {
-      newErrors.phone_number = 'Please enter a valid phone number';
+      newErrors.phoneNumber = 'Please enter a valid phone number';
     }
 
     setErrors(newErrors);
@@ -150,46 +157,46 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
             <div className="form-row">
               <div
                 className={`form-field ${
-                  errors.driver_license_number ? 'has-error' : ''
+                  errors.driverLicenseNumber ? 'has-error' : ''
                 }`}
               >
-                <label htmlFor="driver_license_number">
-                  Driver License Number
+                <label htmlFor="driverLicenseNumber">
+                  Driver License Number <span className="required-mark">*</span>
                 </label>
                 <input
                   type="text"
-                  id="driver_license_number"
-                  name="driver_license_number"
-                  value={formData.driver_license_number}
+                  id="driverLicenseNumber"
+                  name="driverLicenseNumber"
+                  value={formData.driverLicenseNumber}
                   onChange={handleChange}
                   placeholder="Enter driver license number"
                 />
-                {errors.driver_license_number && (
+                {errors.driverLicenseNumber && (
                   <div className="field-error">
                     <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.driver_license_number}</span>
+                    <span>{errors.driverLicenseNumber}</span>
                   </div>
                 )}
               </div>
 
               <div
                 className={`form-field ${
-                  errors.passport_number ? 'has-error' : ''
+                  errors.passportNumber ? 'has-error' : ''
                 }`}
               >
-                <label htmlFor="passport_number">Passport Number</label>
+                <label htmlFor="passportNumber">Passport Number <span className="required-mark">*</span></label>
                 <input
                   type="text"
-                  id="passport_number"
-                  name="passport_number"
-                  value={formData.passport_number}
+                  id="passportNumber"
+                  name="passportNumber"
+                  value={formData.passportNumber}
                   onChange={handleChange}
                   placeholder="Enter passport number"
                 />
-                {errors.passport_number && (
+                {errors.passportNumber && (
                   <div className="field-error">
                     <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.passport_number}</span>
+                    <span>{errors.passportNumber}</span>
                   </div>
                 )}
               </div>
@@ -217,20 +224,20 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                 )}
               </div>
 
-              <div className={`form-field ${errors.phone ? 'has-error' : ''}`}>
-                <label htmlFor="phone">Phone Number</label>
+              <div className={`form-field ${errors.phoneNumber ? 'has-error' : ''}`}>
+                <label htmlFor="phoneNumber">Phone Number</label>
                 <input
                   type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone_number}
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
                   onChange={handleChange}
                   placeholder="Enter phone number"
                 />
-                {errors.phone && (
+                {errors.phoneNumber && (
                   <div className="field-error">
                     <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.phone}</span>
+                    <span>{errors.phoneNumber}</span>
                   </div>
                 )}
               </div>
@@ -246,6 +253,20 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                   onChange={handleChange}
                   placeholder="Enter customer's address"
                   rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-field">
+                <label htmlFor="countryOfOrigin">Country of Origin</label>
+                <input
+                  type="text"
+                  id="countryOfOrigin"
+                  name="countryOfOrigin"
+                  value={formData.countryOfOrigin}
+                  onChange={handleChange}
+                  placeholder="Enter country of origin"
                 />
               </div>
             </div>

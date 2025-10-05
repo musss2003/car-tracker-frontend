@@ -30,12 +30,15 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
     id: '',
     name: '',
     email: '',
-    phone_number: '',
+    phoneNumber: '',
     address: '',
-    driver_license_number: '',
-    passport_number: '',
+    driverLicenseNumber: '',
+    passportNumber: '',
+    countryOfOrigin: '',
     drivingLicensePhotoUrl: '',
     passportPhotoUrl: '',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
   // Original data for comparison
@@ -50,16 +53,19 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
   // Initialize form data from customer prop
   useEffect(() => {
     if (customer) {
-      const initialData = {
+      const initialData: Customer = {
         id: customer.id || '',
         name: customer.name || '',
         email: customer.email || '',
-        phone: customer.phone_number || customer.phone_number || '',
+        phoneNumber: customer.phoneNumber || '',
         address: customer.address || '',
-        driver_license_number: customer.driver_license_number || '',
-        passport_number: customer.passport_number || '',
+        driverLicenseNumber: customer.driverLicenseNumber || '',
+        passportNumber: customer.passportNumber || '',
+        countryOfOrigin: customer.countryOfOrigin || '',
         drivingLicensePhotoUrl: customer.drivingLicensePhotoUrl || '',
         passportPhotoUrl: customer.passportPhotoUrl || '',
+        createdAt: customer.createdAt || new Date(),
+        updatedAt: customer.updatedAt || new Date(),
       };
 
       setFormData(initialData);
@@ -92,12 +98,14 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
       newErrors.name = 'Name is required';
     }
 
-    // At least one identification is required
-    if (!formData.driver_license_number && !formData.passport_number) {
-      newErrors.driver_license_number =
-        'Either driver license or passport number is required';
-      newErrors.passport_number =
-        'Either driver license or passport number is required';
+    // Required driver license number
+    if (!formData.driverLicenseNumber?.trim()) {
+      newErrors.driverLicenseNumber = 'Driver license number is required';
+    }
+
+    // Required passport number
+    if (!formData.passportNumber?.trim()) {
+      newErrors.passportNumber = 'Passport number is required';
     }
 
     // Email validation
@@ -107,10 +115,10 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
 
     // Phone validation
     if (
-      formData.phone_number &&
-      !/^\+?[0-9\s-()]{7,}$/.test(formData.phone_number)
+      formData.phoneNumber &&
+      !/^\+?[0-9\s-()]{7,}$/.test(formData.phoneNumber)
     ) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phoneNumber = 'Please enter a valid phone number';
     }
 
     // URL validation for photos
@@ -244,7 +252,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
               >
                 <label htmlFor="driver_license_number">
                   Driver License Number
-                  {!formData.passport_number && (
+                  {!formData.passportNumber && (
                     <span className="required-mark">*</span>
                   )}
                 </label>
@@ -252,7 +260,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                   type="text"
                   id="driver_license_number"
                   name="driver_license_number"
-                  value={formData.driver_license_number}
+                  value={formData.driverLicenseNumber}
                   onChange={handleChange}
                   placeholder="Enter driver license number"
                 />
@@ -271,7 +279,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
               >
                 <label htmlFor="passport_number">
                   Passport Number
-                  {!formData.driver_license_number && (
+                  {!formData.driverLicenseNumber && (
                     <span className="required-mark">*</span>
                   )}
                 </label>
@@ -279,7 +287,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                   type="text"
                   id="passport_number"
                   name="passport_number"
-                  value={formData.passport_number}
+                  value={formData.passportNumber}
                   onChange={handleChange}
                   placeholder="Enter passport number"
                 />
@@ -323,7 +331,7 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                   type="tel"
                   id="phone"
                   name="phone"
-                  value={formData.phone_number}
+                  value={formData.phoneNumber}
                   onChange={handleChange}
                   placeholder="Enter phone number"
                 />

@@ -39,12 +39,23 @@
   color: #111827;
 }
 
-.customer-created-date {
+.customer-timestamps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.customer-created-date,
+.customer-updated-date {
   display: flex;
   align-items: center;
   gap: 0.375rem;
   font-size: 0.75rem;
   color: #6b7280;
+}
+
+.customer-updated-date {
+  color: #9ca3af;
 }
 
 .icon-small {

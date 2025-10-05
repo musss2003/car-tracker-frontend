@@ -113,12 +113,20 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
       <div className="details-header">
         <div className="header-content">
           <h2 className="details-title">Customer Details</h2>
-          {customer.createdAt && (
-            <div className="customer-created-date">
-              <ClockIcon className="icon-small" />
-              <span>Added on {formatDate(customer.createdAt)}</span>
-            </div>
-          )}
+          <div className="customer-timestamps">
+            {customer.createdAt && (
+              <div className="customer-created-date">
+                <ClockIcon className="icon-small" />
+                <span>Added on {formatDate(customer.createdAt)}</span>
+              </div>
+            )}
+            {customer.updatedAt && customer.updatedAt !== customer.createdAt && (
+              <div className="customer-updated-date">
+                <ClockIcon className="icon-small" />
+                <span>Updated on {formatDate(customer.updatedAt)}</span>
+              </div>
+            )}
+          </div>
         </div>
         <button className="close-button" onClick={onClose}>
           <XIcon className="icon" />
@@ -207,7 +215,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                   <div className="info-content">
                     <span className="info-label">Phone</span>
                     <span className="info-value">
-                      {getValue(customer.phone_number || customer.phone_number)}
+                      {getValue(customer.phoneNumber)}
                     </span>
                   </div>
                 </div>
@@ -220,6 +228,17 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                     </span>
                   </div>
                 </div>
+                {customer.countryOfOrigin && (
+                  <div className="info-item">
+                    <LocationMarkerIcon className="info-icon" />
+                    <div className="info-content">
+                      <span className="info-label">Country of Origin</span>
+                      <span className="info-value">
+                        {getValue(customer.countryOfOrigin)}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -237,7 +256,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                   <div className="info-content">
                     <span className="info-label">Driver License</span>
                     <span className="info-value">
-                      {getValue(customer.driver_license_number)}
+                      {getValue(customer.driverLicenseNumber)}
                     </span>
                   </div>
                 </div>
@@ -246,7 +265,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                   <div className="info-content">
                     <span className="info-label">Passport Number</span>
                     <span className="info-value">
-                      {getValue(customer.passport_number)}
+                      {getValue(customer.passportNumber)}
                     </span>
                   </div>
                 </div>

@@ -31,7 +31,9 @@ export const getCustomers = async (): Promise<Customer[]> => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const errorData = await response.json();
+      console.error('Error fetching customers:', errorData.message || `HTTP error! Status: ${response.status}`);
+      throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
     }
 
     return await response.json();
@@ -121,6 +123,8 @@ export const addCustomer = async (
       },
       body: JSON.stringify(newCustomer),
     });
+
+    console.log(newCustomer)
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

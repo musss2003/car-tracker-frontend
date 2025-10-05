@@ -40,7 +40,6 @@ const CustomersTable = () => {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -63,11 +62,8 @@ const CustomersTable = () => {
         setLoading(true);
         const response = await getCustomers();
         setCustomers(response);
-        setError(null);
       } catch (err) {
-        console.error('Failed to fetch customers:', err);
-        setError('Failed to load customers. Please try again later.');
-        toast.error('Failed to load customers');
+        console.error("Failed to load customers!");
       } finally {
         setLoading(false);
       }
@@ -87,13 +83,17 @@ const CustomersTable = () => {
         (customer) =>
           (customer.name &&
             customer.name.toLowerCase().includes(lowerSearchTerm)) ||
-          (customer.driver_license_number &&
-            customer.driver_license_number.includes(searchTerm)) ||
-          (customer.passport_number &&
-            customer.passport_number.includes(searchTerm)) ||
+          (customer.driverLicenseNumber &&
+            customer.driverLicenseNumber.toLowerCase().includes(lowerSearchTerm)) ||
+          (customer.passportNumber &&
+            customer.passportNumber.toLowerCase().includes(lowerSearchTerm)) ||
           (customer.email &&
             customer.email.toLowerCase().includes(lowerSearchTerm)) ||
-          (customer.phone_number && customer.phone_number.includes(searchTerm))
+          (customer.phoneNumber && customer.phoneNumber.toLowerCase().includes(lowerSearchTerm)) ||
+          (customer.address &&
+            customer.address.toLowerCase().includes(lowerSearchTerm)) ||
+          (customer.countryOfOrigin &&
+            customer.countryOfOrigin.toLowerCase().includes(lowerSearchTerm))
       );
     }
 
@@ -166,10 +166,10 @@ const CustomersTable = () => {
       await deleteCustomer(id);
       setCustomers(customers.filter((c) => c.id !== id));
       setSelectedCustomer(null);
-      toast.success('Customer deleted successfully');
+      toast.success('Korisnik uspješno izbrisan');
     } catch (error) {
       console.error('Error deleting customer:', error);
-      toast.error('Failed to delete customer');
+      toast.error('Neuspješno izbrisan korisnik');
     } finally {
       setLoading(false);
     }
@@ -184,10 +184,10 @@ const CustomersTable = () => {
       );
       setCustomers(customers.map((c) => (c.id === response.id ? response : c)));
       setIsEditing(false);
-      toast.success('Customer updated successfully');
+      toast.success('Korisnik uspješno ažuriran!');
     } catch (error) {
       console.error('Error updating customer:', error);
-      toast.error('Failed to update customer');
+      toast.error('Neuspješno ažuriranje korisnika!');
     } finally {
       setLoading(false);
     }
@@ -199,10 +199,10 @@ const CustomersTable = () => {
       const response = await addCustomer(newCustomer);
       setCustomers([...customers, response]);
       setIsCreating(false);
-      toast.success('Customer added successfully');
+      toast.success('Korisnici uspješno dodani!');
     } catch (error) {
       console.error('Error creating customer:', error);
-      toast.error('Failed to add customer');
+      toast.error('Neuspješno dodavanje korisnika!');
     } finally {
       setLoading(false);
     }
@@ -230,20 +230,22 @@ const CustomersTable = () => {
 
       const worksheetData = filteredAndSortedCustomers.map((customer) => ({
         Name: customer.name || 'N/A',
-        'Driver License': customer.driver_license_number || 'N/A',
-        'Passport Number': customer.passport_number || 'N/A',
+        'Driver License': customer.driverLicenseNumber || 'N/A',
+        'Passport Number': customer.passportNumber || 'N/A',
         Email: customer.email || 'N/A',
-        Phone: customer.phone_number || 'N/A',
+        Phone: customer.phoneNumber || 'N/A',
         Address: customer.address || 'N/A',
+        'Country of Origin': customer.countryOfOrigin || 'N/A',
+        'Created At': customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A',
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Customers');
       XLSX.writeFile(workbook, 'customers.xlsx');
-      toast.success('Excel exported successfully');
+      toast.success('Excel uspješno izvezen');
     } catch (error) {
       console.error('Error exporting to Excel:', error);
-      toast.error('Failed to export Excel');
+      toast.error('Excel neuspješno izvezen');
     }
   };
 
@@ -350,14 +352,6 @@ const CustomersTable = () => {
         </div>
       </div>
 
-      {/* Error message */}
-      {error && (
-        <div className="error-message">
-          <ExclamationCircleIcon className="error-icon" />
-          {error}
-        </div>
-      )}
-
       {/* Loading indicator */}
       {loading && (
         <div className="loading-indicator">
@@ -387,10 +381,11 @@ const CustomersTable = () => {
             <thead className="customer-table-header">
               <tr>
                 {renderTableHeader('Name', 'name')}
-                {renderTableHeader('Driver License', 'driver_license_number')}
-                {renderTableHeader('Passport Number', 'passport_number')}
+                {renderTableHeader('Driver License', 'driverLicenseNumber')}
+                {renderTableHeader('Passport Number', 'passportNumber')}
                 {renderTableHeader('Email', 'email')}
-                {renderTableHeader('Phone', 'phone_number')}
+                {renderTableHeader('Phone', 'phoneNumber')}
+                {renderTableHeader('Country', 'countryOfOrigin')}
                 <th className="customer-table-heading actions-column">
                   Actions
                 </th>
@@ -411,16 +406,19 @@ const CustomersTable = () => {
                       </div>
                     </td>
                     <td className="customer-table-cell">
-                      {customer.driver_license_number || 'N/A'}
+                      {customer.driverLicenseNumber || 'N/A'}
                     </td>
                     <td className="customer-table-cell">
-                      {customer.passport_number || 'N/A'}
+                      {customer.passportNumber || 'N/A'}
                     </td>
                     <td className="customer-table-cell">
                       {customer.email || 'N/A'}
                     </td>
                     <td className="customer-table-cell">
-                      {customer.phone_number || 'N/A'}
+                      {customer.phoneNumber || 'N/A'}
+                    </td>
+                    <td className="customer-table-cell">
+                      {customer.countryOfOrigin || 'N/A'}
                     </td>
                     <td className="customer-table-cell actions-cell">
                       <div className="action-buttons">
