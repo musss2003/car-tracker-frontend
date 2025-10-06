@@ -247,10 +247,10 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
             <div className="form-row">
               <div
                 className={`form-field ${
-                  errors.driver_license_number ? 'has-error' : ''
+                  errors.driverLicenseNumber ? 'has-error' : ''
                 }`}
               >
-                <label htmlFor="driver_license_number">
+                <label htmlFor="driverLicenseNumber">
                   Driver License Number
                   {!formData.passportNumber && (
                     <span className="required-mark">*</span>
@@ -258,26 +258,26 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                 </label>
                 <input
                   type="text"
-                  id="driver_license_number"
-                  name="driver_license_number"
+                  id="driverLicenseNumber"
+                  name="driverLicenseNumber"
                   value={formData.driverLicenseNumber}
                   onChange={handleChange}
                   placeholder="Enter driver license number"
                 />
-                {errors.driver_license_number && (
+                {errors.driverLicenseNumber && (
                   <div className="field-error">
                     <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.driver_license_number}</span>
+                    <span>{errors.driverLicenseNumber}</span>
                   </div>
                 )}
               </div>
 
               <div
                 className={`form-field ${
-                  errors.passport_number ? 'has-error' : ''
+                  errors.passportNumber ? 'has-error' : ''
                 }`}
               >
-                <label htmlFor="passport_number">
+                <label htmlFor="passportNumber">
                   Passport Number
                   {!formData.driverLicenseNumber && (
                     <span className="required-mark">*</span>
@@ -285,16 +285,16 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                 </label>
                 <input
                   type="text"
-                  id="passport_number"
-                  name="passport_number"
+                  id="passportNumber"
+                  name="passportNumber"
                   value={formData.passportNumber}
                   onChange={handleChange}
                   placeholder="Enter passport number"
                 />
-                {errors.passport_number && (
+                {errors.passportNumber && (
                   <div className="field-error">
                     <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.passport_number}</span>
+                    <span>{errors.passportNumber}</span>
                   </div>
                 )}
               </div>
@@ -325,20 +325,20 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                 )}
               </div>
 
-              <div className={`form-field ${errors.phone ? 'has-error' : ''}`}>
-                <label htmlFor="phone">Phone Number</label>
+              <div className={`form-field ${errors.phoneNumber ? 'has-error' : ''}`}>
+                <label htmlFor="phoneNumber">Phone Number</label>
                 <input
                   type="tel"
-                  id="phone"
-                  name="phone"
+                  id="phoneNumber"
+                  name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   placeholder="Enter phone number"
                 />
-                {errors.phone && (
+                {errors.phoneNumber && (
                   <div className="field-error">
                     <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.phone}</span>
+                    <span>{errors.phoneNumber}</span>
                   </div>
                 )}
               </div>
@@ -357,6 +357,23 @@ const EditCustomerForm: React.FC<EditCarFormProps> = ({
                   onChange={handleChange}
                   placeholder="Enter customer's address"
                   rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-field">
+                <label htmlFor="countryOfOrigin">
+                  <LocationMarkerIcon className="field-icon" />
+                  Country of Origin
+                </label>
+                <input
+                  type="text"
+                  id="countryOfOrigin"
+                  name="countryOfOrigin"
+                  value={formData.countryOfOrigin}
+                  onChange={handleChange}
+                  placeholder="Enter country of origin"
                 />
               </div>
             </div>

@@ -155,7 +155,7 @@ const CustomersTable = () => {
 
   const handleDelete = async (id: string) => {
     const confirmDelete = window.confirm(
-      'Are you sure you want to delete this customer?'
+      'Jeste li sigurni da želite izbrisati ovog korisnika?'
     );
     if (!confirmDelete) {
       return;
@@ -229,19 +229,19 @@ const CustomersTable = () => {
       const workbook = XLSX.utils.book_new();
 
       const worksheetData = filteredAndSortedCustomers.map((customer) => ({
-        Name: customer.name || 'N/A',
-        'Driver License': customer.driverLicenseNumber || 'N/A',
-        'Passport Number': customer.passportNumber || 'N/A',
-        Email: customer.email || 'N/A',
-        Phone: customer.phoneNumber || 'N/A',
-        Address: customer.address || 'N/A',
-        'Country of Origin': customer.countryOfOrigin || 'N/A',
-        'Created At': customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A',
+        'Ime': customer.name || 'N/A',
+        'Vozačka dozvola': customer.driverLicenseNumber || 'N/A',
+        'Broj pasoša': customer.passportNumber || 'N/A',
+        'Email': customer.email || 'N/A',
+        'Telefon': customer.phoneNumber || 'N/A',
+        'Adresa': customer.address || 'N/A',
+        'Zemlja porijekla': customer.countryOfOrigin || 'N/A',
+        'Datum kreiranja': customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A',
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Customers');
-      XLSX.writeFile(workbook, 'customers.xlsx');
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Korisnici');
+      XLSX.writeFile(workbook, 'korisnici.xlsx');
       toast.success('Excel uspješno izvezen');
     } catch (error) {
       console.error('Error exporting to Excel:', error);
@@ -321,12 +321,12 @@ const CustomersTable = () => {
         <div className="left-controls">
           <button className="create-btn" onClick={() => setIsCreating(true)}>
             <UserAddIcon className="btn-icon" />
-            Add New Customer
+            Dodaj novog korisnika
           </button>
 
           <button className="export-btn" onClick={exportToExcel}>
             <DownloadIcon className="btn-icon" />
-            Export to Excel
+            Izvezi u Excel
           </button>
         </div>
 
@@ -335,7 +335,7 @@ const CustomersTable = () => {
             <SearchIcon className="search-icon" />
             <input
               type="text"
-              placeholder="Search customers..."
+              placeholder="Pretraži korisnike..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -356,7 +356,7 @@ const CustomersTable = () => {
       {loading && (
         <div className="loading-indicator">
           <div className="spinner"></div>
-          <span>Loading customers...</span>
+          <span>Učitavanje korisnika...</span>
         </div>
       )}
 
@@ -366,10 +366,10 @@ const CustomersTable = () => {
           <div className="empty-icon-container">
             <UserAddIcon className="empty-icon" />
           </div>
-          <h3>No Customers Found</h3>
-          <p>Get started by adding your first customer</p>
+          <h3>Nema pronađenih korisnika</h3>
+          <p>Počnite dodavanjem vašeg prvog korisnika</p>
           <button className="create-btn" onClick={() => setIsCreating(true)}>
-            Add New Customer
+            Dodaj novog korisnika
           </button>
         </div>
       )}
@@ -380,14 +380,14 @@ const CustomersTable = () => {
           <table className="customer-table">
             <thead className="customer-table-header">
               <tr>
-                {renderTableHeader('Name', 'name')}
-                {renderTableHeader('Driver License', 'driverLicenseNumber')}
-                {renderTableHeader('Passport Number', 'passportNumber')}
+                {renderTableHeader('Ime', 'name')}
+                {renderTableHeader('Vozačka dozvola', 'driverLicenseNumber')}
+                {renderTableHeader('Broj pasoša', 'passportNumber')}
                 {renderTableHeader('Email', 'email')}
-                {renderTableHeader('Phone', 'phoneNumber')}
-                {renderTableHeader('Country', 'countryOfOrigin')}
+                {renderTableHeader('Telefon', 'phoneNumber')}
+                {renderTableHeader('Zemlja', 'countryOfOrigin')}
                 <th className="customer-table-heading actions-column">
-                  Actions
+                  Akcije
                 </th>
               </tr>
             </thead>
@@ -428,8 +428,8 @@ const CustomersTable = () => {
                             e.stopPropagation();
                             setSelectedCustomer(customer);
                           }}
-                          title="View Details"
-                          aria-label="View customer details"
+                          title="Prikaži detalje"
+                          aria-label="Prikaži detalje korisnika"
                         >
                           <EyeIcon className="action-icon" />
                         </button>
@@ -439,8 +439,8 @@ const CustomersTable = () => {
                             e.stopPropagation();
                             handleEdit(customer);
                           }}
-                          title="Edit Customer"
-                          aria-label="Edit customer"
+                          title="Uredi korisnika"
+                          aria-label="Uredi korisnika"
                         >
                           <PencilIcon className="action-icon" />
                         </button>
@@ -450,8 +450,8 @@ const CustomersTable = () => {
                             e.stopPropagation();
                             handleDelete(customer.id ?? '');
                           }}
-                          title="Delete Customer"
-                          aria-label="Delete customer"
+                          title="Izbriši korisnika"
+                          aria-label="Izbriši korisnika"
                         >
                           <TrashIcon className="action-icon" />
                         </button>
@@ -462,7 +462,7 @@ const CustomersTable = () => {
               ) : (
                 <tr>
                   <td colSpan={6} className="empty-table-message">
-                    No customers match your search criteria
+                    Nema korisnika koji odgovaraju vašim kriterijima pretrage
                   </td>
                 </tr>
               )}
@@ -475,12 +475,12 @@ const CustomersTable = () => {
       {filteredAndSortedCustomers.length > 0 && (
         <div className="pagination">
           <div className="pagination-info">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            Prikazano {(currentPage - 1) * itemsPerPage + 1} do{' '}
             {Math.min(
               currentPage * itemsPerPage,
               filteredAndSortedCustomers.length
             )}{' '}
-            of {filteredAndSortedCustomers.length} customers
+            od {filteredAndSortedCustomers.length} korisnika
           </div>
 
           <div className="pagination-controls">
@@ -489,7 +489,7 @@ const CustomersTable = () => {
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
             >
-              First
+              Prva
             </button>
             <button
               className="pagination-btn"
@@ -500,7 +500,7 @@ const CustomersTable = () => {
             </button>
 
             <span className="pagination-page">
-              Page {currentPage} of {totalPages}
+              Stranica {currentPage} od {totalPages}
             </span>
 
             <button
@@ -517,12 +517,12 @@ const CustomersTable = () => {
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
             >
-              Last
+              Zadnja
             </button>
           </div>
 
           <div className="items-per-page">
-            <label htmlFor="itemsPerPage">Items per page:</label>
+            <label htmlFor="itemsPerPage">Stavki po stranici:</label>
             <select
               id="itemsPerPage"
               value={itemsPerPage}

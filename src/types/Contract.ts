@@ -1,12 +1,8 @@
+import { Customer } from './Customer';
+
 export interface Contract {
   id?: string; // optional for newly created contracts before save
-  customer: {
-    id?: string;
-    name: string;
-    passport_number: string;
-    driver_license_number: string;
-    address?: string;
-  };
+  customer: Customer;
   car: {
     id: string;
     manufacturer: string;

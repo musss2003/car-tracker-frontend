@@ -341,13 +341,7 @@ const EditContractForm: React.FC<EditContractFormProps> = ({
       // Build full contract from formData
       const updatedContract: Contract = {
         ...formData,
-        customer: {
-          id: formData.customer.id, // take _id and map it to id
-          name: formData.customer.name,
-          passport_number: formData.customer.passport_number,
-          driver_license_number: formData.customer.driver_license_number,
-          address: formData.customer.address,
-        },
+        customer: formData.customer,
         car: {
           id: formData.car.id ?? '', // map _id to id
           manufacturer: formData.car.manufacturer,
@@ -539,7 +533,7 @@ const EditContractForm: React.FC<EditContractFormProps> = ({
                         <div className="customer-info">
                           <span className="customer-name">{customer.name}</span>
                           <span className="customer-passport">
-                            {customer.passport_number}
+                            {customer.passportNumber}
                           </span>
                         </div>
                       </li>
@@ -557,11 +551,29 @@ const EditContractForm: React.FC<EditContractFormProps> = ({
                     <div className="customer-details">
                       <p className="customer-name">{formData.customer.name}</p>
                       <p className="customer-passport">
-                        Passport: {formData.customer.passport_number}
+                        Passport: {formData.customer.passportNumber}
                       </p>
-                      {formData.customer.phone_number && (
+                      <p className="customer-license">
+                        Driver License: {formData.customer.driverLicenseNumber}
+                      </p>
+                      {formData.customer.phoneNumber && (
                         <p className="customer-phone">
-                          Phone: {formData.customer.phone_number}
+                          Phone: {formData.customer.phoneNumber}
+                        </p>
+                      )}
+                      {formData.customer.email && (
+                        <p className="customer-email">
+                          Email: {formData.customer.email}
+                        </p>
+                      )}
+                      {formData.customer.countryOfOrigin && (
+                        <p className="customer-country">
+                          Country: {formData.customer.countryOfOrigin}
+                        </p>
+                      )}
+                      {formData.customer.address && (
+                        <p className="customer-address">
+                          Address: {formData.customer.address}
                         </p>
                       )}
                       {formData.customer.email && (

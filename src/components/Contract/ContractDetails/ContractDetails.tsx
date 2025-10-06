@@ -146,18 +146,50 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
     paymentDetails = {},
   } = contract;
 
-  // Destructure nested objects with defaults
+  // Destructure nested objects with defaults - handle both old and new field names
   const {
     name = '',
+    email = '',
+    phoneNumber = '',
+    address = '',
+    driverLicenseNumber = '',
+    passportNumber = '',
+    countryOfOrigin = '',
+    drivingLicensePhotoUrl = '',
+    passportPhotoUrl = '',
+    // Legacy field support
     passport_number = '',
     driver_license_number = '',
-    address = '',
+    phone_number = '',
+    country_of_origin = '',
+    driver_license_photo_url = '',
+    passport_photo_url = '',
   }: {
     name?: string;
+    email?: string;
+    phoneNumber?: string;
+    address?: string;
+    driverLicenseNumber?: string;
+    passportNumber?: string;
+    countryOfOrigin?: string;
+    drivingLicensePhotoUrl?: string;
+    passportPhotoUrl?: string;
+    // Legacy fields
     passport_number?: string;
     driver_license_number?: string;
-    address?: string;
+    phone_number?: string;
+    country_of_origin?: string;
+    driver_license_photo_url?: string;
+    passport_photo_url?: string;
   } = customer ?? {};
+
+  // Use new fields or fallback to legacy fields
+  const finalPassportNumber = passportNumber || passport_number;
+  const finalDriverLicenseNumber = driverLicenseNumber || driver_license_number;
+  const finalPhoneNumber = phoneNumber || phone_number;
+  const finalCountryOfOrigin = countryOfOrigin || country_of_origin;
+  const finalDrivingLicensePhotoUrl = drivingLicensePhotoUrl || driver_license_photo_url;
+  const finalPassportPhotoUrl = passportPhotoUrl || passport_photo_url;
 
   const {
     model = '',
@@ -219,20 +251,38 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
           <div className="section-content">
             <div className="info-grid">
               <div className="info-item">
-                <span className="info-label">Name</span>
+                <span className="info-label">Full Name</span>
                 <span className="info-value">{getValue(name)}</span>
               </div>
+              {email && (
+                <div className="info-item">
+                  <span className="info-label">Email</span>
+                  <span className="info-value">{getValue(email)}</span>
+                </div>
+              )}
+              {finalPhoneNumber && (
+                <div className="info-item">
+                  <span className="info-label">Phone Number</span>
+                  <span className="info-value">{getValue(finalPhoneNumber)}</span>
+                </div>
+              )}
               <div className="info-item">
                 <span className="info-label">Passport Number</span>
-                <span className="info-value">{getValue(passport_number)}</span>
+                <span className="info-value">{getValue(finalPassportNumber)}</span>
               </div>
               <div className="info-item">
-                <span className="info-label">Driver License</span>
+                <span className="info-label">Driver License Number</span>
                 <span className="info-value">
-                  {getValue(driver_license_number)}
+                  {getValue(finalDriverLicenseNumber)}
                 </span>
               </div>
-              <div className="info-item">
+              {finalCountryOfOrigin && (
+                <div className="info-item">
+                  <span className="info-label">Country of Origin</span>
+                  <span className="info-value">{getValue(finalCountryOfOrigin)}</span>
+                </div>
+              )}
+              <div className="info-item full-width">
                 <span className="info-label">Address</span>
                 <span className="info-value">{getValue(address)}</span>
               </div>
@@ -369,6 +419,70 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
             </div>
             <div className="section-content">
               <p className="notes-text">{getValue(additionalNotes)}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Customer Document Photos Section */}
+        {(finalDrivingLicensePhotoUrl || finalPassportPhotoUrl) && (
+          <div className="contract-section">
+            <div className="section-header">
+              <PhotographIcon className="section-icon" />
+              <h3 className="section-title">Customer Documents</h3>
+            </div>
+            <div className="section-content">
+              <div className="documents-grid">
+                {finalDrivingLicensePhotoUrl && (
+                  <div className="document-item">
+                    <h4 className="document-title">Driver License</h4>
+                    <div
+                      className="photo-container"
+                      title="Driver license photo - click to view full size"
+                    >
+                      <img
+                        src={finalDrivingLicensePhotoUrl}
+                        alt="Driver License"
+                        className="document-photo"
+                        onClick={() => window.open(finalDrivingLicensePhotoUrl, '_blank')}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = '/placeholder.svg';
+                          target.classList.add('error-image');
+                        }}
+                      />
+                      <div className="photo-overlay">
+                        <span>Click to enlarge</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {finalPassportPhotoUrl && (
+                  <div className="document-item">
+                    <h4 className="document-title">Passport</h4>
+                    <div
+                      className="photo-container"
+                      title="Passport photo - click to view full size"
+                    >
+                      <img
+                        src={finalPassportPhotoUrl}
+                        alt="Passport"
+                        className="document-photo"
+                        onClick={() => window.open(finalPassportPhotoUrl, '_blank')}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = '/placeholder.svg';
+                          target.classList.add('error-image');
+                        }}
+                      />
+                      <div className="photo-overlay">
+                        <span>Click to enlarge</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

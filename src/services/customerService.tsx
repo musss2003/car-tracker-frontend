@@ -136,3 +136,76 @@ export const addCustomer = async (
     throw error;
   }
 };
+
+// Define interface for country data from ApiCountries API
+interface Country {
+  name: string;
+  flag: string;
+  callingCodes: string[];
+  alpha2Code: string;
+  alpha3Code: string;
+  capital: string;
+  region: string;
+  subregion: string;
+  population: number;
+  currencies: Array<{
+    code: string;
+    name: string;
+    symbol: string;
+  }>;
+  languages: Array<{
+    iso639_1: string;
+    iso639_2: string;
+    name: string;
+    nativeName: string;
+  }>;
+}
+
+// Interface for the country data we need in the form
+export interface CountryOption {
+  name: string;
+  flag: string;
+  callingCode: string;
+  code: string;
+}
+
+// Get all countries from local database API
+export const getCountries = async (): Promise<CountryOption[]> => {
+  try {
+    const response = await fetch(`${API_URL.replace('customers/', '')}countries`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const countries = await response.json();
+    
+    if (!Array.isArray(countries) || countries.length === 0) {
+      throw new Error('Invalid or empty response data');
+    }
+
+    // Transform database countries to CountryOption format
+    const countryOptions: CountryOption[] = countries
+      .map((country: any) => ({
+        name: country.name?.trim() || 'Unknown',
+        flag: country.flagUrl || '🏳️',
+        callingCode: country.callingCode || '+0',
+        code: country.code || 'XX'
+      }))
+      .filter((country: CountryOption) => country.name !== 'Unknown' && country.name.length > 0)
+      .sort((a: CountryOption, b: CountryOption) => a.name.localeCompare(b.name));
+
+    return countryOptions;
+
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ Failed to fetch countries from local API:', errorMessage);
+    throw new Error(`Failed to fetch countries: ${errorMessage}`);
+  }
+};
+
+
+

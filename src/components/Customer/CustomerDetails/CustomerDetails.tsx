@@ -47,6 +47,15 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
     return value ?? defaultValue;
   };
 
+  // Get field value with backward compatibility for snake_case
+  const getFieldValue = (
+    newField: string | number | null | undefined,
+    legacyField: string | number | null | undefined,
+    defaultValue = 'N/A'
+  ): string | number => {
+    return newField ?? legacyField ?? defaultValue;
+  };
+
   // Format date
   const formatDate = (dateString: string | Date | undefined | null): string => {
     if (!dateString) return 'N/A';
@@ -215,7 +224,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                   <div className="info-content">
                     <span className="info-label">Phone</span>
                     <span className="info-value">
-                      {getValue(customer.phoneNumber)}
+                      {getFieldValue(customer.phoneNumber, (customer as any).phone_number)}
                     </span>
                   </div>
                 </div>
@@ -228,13 +237,13 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                     </span>
                   </div>
                 </div>
-                {customer.countryOfOrigin && (
+                {(customer.countryOfOrigin || (customer as any).country_of_origin) && (
                   <div className="info-item">
                     <LocationMarkerIcon className="info-icon" />
                     <div className="info-content">
                       <span className="info-label">Country of Origin</span>
                       <span className="info-value">
-                        {getValue(customer.countryOfOrigin)}
+                        {getFieldValue(customer.countryOfOrigin, (customer as any).country_of_origin)}
                       </span>
                     </div>
                   </div>
@@ -256,7 +265,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                   <div className="info-content">
                     <span className="info-label">Driver License</span>
                     <span className="info-value">
-                      {getValue(customer.driverLicenseNumber)}
+                      {getFieldValue(customer.driverLicenseNumber, (customer as any).driver_license_number)}
                     </span>
                   </div>
                 </div>
@@ -265,7 +274,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                   <div className="info-content">
                     <span className="info-label">Passport Number</span>
                     <span className="info-value">
-                      {getValue(customer.passportNumber)}
+                      {getFieldValue(customer.passportNumber, (customer as any).passport_number)}
                     </span>
                   </div>
                 </div>
@@ -274,7 +283,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
           </div>
 
           {/* Document Photos */}
-          {(customer.drivingLicensePhotoUrl || customer.passportPhotoUrl) && (
+          {(customer.drivingLicensePhotoUrl || (customer as any).driver_license_photo_url || customer.passportPhotoUrl || (customer as any).passport_photo_url) && (
             <div className="details-section">
               <div className="section-header">
                 <PhotographIcon className="section-icon" />
@@ -282,20 +291,20 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
               </div>
               <div className="section-content">
                 <div className="documents-grid">
-                  {customer.drivingLicensePhotoUrl && (
+                  {(customer.drivingLicensePhotoUrl || (customer as any).driver_license_photo_url) && (
                     <div className="document-item">
                       <h4 className="document-title">Driver License</h4>
                       <div className="document-image-container">
                         <img
                           src={
-                            customer.drivingLicensePhotoUrl ||
+                            customer.drivingLicensePhotoUrl || (customer as any).driver_license_photo_url ||
                             '/placeholder.svg'
                           }
                           alt="Driver License"
                           className="document-image"
                           onClick={() =>
                             expandImage(
-                              customer.drivingLicensePhotoUrl,
+                              customer.drivingLicensePhotoUrl || (customer as any).driver_license_photo_url,
                               'Driver License'
                             )
                           }
@@ -313,16 +322,16 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                     </div>
                   )}
 
-                  {customer.passportPhotoUrl && (
+                  {(customer.passportPhotoUrl || (customer as any).passport_photo_url) && (
                     <div className="document-item">
                       <h4 className="document-title">Passport</h4>
                       <div className="document-image-container">
                         <img
-                          src={customer.passportPhotoUrl || '/placeholder.svg'}
+                          src={customer.passportPhotoUrl || (customer as any).passport_photo_url || '/placeholder.svg'}
                           alt="Passport"
                           className="document-image"
                           onClick={() =>
-                            expandImage(customer.passportPhotoUrl, 'Passport')
+                            expandImage(customer.passportPhotoUrl || (customer as any).passport_photo_url, 'Passport')
                           }
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
