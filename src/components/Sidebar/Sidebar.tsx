@@ -149,15 +149,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             ))}
           </div>
         </div>
-
-        <div className="sidebar-footer">
-          {isOpen && (
-            <div className="sidebar-info">
-              <p>© 2023 Rent A Car</p>
-              <p>Version 1.0</p>
-            </div>
-          )}
-        </div>
       </nav>
     </>
   );

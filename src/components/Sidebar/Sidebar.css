@@ -1,14 +1,18 @@
 /* Base sidebar styles */
 .sidebar {
   height: 100vh;
-  background-color: #1e293b;
-  color: #f8fafc;
-  transition: width 0.3s ease;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  transition: all 0.3s ease;
   z-index: 1000;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 20px 40px -12px rgba(102, 126, 234, 0.25),
+    0 8px 16px -4px rgba(118, 75, 162, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 /* Desktop sidebar styles */
@@ -51,50 +55,64 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.4) 0%, rgba(118, 75, 162, 0.6) 100%);
+  backdrop-filter: blur(8px);
   z-index: 999;
+  transition: all 0.3s ease;
 }
 
 .sidebar-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-weight: bold;
-  color: #f8fafc;
+  font-weight: 700;
+  color: #ffffff;
   text-decoration: none;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .logo-icon {
-  width: 24px;
-  height: 24px;
-  color: #f8fafc;
+  width: 28px;
+  height: 28px;
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .sidebar-close-button {
-  background: none;
-  border: none;
-  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
   cursor: pointer;
   padding: 0.5rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.sidebar-close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-close-button svg {
@@ -103,10 +121,11 @@
 }
 
 .sidebar-nav {
-  padding: 1rem 0;
+  padding: 1.5rem 0;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  flex: 1;
 }
 
 .nav-group {
@@ -119,37 +138,49 @@
   padding: 0.5rem 1rem;
   font-size: 0.75rem;
   text-transform: uppercase;
-  color: #94a3b8;
-  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  color: #e2e8f0;
+  padding: 0.875rem 1rem;
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
-  transition: all 0.2s ease;
-  border-radius: 0.25rem;
-  margin: 0 0.5rem;
+  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+  margin: 0 0.75rem;
   position: relative;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.nav-link-active {
-  background-color: rgba(255, 255, 255, 0.15);
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   color: #ffffff;
 }
 
+.nav-link-active {
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+  color: #ffffff;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+  transform: translateX(4px);
+}
+
 .nav-icon {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   margin-right: 0.75rem;
   flex-shrink: 0;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .sidebar-closed .nav-icon {
@@ -171,19 +202,24 @@
   left: 100%;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #334155;
-  color: #f8fafc;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
   font-size: 0.875rem;
+  font-weight: 500;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   pointer-events: none;
-  margin-left: 0.5rem;
+  margin-left: 0.75rem;
   z-index: 1001;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 
+    0 8px 16px -4px rgba(0, 0, 0, 0.2),
+    0 4px 8px -2px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .sidebar-closed .nav-link:hover .nav-tooltip {
@@ -192,14 +228,92 @@
 }
 
 .sidebar-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 1rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
 }
 
 .sidebar-info {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  font-weight: 500;
+}
+
+/* Additional modern enhancements */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 768px) {
+  .sidebar-mobile {
+    box-shadow: 
+      0 25px 50px -12px rgba(102, 126, 234, 0.4),
+      0 12px 24px -8px rgba(118, 75, 162, 0.2);
+  }
+  
+  .nav-link {
+    padding: 1rem;
+    margin: 0 0.5rem;
+  }
+  
+  .sidebar-header {
+    padding: 1.25rem 1rem;
+  }
+  
+  .sidebar-nav {
+    padding: 1rem 0;
+  }
+}
+
+/* Improved focus states for accessibility */
+.nav-link:focus,
+.sidebar-close-button:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Smooth animations */
+.sidebar-content {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Dark mode compatibility (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    box-shadow: 
+      0 20px 40px -12px rgba(102, 126, 234, 0.4),
+      0 8px 16px -4px rgba(118, 75, 162, 0.3),
+      0 0 0 1px rgba(255, 255, 255, 0.15);
+  }
 }

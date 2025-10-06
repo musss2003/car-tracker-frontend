@@ -1,5 +1,6 @@
 import { getAuthHeaders } from '../utils/getAuthHeaders';
 import { Customer } from '../types/Customer';
+import { C } from 'vitest/dist/chunks/reporters.d.DG9VKi4m.js';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + `/api/customers/`;
 
@@ -182,6 +183,7 @@ export const getCountries = async (): Promise<CountryOption[]> => {
     }
 
     const countries = await response.json();
+
     
     if (!Array.isArray(countries) || countries.length === 0) {
       throw new Error('Invalid or empty response data');
@@ -191,7 +193,7 @@ export const getCountries = async (): Promise<CountryOption[]> => {
     const countryOptions: CountryOption[] = countries
       .map((country: any) => ({
         name: country.name?.trim() || 'Unknown',
-        flag: country.flagUrl || '🏳️',
+        flag: country.flag || '🏳️',
         callingCode: country.callingCode || '+0',
         code: country.code || 'XX'
       }))

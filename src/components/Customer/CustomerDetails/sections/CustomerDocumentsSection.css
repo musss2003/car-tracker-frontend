@@ -1,0 +1,162 @@
+/* Customer Documents Section Styles */
+.customer-documents-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .documents-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.document-group {
+  background: rgba(248, 250, 252, 0.5);
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.document-group:hover {
+  background: rgba(248, 250, 252, 0.8);
+  border-color: #d1d5db;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.document-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.document-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.document-number {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.document-photo {
+  display: flex;
+  justify-content: center;
+}
+
+.photo-container {
+  position: relative;
+  width: 100%;
+  max-width: 200px;
+  height: 140px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #f8fafc;
+  border: 2px solid #e5e7eb;
+}
+
+.photo-container--clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.photo-container--clickable:hover {
+  border-color: #667eea;
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+}
+
+.photo-container--clickable:hover .photo-overlay {
+  opacity: 1;
+}
+
+.document-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.photo-container--clickable:hover .document-image {
+  transform: scale(1.1);
+}
+
+.photo-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  backdrop-filter: blur(4px);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
+  background: rgba(249, 250, 251, 0.5);
+}
+
+.photo-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .documents-grid {
+    gap: 1.5rem;
+  }
+  
+  .document-group {
+    padding: 1.25rem;
+  }
+  
+  .photo-container {
+    height: 120px;
+  }
+  
+  .photo-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  
+  .photo-overlay {
+    font-size: 0.75rem;
+  }
+}

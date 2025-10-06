@@ -1,0 +1,74 @@
+/* Customer Timestamps Section Styles */
+.customer-timestamps-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.timestamps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .timestamps-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.timestamp-item {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.timestamp-item:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.timestamp-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #667eea;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.timestamp-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #667eea;
+}
+
+.timestamp-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timestamp-item {
+    padding: 1rem;
+  }
+  
+  .timestamp-label {
+    font-size: 0.75rem;
+  }
+  
+  .timestamp-value {
+    font-size: 0.9rem;
+  }
+}

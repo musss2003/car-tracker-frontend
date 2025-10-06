@@ -1,22 +1,13 @@
-'use client';
-
-import { useState } from 'react';
-import {
-  XIcon,
-  PencilIcon,
-  TrashIcon,
-  UserIcon,
-  MailIcon,
-  PhoneIcon,
-  LocationMarkerIcon,
-  IdentificationIcon,
-  PhotographIcon,
-  DocumentTextIcon,
-  ClockIcon,
-  ExclamationIcon,
-} from '@heroicons/react/solid';
-import './CustomerDetails.css';
+import React, { useState } from 'react';
+import { XIcon, PencilIcon, TrashIcon } from '@heroicons/react/solid';
+import { Card, CardHeader, Button } from '../../UI';
 import { Customer } from '../../../types/Customer';
+import './CustomerDetails.css';
+import CustomerInfoSection from './sections/CustomerInfoSection';
+import CustomerDocumentsSection from './sections/CustomerDocumentsSection';
+import CustomerTimestampsSection from './sections/CustomerTimestampsSection';
+import DeleteConfirmModal from './modals/DeleteConfirmModal';
+import ImageModal from './modals/ImageModal';
 
 interface ExpandedImage {
   url: string;
@@ -37,7 +28,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
   onClose,
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [expandedImage, setExpandedImage] = useState<ExpandedImage | null>();
+  const [expandedImage, setExpandedImage] = useState<ExpandedImage | null>(null);
 
   // Get value or fallback
   const getValue = (
@@ -61,14 +52,15 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
     if (!dateString) return 'N/A';
 
     try {
-      const date =
-        typeof dateString === 'string' ? new Date(dateString) : dateString;
+      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
       if (isNaN(date.getTime())) return 'N/A';
 
-      return date.toLocaleDateString(undefined, {
+      return date.toLocaleDateString('bs-BA', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
       });
     } catch (error) {
       return 'N/A';
@@ -99,273 +91,85 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
     setExpandedImage(null);
   };
 
-  // Check if customer object is valid
-  if (!customer || Object.keys(customer).length === 0) {
-    return (
-      <div className="customer-details-container">
-        <div className="details-header">
-          <h2 className="details-title">Customer Details</h2>
-          <button className="close-button" onClick={onClose}>
-            <XIcon className="icon" />
-          </button>
-        </div>
-        <div className="empty-details">
-          <p>No customer details available.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="customer-details-container">
-      {/* Header */}
-      <div className="details-header">
-        <div className="header-content">
-          <h2 className="details-title">Customer Details</h2>
-          <div className="customer-timestamps">
-            {customer.createdAt && (
-              <div className="customer-created-date">
-                <ClockIcon className="icon-small" />
-                <span>Added on {formatDate(customer.createdAt)}</span>
-              </div>
-            )}
-            {customer.updatedAt && customer.updatedAt !== customer.createdAt && (
-              <div className="customer-updated-date">
-                <ClockIcon className="icon-small" />
-                <span>Updated on {formatDate(customer.updatedAt)}</span>
-              </div>
-            )}
-          </div>
-        </div>
-        <button className="close-button" onClick={onClose}>
-          <XIcon className="icon" />
-        </button>
-      </div>
-
-      {/* Customer Avatar and Name */}
-      <div className="customer-header">
-        <div className="customer-avatar">
-          {customer.name ? customer.name.charAt(0).toUpperCase() : '?'}
-        </div>
-        <h3 className="customer-name">{getValue(customer.name)}</h3>
-      </div>
-
-      {/* Delete Confirmation (Inline) */}
-      {showDeleteConfirm && (
-        <div className="delete-confirm-section">
-          <div className="delete-confirm-content">
-            <ExclamationIcon className="warning-icon" />
-            <div className="confirm-text">
-              <h4>Confirm Deletion</h4>
-              <p>
-                Are you sure you want to delete this customer? This action
-                cannot be undone.
-              </p>
+    <div className="customer-details-overlay">
+      <Card className="customer-details-card" size="lg">
+        <CardHeader
+          title={`Detalji korisnika: ${getValue(customer.name)}`}
+          subtitle={`ID: ${customer.id} • Email: ${getValue(customer.email)}`}
+          actions={
+            <div className="customer-details-actions">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onEdit}
+                leftIcon={<PencilIcon />}
+              >
+                Uredi
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={handleDeleteClick}
+                leftIcon={<TrashIcon />}
+              >
+                Obriši
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                leftIcon={<XIcon />}
+              >
+                Zatvori
+              </Button>
             </div>
-            <div className="confirm-actions">
-              <button className="confirm-button cancel" onClick={cancelDelete}>
-                Cancel
-              </button>
-              <button className="confirm-button delete" onClick={confirmDelete}>
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          }
+        />
 
-      {/* Expanded Image (Inline) */}
-      {expandedImage && (
-        <div className="expanded-image-section">
-          <div className="expanded-image-header">
-            <h3 className="expanded-image-title">{expandedImage.type}</h3>
-            <button className="close-button" onClick={closeExpandedImage}>
-              <XIcon className="icon" />
-            </button>
-          </div>
-          <div className="expanded-image-content">
-            <img
-              src={expandedImage.url || '/placeholder.svg'}
-              alt={expandedImage.type}
-              className="expanded-image"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = '/placeholder.svg';
-                target.classList.add('error-image');
-              }}
+        <div className="customer-details-content">
+          <div className="details-sections">
+            {/* Personal Information Section */}
+            <CustomerInfoSection
+              customer={customer}
+              getValue={getValue}
+              getFieldValue={getFieldValue}
+            />
+
+            {/* Documents Section */}
+            <CustomerDocumentsSection
+              customer={customer}
+              getValue={getValue}
+              getFieldValue={getFieldValue}
+              onImageClick={expandImage}
+            />
+
+            {/* Timestamps Section */}
+            <CustomerTimestampsSection
+              customer={customer}
+              formatDate={formatDate}
             />
           </div>
         </div>
+      </Card>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <DeleteConfirmModal
+          customerName={getValue(customer.name)}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
       )}
 
-      {/* Details Sections - Only show if no expanded image or delete confirmation */}
-      {!expandedImage && !showDeleteConfirm && (
-        <div className="details-body">
-          {/* Personal Information */}
-          <div className="details-section">
-            <div className="section-header">
-              <UserIcon className="section-icon" />
-              <h3 className="section-title">Personal Information</h3>
-            </div>
-            <div className="section-content">
-              <div className="info-grid">
-                <div className="info-item">
-                  <MailIcon className="info-icon" />
-                  <div className="info-content">
-                    <span className="info-label">Email</span>
-                    <span className="info-value">
-                      {getValue(customer.email)}
-                    </span>
-                  </div>
-                </div>
-                <div className="info-item">
-                  <PhoneIcon className="info-icon" />
-                  <div className="info-content">
-                    <span className="info-label">Phone</span>
-                    <span className="info-value">
-                      {getFieldValue(customer.phoneNumber, (customer as any).phone_number)}
-                    </span>
-                  </div>
-                </div>
-                <div className="info-item full-width">
-                  <LocationMarkerIcon className="info-icon" />
-                  <div className="info-content">
-                    <span className="info-label">Address</span>
-                    <span className="info-value">
-                      {getValue(customer.address)}
-                    </span>
-                  </div>
-                </div>
-                {(customer.countryOfOrigin || (customer as any).country_of_origin) && (
-                  <div className="info-item">
-                    <LocationMarkerIcon className="info-icon" />
-                    <div className="info-content">
-                      <span className="info-label">Country of Origin</span>
-                      <span className="info-value">
-                        {getFieldValue(customer.countryOfOrigin, (customer as any).country_of_origin)}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Identification */}
-          <div className="details-section">
-            <div className="section-header">
-              <IdentificationIcon className="section-icon" />
-              <h3 className="section-title">Identification</h3>
-            </div>
-            <div className="section-content">
-              <div className="info-grid">
-                <div className="info-item">
-                  <DocumentTextIcon className="info-icon" />
-                  <div className="info-content">
-                    <span className="info-label">Driver License</span>
-                    <span className="info-value">
-                      {getFieldValue(customer.driverLicenseNumber, (customer as any).driver_license_number)}
-                    </span>
-                  </div>
-                </div>
-                <div className="info-item">
-                  <DocumentTextIcon className="info-icon" />
-                  <div className="info-content">
-                    <span className="info-label">Passport Number</span>
-                    <span className="info-value">
-                      {getFieldValue(customer.passportNumber, (customer as any).passport_number)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Document Photos */}
-          {(customer.drivingLicensePhotoUrl || (customer as any).driver_license_photo_url || customer.passportPhotoUrl || (customer as any).passport_photo_url) && (
-            <div className="details-section">
-              <div className="section-header">
-                <PhotographIcon className="section-icon" />
-                <h3 className="section-title">Document Photos</h3>
-              </div>
-              <div className="section-content">
-                <div className="documents-grid">
-                  {(customer.drivingLicensePhotoUrl || (customer as any).driver_license_photo_url) && (
-                    <div className="document-item">
-                      <h4 className="document-title">Driver License</h4>
-                      <div className="document-image-container">
-                        <img
-                          src={
-                            customer.drivingLicensePhotoUrl || (customer as any).driver_license_photo_url ||
-                            '/placeholder.svg'
-                          }
-                          alt="Driver License"
-                          className="document-image"
-                          onClick={() =>
-                            expandImage(
-                              customer.drivingLicensePhotoUrl || (customer as any).driver_license_photo_url,
-                              'Driver License'
-                            )
-                          }
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.onerror = null;
-                            target.src = '/placeholder.svg';
-                            target.classList.add('error-image');
-                          }}
-                        />
-                        <div className="image-overlay">
-                          <span>Click to enlarge</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {(customer.passportPhotoUrl || (customer as any).passport_photo_url) && (
-                    <div className="document-item">
-                      <h4 className="document-title">Passport</h4>
-                      <div className="document-image-container">
-                        <img
-                          src={customer.passportPhotoUrl || (customer as any).passport_photo_url || '/placeholder.svg'}
-                          alt="Passport"
-                          className="document-image"
-                          onClick={() =>
-                            expandImage(customer.passportPhotoUrl || (customer as any).passport_photo_url, 'Passport')
-                          }
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.onerror = null;
-                            target.src = '/placeholder.svg';
-                            target.classList.add('error-image');
-                          }}
-                        />
-                        <div className="image-overlay">
-                          <span>Click to enlarge</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Image Modal */}
+      {expandedImage && (
+        <ImageModal
+          imageUrl={expandedImage.url}
+          imageType={expandedImage.type}
+          onClose={closeExpandedImage}
+        />
       )}
-
-      {/* Action Buttons */}
-      <div className="details-footer">
-        <button className="action-button edit" onClick={onEdit}>
-          <PencilIcon className="button-icon" />
-          Edit Customer
-        </button>
-        {!showDeleteConfirm && (
-          <button className="action-button delete" onClick={handleDeleteClick}>
-            <TrashIcon className="button-icon" />
-            Delete Customer
-          </button>
-        )}
-      </div>
     </div>
   );
 };

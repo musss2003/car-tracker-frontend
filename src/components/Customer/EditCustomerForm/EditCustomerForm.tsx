@@ -1,527 +1,333 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import {
-  XIcon,
-  SaveIcon,
-  ExclamationCircleIcon,
-  PhotographIcon,
-  UserIcon,
-  MailIcon,
-  LocationMarkerIcon,
-  IdentificationIcon,
-} from '@heroicons/react/solid';
-import './EditCustomerForm.css';
+import React, { useState, useEffect } from 'react';
+import { XIcon, SaveIcon } from '@heroicons/react/solid';
+import { Card, CardHeader, Button, FormField } from '../../UI';
+import { CustomerPhotoField } from '../shared';
+import CountryDropdown from '../CreateCustomerForm/CountryDropdown';
 import { Customer } from '../../../types/Customer';
+import { getCountries, CountryOption } from '../../../services/customerService';
+import './EditCustomerForm.css';
 
-interface EditCarFormProps {
+interface EditCustomerFormProps {
   customer: Customer;
   onSave: (updatedCustomer: Customer) => void;
   onCancel: () => void;
 }
 
-const EditCustomerForm: React.FC<EditCarFormProps> = ({
+interface FormErrors {
+  [key: string]: string | null;
+}
+
+const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
   customer,
   onSave,
   onCancel,
 }) => {
-  // Form state
+  // Form state - initialize with customer data
   const [formData, setFormData] = useState<Customer>({
-    id: '',
-    name: '',
-    email: '',
-    phoneNumber: '',
-    address: '',
-    driverLicenseNumber: '',
-    passportNumber: '',
-    countryOfOrigin: '',
-    drivingLicensePhotoUrl: '',
-    passportPhotoUrl: '',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    ...customer,
+    // Ensure backward compatibility
+    name: customer.name || (customer as any).name || '',
+    email: customer.email || (customer as any).email || '',
+    phoneNumber: customer.phoneNumber || (customer as any).phone_number || '',
+    address: customer.address || (customer as any).address || '',
+    driverLicenseNumber: customer.driverLicenseNumber || (customer as any).driver_license_number || '',
+    passportNumber: customer.passportNumber || (customer as any).passport_number || '',
+    countryOfOrigin: customer.countryOfOrigin || (customer as any).country_of_origin || '',
+    drivingLicensePhotoUrl: customer.drivingLicensePhotoUrl || (customer as any).driving_license_photo_url || '',
+    passportPhotoUrl: customer.passportPhotoUrl || (customer as any).passport_photo_url || '',
   });
 
-  // Original data for comparison
-  const [originalData, setOriginalData] = useState({});
+  // Track which fields have been modified
+  const [modifiedFields, setModifiedFields] = useState<Set<string>>(new Set());
 
-  // UI state
-  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  // Countries state
+  const [countries, setCountries] = useState<CountryOption[]>([]);
+  const [loadingCountries, setLoadingCountries] = useState(true);
+  const [countriesError, setCountriesError] = useState<string | null>(null);
+
+  // Validation state
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showLicensePreview, setShowLicensePreview] = useState(false);
-  const [showPassportPreview, setShowPassportPreview] = useState(false);
 
-  // Initialize form data from customer prop
+  // Load countries on mount
   useEffect(() => {
-    if (customer) {
-      const initialData: Customer = {
-        id: customer.id || '',
-        name: customer.name || '',
-        email: customer.email || '',
-        phoneNumber: customer.phoneNumber || '',
-        address: customer.address || '',
-        driverLicenseNumber: customer.driverLicenseNumber || '',
-        passportNumber: customer.passportNumber || '',
-        countryOfOrigin: customer.countryOfOrigin || '',
-        drivingLicensePhotoUrl: customer.drivingLicensePhotoUrl || '',
-        passportPhotoUrl: customer.passportPhotoUrl || '',
-        createdAt: customer.createdAt || new Date(),
-        updatedAt: customer.updatedAt || new Date(),
-      };
+    const loadCountries = async () => {
+      try {
+        setLoadingCountries(true);
+        const countriesData = await getCountries();
+        setCountries(countriesData);
+        setCountriesError(null);
+      } catch (error) {
+        console.error('Error loading countries:', error);
+        setCountriesError('Greška pri učitavanju lista zemalja');
+      } finally {
+        setLoadingCountries(false);
+      }
+    };
 
-      setFormData(initialData);
-      setOriginalData(initialData);
-    }
-  }, [customer]);
+    loadCountries();
+  }, []);
 
-  // Handle form field changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Clear error when field is edited
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
+  // Handle input changes
+  const handleInputChange = (field: keyof Customer, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Track modified fields
+    setModifiedFields(prev => new Set(prev).add(field));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
     }
   };
 
-  // Validate form
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  // Handle photo changes
+  const handlePhotoChange = (field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl', file: File | null) => {
+    if (file) {
+      // In real app, you would upload the file and get URL
+      const fakeUrl = URL.createObjectURL(file);
+      handleInputChange(field, fakeUrl);
+    } else {
+      handleInputChange(field, '');
+    }
+  };
 
-    // Required fields
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+  // Check if form has been modified
+  const hasChanges = modifiedFields.size > 0;
+
+  // Validation
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.name?.trim()) {
+      newErrors.name = 'Ime je obavezno';
     }
 
-    // Required driver license number
-    if (!formData.driverLicenseNumber?.trim()) {
-      newErrors.driverLicenseNumber = 'Driver license number is required';
+    if (!formData.email?.trim()) {
+      newErrors.email = 'Email je obavezan';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email format nije valjan';
     }
 
-    // Required passport number
-    if (!formData.passportNumber?.trim()) {
-      newErrors.passportNumber = 'Passport number is required';
+    if (!formData.phoneNumber?.trim()) {
+      newErrors.phoneNumber = 'Broj telefona je obavezan';
     }
 
-    // Email validation
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    // Phone validation
-    if (
-      formData.phoneNumber &&
-      !/^\+?[0-9\s-()]{7,}$/.test(formData.phoneNumber)
-    ) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
-    }
-
-    // URL validation for photos
-    if (
-      formData.drivingLicensePhotoUrl &&
-      !isValidUrl(formData.drivingLicensePhotoUrl)
-    ) {
-      newErrors.drivingLicensePhotoUrl = 'Please enter a valid URL';
-    }
-
-    if (formData.passportPhotoUrl && !isValidUrl(formData.passportPhotoUrl)) {
-      newErrors.passportPhotoUrl = 'Please enter a valid URL';
+    if (!formData.countryOfOrigin?.trim()) {
+      newErrors.countryOfOrigin = 'Zemlja porijekla je obavezna';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Check if URL is valid
-  const isValidUrl = (url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
-  // Check if form has been modified
-  const hasChanges = () => {
-    return JSON.stringify(formData) !== JSON.stringify(originalData);
-  };
-
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!validateForm()) {
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      setIsSubmitting(true);
-      await onSave(formData);
+      // Update the updatedAt timestamp
+      const updatedCustomer = {
+        ...formData,
+        updatedAt: new Date(),
+      };
+      
+      await onSave(updatedCustomer);
     } catch (error) {
-      console.error('Error saving customer:', error);
-      setErrors((prev) => ({
-        ...prev,
-        submit: 'Failed to save customer. Please try again.',
-      }));
+      console.error('Error updating customer:', error);
+    } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle cancel with unsaved changes
-  const handleCancel = () => {
-    if (hasChanges()) {
-      if (
-        window.confirm(
-          'You have unsaved changes. Are you sure you want to cancel?'
-        )
-      ) {
-        onCancel();
-      }
-    } else {
-      onCancel();
-    }
-  };
-
-  // Toggle image previews
-  const toggleLicensePreview = () => setShowLicensePreview(!showLicensePreview);
-  const togglePassportPreview = () =>
-    setShowPassportPreview(!showPassportPreview);
-
   return (
-    <div className="edit-customer-form-container">
-      <div className="form-header">
-        <h2>Edit Customer</h2>
-        <button type="button" className="close-button" onClick={handleCancel}>
-          <XIcon className="icon" />
-        </button>
-      </div>
+    <div className="edit-customer-form-overlay">
+      <Card className="edit-customer-form-card" size="lg">
+        <CardHeader
+          title="Uredi korisnika"
+          subtitle={`Izmjeni podatke za: ${formData.name || 'N/A'}`}
+          actions={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onCancel}
+              leftIcon={<XIcon />}
+            >
+              Zatvori
+            </Button>
+          }
+        />
 
-      {errors.submit && (
-        <div className="global-error">
-          <ExclamationCircleIcon className="error-icon" />
-          <span>{errors.submit}</span>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="edit-customer-form">
-        <div className="form-sections">
-          <div className="form-section">
-            <h3 className="section-title">
-              <UserIcon className="section-icon" />
-              Basic Information
-            </h3>
-            <div className="form-row">
-              <div className={`form-field ${errors.name ? 'has-error' : ''}`}>
-                <label htmlFor="name">
-                  Full Name <span className="required-mark">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter customer's full name"
-                />
-                {errors.name && (
-                  <div className="field-error">
-                    <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.name}</span>
-                  </div>
-                )}
-              </div>
+        <div className="edit-customer-form-content">
+          {!hasChanges && (
+            <div className="no-changes-notice">
+              <p>Napravite izmjene u poljima ispod da bi se omogućilo čuvanje.</p>
             </div>
-          </div>
+          )}
 
-          <div className="form-section">
-            <h3 className="section-title">
-              <IdentificationIcon className="section-icon" />
-              Identification
-            </h3>
-            <div className="form-row">
-              <div
-                className={`form-field ${
-                  errors.driverLicenseNumber ? 'has-error' : ''
-                }`}
-              >
-                <label htmlFor="driverLicenseNumber">
-                  Driver License Number
-                  {!formData.passportNumber && (
-                    <span className="required-mark">*</span>
-                  )}
-                </label>
-                <input
-                  type="text"
-                  id="driverLicenseNumber"
-                  name="driverLicenseNumber"
-                  value={formData.driverLicenseNumber}
-                  onChange={handleChange}
-                  placeholder="Enter driver license number"
-                />
-                {errors.driverLicenseNumber && (
-                  <div className="field-error">
-                    <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.driverLicenseNumber}</span>
-                  </div>
-                )}
-              </div>
-
-              <div
-                className={`form-field ${
-                  errors.passportNumber ? 'has-error' : ''
-                }`}
-              >
-                <label htmlFor="passportNumber">
-                  Passport Number
-                  {!formData.driverLicenseNumber && (
-                    <span className="required-mark">*</span>
-                  )}
-                </label>
-                <input
-                  type="text"
-                  id="passportNumber"
-                  name="passportNumber"
-                  value={formData.passportNumber}
-                  onChange={handleChange}
-                  placeholder="Enter passport number"
-                />
-                {errors.passportNumber && (
-                  <div className="field-error">
-                    <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.passportNumber}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h3 className="section-title">
-              <MailIcon className="section-icon" />
-              Contact Information
-            </h3>
-            <div className="form-row">
-              <div className={`form-field ${errors.email ? 'has-error' : ''}`}>
-                <label htmlFor="email">Email Address</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter email address"
-                />
-                {errors.email && (
-                  <div className="field-error">
-                    <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.email}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className={`form-field ${errors.phoneNumber ? 'has-error' : ''}`}>
-                <label htmlFor="phoneNumber">Phone Number</label>
-                <input
-                  type="tel"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  placeholder="Enter phone number"
-                />
-                {errors.phoneNumber && (
-                  <div className="field-error">
-                    <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.phoneNumber}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="address">
-                  <LocationMarkerIcon className="field-icon" />
-                  Address
-                </label>
-                <textarea
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Enter customer's address"
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="countryOfOrigin">
-                  <LocationMarkerIcon className="field-icon" />
-                  Country of Origin
-                </label>
-                <input
-                  type="text"
-                  id="countryOfOrigin"
-                  name="countryOfOrigin"
-                  value={formData.countryOfOrigin}
-                  onChange={handleChange}
-                  placeholder="Enter country of origin"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h3 className="section-title">
-              <PhotographIcon className="section-icon" />
-              Document Photos
-            </h3>
-            <div className="form-row">
-              <div
-                className={`form-field ${
-                  errors.drivingLicensePhotoUrl ? 'has-error' : ''
-                }`}
-              >
-                <label htmlFor="drivingLicensePhotoUrl">
-                  Driver License Photo URL
-                </label>
-                <div className="input-with-button">
-                  <input
-                    type="text"
-                    id="drivingLicensePhotoUrl"
-                    name="drivingLicensePhotoUrl"
-                    value={formData.drivingLicensePhotoUrl}
-                    onChange={handleChange}
-                    placeholder="Enter URL for driver license photo"
-                  />
-                  {formData.drivingLicensePhotoUrl && (
-                    <button
-                      type="button"
-                      className="preview-button"
-                      onClick={toggleLicensePreview}
-                      title={
-                        showLicensePreview ? 'Hide preview' : 'Show preview'
-                      }
-                    >
-                      <PhotographIcon className="button-icon" />
-                    </button>
-                  )}
-                </div>
-                {errors.drivingLicensePhotoUrl && (
-                  <div className="field-error">
-                    <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.drivingLicensePhotoUrl}</span>
-                  </div>
-                )}
-                {showLicensePreview && formData.drivingLicensePhotoUrl && (
-                  <div className="image-preview">
-                    <img
-                      src={
-                        formData.drivingLicensePhotoUrl || '/placeholder.svg'
-                      }
-                      alt="Driver License"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = '/placeholder.svg';
-                        target.classList.add('error-image');
-                      }}
+          <form onSubmit={handleSubmit} className="edit-customer-form">
+            <div className="form-sections">
+              {/* Personal Information Section */}
+              <div className="form-section">
+                <h3 className="form-section__title">Lični podaci</h3>
+                
+                <div className="form-row">
+                  <FormField
+                    label="Ime i prezime"
+                    required
+                    error={errors.name}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.name || ''}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      placeholder="Unesite ime i prezime"
                     />
-                  </div>
-                )}
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Email adresa"
+                    required
+                    error={errors.email}
+                  >
+                    <input
+                      type="email"
+                      className="ui-input"
+                      value={formData.email || ''}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="example@email.com"
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Broj telefona"
+                    required
+                    error={errors.phoneNumber}
+                  >
+                    <input
+                      type="tel"
+                      className="ui-input"
+                      value={formData.phoneNumber || ''}
+                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      placeholder="+387 61 123 456"
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Adresa"
+                    error={errors.address}
+                  >
+                    <textarea
+                      className="ui-input ui-textarea"
+                      value={formData.address || ''}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      placeholder="Unesite adresu"
+                      rows={3}
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Zemlja porijekla"
+                    required
+                    error={errors.countryOfOrigin}
+                  >
+                    <CountryDropdown
+                      countries={countries}
+                      selectedCountry={formData.countryOfOrigin || ''}
+                      onSelect={(country: string) => handleInputChange('countryOfOrigin', country)}
+                      loading={loadingCountries}
+                      error={countriesError}
+                    />
+                  </FormField>
+                </div>
               </div>
 
-              <div
-                className={`form-field ${
-                  errors.passportPhotoUrl ? 'has-error' : ''
-                }`}
-              >
-                <label htmlFor="passportPhotoUrl">Passport Photo URL</label>
-                <div className="input-with-button">
-                  <input
-                    type="text"
-                    id="passportPhotoUrl"
-                    name="passportPhotoUrl"
-                    value={formData.passportPhotoUrl}
-                    onChange={handleChange}
-                    placeholder="Enter URL for passport photo"
-                  />
-                  {formData.passportPhotoUrl && (
-                    <button
-                      type="button"
-                      className="preview-button"
-                      onClick={togglePassportPreview}
-                      title={
-                        showPassportPreview ? 'Hide preview' : 'Show preview'
-                      }
-                    >
-                      <PhotographIcon className="button-icon" />
-                    </button>
-                  )}
-                </div>
-                {errors.passportPhotoUrl && (
-                  <div className="field-error">
-                    <ExclamationCircleIcon className="error-icon-small" />
-                    <span>{errors.passportPhotoUrl}</span>
-                  </div>
-                )}
-                {showPassportPreview && formData.passportPhotoUrl && (
-                  <div className="image-preview">
-                    <img
-                      src={formData.passportPhotoUrl || '/placeholder.svg'}
-                      alt="Passport"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = '/placeholder.svg';
-                        target.classList.add('error-image');
-                      }}
+              {/* Documents Section */}
+              <div className="form-section">
+                <h3 className="form-section__title">Dokumenti</h3>
+                
+                <div className="form-row">
+                  <FormField
+                    label="Broj vozačke dozvole"
+                    error={errors.driverLicenseNumber}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.driverLicenseNumber || ''}
+                      onChange={(e) => handleInputChange('driverLicenseNumber', e.target.value)}
+                      placeholder="Unesite broj vozačke dozvole"
                     />
-                  </div>
-                )}
+                  </FormField>
+
+                  <FormField
+                    label="Broj pasoša"
+                    error={errors.passportNumber}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.passportNumber || ''}
+                      onChange={(e) => handleInputChange('passportNumber', e.target.value)}
+                      placeholder="Unesite broj pasoša"
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <CustomerPhotoField
+                    label="Slika vozačke dozvole"
+                    photoUrl={formData.drivingLicensePhotoUrl}
+                    onFileChange={(file) => handlePhotoChange('drivingLicensePhotoUrl', file)}
+                    error={errors.drivingLicensePhotoUrl as string}
+                  />
+
+                  <CustomerPhotoField
+                    label="Slika pasoša"
+                    photoUrl={formData.passportPhotoUrl}
+                    onFileChange={(file) => handlePhotoChange('passportPhotoUrl', file)}
+                    error={errors.passportPhotoUrl as string}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="form-actions">
-          <button
-            type="button"
-            className="cancel-button"
-            onClick={handleCancel}
-            disabled={isSubmitting}
-          >
-            <XIcon className="button-icon" />
-            Cancel
-          </button>
-
-          <button
-            type="submit"
-            className="save-button"
-            disabled={isSubmitting || !hasChanges()}
-          >
-            {isSubmitting ? (
-              <>
-                <div className="spinner"></div>
-                <span>Saving...</span>
-              </>
-            ) : (
-              <>
-                <SaveIcon className="button-icon" />
-                <span>Save Changes</span>
-              </>
-            )}
-          </button>
+            {/* Form Actions */}
+            <div className="form-actions">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onCancel}
+                disabled={isSubmitting}
+              >
+                Otkaži
+              </Button>
+              
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={isSubmitting}
+                disabled={!hasChanges}
+                leftIcon={<SaveIcon />}
+              >
+                {isSubmitting ? 'Čuvanje...' : 'Sačuvaj izmjene'}
+              </Button>
+            </div>
+          </form>
         </div>
-      </form>
+      </Card>
     </div>
   );
 };

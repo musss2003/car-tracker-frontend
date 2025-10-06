@@ -1,15 +1,12 @@
-'use client';
-
-import { ChangeEvent, useEffect, useState } from 'react';
-import {
-  XIcon,
-  UserAddIcon,
-  ExclamationCircleIcon,
-  PhotographIcon,
-} from '@heroicons/react/solid';
-import './CreateCustomerForm.css';
+import React, { useState, useEffect } from 'react';
+import { XIcon, UserAddIcon } from '@heroicons/react/solid';
+import { Card, CardHeader, Button, FormField } from '../../UI';
+import { CustomerPhotoField } from '../shared';
 import { Customer } from '../../../types/Customer';
 import { getCountries, CountryOption } from '../../../services/customerService';
+
+import './CreateCustomerForm.css';
+import CountryDropdown from './CountryDropdown';
 
 interface CreateCustomerFormProps {
   onSave: (customerData: Customer) => void;
@@ -39,108 +36,76 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
     createdAt: new Date(),
     updatedAt: new Date(),
   });
+
+  // Countries state
   const [countries, setCountries] = useState<CountryOption[]>([]);
   const [loadingCountries, setLoadingCountries] = useState(true);
   const [countriesError, setCountriesError] = useState<string | null>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
 
   // Validation state
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Load countries on mount
   useEffect(() => {
-    const fetchCountries = async () => {
+    const loadCountries = async () => {
       try {
         setLoadingCountries(true);
+        const countriesData = await getCountries();
+        setCountries(countriesData);
         setCountriesError(null);
-        const countryList = await getCountries();
-        setCountries(countryList);
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Failed to load countries';
-        console.error('Failed to load countries:', errorMessage);
-        setCountriesError(errorMessage);
+        console.error('Error loading countries:', error);
+        setCountriesError('Greška pri učitavanju lista zemalja');
       } finally {
         setLoadingCountries(false);
       }
     };
 
-    fetchCountries();
+    loadCountries();
   }, []);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.custom-dropdown')) {
-        setIsDropdownOpen(false);
-        setSearchTerm('');
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Filter countries based on search term
-  const filteredCountries = countries.filter((country) =>
-    country.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Handle country selection
-  const handleCountrySelect = (countryName: string) => {
-    setFormData((prev) => ({ ...prev, countryOfOrigin: countryName }));
-    setIsDropdownOpen(false);
-    setSearchTerm('');
-
-    if (errors.countryOfOrigin) {
-      setErrors((prev) => ({ ...prev, countryOfOrigin: null }));
+  // Handle input changes
+  const handleInputChange = (field: keyof Customer, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
     }
   };
 
-  // Handle form field changes
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
+  // Handle photo changes
+  const handlePhotoChange = (field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl', file: File | null) => {
+    if (file) {
+      // In real app, you would upload the file and get URL
+      const fakeUrl = URL.createObjectURL(file);
+      handleInputChange(field, fakeUrl);
+    } else {
+      handleInputChange(field, '');
     }
   };
 
-  // Validate form
+  // Validation
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // Required name
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+    if (!formData.name?.trim()) {
+      newErrors.name = 'Ime je obavezno';
     }
 
-    // Required driver license number
-    if (!formData.driverLicenseNumber?.trim()) {
-      newErrors.driverLicenseNumber = 'Driver license number is required';
+    if (!formData.email?.trim()) {
+      newErrors.email = 'Email je obavezan';
+    } else if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email format nije valjan';
     }
 
-    // Required passport number
-    if (!formData.passportNumber?.trim()) {
-      newErrors.passportNumber = 'Passport number is required';
+    if (!formData.phoneNumber?.trim()) {
+      newErrors.phoneNumber = 'Broj telefona je obavezan';
     }
 
-    // Email validation
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    // Phone validation
-    if (
-      formData.phoneNumber &&
-      !/^\+?[0-9\s-()]{7,}$/.test(formData.phoneNumber)
-    ) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
+    if (!formData.countryOfOrigin?.trim()) {
+      newErrors.countryOfOrigin = 'Zemlja porijekla je obavezna';
     }
 
     setErrors(newErrors);
@@ -148,418 +113,198 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
   };
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!validateForm()) {
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      setIsSubmitting(true);
       await onSave(formData);
     } catch (error) {
-      console.error('Error creating customer:', error);
-      setErrors((prev) => ({
-        ...prev,
-        submit: 'Failed to create customer. Please try again.',
-      }));
+      console.error('Error saving customer:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="create-customer-form-container">
-        <div className="form-header">
-          <h2>Add New Customer</h2>
-          <button type="button" className="close-button" onClick={onCancel}>
-            <XIcon className="icon" />
-          </button>
-        </div>
-
-        {errors.submit && (
-          <div className="global-error">
-            <ExclamationCircleIcon className="error-icon" />
-            <span>{errors.submit}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="create-customer-form">
-          <div className="form-sections">
-            <div className="form-section">
-              <h3 className="section-title">Basic Information</h3>
-              <div className="form-row">
-                <div className={`form-field ${errors.name ? 'has-error' : ''}`}>
-                  <label htmlFor="name">
-                    Full Name <span className="required-mark">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter customer's full name"
-                  />
-                  {errors.name && (
-                    <div className="field-error">
-                      <ExclamationCircleIcon className="error-icon-small" />
-                      <span>{errors.name}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-field">
-                  <label htmlFor="countryOfOrigin">Country of Origin</label>
-                  <div className="custom-dropdown" style={{ position: 'relative' }}>
-                    <div
-                      className="dropdown-trigger"
-                      onClick={() => !loadingCountries && !countriesError && setIsDropdownOpen(!isDropdownOpen)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        backgroundColor: loadingCountries ? '#f5f5f5' : '#fff',
-                        cursor: loadingCountries || countriesError ? 'not-allowed' : 'pointer',
-                        minHeight: '44px',
-                        fontSize: '14px'
-                      }}
-                    >
-                      {loadingCountries ? (
-                        <span style={{ color: '#666' }}>Loading countries...</span>
-                      ) : countriesError ? (
-                        <span style={{ color: '#dc3545' }}>Error loading countries</span>
-                      ) : formData.countryOfOrigin ? (
-                        <>
-                          <img
-                            src={`https://flagcdn.com/w20/${countries.find(c => c.name === formData.countryOfOrigin)?.code.toLowerCase()}.png`}
-                            alt=""
-                            style={{
-                              width: '20px',
-                              height: '15px',
-                              marginRight: '8px'
-                            }}
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                            }}
-                          />
-                          <span>{formData.countryOfOrigin}</span>
-                        </>
-                      ) : (
-                        <span style={{ color: '#999' }}>Select country</span>
-                      )}
-                      <span style={{ marginLeft: 'auto', color: '#666' }}>▼</span>
-                    </div>
-
-                    {isDropdownOpen && !loadingCountries && !countriesError && (
-                      <div
-                        className="dropdown-menu"
-                        style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: 0,
-                          right: 0,
-                          backgroundColor: '#fff',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                          maxHeight: '200px',
-                          overflowY: 'auto',
-                          zIndex: 1000,
-                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-                        }}
-                      >
-                        <div style={{ padding: '8px' }}>
-                          <input
-                            type="text"
-                            placeholder="Search countries..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{
-                              width: '100%',
-                              padding: '8px',
-                              border: '1px solid #ddd',
-                              borderRadius: '4px',
-                              fontSize: '14px',
-                              outline: 'none'
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </div>
-                        {filteredCountries.map((country) => (
-                          <div
-                            key={country.code}
-                            className="dropdown-option"
-                            onClick={() => handleCountrySelect(country.name)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              padding: '8px 12px',
-                              cursor: 'pointer',
-                              borderBottom: '1px solid #f0f0f0'
-                            }}
-                            onMouseEnter={(e) => {
-                              (e.target as HTMLElement).style.backgroundColor = '#f5f5f5';
-                            }}
-                            onMouseLeave={(e) => {
-                              (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                            }}
-                          >
-                            <img
-                              src={`https://flagcdn.com/w20/${country.code.toLowerCase()}.png`}
-                              alt={`${country.name} flag`}
-                              style={{
-                                width: '20px',
-                                height: '15px',
-                                marginRight: '8px'
-                              }}
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                              }}
-                            />
-                            <span>{country.name}</span>
-                          </div>
-                        ))}
-                        {filteredCountries.length === 0 && searchTerm && (
-                          <div style={{ 
-                            padding: '12px', 
-                            color: '#666', 
-                            textAlign: 'center' 
-                          }}>
-                            No countries found
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {countriesError && (
-                    <div
-                      className="error-message"
-                      style={{
-                        fontSize: '12px',
-                        color: '#dc3545',
-                        marginTop: '4px',
-                      }}
-                    >
-                      ⚠️ {countriesError}{' '}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const fetchCountries = async () => {
-                            try {
-                              setLoadingCountries(true);
-                              setCountriesError(null);
-                              const countryList = await getCountries();
-                              setCountries(countryList);
-                            } catch (error) {
-                              const errorMessage =
-                                error instanceof Error
-                                  ? error.message
-                                  : 'Failed to load countries';
-                              setCountriesError(errorMessage);
-                            } finally {
-                              setLoadingCountries(false);
-                            }
-                          };
-                          fetchCountries();
-                        }}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#007bff',
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                          fontSize: '12px',
-                          padding: '0',
-                          marginLeft: '4px',
-                        }}
-                      >
-                        Retry
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div
-                  className={`form-field ${
-                    errors.driverLicenseNumber ? 'has-error' : ''
-                  }`}
-                >
-                  <label htmlFor="driverLicenseNumber">
-                    Driver License Number{' '}
-                    <span className="required-mark">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="driverLicenseNumber"
-                    name="driverLicenseNumber"
-                    value={formData.driverLicenseNumber}
-                    onChange={handleChange}
-                    placeholder="Enter driver license number"
-                  />
-                  {errors.driverLicenseNumber && (
-                    <div className="field-error">
-                      <ExclamationCircleIcon className="error-icon-small" />
-                      <span>{errors.driverLicenseNumber}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  className={`form-field ${
-                    errors.passportNumber ? 'has-error' : ''
-                  }`}
-                >
-                  <label htmlFor="passportNumber">
-                    Passport Number <span className="required-mark">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="passportNumber"
-                    name="passportNumber"
-                    value={formData.passportNumber}
-                    onChange={handleChange}
-                    placeholder="Enter passport number"
-                  />
-                  {errors.passportNumber && (
-                    <div className="field-error">
-                      <ExclamationCircleIcon className="error-icon-small" />
-                      <span>{errors.passportNumber}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="form-section">
-              <h3 className="section-title">Contact Information</h3>
-              <div className="form-row">
-                <div
-                  className={`form-field ${errors.email ? 'has-error' : ''}`}
-                >
-                  <label htmlFor="email">Email Address</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter email address"
-                  />
-                  {errors.email && (
-                    <div className="field-error">
-                      <ExclamationCircleIcon className="error-icon-small" />
-                      <span>{errors.email}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  className={`form-field ${errors.phoneNumber ? 'has-error' : ''}`}
-                >
-                  <label htmlFor="phoneNumber">Phone Number</label>
-                  <input
-                    type="tel"
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    placeholder="Enter phone number"
-                  />
-                  {errors.phoneNumber && (
-                    <div className="field-error">
-                      <ExclamationCircleIcon className="error-icon-small" />
-                      <span>{errors.phoneNumber}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-field">
-                  <label htmlFor="address">Address</label>
-                  <textarea
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    placeholder="Enter customer's address"
-                    rows={3}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="form-section">
-              <h3 className="section-title">Document Photos (Optional)</h3>
-              <div className="form-row">
-                <div className="form-field">
-                  <label htmlFor="drivingLicensePhotoUrl">
-                    Driver License Photo URL
-                  </label>
-                  <input
-                    type="url"
-                    id="drivingLicensePhotoUrl"
-                    name="drivingLicensePhotoUrl"
-                    value={formData.drivingLicensePhotoUrl}
-                    onChange={handleChange}
-                    placeholder="Enter URL for driver license photo"
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label htmlFor="passportPhotoUrl">Passport Photo URL</label>
-                  <input
-                    type="url"
-                    id="passportPhotoUrl"
-                    name="passportPhotoUrl"
-                    value={formData.passportPhotoUrl}
-                    onChange={handleChange}
-                    placeholder="Enter URL for passport photo"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
+    <div className="create-customer-form-overlay">
+      <Card className="create-customer-form-card" size="lg">
+        <CardHeader
+          title="Dodaj novog korisnika"
+          subtitle="Unesite podatke o novom korisniku"
+          actions={
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onCancel}
-              disabled={isSubmitting}
+              leftIcon={<XIcon />}
             >
-              Cancel
-            </button>
+              Zatvori
+            </Button>
+          }
+        />
 
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="spinner-small"></div>
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <UserAddIcon className="button-icon" />
-                  Create Customer
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div className="create-customer-form-content">
+          <form onSubmit={handleSubmit} className="create-customer-form">
+            <div className="form-sections">
+              {/* Personal Information Section */}
+              <div className="form-section">
+                <h3 className="form-section__title">Lični podaci</h3>
+                
+                <div className="form-row form-row--single">
+                  <FormField
+                    label="Ime i prezime"
+                    required
+                    error={errors.name}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      placeholder="Unesite ime i prezime"
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Email adresa"
+                    required
+                    error={errors.email}
+                  >
+                    <input
+                      type="email"
+                      className="ui-input"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="example@email.com"
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Broj telefona"
+                    required
+                    error={errors.phoneNumber}
+                  >
+                    <input
+                      type="tel"
+                      className="ui-input"
+                      value={formData.phoneNumber}
+                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      placeholder="+387 61 123 456"
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Adresa"
+                    error={errors.address}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.address}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      placeholder="Unesite adresu"
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Zemlja porijekla"
+                    required
+                    error={errors.countryOfOrigin}
+                  >
+                    <CountryDropdown
+                      countries={countries}
+                      selectedCountry={formData.countryOfOrigin || ''}
+                      onSelect={(country: string) => handleInputChange('countryOfOrigin', country)}
+                      loading={loadingCountries}
+                      error={countriesError}
+                    />
+                  </FormField>
+                </div>
+              </div>
+
+              {/* Documents Section */}
+              <div className="form-section">
+                <h3 className="form-section__title">Dokumenti</h3>
+                
+                <div className="form-row">
+                  <FormField
+                    label="Broj vozačke dozvole"
+                    error={errors.driverLicenseNumber}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.driverLicenseNumber}
+                      onChange={(e) => handleInputChange('driverLicenseNumber', e.target.value)}
+                      placeholder="Unesite broj vozačke dozvole"
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Broj pasoša"
+                    error={errors.passportNumber}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.passportNumber}
+                      onChange={(e) => handleInputChange('passportNumber', e.target.value)}
+                      placeholder="Unesite broj pasoša"
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <CustomerPhotoField
+                    label="Slika vozačke dozvole"
+                    photoUrl={formData.drivingLicensePhotoUrl}
+                    onFileChange={(file) => handlePhotoChange('drivingLicensePhotoUrl', file)}
+                    error={errors.drivingLicensePhotoUrl}
+                  />
+
+                  <CustomerPhotoField
+                    label="Slika pasoša"
+                    photoUrl={formData.passportPhotoUrl}
+                    onFileChange={(file) => handlePhotoChange('passportPhotoUrl', file)}
+                    error={errors.passportPhotoUrl}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="form-actions">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onCancel}
+                disabled={isSubmitting}
+              >
+                Otkaži
+              </Button>
+              
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={isSubmitting}
+                leftIcon={<UserAddIcon />}
+              >
+                {isSubmitting ? 'Čuvanje...' : 'Sačuvaj korisnika'}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </Card>
+    </div>
   );
 };
 
