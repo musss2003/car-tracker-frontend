@@ -34,6 +34,9 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
     countryOfOrigin: '',
     drivingLicensePhotoUrl: '',
     passportPhotoUrl: '',
+    fatherName: '',
+    cityOfResidence: '',
+    idOfPerson: '',
     createdAt: new Date(),
     updatedAt: new Date(),
   });
@@ -259,6 +262,59 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                   </FormField>
                 </div>
               </div>
+
+              {/* Bosnia and Herzegovina Additional Fields */}
+              {formData.countryOfOrigin === 'Bosnia and Herzegovina' && (
+                <div className="form-section">
+                  <h3 className="form-section__title">Dodatni podaci za državljane BiH</h3>
+                  
+                  <div className="form-row form-row--single">
+                    <FormField
+                      label="Ime oca"
+                      error={errors.fatherName}
+                    >
+                      <input
+                        type="text"
+                        className="ui-input"
+                        value={formData.fatherName || ''}
+                        onChange={(e) => handleInputChange('fatherName', e.target.value)}
+                        placeholder="Unesite ime oca"
+                        disabled={isSubmitting}
+                      />
+                    </FormField>
+                  </div>
+
+                  <div className="form-row">
+                    <FormField
+                      label="Grad prebivališta"
+                      error={errors.cityOfResidence}
+                    >
+                      <input
+                        type="text"
+                        className="ui-input"
+                        value={formData.cityOfResidence || ''}
+                        onChange={(e) => handleInputChange('cityOfResidence', e.target.value)}
+                        placeholder="Unesite grad prebivališta"
+                        disabled={isSubmitting}
+                      />
+                    </FormField>
+
+                    <FormField
+                      label="JMBG"
+                      error={errors.idOfPerson}
+                    >
+                      <input
+                        type="text"
+                        className="ui-input"
+                        value={formData.idOfPerson || ''}
+                        onChange={(e) => handleInputChange('idOfPerson', e.target.value)}
+                        placeholder="Unesite JMBG"
+                        disabled={isSubmitting}
+                      />
+                    </FormField>
+                  </div>
+                </div>
+              )}
 
               {/* Documents Section */}
               <div className="form-section">

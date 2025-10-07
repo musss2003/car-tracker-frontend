@@ -36,6 +36,9 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
     countryOfOrigin: customer.countryOfOrigin || (customer as any).country_of_origin || '',
     drivingLicensePhotoUrl: customer.drivingLicensePhotoUrl || (customer as any).driving_license_photo_url || '',
     passportPhotoUrl: customer.passportPhotoUrl || (customer as any).passport_photo_url || '',
+    fatherName: customer.fatherName || (customer as any).father_name || '',
+    cityOfResidence: customer.cityOfResidence || (customer as any).city_of_residence || '',
+    idOfPerson: customer.idOfPerson || (customer as any).id_of_person || '',
   });
 
   // Track which fields have been modified
@@ -247,6 +250,56 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                   </FormField>
                 </div>
               </div>
+
+              {/* Bosnia and Herzegovina Additional Fields */}
+              {formData.countryOfOrigin === 'Bosnia and Herzegovina' && (
+                <div className="form-section">
+                  <h3 className="form-section__title">Dodatni podaci za državljane BiH</h3>
+                  
+                  <div className="form-row form-row--single">
+                    <FormField
+                      label="Ime oca"
+                      error={errors.fatherName}
+                    >
+                      <input
+                        type="text"
+                        className="ui-input"
+                        value={formData.fatherName || ''}
+                        onChange={(e) => handleInputChange('fatherName', e.target.value)}
+                        placeholder="Unesite ime oca"
+                      />
+                    </FormField>
+                  </div>
+
+                  <div className="form-row">
+                    <FormField
+                      label="Grad prebivališta"
+                      error={errors.cityOfResidence}
+                    >
+                      <input
+                        type="text"
+                        className="ui-input"
+                        value={formData.cityOfResidence || ''}
+                        onChange={(e) => handleInputChange('cityOfResidence', e.target.value)}
+                        placeholder="Unesite grad prebivališta"
+                      />
+                    </FormField>
+
+                    <FormField
+                      label="JMBG"
+                      error={errors.idOfPerson}
+                    >
+                      <input
+                        type="text"
+                        className="ui-input"
+                        value={formData.idOfPerson || ''}
+                        onChange={(e) => handleInputChange('idOfPerson', e.target.value)}
+                        placeholder="Unesite JMBG"
+                      />
+                    </FormField>
+                  </div>
+                </div>
+              )}
 
               {/* Documents Section */}
               <div className="form-section">

@@ -75,6 +75,47 @@ const CustomerInfoSection: React.FC<CustomerInfoSectionProps> = ({
             {getFieldValue(customer.countryOfOrigin, (customer as any).country_of_origin)}
           </div>
         </div>
+
+        {/* Bosnia and Herzegovina Additional Fields */}
+        {(customer.countryOfOrigin === 'Bosnia and Herzegovina' || (customer as any).country_of_origin === 'Bosnia and Herzegovina') && (
+          <>
+            {(customer.fatherName || (customer as any).father_name) && (
+              <div className="info-item">
+                <div className="info-item__label">
+                  <UserIcon className="info-icon" />
+                  Ime oca
+                </div>
+                <div className="info-item__value">
+                  {getFieldValue(customer.fatherName, (customer as any).father_name)}
+                </div>
+              </div>
+            )}
+
+            {(customer.cityOfResidence || (customer as any).city_of_residence) && (
+              <div className="info-item">
+                <div className="info-item__label">
+                  <LocationMarkerIcon className="info-icon" />
+                  Grad prebivališta
+                </div>
+                <div className="info-item__value">
+                  {getFieldValue(customer.cityOfResidence, (customer as any).city_of_residence)}
+                </div>
+              </div>
+            )}
+
+            {(customer.idOfPerson || (customer as any).id_of_person) && (
+              <div className="info-item">
+                <div className="info-item__label">
+                  <IdentificationIcon className="info-icon" />
+                  JMBG
+                </div>
+                <div className="info-item__value">
+                  {getFieldValue(customer.idOfPerson, (customer as any).id_of_person)}
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
