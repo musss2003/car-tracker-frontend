@@ -5,7 +5,9 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Sidebar from './components/Sidebar/Sidebar';
+import { MobileHeader } from './components/UI';
 import { AppRoutes } from './routes/AppRoutes';
+import './utils/themeManager'; // Initialize theme manager
 import './App.css';
 
 function App() {
@@ -31,6 +33,14 @@ function App() {
             isOpen={isSidebarOpen}
             isSmallScreen={isSmallScreen}
             toggleSidebar={toggleSidebar}
+          />
+        )}
+
+        {/* Mobile Header */}
+        {isLoggedIn() && (
+          <MobileHeader
+            onMenuClick={toggleSidebar}
+            isVisible={isSmallScreen}
           />
         )}
 

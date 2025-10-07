@@ -10,8 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  animation: fadeIn 0.3s ease-out;
+  padding: var(--spacing-md);
+  animation: fadeIn var(--transition-slow) ease-out;
 }
 
 @keyframes fadeIn {
@@ -29,7 +29,7 @@
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.3s ease-out;
+  animation: slideUp var(--transition-slow) ease-out;
   position: relative;
   overflow: visible; /* Allow dropdowns to extend beyond card */
 }
@@ -49,14 +49,14 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: visible; /* Allow dropdowns to extend horizontally */
-  padding: 2rem;
+  padding: var(--spacing-xl);
   position: relative;
 }
 
 .edit-customer-form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--spacing-xl);
 }
 
 .form-sections {
@@ -70,7 +70,7 @@
 .form-section {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-lg);
   position: relative;
   overflow: visible; /* Allow dropdowns to extend beyond section */
 }
@@ -78,20 +78,20 @@
 .form-section__title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--text-primary);
   margin: 0;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border-primary);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .form-section__title::before {
   content: '';
   width: 4px;
-  height: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: var(--spacing-lg);
+  background: var(--gradient-primary);
   border-radius: 2px;
 }
 

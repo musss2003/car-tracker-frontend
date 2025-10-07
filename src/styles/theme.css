@@ -1,0 +1,175 @@
+/* ===========================================
+   RENT A CAR - Color Theme System
+   =========================================== */
+
+:root {
+  /* Primary Brand Colors */
+  --primary-color: #0056b3;
+  --primary-color-light: #007bff;
+  --primary-color-dark: #004494;
+  --primary-color-darker: #003d82;
+
+  /* Secondary Colors */
+  --secondary-color: #6c757d;
+  --secondary-color-light: #adb5bd;
+  --secondary-color-dark: #495057;
+
+  /* Accent Colors */
+  --accent-color: #28a745;
+  --accent-color-light: #34ce57;
+  --accent-color-dark: #1e7e34;
+
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --bg-dark: #343a40;
+  --bg-darker: #212529;
+
+  /* Text Colors */
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+  --text-light: #ffffff;
+  --text-inverse: #ffffff;
+
+  /* Border Colors */
+  --border-primary: #dee2e6;
+  --border-secondary: #e9ecef;
+  --border-dark: #6c757d;
+
+  /* Status Colors */
+  --success-color: #28a745;
+  --success-color-light: #d4edda;
+  --success-color-dark: #155724;
+
+  --warning-color: #ffc107;
+  --warning-color-light: #fff3cd;
+  --warning-color-dark: #856404;
+
+  --error-color: #dc3545;
+  --error-color-light: #f8d7da;
+  --error-color-dark: #721c24;
+
+  --info-color: #17a2b8;
+  --info-color-light: #d1ecf1;
+  --info-color-dark: #0c5460;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+  --gradient-primary-dark: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
+  --gradient-primary-darker: linear-gradient(135deg, var(--primary-color-darker) 0%, var(--primary-color-dark) 100%);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 86, 179, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 86, 179, 0.15);
+  --shadow-lg: 0 6px 16px rgba(0, 86, 179, 0.2);
+  --shadow-xl: 0 8px 24px rgba(0, 86, 179, 0.25);
+
+  /* Interactive States */
+  --hover-opacity: 0.85;
+  --active-opacity: 0.7;
+  --disabled-opacity: 0.5;
+
+  /* Spacing (for consistency) */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
+
+  /* Border Radius */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+  --border-radius-xl: 1.5rem;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}
+
+/* ===========================================
+   Alternative Color Themes
+   =========================================== */
+
+/* Green Theme */
+.theme-green {
+  --primary-color: #28a745;
+  --primary-color-light: #34ce57;
+  --primary-color-dark: #1e7e34;
+  --primary-color-darker: #155724;
+  --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+  --gradient-primary-dark: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
+  --gradient-primary-darker: linear-gradient(135deg, var(--primary-color-darker) 0%, var(--primary-color-dark) 100%);
+  --shadow-sm: 0 2px 4px rgba(40, 167, 69, 0.1);
+  --shadow-md: 0 4px 12px rgba(40, 167, 69, 0.15);
+  --shadow-lg: 0 6px 16px rgba(40, 167, 69, 0.2);
+  --shadow-xl: 0 8px 24px rgba(40, 167, 69, 0.25);
+}
+
+/* Purple Theme */
+.theme-purple {
+  --primary-color: #6f42c1;
+  --primary-color-light: #8a63d2;
+  --primary-color-dark: #59359a;
+  --primary-color-darker: #4c2a85;
+  --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+  --gradient-primary-dark: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
+  --gradient-primary-darker: linear-gradient(135deg, var(--primary-color-darker) 0%, var(--primary-color-dark) 100%);
+  --shadow-sm: 0 2px 4px rgba(111, 66, 193, 0.1);
+  --shadow-md: 0 4px 12px rgba(111, 66, 193, 0.15);
+  --shadow-lg: 0 6px 16px rgba(111, 66, 193, 0.2);
+  --shadow-xl: 0 8px 24px rgba(111, 66, 193, 0.25);
+}
+
+/* Orange Theme */
+.theme-orange {
+  --primary-color: #fd7e14;
+  --primary-color-light: #fe8d39;
+  --primary-color-dark: #e8610e;
+  --primary-color-darker: #cc5500;
+  --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+  --gradient-primary-dark: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
+  --gradient-primary-darker: linear-gradient(135deg, var(--primary-color-darker) 0%, var(--primary-color-dark) 100%);
+  --shadow-sm: 0 2px 4px rgba(253, 126, 20, 0.1);
+  --shadow-md: 0 4px 12px rgba(253, 126, 20, 0.15);
+  --shadow-lg: 0 6px 16px rgba(253, 126, 20, 0.2);
+  --shadow-xl: 0 8px 24px rgba(253, 126, 20, 0.25);
+}
+
+/* Dark Theme */
+.theme-dark {
+  --bg-primary: #2d3748;
+  --bg-secondary: #1a202c;
+  --bg-tertiary: #171923;
+  --text-primary: #f7fafc;
+  --text-secondary: #e2e8f0;
+  --text-muted: #a0aec0;
+  --border-primary: #4a5568;
+  --border-secondary: #2d3748;
+}
+
+/* ===========================================
+   Usage Instructions
+   ===========================================
+   
+   To change the entire app theme, simply add a class to the body:
+   
+   Default Blue Theme:    <body> (no class needed)
+   Green Theme:          <body class="theme-green">
+   Purple Theme:         <body class="theme-purple">
+   Orange Theme:         <body class="theme-orange">
+   Dark Mode:            <body class="theme-dark">
+   
+   Custom colors can be created by overriding CSS variables:
+   
+   .theme-custom {
+     --primary-color: #your-color;
+     --primary-color-light: #your-light-color;
+     --primary-color-dark: #your-dark-color;
+   }
+   
+   =========================================== */
