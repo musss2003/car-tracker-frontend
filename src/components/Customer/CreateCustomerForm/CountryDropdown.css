@@ -126,7 +126,6 @@
 }
 
 .country-dropdown__search-input {
-  width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
@@ -166,7 +165,8 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.875rem 1rem;
+  padding: 1rem 1rem;
+  margin-left: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
   border-bottom: 1px solid rgba(229, 231, 235, 0.5);

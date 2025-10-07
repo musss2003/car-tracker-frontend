@@ -7,6 +7,7 @@ import { getCountries, CountryOption } from '../../../services/customerService';
 
 import './CreateCustomerForm.css';
 import CountryDropdown from './CountryDropdown';
+import PhoneNumberField from './PhoneNumberField';
 
 interface CreateCustomerFormProps {
   onSave: (customerData: Customer) => void;
@@ -174,7 +175,6 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                 <div className="form-row">
                   <FormField
                     label="Email adresa"
-                    required
                     error={errors.email}
                   >
                     <input
@@ -188,15 +188,15 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 
                   <FormField
                     label="Broj telefona"
-                    required
                     error={errors.phoneNumber}
                   >
-                    <input
-                      type="tel"
-                      className="ui-input"
-                      value={formData.phoneNumber}
-                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                      placeholder="+387 61 123 456"
+                    <PhoneNumberField
+                      countries={countries}
+                      value={formData.phoneNumber || ''}
+                      onChange={(value) => handleInputChange('phoneNumber', value)}
+                      loading={loadingCountries}
+                      error={countriesError}
+                      placeholder="61123456"
                     />
                   </FormField>
                 </div>
@@ -239,6 +239,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                   <FormField
                     label="Broj vozačke dozvole"
                     error={errors.driverLicenseNumber}
+                    required
                   >
                     <input
                       type="text"
@@ -252,6 +253,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                   <FormField
                     label="Broj pasoša"
                     error={errors.passportNumber}
+                    required
                   >
                     <input
                       type="text"

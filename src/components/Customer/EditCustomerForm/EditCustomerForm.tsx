@@ -3,6 +3,7 @@ import { XIcon, SaveIcon } from '@heroicons/react/solid';
 import { Card, CardHeader, Button, FormField } from '../../UI';
 import { CustomerPhotoField } from '../shared';
 import CountryDropdown from '../CreateCustomerForm/CountryDropdown';
+import PhoneNumberField from '../CreateCustomerForm/PhoneNumberField';
 import { Customer } from '../../../types/Customer';
 import { getCountries, CountryOption } from '../../../services/customerService';
 import './EditCustomerForm.css';
@@ -212,12 +213,13 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                     required
                     error={errors.phoneNumber}
                   >
-                    <input
-                      type="tel"
-                      className="ui-input"
+                    <PhoneNumberField
+                      countries={countries}
                       value={formData.phoneNumber || ''}
-                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                      placeholder="+387 61 123 456"
+                      onChange={(value) => handleInputChange('phoneNumber', value)}
+                      loading={loadingCountries}
+                      error={countriesError}
+                      placeholder="61123456"
                     />
                   </FormField>
                 </div>
