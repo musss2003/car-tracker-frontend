@@ -703,33 +703,55 @@
   }
 }
 
-/* Add these styles to the existing CSS file */
+/* Smooth overlay animations */
 .overlay-container {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  background-color: #f9fafb;
-  min-height: 100vh; /* Changed from 100% to 100vh */
-  overflow-y: auto; /* Added to ensure container is scrollable */
+  align-items: center;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  z-index: 1000;
+  padding: 2rem;
+  overflow-y: auto;
+  animation: overlayAppear 0.4s ease-out forwards;
 }
 
 .form-container,
 .details-container {
   width: 100%;
   max-width: 800px;
-  animation: slide-in 0.3s ease-out;
-  margin-bottom: 2rem; /* Added to ensure there's space at the bottom */
+  margin: auto 0;
+  opacity: 0;
+  transform: scale(0.9);
+  animation: formAppear 0.5s ease-out 0.1s forwards;
 }
 
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+/* Smooth overlay background animation */
+@keyframes overlayAppear {
+  0% {
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
   }
-  to {
+  100% {
+    background: rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Smooth form appearance animation */
+@keyframes formAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
 }
 

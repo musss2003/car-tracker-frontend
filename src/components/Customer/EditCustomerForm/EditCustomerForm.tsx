@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SaveIcon } from '@heroicons/react/solid';
 import { Card, CardHeader, Button, FormField } from '../../UI';
-import { CustomerPhotoField } from '../shared';
+import CustomerPhotoFieldSupabase from '../CustomerPhotoFieldSupabase';
 import CountryDropdown from '../CreateCustomerForm/CountryDropdown';
 import PhoneNumberField from '../CreateCustomerForm/PhoneNumberField';
 import { Customer } from '../../../types/Customer';
@@ -82,15 +82,9 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
     }
   };
 
-  // Handle photo changes
-  const handlePhotoChange = (field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl', file: File | null) => {
-    if (file) {
-      // In real app, you would upload the file and get URL
-      const fakeUrl = URL.createObjectURL(file);
-      handleInputChange(field, fakeUrl);
-    } else {
-      handleInputChange(field, '');
-    }
+  // Handle Supabase photo changes
+  const handlePhotoChange = (field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl', uploadedUrl: string | null) => {
+    handleInputChange(field, uploadedUrl || '');
   };
 
   // Check if form has been modified
@@ -177,7 +171,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
               <div className="form-section">
                 <h3 className="form-section__title">Lični podaci</h3>
                 
-                <div className="form-row">
+                <div className="form-row form-row--single">
                   <FormField
                     label="Ime i prezime"
                     required
@@ -229,17 +223,15 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                     label="Adresa"
                     error={errors.address}
                   >
-                    <textarea
-                      className="ui-input ui-textarea"
+                    <input
+                      type="text"
+                      className="ui-input"
                       value={formData.address || ''}
                       onChange={(e) => handleInputChange('address', e.target.value)}
                       placeholder="Unesite adresu"
-                      rows={3}
                     />
                   </FormField>
-                </div>
 
-                <div className="form-row">
                   <FormField
                     label="Zemlja porijekla"
                     required
@@ -289,18 +281,22 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                 </div>
 
                 <div className="form-row">
-                  <CustomerPhotoField
+                  <CustomerPhotoFieldSupabase
                     label="Slika vozačke dozvole"
-                    photoUrl={formData.drivingLicensePhotoUrl}
-                    onFileChange={(file) => handlePhotoChange('drivingLicensePhotoUrl', file)}
-                    error={errors.drivingLicensePhotoUrl as string}
+                    value={formData.drivingLicensePhotoUrl}
+                    onChange={(url) => handlePhotoChange('drivingLicensePhotoUrl', url)}
+                    customerId={customer.id}
+                    documentType="license"
+                    disabled={isSubmitting}
                   />
 
-                  <CustomerPhotoField
+                  <CustomerPhotoFieldSupabase
                     label="Slika pasoša"
-                    photoUrl={formData.passportPhotoUrl}
-                    onFileChange={(file) => handlePhotoChange('passportPhotoUrl', file)}
-                    error={errors.passportPhotoUrl as string}
+                    value={formData.passportPhotoUrl}
+                    onChange={(url) => handlePhotoChange('passportPhotoUrl', url)}
+                    customerId={customer.id}
+                    documentType="passport"
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>

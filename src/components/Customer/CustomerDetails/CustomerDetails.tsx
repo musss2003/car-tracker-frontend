@@ -55,12 +55,14 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
       const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
       if (isNaN(date.getTime())) return 'N/A';
 
-      return date.toLocaleDateString('bs-BA', {
+      return date.toLocaleDateString('en-US', {
         year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }) + ' ' + date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false
       });
     } catch (error) {
       return 'N/A';

@@ -25,9 +25,9 @@ import {
 import './CustomersTable.css';
 import CustomerDetails from '../../../components/Customer/CustomerDetails/CustomerDetails';
 import EditCustomerForm from '../../../components/Customer/EditCustomerForm/EditCustomerForm';
-import CreateCustomerForm from '../../../components/Customer/CreateCustomerForm/CreateCustomerForm';
 import * as XLSX from 'xlsx';
 import { Customer } from '../../../types/Customer';
+import CreateCustomerForm from '../../../components/Customer/CreateCustomerForm/CreateCustomerForm';
 
 const CustomersTable = () => {
   // State management

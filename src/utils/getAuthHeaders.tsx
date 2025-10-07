@@ -1,7 +1,14 @@
 export const getAuthHeaders = () => {
   const token = localStorage.getItem('accessToken'); // Retrieve access token from local storage
-  return {
+  
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`, // Set Authorization header with token
   };
+  
+  // Only add Authorization header if token exists
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  
+  return headers;
 };

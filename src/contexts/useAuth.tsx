@@ -17,6 +17,7 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   isLoggedIn: () => boolean;
   isReady: boolean;
+  refreshSession: () => Promise<void>;
 }
 
 export const UserContext = createContext<AuthContextType | undefined>(
@@ -27,30 +28,14 @@ interface Props {
   children: React.ReactNode;
 }
 
-// Mock data for development mode
-const MOCK_USER: User = {
-  username: 'testuser',
-  email: 'testuser@example.com',
-  id: '12345',
-  role: UserRole.USER,
-};
-
 const UserProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
-  const isDevelopment = false; // import.meta.env.MODE === 'development';
 
   const checkSession = useCallback(async () => {
-    if (isDevelopment) {
-      console.warn('Development Mode: Mock session data loaded.');
-      setUser(MOCK_USER);
-      setIsReady(true);
-      return;
-    }
-
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/auth/session-check`,
@@ -61,56 +46,78 @@ const UserProvider: React.FC<Props> = ({ children }) => {
         }
       );
 
-      if (!response.ok) throw new Error('Session not found');
+      if (!response.ok) {
+        throw new Error(`Session check failed: ${response.status}`);
+      }
 
       const data = await response.json();
-      setUser(data);
-    } catch {
+      
+      if (!data.authenticated) {
+        throw new Error('Not authenticated');
+      }
+      
+      // If backend returned a new access token, store it
+      if (data.accessToken) {
+        localStorage.setItem('accessToken', data.accessToken);
+        console.log('🔄 Access token refreshed successfully');
+      }
+      
+      setUser({
+        id: data.id,
+        username: data.username,
+        email: data.email,
+        role: data.role
+      });
+      
+    } catch (error: any) {
+      console.log('Session check failed:', error.message);
       setUser(null);
+      // Clear invalid access token
+      localStorage.removeItem('accessToken');
     } finally {
       setIsReady(true);
     }
-  }, [isDevelopment]);
+  }, []);
 
   useEffect(() => {
     checkSession();
   }, [location.pathname, checkSession]);
 
   const loginUser = async (username: string, password: string) => {
-    if (isDevelopment) {
-      console.warn('Development Mode: Mock login.');
-      setUser(MOCK_USER);
-      toast.success('Logged in as ' + MOCK_USER.username);
-      return;
-    }
-
     try {
       const res = await loginAPI(username, password);
+      
+      // Store access token in localStorage
+      if (res.data.accessToken) {
+        localStorage.setItem('accessToken', res.data.accessToken);
+      }
+      
       setUser(res.data);
+      toast.success(`Welcome back, ${res.data.username}!`);
       navigate('/');
-    } catch {
-      toast.error('Login failed');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast.error('Login failed. Please check your credentials.');
     }
   };
 
   const logout = async () => {
-    if (isDevelopment) {
-      console.warn('Development Mode: Mock logout.');
-      setUser(null);
-      toast.success('Logged out.');
-      return;
-    }
-
     try {
       await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
         headers: getAuthHeaders(),
       });
+      
+      toast.success('Successfully logged out.');
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      toast.error('Logout failed, but you have been logged out locally.');
+    } finally {
+      // Always clear local data regardless of server response
+      localStorage.removeItem('accessToken');
       setUser(null);
       navigate('/login');
-    } catch {
-      toast.error('Logout failed');
     }
   };
 
@@ -119,23 +126,29 @@ const UserProvider: React.FC<Props> = ({ children }) => {
     username: string,
     password: string
   ) => {
-    if (isDevelopment) {
-      console.warn('Development Mode: Mock registration.');
-      setUser(MOCK_USER);
-      toast.success('Registered as ' + MOCK_USER.username);
-      return;
-    }
-
     try {
       const res = await registerAPI(email, username, password);
+      
+      // Store access token in localStorage
+      if ((res.data as any).accessToken) {
+        localStorage.setItem('accessToken', (res.data as any).accessToken);
+      }
+      
       setUser(res.data);
+      toast.success(`Welcome, ${res.data.username}! Your account has been created.`);
       navigate('/');
-    } catch {
-      toast.error('Registration failed');
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      toast.error('Registration failed. Please try again.');
     }
   };
 
   const isLoggedIn = () => user !== null;
+
+  // Expose refresh session function for manual use
+  const refreshSession = useCallback(async () => {
+    await checkSession();
+  }, [checkSession]);
 
   return (
     <UserContext.Provider
@@ -147,9 +160,10 @@ const UserProvider: React.FC<Props> = ({ children }) => {
         registerUser,
         isLoggedIn,
         isReady,
+        refreshSession,
       }}
     >
-      {isReady ? children : <p>Loading...</p>}
+      {isReady ? children : <div>Loading authentication...</div>}
     </UserContext.Provider>
   );
 };

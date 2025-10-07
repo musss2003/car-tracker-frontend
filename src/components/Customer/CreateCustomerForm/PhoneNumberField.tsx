@@ -93,9 +93,6 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
     );
   }
 
-  // Debug: Check if we have countries
-  console.log('PhoneNumberField countries:', countries.length, 'isOpen:', isOpen);
-
   // Don't render if no countries available
   if (!countries || countries.length === 0) {
     return (
@@ -121,7 +118,7 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
   }
 
   return (
-    <div className="phone-field" ref={dropdownRef}>
+    <div className={`phone-field ${isOpen ? 'phone-field--open' : ''}`} ref={dropdownRef}>
       <div className="phone-field__container">
         {/* Country Code Dropdown */}
         <div className="phone-field__country-section">
