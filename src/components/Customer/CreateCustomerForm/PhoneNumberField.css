@@ -9,23 +9,23 @@
 .phone-field__container {
   display: flex;
   gap: 0;
-  border-radius: 12px;
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow-sm);
+  background: var(--white-overlay-ultra);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(103, 126, 234, 0.2);
-  transition: all 0.2s ease;
+  border: 1px solid var(--primary-color-light-rgba);
+  transition: var(--transition-normal);
 }
 
 .phone-field__container:hover {
-  border-color: rgba(103, 126, 234, 0.3);
-  box-shadow: 0 2px 8px rgba(103, 126, 234, 0.1);
+  border-color: var(--primary-color-medium-rgba);
+  box-shadow: var(--shadow-md);
 }
 
 .phone-field__container:focus-within {
-  border-color: #677eea;
-  box-shadow: 0 0 0 3px rgba(103, 126, 234, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light-rgba);
 }
 
 /* Country Code Section */
@@ -41,22 +41,22 @@
   min-width: 120px;
   height: 48px;
   padding: 0 12px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: var(--bg-tertiary);
   border: none;
-  border-right: 1px solid rgba(103, 126, 234, 0.2);
+  border-right: 1px solid var(--primary-color-light-rgba);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition-normal);
   font-size: 0.95rem;
   font-weight: 500;
 }
 
 .phone-field__country-trigger:hover {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: var(--bg-secondary);
 }
 
 .phone-field__country-trigger--open {
-  background: linear-gradient(135deg, #677eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--gradient-primary);
+  color: var(--text-light);
 }
 
 .phone-field__country-content {
@@ -87,7 +87,7 @@
 .phone-field__arrow {
   width: 16px;
   height: 16px;
-  transition: transform 0.2s ease;
+  transition: transform var(--transition-normal);
   flex-shrink: 0;
 }
 
@@ -108,13 +108,13 @@
   border: none;
   background: transparent;
   font-size: 1rem;
-  color: #334155;
+  color: var(--text-primary);
   outline: none;
-  transition: all 0.2s ease;
+  transition: var(--transition-normal);
 }
 
 .phone-field__number-input::placeholder {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-weight: 400;
 }
 
@@ -125,15 +125,15 @@
   left: 0;
   right: 0;
   min-width: 300px;
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--white-overlay-near);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(103, 126, 234, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--primary-color-light-rgba);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
   z-index: 9999;
   max-height: 280px;
   overflow: hidden;
-  animation: phoneDropdownShow 0.2s ease-out;
+  animation: phoneDropdownShow var(--transition-normal) ease-out;
 }
 
 @keyframes phoneDropdownShow {
@@ -150,26 +150,26 @@
 /* Search Input */
 .phone-field__search-container {
   padding: 12px;
-  border-bottom: 1px solid rgba(103, 126, 234, 0.1);
+  border-bottom: 1px solid var(--primary-color-light-rgba);
 }
 
 .phone-field__search {
-  padding: 8px 12px;
-  border: 1px solid rgba(103, 126, 234, 0.2);
-  border-radius: 8px;
+  padding: var(--spacing-sm) 12px;
+  border: 1px solid var(--primary-color-light-rgba);
+  border-radius: var(--border-radius-sm);
   font-size: 0.9rem;
-  background: rgba(255, 255, 255, 0.8);
-  transition: all 0.2s ease;
+  background: var(--white-overlay-heavy);
+  transition: var(--transition-normal);
   outline: none;
 }
 
 .phone-field__search:focus {
-  border-color: #677eea;
-  box-shadow: 0 0 0 2px rgba(103, 126, 234, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-light-rgba);
 }
 
 .phone-field__search::placeholder {
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 /* Options Container */
@@ -177,7 +177,7 @@
   max-height: 200px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(103, 126, 234, 0.3) transparent;
+  scrollbar-color: var(--primary-color-medium-rgba) transparent;
 }
 
 .phone-field__options::-webkit-scrollbar {
@@ -189,12 +189,12 @@
 }
 
 .phone-field__options::-webkit-scrollbar-thumb {
-  background: rgba(103, 126, 234, 0.3);
+  background: var(--primary-color-medium-rgba);
   border-radius: 3px;
 }
 
 .phone-field__options::-webkit-scrollbar-thumb:hover {
-  background: rgba(103, 126, 234, 0.5);
+  background: var(--primary-color-strong-rgba);
 }
 
 /* Option Item */
@@ -208,8 +208,8 @@
   background: transparent;
   text-align: left;
   cursor: pointer;
-  transition: all 0.15s ease;
-  border-bottom: 1px solid rgba(103, 126, 234, 0.05);
+  transition: var(--transition-fast);
+  border-bottom: 1px solid var(--primary-color-light-rgba);
 }
 
 .phone-field__option:last-child {
@@ -217,12 +217,12 @@
 }
 
 .phone-field__option:hover {
-  background: linear-gradient(135deg, rgba(103, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  background: var(--primary-color-light-rgba);
 }
 
 .phone-field__option--selected {
-  background: linear-gradient(135deg, rgba(103, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
-  color: #677eea;
+  background: var(--primary-color-medium-rgba);
+  color: var(--primary-color);
   font-weight: 600;
 }
 
@@ -237,7 +237,7 @@
 .phone-field__country-name {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #334155;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -245,19 +245,19 @@
 
 .phone-field__calling-code {
   font-size: 0.8rem;
-  color: #677eea;
+  color: var(--primary-color);
   font-weight: 600;
 }
 
 .phone-field__option--selected .phone-field__country-name {
-  color: #677eea;
+  color: var(--primary-color);
 }
 
 /* No Results */
 .phone-field__no-results {
   padding: 16px;
   text-align: center;
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-style: italic;
 }
@@ -269,19 +269,19 @@
   justify-content: center;
   gap: 12px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--white-overlay-ultra);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(103, 126, 234, 0.2);
-  border-radius: 12px;
-  color: #677eea;
+  border: 1px solid var(--primary-color-light-rgba);
+  border-radius: var(--border-radius-lg);
+  color: var(--primary-color);
   font-size: 0.9rem;
 }
 
 .phone-field__loading-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(103, 126, 234, 0.2);
-  border-top: 2px solid #677eea;
+  border: 2px solid var(--primary-color-light-rgba);
+  border-top: 2px solid var(--primary-color);
   border-radius: 50%;
   animation: phoneSpinner 1s linear infinite;
 }
@@ -294,10 +294,10 @@
 /* Error State */
 .phone-field__error {
   padding: 16px;
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid rgba(248, 113, 113, 0.3);
-  border-radius: 12px;
-  color: #dc2626;
+  background: var(--error-color-light);
+  border: 1px solid var(--error-color);
+  border-radius: var(--border-radius-lg);
+  color: var(--error-color);
   font-size: 0.9rem;
   text-align: center;
 }

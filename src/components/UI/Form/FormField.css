@@ -2,23 +2,23 @@
 .ui-form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
 }
 
 .ui-form-field__label {
   font-weight: 600;
-  color: #374151;
-  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--spacing-xs);
 }
 
 .ui-form-field__required {
-  color: #ef4444;
+  color: var(--error-color);
   font-weight: 700;
 }
 
@@ -27,8 +27,8 @@
 }
 
 .ui-form-field__error {
-  color: #ef4444;
-  font-size: 0.875rem;
+  color: var(--error-color);
+  font-size: var(--font-size-sm);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -37,56 +37,56 @@
 
 .ui-form-field__error::before {
   content: '⚠';
-  font-size: 1rem;
+  font-size: var(--font-size-base);
 }
 
 .ui-form-field__help {
-  color: #6b7280;
-  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
   font-style: italic;
 }
 
 .ui-form-field--error .ui-form-field__label {
-  color: #ef4444;
+  color: var(--error-color);
 }
 
 /* Input Styles that can be used with FormField */
 .ui-input {
   width: 100%;
-  padding: 1rem 1.25rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.75rem;
-  font-size: 1rem;
+  padding: var(--spacing-lg) 1.25rem;
+  border: var(--border-width-base) solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-base);
   font-weight: 500;
-  transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.9);
+  transition: var(--transition-slow);
+  background: var(--white-overlay-near);
   backdrop-filter: blur(10px);
   outline: none;
 }
 
 .ui-input:focus {
-  border-color: #667eea;
-  background: white;
+  border-color: var(--primary-color);
+  background: var(--bg-primary);
   box-shadow: 
-    0 0 0 3px rgba(102, 126, 234, 0.1),
-    0 4px 12px rgba(102, 126, 234, 0.15);
+    0 0 0 3px var(--primary-color-light-rgba),
+    var(--shadow-md);
 }
 
 .ui-input::placeholder {
-  color: #9ca3af;
+  color: var(--text-muted);
   font-weight: 400;
 }
 
 .ui-form-field--error .ui-input {
-  border-color: #ef4444;
-  background: rgba(254, 242, 242, 0.5);
+  border-color: var(--error-color);
+  background: var(--error-color-light);
 }
 
 .ui-form-field--error .ui-input:focus {
-  border-color: #ef4444;
+  border-color: var(--error-color);
   box-shadow: 
-    0 0 0 3px rgba(239, 68, 68, 0.1),
-    0 4px 12px rgba(239, 68, 68, 0.15);
+    0 0 0 3px var(--error-color-light-rgba),
+    var(--shadow-md);
 }
 
 /* Textarea */
@@ -108,18 +108,18 @@
 
 /* File Input */
 .ui-file-input {
-  padding: 0.75rem;
-  border: 2px dashed #d1d5db;
-  border-radius: 0.75rem;
+  padding: var(--spacing-md);
+  border: var(--border-width-base) dashed var(--border-primary);
+  border-radius: var(--border-radius-lg);
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: rgba(249, 250, 251, 0.5);
+  transition: var(--transition-slow);
+  background: var(--bg-secondary);
 }
 
 .ui-file-input:hover {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
+  border-color: var(--primary-color);
+  background: var(--primary-color-light-rgba);
 }
 
 .ui-file-input input[type="file"] {
@@ -129,11 +129,11 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 48rem) { /* 768px */
   .ui-input,
   .ui-textarea,
   .ui-select {
-    padding: 0.875rem 1rem;
+    padding: 0.875rem var(--spacing-lg);
     font-size: 0.9rem;
   }
   

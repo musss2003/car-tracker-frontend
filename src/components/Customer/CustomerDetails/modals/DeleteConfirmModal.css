@@ -5,14 +5,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--overlay-modal-dark);
   backdrop-filter: blur(8px);
   z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  animation: fadeIn 0.2s ease-out;
+  padding: var(--spacing-lg);
+  animation: fadeIn var(--transition-normal) ease-out;
 }
 
 @keyframes fadeIn {
@@ -26,19 +26,17 @@
 
 .delete-confirm-modal {
   background: white;
-  border-radius: 1rem;
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 12px 24px -8px rgba(0, 0, 0, 0.15);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-modal);
   width: 100%;
-  max-width: 480px;
-  animation: slideUp 0.2s ease-out;
+  max-width: var(--modal-max-width);
+  animation: slideUp var(--transition-normal) ease-out;
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(var(--modal-slide-offset));
   }
   to {
     opacity: 1;
@@ -48,26 +46,26 @@
 
 .delete-confirm-content {
   display: flex;
-  gap: 1.5rem;
-  padding: 2rem;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-2xl);
   align-items: flex-start;
 }
 
 .delete-confirm-icon {
   flex-shrink: 0;
-  width: 3rem;
-  height: 3rem;
+  width: var(--spacing-3xl);
+  height: var(--spacing-3xl);
   border-radius: 50%;
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  background: var(--gradient-error-light);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .delete-confirm-icon svg {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: #ef4444;
+  width: var(--spacing-xl);
+  height: var(--spacing-xl);
+  color: var(--color-error);
 }
 
 .delete-confirm-text {
@@ -75,44 +73,44 @@
 }
 
 .delete-confirm-title {
-  font-size: 1.25rem;
+  font-size: var(--font-size-xl);
   font-weight: 700;
-  color: #374151;
-  margin: 0 0 0.75rem 0;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-md) 0;
 }
 
 .delete-confirm-message {
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0 0 0.5rem 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--spacing-sm) 0;
   line-height: 1.5;
 }
 
 .delete-confirm-warning {
-  font-size: 0.875rem;
-  color: #ef4444;
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
   font-weight: 500;
   margin: 0;
 }
 
 .delete-confirm-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--spacing-md);
   justify-content: flex-end;
-  padding: 1.5rem 2rem 2rem 2rem;
-  border-top: 1px solid #e5e7eb;
+  padding: var(--spacing-xl) var(--spacing-2xl) var(--spacing-2xl) var(--spacing-2xl);
+  border-top: var(--border-width-thin) solid var(--color-border);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .delete-confirm-content {
-    padding: 1.5rem;
+    padding: var(--spacing-xl);
     flex-direction: column;
     text-align: center;
   }
   
   .delete-confirm-actions {
-    padding: 1rem 1.5rem 1.5rem 1.5rem;
+    padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
     flex-direction: column-reverse;
   }
   

@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { PhotographIcon, UploadIcon, XIcon, EyeIcon } from '@heroicons/react/solid';
 import { supabasePhotoUploadService } from '../../../services/supabasePhotoUploadService';
-import './CustomerPhotoField.css';
 
 interface CustomerPhotoFieldFirebaseProps {
   label: string;

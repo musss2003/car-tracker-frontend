@@ -180,11 +180,11 @@
 
 .form-actions {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-lg);
   justify-content: flex-end;
   padding-top: 1.5rem;
-  border-top: 2px solid #e5e7eb;
-  margin-top: 1rem;
+  border-top: 2px solid var(--border-primary);
+  margin-top: var(--spacing-lg);
 }
 
 /* Custom scrollbar for form content */
@@ -193,18 +193,18 @@
 }
 
 .create-customer-form-content::-webkit-scrollbar-track {
-  background: rgba(229, 231, 235, 0.3);
+  background: var(--border-primary);
   border-radius: 4px;
 }
 
 .create-customer-form-content::-webkit-scrollbar-thumb {
-  background: rgba(102, 126, 234, 0.3);
+  background: var(--primary-color-light-rgba);
   border-radius: 4px;
-  transition: background 0.2s ease;
+  transition: background var(--transition-normal);
 }
 
 .create-customer-form-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(102, 126, 234, 0.5);
+  background: var(--primary-color-strong-rgba);
 }
 
 /* Responsive Design */
@@ -270,18 +270,18 @@
 .create-customer-form textarea:focus,
 .create-customer-form select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary-color);
   box-shadow: 
-    0 0 0 3px rgba(102, 126, 234, 0.1),
-    0 4px 12px rgba(102, 126, 234, 0.15);
+    0 0 0 3px var(--primary-color-light-rgba),
+    var(--shadow-md);
 }
 
 /* Form validation states */
 .form-section--has-errors {
-  border-left: 4px solid #ef4444;
-  padding-left: 1rem;
-  background: rgba(254, 242, 242, 0.3);
-  border-radius: 0.5rem;
+  border-left: 4px solid var(--error-color);
+  padding-left: var(--spacing-lg);
+  background: var(--error-color-light);
+  border-radius: var(--border-radius-md);
 }
 
 /* Loading state for the entire form */
@@ -297,7 +297,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--white-overlay-heavy);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,0 +1,206 @@
+/* Supabase Photo Field Styles */
+.customer-photo-field {
+  margin-bottom: var(--spacing-lg);
+}
+
+.photo-field-label {
+  display: block;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.required-asterisk {
+  color: var(--error-color);
+  margin-left: var(--spacing-xs);
+}
+
+.photo-upload-container {
+  border: var(--border-width-base) dashed var(--border-primary);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  transition: var(--transition-slow);
+  background: var(--bg-tertiary);
+}
+
+.photo-upload-container:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-secondary);
+}
+
+.photo-preview-area {
+  margin-bottom: var(--spacing-lg);
+}
+
+.photo-preview {
+  position: relative;
+  max-width: 18.75rem; /* 300px */
+  margin: 0 auto;
+}
+
+.preview-image {
+  width: 100%;
+  height: auto;
+  max-height: 18.75rem; /* 300px */
+  object-fit: cover;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.photo-error-fallback {
+  text-align: center;
+  padding: var(--spacing-lg);
+  background: var(--error-color-light);
+  border: var(--border-width-thin) solid var(--error-color);
+  border-radius: var(--border-radius-md);
+  color: var(--error-color-dark);
+}
+
+.photo-error-fallback.hidden {
+  display: none;
+}
+
+.photo-error-fallback small {
+  display: block;
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
+  word-break: break-all;
+}
+
+.upload-placeholder {
+  text-align: center;
+  padding: var(--spacing-xxl) var(--spacing-lg);
+  cursor: pointer;
+  transition: var(--transition-slow);
+  border-radius: var(--border-radius-md);
+}
+
+.upload-placeholder:hover:not(.disabled) {
+  background: var(--primary-color-light-rgba);
+  transform: var(--transform-hover);
+}
+
+.upload-placeholder.disabled {
+  cursor: not-allowed;
+  opacity: var(--disabled-opacity);
+}
+
+.upload-icon {
+  font-size: var(--font-size-5xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.upload-text {
+  display: block;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.upload-progress {
+  margin-bottom: var(--spacing-lg);
+}
+
+.progress-bar {
+  width: 100%;
+  height: var(--spacing-sm);
+  background: var(--border-primary);
+  border-radius: var(--border-radius-full);
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--border-radius-full);
+  transition: width var(--transition-slow);
+}
+
+.progress-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.upload-error {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--error-color-light);
+  border: var(--border-width-thin) solid var(--error-color);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.error-icon {
+  color: var(--error-color);
+}
+
+.error-text {
+  color: var(--error-color-dark);
+  font-size: var(--font-size-sm);
+}
+
+.photo-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+}
+
+.btn-upload,
+.btn-remove {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  transition: var(--transition-slow);
+  cursor: pointer;
+  border: none;
+}
+
+.btn-upload {
+  background: var(--gradient-primary);
+  color: var(--text-light);
+}
+
+.btn-upload:hover:not(:disabled) {
+  transform: var(--transform-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-upload:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-remove {
+  background: var(--error-color);
+  color: var(--text-light);
+}
+
+.btn-remove:hover:not(:disabled) {
+  background: var(--error-color-dark);
+  transform: var(--transform-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-remove:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 40rem) { /* 640px */
+  .photo-actions {
+    flex-direction: column;
+  }
+  
+  .btn-upload,
+  .btn-remove {
+    width: 100%;
+  }
+}

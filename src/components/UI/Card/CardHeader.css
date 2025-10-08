@@ -1,69 +1,72 @@
+/* Import theme variables */
+@import '../../../styles/theme.css';
+
 /* Card Header Styles */
 .ui-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 2px solid #e2e8f0;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: var(--border-width-base) solid var(--border-primary);
   position: sticky;
   top: 0;
   z-index: 10;
-  border-radius: 1rem 1rem 0 0;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
 }
 
 .ui-card-header--default {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  color: #1e293b;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .ui-card-header--gradient {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-bottom-color: rgba(255, 255, 255, 0.2);
+  background: var(--gradient-primary);
+  color: var(--text-light);
+  border-bottom-color: var(--white-overlay-light);
 }
 
 .ui-card-header__content {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--spacing-xs);
 }
 
 .ui-card-header__title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: var(--font-size-3xl);
   font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 4px var(--black-overlay-light);
 }
 
 .ui-card-header--gradient .ui-card-header__title {
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: var(--text-light);
+  text-shadow: 0 2px 4px var(--black-overlay-medium);
 }
 
 .ui-card-header__subtitle {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   opacity: 0.8;
   font-weight: 500;
 }
 
 .ui-card-header__actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--spacing-md);
   align-items: center;
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 48rem) { /* 768px */
   .ui-card-header {
-    padding: 1.25rem 1rem;
+    padding: 1.25rem var(--spacing-lg);
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--spacing-lg);
     align-items: flex-start;
   }
   
   .ui-card-header__title {
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
   }
   
   .ui-card-header__actions {

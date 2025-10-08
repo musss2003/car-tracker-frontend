@@ -10,8 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  animation: fadeIn 0.3s ease-out;
+  padding: var(--spacing-lg);
+  animation: fadeIn var(--transition-slow) ease-out;
 }
 
 @keyframes fadeIn {
@@ -25,17 +25,17 @@
 
 .customer-details-card {
   width: 100%;
-  max-width: 1000px;
+  max-width: var(--details-max-width);
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.3s ease-out;
+  animation: slideUp var(--transition-slow) ease-out;
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(var(--slide-up-offset));
   }
   to {
     opacity: 1;
@@ -45,46 +45,46 @@
 
 .customer-details-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--spacing-md);
   align-items: center;
 }
 
 .customer-details-content {
   flex: 1;
   overflow-y: auto;
-  padding: 2rem;
+  padding: var(--spacing-2xl);
 }
 
 .details-sections {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: var(--spacing-2xl-plus);
 }
 
 /* Custom scrollbar for details content */
 .customer-details-content::-webkit-scrollbar {
-  width: 8px;
+  width: var(--scrollbar-width);
 }
 
 .customer-details-content::-webkit-scrollbar-track {
-  background: rgba(229, 231, 235, 0.3);
-  border-radius: 4px;
+  background: var(--overlay-scrollbar-track);
+  border-radius: var(--border-radius-sm);
 }
 
 .customer-details-content::-webkit-scrollbar-thumb {
-  background: rgba(102, 126, 234, 0.3);
-  border-radius: 4px;
-  transition: background 0.2s ease;
+  background: var(--overlay-scrollbar-thumb);
+  border-radius: var(--border-radius-sm);
+  transition: background var(--transition-normal) ease;
 }
 
 .customer-details-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(102, 126, 234, 0.5);
+  background: var(--overlay-scrollbar-thumb-hover);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .customer-details-overlay {
-    padding: 0.5rem;
+    padding: var(--spacing-sm);
   }
   
   .customer-details-card {
@@ -92,11 +92,11 @@
   }
   
   .customer-details-content {
-    padding: 1.5rem;
+    padding: var(--spacing-xl);
   }
   
   .details-sections {
-    gap: 2rem;
+    gap: var(--spacing-2xl);
   }
   
   .customer-details-actions {
@@ -111,14 +111,14 @@
 
 @media (max-width: 480px) {
   .customer-details-actions {
-    gap: 0.5rem;
+    gap: var(--spacing-sm);
   }
   
   .customer-details-content {
-    padding: 1rem;
+    padding: var(--spacing-lg);
   }
   
   .details-sections {
-    gap: 1.5rem;
+    gap: var(--spacing-xl);
   }
 }

@@ -1,6 +1,7 @@
 /* ===========================================
    RENT A CAR - Color Theme System
-   =========================================== */
+   ============  --spacing-xl: 1.5rem;
+  --spacing-xxl: 3rem;============================ */
 
 :root {
   /* Primary Brand Colors */
@@ -59,6 +60,8 @@
   --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
   --gradient-primary-dark: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
   --gradient-primary-darker: linear-gradient(135deg, var(--primary-color-darker) 0%, var(--primary-color-dark) 100%);
+  --gradient-success: linear-gradient(135deg, var(--success-color) 0%, var(--success-color-dark) 100%);
+  --gradient-error: linear-gradient(135deg, var(--error-color) 0%, var(--error-color-dark) 100%);
 
   /* Shadows */
   --shadow-sm: 0 2px 4px rgba(0, 86, 179, 0.1);
@@ -71,6 +74,25 @@
   --active-opacity: 0.7;
   --disabled-opacity: 0.5;
 
+  /* Overlay and Transparent Colors */
+  --overlay-color: rgba(0, 0, 0, 0.05);
+  --white-overlay-light: rgba(255, 255, 255, 0.2);
+  --white-overlay-medium: rgba(255, 255, 255, 0.3);
+  --white-overlay-strong: rgba(255, 255, 255, 0.5);
+  --white-overlay-heavy: rgba(255, 255, 255, 0.8);
+  --white-overlay-opaque: rgba(255, 255, 255, 0.9);
+  --white-overlay-ultra: rgba(255, 255, 255, 0.95);
+  --white-overlay-near: rgba(255, 255, 255, 0.98);
+  --primary-color-light-rgba: rgba(0, 123, 255, 0.1);
+  --primary-color-medium-rgba: rgba(0, 123, 255, 0.15);
+  --primary-color-strong-rgba: rgba(0, 123, 255, 0.2);
+  --error-color-light-rgba: rgba(239, 68, 68, 0.1);
+  --success-shadow-light: rgba(40, 167, 69, 0.3);
+  --success-shadow-medium: rgba(40, 167, 69, 0.4);
+  --black-overlay-light: rgba(0, 0, 0, 0.1);
+  --black-overlay-medium: rgba(0, 0, 0, 0.12);
+  --black-overlay-strong: rgba(0, 0, 0, 0.15);
+
   /* Spacing (for consistency) */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -78,17 +100,144 @@
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
   --spacing-xxl: 3rem;
+  --spacing-xxxl: 2.5rem;
 
   /* Border Radius */
   --border-radius-sm: 0.25rem;
   --border-radius-md: 0.5rem;
   --border-radius-lg: 1rem;
   --border-radius-xl: 1.5rem;
+  --border-radius-full: 9999px;
+
+  /* Typography */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+
+  /* Border Widths */
+  --border-width-thin: 1px;
+  --border-width-base: 2px;
+  --border-width-thick: 3px;
+
+  /* Transform Values */
+  --transform-hover: translateY(-2px);
+
+  /* Breakpoints */
+  --breakpoint-sm: 640px;
 
   /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.2s ease;
   --transition-slow: 0.3s ease;
+
+  /* Customer Photo Field Specific Variables */
+  --gradient-subtle: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  --gradient-hover: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --gradient-primary-light: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  --gradient-error-light: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  --gradient-dark: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --gradient-dark-hover: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+  --color-background-subtle: #f9fafb;
+  --shadow-primary-light: rgba(99, 102, 241, 0.1);
+  --shadow-primary-medium: rgba(79, 70, 229, 0.15);
+  --shadow-primary-strong: rgba(79, 70, 229, 0.3);
+  --overlay-dark: rgba(0, 0, 0, 0.5);
+  --overlay-modal: rgba(0, 0, 0, 0.9);
+  --overlay-light: rgba(255, 255, 255, 0.2);
+  --overlay-light-hover: rgba(255, 255, 255, 0.3);
+  --overlay-light-mobile: rgba(0, 0, 0, 0.3);
+  --overlay-primary-medium: rgba(59, 130, 246, 0.8);
+  --overlay-primary-strong: rgba(59, 130, 246, 1);
+  --overlay-error-medium: rgba(239, 68, 68, 0.8);
+  --overlay-error-strong: rgba(239, 68, 68, 1);
+  --color-primary: #6366f1;
+  --color-primary-dark: #4f46e5;
+  --color-error: #ef4444;
+  --color-text-secondary: #374151;
+  --color-text-muted: #9ca3af;
+  --color-border: #d1d5db;
+  --spacing-2xl: 2rem;
+  --spacing-3xl: 3rem;
+  --spacing-4xl: 4rem;
+  --photo-height: 200px;
+  --photo-height-mobile: 160px;
+  --progress-ring-size: 80px;
+  --modal-close-offset: -3rem;
+  --float-offset: -10px;
+  --modal-slide-offset: 20px;
+  --shadow-hover-medium: 0 10px 25px var(--shadow-primary-light);
+  --shadow-hover-strong: 0 10px 20px var(--shadow-primary-strong);
+
+  /* Edit Customer Form Specific Variables */
+  --form-max-width: 900px;
+  --slide-up-offset: 30px;
+  --gradient-primary-notice: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+  --overlay-primary-light: rgba(59, 130, 246, 0.2);
+  --font-size-notice: 0.9rem;
+  --gradient-section-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --section-accent-width: 4px;
+  --spacing-2xl-plus: 2.5rem;
+  --spacing-lg-plus: 1.25rem;
+  --spacing-md-plus: 0.875rem;
+  --modified-indicator-offset: -1rem;
+  --overlay-success-light: rgba(16, 185, 129, 0.05);
+  --scrollbar-width: 8px;
+  --overlay-scrollbar-track: rgba(229, 231, 235, 0.3);
+  --overlay-scrollbar-thumb: rgba(102, 126, 234, 0.3);
+  --overlay-scrollbar-thumb-hover: rgba(102, 126, 234, 0.5);
+  --color-focus: #667eea;
+  --focus-ring-width: 3px;
+  --overlay-focus-ring: rgba(102, 126, 234, 0.1);
+  --shadow-focus: 0 4px 12px rgba(102, 126, 234, 0.15);
+  --loading-opacity: 0.7;
+  --overlay-loading: rgba(255, 255, 255, 0.8);
+
+  /* Customer Details Section Variables */
+  --details-max-width: 1000px;
+  --gradient-timestamp-subtle: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  --gradient-timestamp-hover: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  --overlay-timestamp-border: rgba(102, 126, 234, 0.1);
+  --overlay-timestamp-border-hover: rgba(102, 126, 234, 0.2);
+  --shadow-timestamp: 0 4px 12px rgba(102, 126, 234, 0.1);
+  --color-timestamp-label: #667eea;
+  --color-section-icon: #667eea;
+  --overlay-info-item: rgba(248, 250, 252, 0.5);
+  --overlay-info-item-hover: rgba(248, 250, 252, 0.8);
+  --color-border-hover: #d1d5db;
+  --shadow-info-item: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-document-group: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --photo-container-width: 200px;
+  --photo-container-height: 140px;
+  --photo-container-height-mobile: 120px;
+  --color-photo-background: #f8fafc;
+  --shadow-photo-hover: 0 8px 24px rgba(102, 126, 234, 0.15);
+  --gradient-photo-overlay: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+  --overlay-photo-placeholder: rgba(249, 250, 251, 0.5);
+
+  /* Modal Specific Variables */
+  --overlay-modal-dark: rgba(0, 0, 0, 0.6);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+  --modal-max-width: 480px;
+  --shadow-image-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 12px 24px -8px rgba(0, 0, 0, 0.3);
+  --image-modal-max-width: 800px;
+  --text-shadow-header: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-image: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  /* Authentication Loading Variables */
+  --spinner-size: 3rem;
+  --spinner-size-mobile: 2.5rem;
+  --spinner-border-width: 4px;
+  --spinner-duration: 1s;
+  --pulse-duration: 2s;
+  --color-background-dark: #1f2937;
+  --color-text-dark: #d1d5db;
+  --color-border-dark: #374151;
 }
 
 /* ===========================================
@@ -104,10 +253,38 @@
   --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
   --gradient-primary-dark: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
   --gradient-primary-darker: linear-gradient(135deg, var(--primary-color-darker) 0%, var(--primary-color-dark) 100%);
+  --gradient-success: linear-gradient(135deg, var(--success-color) 0%, var(--success-color-dark) 100%);
+  --gradient-error: linear-gradient(135deg, var(--error-color) 0%, var(--error-color-dark) 100%);
   --shadow-sm: 0 2px 4px rgba(40, 167, 69, 0.1);
   --shadow-md: 0 4px 12px rgba(40, 167, 69, 0.15);
   --shadow-lg: 0 6px 16px rgba(40, 167, 69, 0.2);
   --shadow-xl: 0 8px 24px rgba(40, 167, 69, 0.25);
+  --primary-color-light-rgba: rgba(40, 167, 69, 0.1);
+  --primary-color-medium-rgba: rgba(40, 167, 69, 0.15);
+  --primary-color-strong-rgba: rgba(40, 167, 69, 0.2);
+  --error-color-light-rgba: rgba(239, 68, 68, 0.1);
+  --success-shadow-light: rgba(40, 167, 69, 0.3);
+  --success-shadow-medium: rgba(40, 167, 69, 0.4);
+
+  /* Consistent values across all themes */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+  --border-radius-xl: 1.5rem;
+  --border-radius-full: 9999px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --border-width-thin: 1px;
+  --border-width-base: 2px;
+  --border-width-thick: 3px;
+  --transform-hover: translateY(-1px);
 }
 
 /* Purple Theme */
@@ -119,10 +296,38 @@
   --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
   --gradient-primary-dark: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
   --gradient-primary-darker: linear-gradient(135deg, var(--primary-color-darker) 0%, var(--primary-color-dark) 100%);
+  --gradient-success: linear-gradient(135deg, var(--success-color) 0%, var(--success-color-dark) 100%);
+  --gradient-error: linear-gradient(135deg, var(--error-color) 0%, var(--error-color-dark) 100%);
   --shadow-sm: 0 2px 4px rgba(111, 66, 193, 0.1);
   --shadow-md: 0 4px 12px rgba(111, 66, 193, 0.15);
   --shadow-lg: 0 6px 16px rgba(111, 66, 193, 0.2);
   --shadow-xl: 0 8px 24px rgba(111, 66, 193, 0.25);
+  --primary-color-light-rgba: rgba(111, 66, 193, 0.1);
+  --primary-color-medium-rgba: rgba(111, 66, 193, 0.15);
+  --primary-color-strong-rgba: rgba(111, 66, 193, 0.2);
+  --error-color-light-rgba: rgba(239, 68, 68, 0.1);
+  --success-shadow-light: rgba(40, 167, 69, 0.3);
+  --success-shadow-medium: rgba(40, 167, 69, 0.4);
+
+  /* Consistent values across all themes */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+  --border-radius-xl: 1.5rem;
+  --border-radius-full: 9999px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --border-width-thin: 1px;
+  --border-width-base: 2px;
+  --border-width-thick: 3px;
+  --transform-hover: translateY(-1px);
 }
 
 /* Orange Theme */
@@ -134,10 +339,38 @@
   --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
   --gradient-primary-dark: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
   --gradient-primary-darker: linear-gradient(135deg, var(--primary-color-darker) 0%, var(--primary-color-dark) 100%);
+  --gradient-success: linear-gradient(135deg, var(--success-color) 0%, var(--success-color-dark) 100%);
+  --gradient-error: linear-gradient(135deg, var(--error-color) 0%, var(--error-color-dark) 100%);
   --shadow-sm: 0 2px 4px rgba(253, 126, 20, 0.1);
   --shadow-md: 0 4px 12px rgba(253, 126, 20, 0.15);
   --shadow-lg: 0 6px 16px rgba(253, 126, 20, 0.2);
   --shadow-xl: 0 8px 24px rgba(253, 126, 20, 0.25);
+  --primary-color-light-rgba: rgba(253, 126, 20, 0.1);
+  --primary-color-medium-rgba: rgba(253, 126, 20, 0.15);
+  --primary-color-strong-rgba: rgba(253, 126, 20, 0.2);
+  --error-color-light-rgba: rgba(239, 68, 68, 0.1);
+  --success-shadow-light: rgba(40, 167, 69, 0.3);
+  --success-shadow-medium: rgba(40, 167, 69, 0.4);
+
+  /* Consistent values across all themes */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+  --border-radius-xl: 1.5rem;
+  --border-radius-full: 9999px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --border-width-thin: 1px;
+  --border-width-base: 2px;
+  --border-width-thick: 3px;
+  --transform-hover: translateY(-1px);
 }
 
 /* Dark Theme */
@@ -150,6 +383,27 @@
   --text-muted: #a0aec0;
   --border-primary: #4a5568;
   --border-secondary: #2d3748;
+  --overlay-color: rgba(0, 0, 0, 0.2);
+
+  /* Consistent values across all themes */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+  --border-radius-xl: 1.5rem;
+  --border-radius-full: 9999px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --border-width-thin: 1px;
+  --border-width-base: 2px;
+  --border-width-thick: 3px;
+  --transform-hover: translateY(-1px);
 }
 
 /* ===========================================

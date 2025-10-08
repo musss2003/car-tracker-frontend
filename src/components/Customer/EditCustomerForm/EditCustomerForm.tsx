@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SaveIcon } from '@heroicons/react/solid';
 import { Card, CardHeader, Button, FormField } from '../../UI';
-import CustomerPhotoFieldSupabase from '../CustomerPhotoFieldSupabase';
+import CustomerPhotoFieldSupabase from '../CustomerPhotoField';
 import CountryDropdown from '../CreateCustomerForm/CountryDropdown';
 import PhoneNumberField from '../CreateCustomerForm/PhoneNumberField';
 import { Customer } from '../../../types/Customer';

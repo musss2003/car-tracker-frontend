@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { supabasePhotoUploadService } from '../../services/supabasePhotoUploadService';
-import './CustomerPhotoFieldSupabase.css';
+import './CustomerPhotoField.css';
 
 interface CustomerPhotoFieldSupabaseProps {
   value?: string | null;
@@ -18,7 +18,7 @@ interface UploadState {
   error: string | null;
 }
 
-const CustomerPhotoFieldSupabase: React.FC<CustomerPhotoFieldSupabaseProps> = ({
+const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
   value,
   onChange,
   label = 'Upload Photo',
@@ -231,4 +231,4 @@ const CustomerPhotoFieldSupabase: React.FC<CustomerPhotoFieldSupabaseProps> = ({
   );
 };
 
-export default CustomerPhotoFieldSupabase;
+export default CustomerPhotoField;
