@@ -262,7 +262,6 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
   };
 
   // Validate form before submission
-  // Validate form before submission
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 

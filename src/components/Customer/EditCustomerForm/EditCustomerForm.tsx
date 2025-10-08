@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SaveIcon } from '@heroicons/react/solid';
 import { Card, CardHeader, Button, FormField } from '../../UI';
-import CustomerPhotoFieldSupabase from '../CustomerPhotoField';
-import CountryDropdown from '../CreateCustomerForm/CountryDropdown';
-import PhoneNumberField from '../CreateCustomerForm/PhoneNumberField';
+import CustomerPhotoField from '../shared/CustomerPhotoField';
+import CountryDropdown from '../shared/CountryDropdown';
+import PhoneNumberField from '../shared/PhoneNumberField';
+import MunicipalityDropdown from '../shared/MunicipalityDropdown';
 import { Customer } from '../../../types/Customer';
 import { getCountries, CountryOption } from '../../../services/customerService';
 import './EditCustomerForm.css';
@@ -276,12 +277,11 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                       label="Grad prebivališta"
                       error={errors.cityOfResidence}
                     >
-                      <input
-                        type="text"
-                        className="ui-input"
-                        value={formData.cityOfResidence || ''}
-                        onChange={(e) => handleInputChange('cityOfResidence', e.target.value)}
-                        placeholder="Unesite grad prebivališta"
+                      <MunicipalityDropdown
+                        selectedMunicipality={formData.cityOfResidence || ''}
+                        onSelect={(municipalityName) => handleInputChange('cityOfResidence', municipalityName)}
+                        placeholder="Izaberite grad prebivališta"
+                        disabled={isSubmitting}
                       />
                     </FormField>
 
@@ -334,7 +334,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                 </div>
 
                 <div className="form-row">
-                  <CustomerPhotoFieldSupabase
+                  <CustomerPhotoField
                     label="Slika vozačke dozvole"
                     value={formData.drivingLicensePhotoUrl}
                     onChange={(url) => handlePhotoChange('drivingLicensePhotoUrl', url)}
@@ -343,7 +343,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                     disabled={isSubmitting}
                   />
 
-                  <CustomerPhotoFieldSupabase
+                  <CustomerPhotoField
                     label="Slika pasoša"
                     value={formData.passportPhotoUrl}
                     onChange={(url) => handlePhotoChange('passportPhotoUrl', url)}
