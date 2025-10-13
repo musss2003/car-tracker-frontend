@@ -177,25 +177,6 @@
   z-index: 30;
 }
 
-.form-actions {
-  display: flex;
-  gap: var(--spacing-lg);
-  justify-content: flex-end;
-  padding-top: var(--spacing-xl);
-  border-top: var(--border-width-base) solid var(--color-border);
-  margin-top: var(--spacing-2xl);
-  flex-wrap: wrap;
-}
-
-@media (max-width: 640px) {
-  .form-actions {
-    justify-content: stretch;
-  }
-  
-  .form-actions button {
-    flex: 1;
-  }
-}
 
 /* Modified field indicator */
 .form-section--modified {
@@ -281,14 +262,6 @@
   
   .form-section__title {
     font-size: var(--font-size-lg);
-  }
-  
-  .form-actions {
-    flex-direction: column-reverse;
-  }
-  
-  .form-actions button {
-    width: 100%;
   }
   
   .no-changes-notice {

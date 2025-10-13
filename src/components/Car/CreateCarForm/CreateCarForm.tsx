@@ -5,7 +5,7 @@ import {
   ExclamationCircleIcon,
   PlusCircleIcon,
 } from '@heroicons/react/solid';
-import { Card, CardHeader, Button, FormField } from '../../UI';
+import { Card, CardHeader, Button, FormField, FormActions } from '../../UI';
 import './CreateCarForm.css';
 import {
   Car,
@@ -683,7 +683,7 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
               </div>
             </div>
 
-            <div className="form-actions">
+            <FormActions alignment="right" withBorder={true}>
               <Button
                 type="button"
                 variant="secondary"
@@ -701,7 +701,7 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
               >
                 {isSubmitting ? 'Creating...' : 'Create Car'}
               </Button>
-        </div>
+            </FormActions>
       </form>
         </div>
       </Card>

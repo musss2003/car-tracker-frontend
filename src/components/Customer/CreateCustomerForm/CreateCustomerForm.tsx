@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, UserAddIcon } from '@heroicons/react/solid';
-import { Card, CardHeader, Button, FormField } from '../../UI';
+import { Card, CardHeader, Button, FormField, FormActions } from '../../UI';
 
 import { Customer } from '../../../types/Customer';
 import { getCountries, CountryOption } from '../../../services/customerService';
@@ -374,7 +374,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
             </div>
 
             {/* Form Actions */}
-            <div className="form-actions">
+            <FormActions alignment="right" withBorder={true}>
               <Button
                 type="button"
                 variant="secondary"
@@ -392,7 +392,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
               >
                 {isSubmitting ? 'Čuvanje...' : 'Sačuvaj kupca'}
               </Button>
-            </div>
+            </FormActions>
           </form>
         </div>
       </Card>

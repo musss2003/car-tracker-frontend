@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SaveIcon } from '@heroicons/react/solid';
-import { Card, CardHeader, Button, FormField } from '../../UI';
+import { Card, CardHeader, Button, FormField, FormActions } from '../../UI';
 import CustomerPhotoField from '../shared/CustomerPhotoField';
 import CountryDropdown from '../shared/CountryDropdown';
 import PhoneNumberField from '../shared/PhoneNumberField';
@@ -356,7 +356,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
             </div>
 
             {/* Form Actions */}
-            <div className="form-actions">
+            <FormActions alignment="right" withBorder={true}>
               <Button
                 type="button"
                 variant="secondary"
@@ -375,7 +375,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
               >
                 {isSubmitting ? 'Čuvanje...' : 'Sačuvaj izmjene'}
               </Button>
-            </div>
+            </FormActions>
           </form>
         </div>
       </Card>

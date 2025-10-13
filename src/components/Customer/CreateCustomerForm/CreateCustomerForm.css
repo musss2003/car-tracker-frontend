@@ -178,15 +178,7 @@
   z-index: 30;
 }
 
-.form-actions {
-  display: flex;
-  z-index: 50;
-  gap: var(--spacing-lg);
-  justify-content: flex-end;
-  padding-top: 1.5rem;
-  border-top: 2px solid var(--border-primary);
-  margin-top: var(--spacing-lg);
-}
+/* Form actions styling removed - now using UI/Form/FormActions component */
 
 /* Custom scrollbar for form content */
 .create-customer-form-content::-webkit-scrollbar {
@@ -257,13 +249,7 @@
     font-size: 1.125rem;
   }
   
-  .form-actions {
-    flex-direction: column-reverse;
-  }
-  
-  .form-actions button {
-    width: 100%;
-  }
+  /* Form actions responsive styling now handled by FormActions component */
 }
 
 /* Enhanced focus states */

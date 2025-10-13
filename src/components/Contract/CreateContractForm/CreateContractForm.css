@@ -562,15 +562,6 @@
   }
 }
 
-/* Form Actions */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-}
 
 .cancel-button,
 .save-button {
@@ -660,9 +651,7 @@
     gap: 0.75rem;
   }
 
-  .form-actions {
-    flex-direction: column-reverse;
-  }
+
 
   .cancel-button,
   .save-button {

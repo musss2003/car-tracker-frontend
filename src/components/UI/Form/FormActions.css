@@ -1,0 +1,135 @@
+/* Form Actions Component - Reusable form action button container */
+
+.ui-form-actions {
+  display: flex;
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  position: relative;
+  z-index: 50;
+}
+
+/* Border variants */
+.ui-form-actions--with-border {
+  border-top: 2px solid var(--border-primary);
+}
+
+/* Alignment variants */
+.ui-form-actions--left {
+  justify-content: flex-start;
+}
+
+.ui-form-actions--center {
+  justify-content: center;
+}
+
+.ui-form-actions--right {
+  justify-content: flex-end;
+}
+
+.ui-form-actions--space-between {
+  justify-content: space-between;
+}
+
+/* Size variants */
+.ui-form-actions--sm {
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.ui-form-actions--md {
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.ui-form-actions--lg {
+  gap: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+}
+
+/* Orientation variants */
+.ui-form-actions--horizontal {
+  flex-direction: row;
+}
+
+.ui-form-actions--vertical {
+  flex-direction: column;
+}
+
+/* Responsive behavior */
+@media (max-width: 640px) {
+  .ui-form-actions--horizontal {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .ui-form-actions--horizontal > * {
+    width: 100%;
+  }
+
+  /* Maintain horizontal layout on mobile if explicitly needed */
+  .ui-form-actions--horizontal.ui-form-actions--force-horizontal {
+    flex-direction: row;
+  }
+
+  .ui-form-actions--horizontal.ui-form-actions--force-horizontal > * {
+    width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .ui-form-actions {
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    margin-top: var(--spacing-md);
+  }
+
+  .ui-form-actions--sm {
+    gap: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+  }
+}
+
+/* Integration with form containers */
+.ui-form-actions:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* High z-index to ensure actions appear above form elements like dropdowns */
+.ui-form-actions {
+  position: relative;
+  z-index: 100;
+}
+
+/* Button spacing within actions */
+.ui-form-actions .ui-button + .ui-button {
+  margin-left: 0; /* Reset any button-specific margins */
+}
+
+/* Focus trap for accessibility */
+.ui-form-actions:focus-within {
+  outline: none;
+}
+
+/* Loading state support */
+.ui-form-actions--loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.ui-form-actions--loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-loading);
+  border-radius: var(--border-radius-md);
+  z-index: 1;
+}
