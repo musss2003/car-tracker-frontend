@@ -9,19 +9,14 @@ import {
 } from '../../../services/contractService';
 import { toast } from 'react-toastify';
 import {
-  PlusCircleIcon,
-  SearchIcon,
   FilterIcon,
   SortAscendingIcon,
   SortDescendingIcon,
   DocumentDownloadIcon,
-  DocumentTextIcon,
   PencilIcon,
   TrashIcon,
   EyeIcon,
   XIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   CheckCircleIcon,
   ClockIcon,
   CheckIcon,
@@ -40,6 +35,12 @@ import EditContractForm from '../../../components/Contract/EditContractForm/Edit
 import ContractDetails from '../../../components/Contract/ContractDetails/ContractDetails';
 import CreateContractForm from '../../../components/Contract/CreateContractForm/CreateContractForm';
 import { Contract } from '../../../types/Contract';
+import {
+  TableContainer,
+  TableActions,
+  SearchFilter,
+  Pagination
+} from '../../../components/UI';
 
 const ContractsTable = () => {
   // State management
@@ -99,7 +100,7 @@ const ContractsTable = () => {
       result = result.filter(
         (contract) =>
           contract.customer?.name?.toLowerCase().includes(lowerSearchTerm) ||
-          contract.customer?.passport_number?.includes(searchTerm) ||
+          contract.customer?.passportNumber?.includes(searchTerm) ||
           contract.car?.model?.toLowerCase().includes(lowerSearchTerm) ||
           contract.car?.license_plate?.includes(searchTerm)
       );
@@ -344,7 +345,7 @@ const ContractsTable = () => {
 
         return [
           contract.customer?.name || 'N/A',
-          contract.customer?.passport_number || 'N/A',
+          contract.customer?.passportNumber || 'N/A',
           contract.car?.model || 'N/A',
           contract.car?.license_plate || 'N/A',
           startDate.toLocaleDateString(),
@@ -389,7 +390,7 @@ const ContractsTable = () => {
 
         return {
           'Customer Name': contract.customer?.name || 'N/A',
-          'Passport Number': contract.customer?.passport_number || 'N/A',
+          'Passport Number': contract.customer?.passportNumber || 'N/A',
           'Car Model': contract.car?.model || 'N/A',
           'License Plate': contract.car?.license_plate || 'N/A',
           'Start Date': startDate.toLocaleDateString(),
@@ -425,20 +426,13 @@ const ContractsTable = () => {
   };
 
   // Render table header with sort indicators
-  const renderTableHeader = (
-    label: string,
-    key: string,
-    additionalClass = ''
-  ) => {
+  const renderTableHeader = (label: string, key: string, additionalClass = '') => {
     const isSorted = sortConfig.key === key;
     const SortIcon =
       sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
 
     return (
-      <th
-        className={`table-header-cell ${additionalClass}`}
-        onClick={() => handleSort(key)}
-      >
+      <th className={`table-heading ${additionalClass}`} onClick={() => handleSort(key)}>
         <div className="header-content">
           <span>{label}</span>
           {isSorted ? (
@@ -477,67 +471,41 @@ const ContractsTable = () => {
   };
 
   return (
-    <div className="contracts-table-container">
-      {/* Table controls */}
-      <div className="table-controls">
-        <div className="left-controls">
-          <button className="create-btn" onClick={() => setIsCreating(true)}>
-            <PlusCircleIcon className="btn-icon" />
-            Create New Contract
-          </button>
-
-          <div className="export-controls">
-            <button className="export-btn pdf" onClick={exportToPDF}>
-              <DocumentTextIcon className="btn-icon" />
-              Export PDF
-            </button>
-
-            <button className="export-btn excel" onClick={exportToExcel}>
-              <DocumentDownloadIcon className="btn-icon" />
-              Export Excel
-            </button>
-          </div>
-        </div>
-
-        <div className="right-controls">
-          <div className="search-container">
-            <SearchIcon className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search by customer, passport, or car..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            {searchTerm && (
-              <button
-                className="clear-search"
-                onClick={() => setSearchTerm('')}
-              >
-                <XIcon className="clear-icon" />
-              </button>
-            )}
-          </div>
-
-          <div className="filter-container">
-            <FilterIcon className="filter-icon" />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="filter-select"
-            >
-              <option value="all">All Statuses</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
+    <TableContainer>
+      <TableActions
+        onCreateClick={() => setIsCreating(true)}
+        createLabel="Create New Contract"
+        loading={loading}
+        showExport={true}
+        onExportPDF={exportToPDF}
+        onExportExcel={exportToExcel}
+      />
+      
+      <div className="contracts-table-custom-controls">
+        <SearchFilter
+          searchTerm={searchTerm}
+          onSearchChange={(value) => setSearchTerm(value)}
+          placeholder="Search by customer, passport, or car..."
+        />
+        
+        <div className="filter-container">
+          <FilterIcon className="filter-icon" />
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">All Statuses</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+          </select>
         </div>
       </div>
 
       {/* Error message */}
       {error && (
-        <div className="error-message">
+        <div className="contracts-error-message">
           <XIcon className="error-icon" />
           {error}
         </div>
@@ -545,14 +513,14 @@ const ContractsTable = () => {
 
       {/* Loading indicator */}
       {loading && (
-        <div className="loading-indicator">
-          <div className="spinner"></div>
+        <div className="contracts-loading-indicator">
+          <div className="contracts-spinner"></div>
           <span>Loading contracts...</span>
         </div>
       )}
 
       {/* Contracts table */}
-      <div className="table-wrapper">
+      <div className="contracts-table-wrapper">
         <table className="contracts-table">
           <thead>
             <tr>
@@ -579,7 +547,7 @@ const ContractsTable = () => {
                 'hide-on-small'
               )}
               {renderTableHeader('Status', 'status')}
-              <th className="table-header-cell">Actions</th>
+              <th className="table-heading actions-column">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -589,7 +557,7 @@ const ContractsTable = () => {
 
                 return (
                   <tr key={contract.id || index} className="contract-row">
-                    <td className="table-cell">
+                    <td className="contracts-table-cell">
                       <div className="customer-info">
                         <div className="customer-avatar">
                           {contract.customer?.name?.charAt(0) || '?'}
@@ -599,70 +567,70 @@ const ContractsTable = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="table-cell hide-on-small">
-                      {contract.customer?.passport_number || 'N/A'}
+                    <td className="contracts-table-cell hide-on-small">
+                      {contract.customer?.passportNumber || 'N/A'}
                     </td>
-                    <td className="table-cell">
+                    <td className="contracts-table-cell">
                       {contract.car?.model || 'N/A'}
                     </td>
-                    <td className="table-cell hide-on-small">
+                    <td className="contracts-table-cell hide-on-small">
                       {contract.car?.license_plate || 'N/A'}
                     </td>
-                    <td className="table-cell hide-on-small">
+                    <td className="contracts-table-cell hide-on-small">
                       {contract.rentalPeriod.startDate
                         ? new Date(
                             contract.rentalPeriod.startDate
                           ).toLocaleDateString()
                         : 'N/A'}
                     </td>
-                    <td className="table-cell hide-on-small">
+                    <td className="contracts-table-cell hide-on-small">
                       {contract.rentalPeriod.endDate
                         ? new Date(
                             contract.rentalPeriod.endDate
                           ).toLocaleDateString()
                         : 'N/A'}
                     </td>
-                    <td className="table-cell">
+                    <td className="contracts-table-cell">
                       {renderStatusBadge(status, className)}
                     </td>
-                    <td className="table-cell actions-cell">
-                      <div className="action-buttons">
+                    <td className="contracts-table-cell actions-cell">
+                      <div className="contracts-action-buttons">
                         <button
-                          className="action-btn view"
+                          className="contracts-action-btn view"
                           onClick={() => handleContractClick(contract)}
                           title="View Details"
                         >
-                          <EyeIcon className="action-icon" />
+                          <EyeIcon className="contracts-action-icon" />
                         </button>
                         <button
-                          className="action-btn edit"
+                          className="contracts-action-btn edit"
                           onClick={() => {
                             setSelectedContract(contract);
                             handleEdit();
                           }}
                           title="Edit Contract"
                         >
-                          <PencilIcon className="action-icon" />
+                          <PencilIcon className="contracts-action-icon" />
                         </button>
                         <button
-                          className="action-btn download"
+                          className="contracts-action-btn download"
                           onClick={() => {
                             setSelectedContract(contract);
                             handleDownloadContract();
                           }}
                           title="Download Contract"
                         >
-                          <DocumentDownloadIcon className="action-icon" />
+                          <DocumentDownloadIcon className="contracts-action-icon" />
                         </button>
                         <button
-                          className="action-btn delete"
+                          className="contracts-action-btn delete"
                           onClick={() => {
                             setSelectedContract(contract);
                             handleDeleteContract();
                           }}
                           title="Delete Contract"
                         >
-                          <TrashIcon className="action-icon" />
+                          <TrashIcon className="contracts-action-icon" />
                         </button>
                       </div>
                     </td>
@@ -682,77 +650,21 @@ const ContractsTable = () => {
         </table>
       </div>
 
-      {/* Pagination */}
-      {filteredAndSortedContracts.length > 0 && (
-        <div className="pagination">
-          <div className="pagination-info">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-            {Math.min(
-              currentPage * itemsPerPage,
-              filteredAndSortedContracts.length
-            )}{' '}
-            of {filteredAndSortedContracts.length} contracts
-          </div>
-
-          <div className="pagination-controls">
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              className="pagination-btn"
-              onClick={handlePrevPage}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeftIcon className="pagination-icon" />
-            </button>
-
-            <span className="pagination-page">
-              Page {currentPage} of {totalPages}
-            </span>
-
-            <button
-              className="pagination-btn"
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRightIcon className="pagination-icon" />
-            </button>
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-
-          <div className="items-per-page">
-            <label htmlFor="itemsPerPage">Items per page:</label>
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="items-per-page-select"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-            </select>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={filteredAndSortedContracts.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setCurrentPage}
+        onItemsPerPageChange={(value) => {
+          setItemsPerPage(value);
+          setCurrentPage(1);
+        }}
+      />
 
       {/* Modals */}
       {isViewingDetails && selectedContract && (
-        <div className="modal-overlay">
+        <div className="contracts-modal-overlay">
           <div className="modal-content">
             <ContractDetails
               contract={selectedContract}
@@ -766,7 +678,7 @@ const ContractsTable = () => {
       )}
 
       {isEditing && selectedContract && (
-        <div className="modal-overlay">
+        <div className="contracts-modal-overlay">
           <div className="modal-content">
             <EditContractForm
               contract={selectedContract}
@@ -778,7 +690,7 @@ const ContractsTable = () => {
       )}
 
       {isCreating && (
-        <div className="modal-overlay">
+        <div className="contracts-modal-overlay">
           <div className="modal-content">
             <CreateContractForm
               onSave={handleCreateContract}
@@ -787,7 +699,7 @@ const ContractsTable = () => {
           </div>
         </div>
       )}
-    </div>
+    </TableContainer>
   );
 };
 

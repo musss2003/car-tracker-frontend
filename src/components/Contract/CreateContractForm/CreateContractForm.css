@@ -157,15 +157,6 @@
   align-items: center;
 }
 
-.search-icon {
-  position: absolute;
-  left: 0.75rem;
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #9ca3af;
-  pointer-events: none;
-}
-
 .customer-search-input {
   width: 100%;
   padding: 0.75rem 0.75rem 0.75rem 2.5rem;

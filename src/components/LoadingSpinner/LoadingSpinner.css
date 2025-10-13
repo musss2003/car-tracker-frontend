@@ -9,11 +9,11 @@
 }
 
 .spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  width: 36px;
-  height: 36px;
+  border: 4px solid var(--border-light);
+  width: var(--spacing-4xl);
+  height: var(--spacing-4xl);
   border-radius: 50%;
-  border-left-color: #0056b3;
+  border-left-color: var(--primary-color);
   animation: spin 1s linear infinite;
 }
 
@@ -27,6 +27,7 @@
 }
 
 .loading-container p {
-  margin-top: 1rem;
-  color: #666;
+  margin-top: var(--spacing-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }

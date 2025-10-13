@@ -1,105 +1,139 @@
-.create-car-form-container {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  width: 100%;
-  max-width: 800px;
-  max-height: 85vh; /* Limit height to 85% of viewport height */
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* Hide overflow on the container */
-}
-
-.form-header {
-  position: sticky;
+/* Create Car Form Refactored Styles */
+.edit-customer-form-overlay {
+  position: fixed;
   top: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  background-color: #f9fafb;
-}
-
-.form-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(8px);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
+  padding: var(--spacing-md);
+  animation: fadeIn var(--transition-slow) ease-out;
 }
 
-.close-button:hover {
-  background-color: #f3f4f6;
-  color: #1f2937;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.close-button .icon {
-  width: 1.25rem;
-  height: 1.25rem;
+.edit-customer-form-card {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp var(--transition-slow) ease-out;
+  position: relative;
+  overflow: visible; /* Allow dropdowns to extend beyond card */
 }
 
-.create-car-form {
-  padding: 1.5rem;
-  overflow-y: auto; /* Enable vertical scrolling */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.edit-customer-form-content {
   flex: 1;
+  overflow-y: auto;
+  overflow-x: visible; /* Allow dropdowns to extend horizontally */
+  padding: var(--spacing-xl);
+  position: relative;
+}
+
+.edit-customer-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
 }
 
 .form-sections {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2.5rem;
+  position: relative;
+  overflow: visible; /* Allow dropdowns to extend beyond sections container */
 }
 
 .form-section {
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  padding: 1.25rem;
-  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: visible; /* Allow dropdowns to extend beyond section */
 }
 
-.section-title {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
+.form-section__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.form-section__title::before {
+  content: '';
+  width: 4px;
+  height: var(--spacing-lg);
+  background: var(--gradient-primary);
+  border-radius: 2px;
 }
 
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  position: relative;
+  overflow: visible; /* Allow dropdowns to extend beyond row */
 }
 
-.form-field {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
+/* Responsive grid layout */
+@media (min-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  
+  .form-row--single {
+    grid-template-columns: 1fr;
+  }
 }
 
-.form-field label {
-  font-size: 0.875rem;
-  font-weight: 500;
+@media (min-width: 1024px) {
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem; /* Increased gap for better spacing between fields */
+  }
+}
+
+/* Ensure form fields don't overflow their containers */
+.form-row .ui-form-field {
+  min-width: 0; /* Allow fields to shrink properly */
+  width: 100%;
+  margin-bottom: 0; /* Remove default margin to prevent overlap */
+}
+
+.form-row .ui-input,
+.form-row .ui-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%; /* Prevent inputs from growing beyond container */
   color: #374151;
   margin-bottom: 0.375rem;
   display: flex;
@@ -364,6 +398,34 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-primary);
+  margin-top: var(--spacing-lg);
+}
+
+/* Custom scrollbar for form content */
+.edit-customer-form-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.edit-customer-form-content::-webkit-scrollbar-track {
+  background: var(--border-primary);
+  border-radius: 4px;
+}
+
+.edit-customer-form-content::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 4px;
+}
+
+.edit-customer-form-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary-dark);
 }
 
 /* Responsive styles */

@@ -180,6 +180,7 @@
 
 .form-actions {
   display: flex;
+  z-index: 50;
   gap: var(--spacing-lg);
   justify-content: flex-end;
   padding-top: 1.5rem;

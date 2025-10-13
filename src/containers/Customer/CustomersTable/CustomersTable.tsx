@@ -9,18 +9,12 @@ import {
 } from '../../../services/customerService';
 import { toast } from 'react-toastify';
 import {
-  SearchIcon,
   SortAscendingIcon,
   SortDescendingIcon,
-  XIcon,
   PencilIcon,
   TrashIcon,
   EyeIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ExclamationCircleIcon,
-  UserAddIcon,
-  DownloadIcon,
+  UserAddIcon
 } from '@heroicons/react/solid';
 import './CustomersTable.css';
 import CustomerDetails from '../../../components/Customer/CustomerDetails/CustomerDetails';
@@ -28,6 +22,12 @@ import EditCustomerForm from '../../../components/Customer/EditCustomerForm/Edit
 import * as XLSX from 'xlsx';
 import { Customer } from '../../../types/Customer';
 import CreateCustomerForm from '../../../components/Customer/CreateCustomerForm/CreateCustomerForm';
+import {
+  TableContainer,
+  TableActions,
+  SearchFilter,
+  Pagination
+} from '../../../components/UI';
 
 const CustomersTable = () => {
   // State management
@@ -256,7 +256,7 @@ const CustomersTable = () => {
       sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
 
     return (
-      <th className="customer-table-heading" onClick={() => handleSort(key)}>
+      <th className="table-heading" onClick={() => handleSort(key)}>
         <div className="header-content">
           <span>{label}</span>
           {isSorted ? (
@@ -315,47 +315,28 @@ const CustomersTable = () => {
   }
 
   return (
-    <div className="customer-list-container">
-      {/* Table controls */}
-      <div className="table-controls">
-        <div className="left-controls">
-          <button className="create-btn" onClick={() => setIsCreating(true)}>
-            <UserAddIcon className="btn-icon" />
-            Dodaj novog korisnika
-          </button>
+    <TableContainer>
+      <TableActions
+        onCreateClick={() => setIsCreating(true)}
+        onExportExcel={exportToExcel}
+        createLabel="Dodaj novog korisnika"
+        createIcon="user"
+        loading={loading}
+        showExport={true}
+      />
 
-          <button className="export-btn" onClick={exportToExcel}>
-            <DownloadIcon className="btn-icon" />
-            Izvezi u Excel
-          </button>
-        </div>
-
-        <div className="right-controls">
-          <div className="search-container">
-            <SearchIcon className="search-icon" />
-            <input
-              type="text"
-              placeholder="Pretraži korisnike..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            {searchTerm && (
-              <button
-                className="clear-search"
-                onClick={() => setSearchTerm('')}
-              >
-                <XIcon className="clear-icon" />
-              </button>
-            )}
-          </div>
-        </div>
+      <div className="customers-table-custom-controls">
+        <SearchFilter
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          placeholder="Pretraži korisnike..."
+        />
       </div>
 
       {/* Loading indicator */}
       {loading && (
-        <div className="loading-indicator">
-          <div className="spinner"></div>
+        <div className="customers-loading-indicator">
+          <div className="customers-spinner"></div>
           <span>Učitavanje korisnika...</span>
         </div>
       )}
@@ -376,7 +357,7 @@ const CustomersTable = () => {
 
       {/* Customer table */}
       {!loading && customers.length > 0 && (
-        <div className="table-wrapper">
+        <div className="customers-table-wrapper">
           <table className="customer-table">
             <thead className="customer-table-header">
               <tr>
@@ -386,16 +367,16 @@ const CustomersTable = () => {
                 {renderTableHeader('Email', 'email')}
                 {renderTableHeader('Telefon', 'phoneNumber')}
                 {renderTableHeader('Zemlja', 'countryOfOrigin')}
-                <th className="customer-table-heading actions-column">
+                <th className="table-heading actions-column">
                   Akcije
                 </th>
               </tr>
             </thead>
-            <tbody className="customer-table-body">
+            <tbody>
               {paginatedCustomers.length > 0 ? (
                 paginatedCustomers.map((customer, index) => (
-                  <tr key={customer.id || index} className="customer-table-row">
-                    <td className="customer-table-cell">
+                  <tr key={customer.id || index} className="table-row">
+                    <td className="table-cell">
                       <div className="customer-name-cell">
                         <div className="customer-avatar">
                           {customer.name
@@ -405,25 +386,25 @@ const CustomersTable = () => {
                         <span>{customer.name || 'N/A'}</span>
                       </div>
                     </td>
-                    <td className="customer-table-cell">
+                    <td className="table-cell">
                       {customer.driverLicenseNumber || 'N/A'}
                     </td>
-                    <td className="customer-table-cell">
+                    <td className="table-cell">
                       {customer.passportNumber || 'N/A'}
                     </td>
-                    <td className="customer-table-cell">
+                    <td className="table-cell">
                       {customer.email || 'N/A'}
                     </td>
-                    <td className="customer-table-cell">
+                    <td className="table-cell">
                       {customer.phoneNumber || 'N/A'}
                     </td>
-                    <td className="customer-table-cell">
+                    <td className="table-cell">
                       {customer.countryOfOrigin || 'N/A'}
                     </td>
-                    <td className="customer-table-cell actions-cell">
-                      <div className="action-buttons">
+                    <td className="table-cell actions-cell">
+                      <div className="customers-action-buttons">
                         <button
-                          className="action-btn view"
+                          className="customers-action-btn view"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedCustomer(customer);
@@ -431,10 +412,10 @@ const CustomersTable = () => {
                           title="Prikaži detalje"
                           aria-label="Prikaži detalje korisnika"
                         >
-                          <EyeIcon className="action-icon" />
+                          <EyeIcon className="customers-action-icon" />
                         </button>
                         <button
-                          className="action-btn edit"
+                          className="customers-action-btn edit"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEdit(customer);
@@ -442,10 +423,10 @@ const CustomersTable = () => {
                           title="Uredi korisnika"
                           aria-label="Uredi korisnika"
                         >
-                          <PencilIcon className="action-icon" />
+                          <PencilIcon className="customers-action-icon" />
                         </button>
                         <button
-                          className="action-btn delete"
+                          className="customers-action-btn delete"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(customer.id ?? '');
@@ -453,7 +434,7 @@ const CustomersTable = () => {
                           title="Izbriši korisnika"
                           aria-label="Izbriši korisnika"
                         >
-                          <TrashIcon className="action-icon" />
+                          <TrashIcon className="customers-action-icon" />
                         </button>
                       </div>
                     </td>
@@ -473,74 +454,19 @@ const CustomersTable = () => {
 
       {/* Pagination */}
       {filteredAndSortedCustomers.length > 0 && (
-        <div className="pagination">
-          <div className="pagination-info">
-            Prikazano {(currentPage - 1) * itemsPerPage + 1} do{' '}
-            {Math.min(
-              currentPage * itemsPerPage,
-              filteredAndSortedCustomers.length
-            )}{' '}
-            od {filteredAndSortedCustomers.length} korisnika
-          </div>
-
-          <div className="pagination-controls">
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              Prva
-            </button>
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeftIcon className="pagination-icon" />
-            </button>
-
-            <span className="pagination-page">
-              Stranica {currentPage} od {totalPages}
-            </span>
-
-            <button
-              className="pagination-btn"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRightIcon className="pagination-icon" />
-            </button>
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Zadnja
-            </button>
-          </div>
-
-          <div className="items-per-page">
-            <label htmlFor="itemsPerPage">Stavki po stranici:</label>
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1); // Reset to first page when changing items per page
-              }}
-              className="items-per-page-select"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-            </select>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredAndSortedCustomers.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(newItemsPerPage) => {
+            setItemsPerPage(newItemsPerPage);
+            setCurrentPage(1);
+          }}
+        />
       )}
-    </div>
+    </TableContainer>
   );
 };
 

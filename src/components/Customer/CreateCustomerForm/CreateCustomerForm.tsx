@@ -161,7 +161,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 
   return (
     <div className="edit-customer-form-overlay">
-      <Card className="edit-customer-form-card" size="lg">
+      <Card className="edit-customer-form-card">
         <CardHeader
           title="Dodaj novog kupca"
           subtitle="Unesite podatke za novog kupca"

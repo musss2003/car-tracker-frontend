@@ -1,12 +1,7 @@
-import type React from 'react';
+'use client';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { useMediaQuery } from '@mui/material';
-import {
-  useState,
-  useEffect,
-  useMemo,
-  type MouseEventHandler,
-  type ReactNode,
-} from 'react';
 import { getActiveContracts } from '../../../services/contractService';
 import {
   updateCar,
@@ -38,21 +33,22 @@ import {
   ViewListIcon,
 } from '@heroicons/react/solid';
 import './CarTable.css';
-import type { Car } from '../../../types/Car';
-import type { Contract } from '../../../types/Contract';
+import { Car } from '../../../types/Car';
+import { Contract } from '../../../types/Contract';
 import EditCarForm from '../../../components/Car/EditCarForm/EditCarForm';
 import CreateCarForm from '../../../components/Car/CreateCarForm/CreateCarForm';
 import CarAvailabilityCalendar from '../../../components/Car/CarAvailabilityCalendar/CarAvailabilityCalendar';
 import CarDetails from '../../../components/Car/CarDetails/CarDetails';
-
-interface CarTableProps {
-  cars: Car[];
-  setCars: React.Dispatch<React.SetStateAction<Car[]>>;
-}
+import {
+  TableContainer,
+  TableActions,
+  SearchFilter,
+  Pagination
+} from '../../../components/UI';
 
 interface ActionButtonProps {
-  onClick: MouseEventHandler<HTMLButtonElement>;
-  icon: ReactNode;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  icon: React.ReactNode;
   label: string;
   className?: string;
   disabled?: boolean;
@@ -71,17 +67,14 @@ interface SortConfig {
   direction: 'asc' | 'desc';
 }
 
-const CarTable: React.FC<CarTableProps> = ({
-  cars: initialCars,
-  setCars: setParentCars,
-}) => {
+const CarTable = () => {
   // State management
-  const [cars, setCars] = useState<Car[]>(initialCars || []);
+  const [cars, setCars] = useState<Car[]>([]);
   const [activeContracts, setActiveContracts] = useState<Contract[]>([]);
   const [editCar, setEditCar] = useState<Car | undefined>(undefined);
   const [selectedCar, setSelectedCar] = useState<Car | undefined>(undefined);
-  const [isCreatingCar, setIsCreatingCar] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
   const [showAvailabilityCalendar, setShowAvailabilityCalendar] =
@@ -114,32 +107,29 @@ const CarTable: React.FC<CarTableProps> = ({
     }
   }, [isMobile]);
 
-  // Fetch active contracts
+  // Fetch cars and active contracts
   useEffect(() => {
-    const fetchActiveContracts = async () => {
+    const fetchData = async () => {
       try {
-        setIsLoading(true);
-        const contracts = await getActiveContracts();
+        setLoading(true);
+        const [carsData, contracts] = await Promise.all([
+          getCars(),
+          getActiveContracts()
+        ]);
+        setCars(carsData);
         setActiveContracts(contracts);
         setError(null);
       } catch (error) {
-        console.error('Error fetching active contracts:', error);
-        setError('Failed to load contract data. Please try again later.');
-        toast.error('Failed to load contract data');
+        console.error('Error fetching data:', error);
+        setError('Failed to load data. Please try again later.');
+        toast.error('Failed to load data');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchActiveContracts();
+    fetchData();
   }, []);
-
-  // Update local cars state when parent cars change
-  useEffect(() => {
-    if (initialCars) {
-      setCars(initialCars);
-    }
-  }, [initialCars]);
 
   // Create a set of busy car license plates for quick lookup
   const busyCarLicensePlates = useMemo(() => {
@@ -230,35 +220,33 @@ const CarTable: React.FC<CarTableProps> = ({
 
   const handleSave = async (updatedCar: Car) => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       await updateCar(updatedCar.license_plate, updatedCar);
       const updatedCars = await getCars();
       setCars(updatedCars);
-      setParentCars(updatedCars);
       setEditCar(undefined);
       toast.success('Car updated successfully');
     } catch (error) {
       console.error('Error saving car:', error);
       toast.error('Failed to update car');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const handleCreate = async (newCar: Car) => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       await addCar(newCar);
       const updatedCars = await getCars();
       setCars(updatedCars);
-      setParentCars(updatedCars);
-      setIsCreatingCar(false);
+      setIsCreating(false);
       toast.success('Car added successfully');
     } catch (error) {
       console.error('Error creating car:', error);
       toast.error('Failed to add car');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -273,17 +261,16 @@ const CarTable: React.FC<CarTableProps> = ({
     );
     if (confirmed) {
       try {
-        setIsLoading(true);
+        setLoading(true);
         await deleteCar(licensePlate);
         const updatedCars = await getCars();
         setCars(updatedCars);
-        setParentCars(updatedCars);
         toast.success('Car deleted successfully');
       } catch (error) {
         console.error('Error deleting car:', error);
         toast.error('Failed to delete car');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     }
   };
@@ -319,15 +306,15 @@ const CarTable: React.FC<CarTableProps> = ({
 
     return (
       <th
-        className="table-header table-header-sortable"
+        className="table-heading"
         onClick={() => handleSort(key)}
       >
-        <div className="table-header-content">
+        <div className="header-content">
           <span>{label}</span>
           {isSorted ? (
-            <SortIcon className="sort-icon sort-icon-active" />
+            <SortIcon className="sort-icon active" />
           ) : (
-            <SortAscendingIcon className="sort-icon sort-icon-inactive" />
+            <SortAscendingIcon className="sort-icon" />
           )}
         </div>
       </th>
@@ -488,10 +475,10 @@ const CarTable: React.FC<CarTableProps> = ({
   };
 
   return (
-    <div className="car-table-container">
+    <TableContainer>
       {/* Modals */}
       {editCar && (
-        <div className="modal-overlay">
+        <div className="car-modal-overlay">
           <div className="modal-content">
             <button
               className="modal-close"
@@ -508,25 +495,25 @@ const CarTable: React.FC<CarTableProps> = ({
         </div>
       )}
 
-      {isCreatingCar && (
-        <div className="modal-overlay">
+      {isCreating && (
+        <div className="car-modal-overlay">
           <div className="modal-content">
             <button
               className="modal-close"
-              onClick={() => setIsCreatingCar(false)}
+              onClick={() => setIsCreating(false)}
             >
               <XIcon className="modal-close-icon" />
             </button>
             <CreateCarForm
               onSave={handleCreate}
-              onClose={() => setIsCreatingCar(false)}
+              onCancel={() => setIsCreating(false)}
             />
           </div>
         </div>
       )}
 
       {selectedCar && (
-        <div className="modal-overlay">
+        <div className="car-modal-overlay">
           <div className="modal-content">
             <button className="modal-close" onClick={handleCloseDetails}>
               <XIcon className="modal-close-icon" />
@@ -545,7 +532,7 @@ const CarTable: React.FC<CarTableProps> = ({
       )}
 
       {showAvailabilityCalendar && selectedCarForCalendar && (
-        <div className="modal-overlay">
+        <div className="car-modal-overlay">
           <div className="modal-content modal-content-large">
             <CarAvailabilityCalendar
               car={selectedCarForCalendar}
@@ -555,19 +542,17 @@ const CarTable: React.FC<CarTableProps> = ({
         </div>
       )}
 
-      {/* Table controls */}
-      <div className="table-controls">
-        <div className="left-controls">
-          <button className="create-btn" onClick={() => setIsCreatingCar(true)}>
-            <PlusCircleIcon className="btn-icon" />
-            <span className="btn-text">Add New Car</span>
-          </button>
+      <TableActions
+        onCreateClick={() => setIsCreating(true)}
+        onExportExcel={exportToCSV}
+        createLabel="Add New Car"
+        createIcon="plus"
+        loading={loading}
+        showExport={true}
+      />
 
-          <button className="export-btn" onClick={exportToCSV}>
-            <DownloadIcon className="btn-icon" />
-            <span className="btn-text">Export</span>
-          </button>
-
+      <div className="car-table-custom-controls">
+        <div className="car-left-controls">
           {!isMobile && (
             <button
               className="view-toggle-btn"
@@ -589,26 +574,12 @@ const CarTable: React.FC<CarTableProps> = ({
           )}
         </div>
 
-        <div className="right-controls">
-          <div className="search-container">
-            <SearchIcon className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search cars..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            {searchTerm && (
-              <button
-                className="clear-search"
-                onClick={() => setSearchTerm('')}
-                aria-label="Clear search"
-              >
-                <XIcon className="clear-search-icon" />
-              </button>
-            )}
-          </div>
+        <div className="car-right-controls">
+          <SearchFilter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="Search cars..."
+          />
 
           <div className="filter-container">
             <FilterIcon className="filter-icon" />
@@ -627,38 +598,52 @@ const CarTable: React.FC<CarTableProps> = ({
 
       {/* Error message */}
       {error && (
-        <div className="error-message">
-          <ExclamationCircleIcon className="error-icon" />
+        <div className="car-error-message">
+          <ExclamationCircleIcon className="car-error-icon" />
           {error}
         </div>
       )}
 
       {/* Loading indicator */}
-      {isLoading && (
-        <div className="loading-indicator">
-          <div className="spinner"></div>
+      {loading && (
+        <div className="car-loading-indicator">
+          <div className="car-spinner"></div>
           <span>Loading...</span>
         </div>
       )}
 
+      {/* Empty state */}
+      {!loading && cars.length === 0 && (
+        <div className="empty-state">
+          <div className="empty-icon-container">
+            <PlusCircleIcon className="empty-icon" />
+          </div>
+          <h3>No cars found</h3>
+          <p>Start by adding your first car</p>
+          <button className="create-btn" onClick={() => setIsCreating(true)}>
+            Add New Car
+          </button>
+        </div>
+      )}
+
       {/* Car table or card view */}
-      {!isLoading && (
+      {!loading && cars.length > 0 && (
         <>
           {viewMode === 'table' ? (
             <div className="table-wrapper">
               <table className="car-table">
-                <thead>
+                <thead className="car-table thead">
                   <tr>
                     {renderTableHeader('Manufacturer', 'manufacturer')}
                     {renderTableHeader('Model', 'model')}
                     {renderTableHeader('Year', 'year')}
-                    <th className="table-header hide-on-small">Color</th>
-                    <th className="table-header hide-on-small">
+                    <th className="table-heading hide-on-small">Color</th>
+                    <th className="table-heading hide-on-small">
                       License Plate
                     </th>
                     {renderTableHeader('Price/Day', 'price_per_day')}
-                    <th className="table-header">Status</th>
-                    <th className="table-header table-header-center">
+                    <th className="table-heading">Status</th>
+                    <th className="table-heading table-header-center">
                       Actions
                     </th>
                   </tr>
@@ -671,8 +656,8 @@ const CarTable: React.FC<CarTableProps> = ({
                       );
 
                       return (
-                        <tr key={car.license_plate} className="table-row">
-                          <td className="table-cell">
+                        <tr key={car.license_plate} className="car-table-row">
+                          <td className="car-table-cell">
                             <div className="manufacturer-cell">
                               <div className="car-icon-placeholder"></div>
                               <div className="manufacturer-name">
@@ -682,9 +667,9 @@ const CarTable: React.FC<CarTableProps> = ({
                               </div>
                             </div>
                           </td>
-                          <td className="table-cell">{car.model}</td>
-                          <td className="table-cell">{car.year}</td>
-                          <td className="table-cell hide-on-small">
+                          <td className="car-table-cell">{car.model}</td>
+                          <td className="car-table-cell">{car.year}</td>
+                          <td className="car-table-cell hide-on-small">
                             <div className="color-cell">
                               {car.color && (
                                 <div
@@ -695,15 +680,15 @@ const CarTable: React.FC<CarTableProps> = ({
                               <span>{car.color || 'N/A'}</span>
                             </div>
                           </td>
-                          <td className="table-cell hide-on-small">
+                          <td className="car-table-cell hide-on-small">
                             {car.license_plate}
                           </td>
-                          <td className="table-cell">
+                          <td className="car-table-cell">
                             {car.price_per_day
                               ? `$${car.price_per_day}`
                               : 'N/A'}
                           </td>
-                          <td className="table-cell">
+                          <td className="car-table-cell">
                             <span
                               className={`status-badge ${isBusy ? 'status-busy' : 'status-available'}`}
                             >
@@ -720,33 +705,37 @@ const CarTable: React.FC<CarTableProps> = ({
                               )}
                             </span>
                           </td>
-                          <td className="table-cell table-cell-center">
-                            <div className="action-buttons">
-                              <ActionButton
+                          <td className="car-table-cell actions-cell">
+                            <div className="car-action-buttons">
+                              <button
                                 onClick={() => handleViewDetails(car)}
-                                icon={<EyeIcon className="action-icon" />}
-                                label="View"
-                                className="action-view"
-                              />
-                              <ActionButton
+                                className="car-action-btn view"
+                                title="View"
+                              >
+                                <EyeIcon className="car-action-icon" />
+                              </button>
+                              <button
                                 onClick={() => handleViewAvailability(car)}
-                                icon={<CalendarIcon className="action-icon" />}
-                                label="Availability"
-                                className="action-calendar"
-                              />
-                              <ActionButton
+                                className="car-action-btn view"
+                                title="Availability"
+                              >
+                                <CalendarIcon className="car-action-icon" />
+                              </button>
+                              <button
                                 onClick={() => setEditCar(car)}
-                                icon={<PencilIcon className="action-icon" />}
-                                label="Edit"
-                                className="action-edit"
-                              />
-                              <ActionButton
+                                className="car-action-btn edit"
+                                title="Edit"
+                              >
+                                <PencilIcon className="car-action-icon" />
+                              </button>
+                              <button
                                 onClick={() => handleDelete(car.license_plate)}
-                                icon={<TrashIcon className="action-icon" />}
-                                label="Delete"
-                                className="action-delete"
+                                className="car-action-btn delete"
+                                title="Delete"
                                 disabled={isBusy}
-                              />
+                              >
+                                <TrashIcon className="car-action-icon" />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -782,71 +771,19 @@ const CarTable: React.FC<CarTableProps> = ({
 
       {/* Pagination */}
       {filteredAndSortedCars.length > 0 && (
-        <div className="pagination">
-          <div className="pagination-info">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-            {Math.min(currentPage * itemsPerPage, filteredAndSortedCars.length)}{' '}
-            of {filteredAndSortedCars.length} cars
-          </div>
-
-          <div className="pagination-controls">
-            <button
-              className="pagination-button"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              First
-            </button>
-            <button
-              className="pagination-button"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeftIcon className="pagination-icon" />
-            </button>
-
-            <span className="pagination-page">
-              Page {currentPage} of {totalPages}
-            </span>
-
-            <button
-              className="pagination-button"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRightIcon className="pagination-icon" />
-            </button>
-            <button
-              className="pagination-button"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              Last
-            </button>
-          </div>
-
-          <div className="items-per-page">
-            <label htmlFor="itemsPerPage">Items per page:</label>
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1); // Reset to first page when changing items per page
-              }}
-              className="items-per-page-select"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-            </select>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredAndSortedCars.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(newItemsPerPage) => {
+            setItemsPerPage(newItemsPerPage);
+            setCurrentPage(1);
+          }}
+        />
       )}
-    </div>
+    </TableContainer>
   );
 };
 

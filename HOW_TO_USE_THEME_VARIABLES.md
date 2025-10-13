@@ -4,7 +4,7 @@
 
 ### **Step 1: Add Import at the Top**
 ```css
-/* Import theme variables at the top of your CSS file */
+/* Import theme variables GLOBALLY */
 @import '../../../styles/theme.css';
 
 /* Your component styles */
@@ -39,7 +39,7 @@
 
 ## **Method 2: Global Import (Already Done)**
 
-The theme is already imported in `App.css`, so variables are available globally:
+The theme is already imported in `main.tsx`, so variables are available globally:
 
 ```css
 /* In any CSS file, you can directly use: */

@@ -17,6 +17,13 @@
   user-select: none;
 }
 
+.ui-button__text{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
 .ui-button:focus {
   outline: var(--border-width-base) solid var(--primary-color-medium-rgba);
   outline-offset: var(--border-width-base);
