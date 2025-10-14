@@ -43,16 +43,9 @@ import {
   TableContainer,
   TableActions,
   SearchFilter,
-  Pagination
+  Pagination,
+  Button
 } from '../../../components/UI';
-
-interface ActionButtonProps {
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-  icon: React.ReactNode;
-  label: string;
-  className?: string;
-  disabled?: boolean;
-}
 
 // Define the keys that can be sorted
 type SortableCarKey = keyof Pick<
@@ -322,25 +315,6 @@ const CarTable = () => {
   };
 
   // Render action buttons
-  const ActionButton: React.FC<ActionButtonProps> = ({
-    onClick,
-    icon,
-    label,
-    className = '',
-    disabled = false,
-  }) => (
-    <button
-      onClick={onClick}
-      className={`action-button ${className} ${disabled ? 'action-button-disabled' : ''}`}
-      disabled={disabled}
-      title={label}
-      aria-label={label}
-    >
-      {icon}
-      <span className="action-label">{label}</span>
-    </button>
-  );
-
   // Export to CSV
   const exportToCSV = () => {
     const headers = [
@@ -444,31 +418,39 @@ const CarTable = () => {
         </div>
 
         <div className="car-card-actions">
-          <ActionButton
+          <Button
+            variant="ghost"
             onClick={() => handleViewDetails(car)}
-            icon={<EyeIcon className="action-icon" />}
-            label="View"
+            leftIcon={<EyeIcon />}
             className="action-view"
-          />
-          <ActionButton
+          >
+            View
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => handleViewAvailability(car)}
-            icon={<CalendarIcon className="action-icon" />}
-            label="Availability"
+            leftIcon={<CalendarIcon />}
             className="action-calendar"
-          />
-          <ActionButton
+          >
+            Availability
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => setEditCar(car)}
-            icon={<PencilIcon className="action-icon" />}
-            label="Edit"
+            leftIcon={<PencilIcon />}
             className="action-edit"
-          />
-          <ActionButton
+          >
+            Edit
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => handleDelete(car.license_plate)}
-            icon={<TrashIcon className="action-icon" />}
-            label="Delete"
+            leftIcon={<TrashIcon />}
             className="action-delete"
             disabled={isBusy}
-          />
+          >
+            Delete
+          </Button>
         </div>
       </div>
     );
@@ -515,9 +497,13 @@ const CarTable = () => {
       {selectedCar && (
         <div className="car-modal-overlay">
           <div className="modal-content">
-            <button className="modal-close" onClick={handleCloseDetails}>
-              <XIcon className="modal-close-icon" />
-            </button>
+            <Button
+              variant="ghost"
+              onClick={handleCloseDetails}
+              className="modal-close"
+              leftIcon={<XIcon />}
+              aria-label="Close modal"
+            />
             <CarDetails
               car={selectedCar}
               isBusy={busyCarLicensePlates.has(selectedCar.license_plate)}
@@ -554,23 +540,15 @@ const CarTable = () => {
       <div className="car-table-custom-controls">
         <div className="car-left-controls">
           {!isMobile && (
-            <button
-              className="view-toggle-btn"
+            <Button
+              variant="secondary"
               onClick={toggleViewMode}
+              leftIcon={viewMode === 'table' ? <ViewGridIcon /> : <ViewListIcon />}
+              className="view-toggle-btn"
               aria-label={`Switch to ${viewMode === 'table' ? 'card' : 'table'} view`}
             >
-              {viewMode === 'table' ? (
-                <>
-                  <ViewGridIcon className="btn-icon" />
-                  <span className="btn-text">Card View</span>
-                </>
-              ) : (
-                <>
-                  <ViewListIcon className="btn-icon" />
-                  <span className="btn-text">Table View</span>
-                </>
-              )}
-            </button>
+              {viewMode === 'table' ? 'Card View' : 'Table View'}
+            </Button>
           )}
         </div>
 
@@ -620,9 +598,13 @@ const CarTable = () => {
           </div>
           <h3>No cars found</h3>
           <p>Start by adding your first car</p>
-          <button className="create-btn" onClick={() => setIsCreating(true)}>
+          <Button
+            variant="primary"
+            onClick={() => setIsCreating(true)}
+            leftIcon={<PlusCircleIcon />}
+          >
             Add New Car
-          </button>
+          </Button>
         </div>
       )}
 
@@ -657,7 +639,7 @@ const CarTable = () => {
 
                       return (
                         <tr key={car.license_plate} className="car-table-row">
-                          <td className="car-table-cell">
+                          <td className="table-cell">
                             <div className="manufacturer-cell">
                               <div className="car-icon-placeholder"></div>
                               <div className="manufacturer-name">
@@ -667,9 +649,9 @@ const CarTable = () => {
                               </div>
                             </div>
                           </td>
-                          <td className="car-table-cell">{car.model}</td>
-                          <td className="car-table-cell">{car.year}</td>
-                          <td className="car-table-cell hide-on-small">
+                          <td className="table-cell">{car.model}</td>
+                          <td className="table-cell">{car.year}</td>
+                          <td className="table-cell hide-on-small">
                             <div className="color-cell">
                               {car.color && (
                                 <div
@@ -680,15 +662,15 @@ const CarTable = () => {
                               <span>{car.color || 'N/A'}</span>
                             </div>
                           </td>
-                          <td className="car-table-cell hide-on-small">
+                          <td className="table-cell hide-on-small">
                             {car.license_plate}
                           </td>
-                          <td className="car-table-cell">
+                          <td className="table-cell">
                             {car.price_per_day
                               ? `$${car.price_per_day}`
                               : 'N/A'}
                           </td>
-                          <td className="car-table-cell">
+                          <td className="table-cell">
                             <span
                               className={`status-badge ${isBusy ? 'status-busy' : 'status-available'}`}
                             >
@@ -705,37 +687,37 @@ const CarTable = () => {
                               )}
                             </span>
                           </td>
-                          <td className="car-table-cell actions-cell">
+                          <td className="table-cell actions-cell">
                             <div className="car-action-buttons">
-                              <button
+                              <Button
+                                variant="ghost"
                                 onClick={() => handleViewDetails(car)}
+                                leftIcon={<EyeIcon />}
                                 className="car-action-btn view"
-                                title="View"
-                              >
-                                <EyeIcon className="car-action-icon" />
-                              </button>
-                              <button
+                                aria-label="View"
+                              />
+                              <Button
+                                variant="ghost"
                                 onClick={() => handleViewAvailability(car)}
+                                leftIcon={<CalendarIcon />}
                                 className="car-action-btn view"
-                                title="Availability"
-                              >
-                                <CalendarIcon className="car-action-icon" />
-                              </button>
-                              <button
+                                aria-label="Availability"
+                              />
+                              <Button
+                                variant="ghost"
                                 onClick={() => setEditCar(car)}
+                                leftIcon={<PencilIcon />}
                                 className="car-action-btn edit"
-                                title="Edit"
-                              >
-                                <PencilIcon className="car-action-icon" />
-                              </button>
-                              <button
+                                aria-label="Edit"
+                              />
+                              <Button
+                                variant="ghost"
                                 onClick={() => handleDelete(car.license_plate)}
+                                leftIcon={<TrashIcon />}
                                 className="car-action-btn delete"
-                                title="Delete"
                                 disabled={isBusy}
-                              >
-                                <TrashIcon className="car-action-icon" />
-                              </button>
+                                aria-label="Delete"
+                              />
                             </div>
                           </td>
                         </tr>

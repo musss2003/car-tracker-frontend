@@ -68,12 +68,7 @@
 }
 
 
-/* Keep filter-container for the status filter dropdown */
-.filter-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
+
 
 .filter-icon {
   position: absolute;
@@ -85,9 +80,6 @@
   transition: var(--transition-slow);
 }
 
-.filter-container:focus-within .filter-icon {
-  color: var(--text-primary);
-}
 
 
 .filter-select {
@@ -206,18 +198,6 @@
   opacity: 1;
 }
 
-.car-table-cell {
-  padding: var(--spacing-lg) var(--spacing-xl);
-  vertical-align: middle;
-  color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  position: relative;
-}
-
-.car-table-cell-center {
-  text-align: center;
-}
 
 .manufacturer-cell {
   display: flex;
@@ -358,8 +338,8 @@
 }
 
 .empty-icon {
-  width: var(--spacing-3xl);
-  height: var(--spacing-3xl);
+  width: var(--icon-size-2xl);
+  height: var(--icon-size-2xl);
   color: white;
   position: relative;
   z-index: 1;
@@ -985,10 +965,6 @@
     justify-content: space-between;
   }
 
-  .filter-container {
-    width: 100%;
-  }
-
   .filter-select {
     width: 100%;
   }
@@ -1120,8 +1096,7 @@ select:focus-visible {
     display: none;
   }
 
-  .table-header,
-  .table-cell {
+  .table-header{
     padding: var(--spacing-xs);
   }
 

@@ -17,6 +17,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
 } from '@heroicons/react/solid';
+import { Button, FormActions } from '../../UI';
 import './EditContractForm.css';
 import { Contract } from '../../../types/Contract';
 import { Customer } from '../../../types/Customer';
@@ -859,31 +860,27 @@ const EditContractForm: React.FC<EditContractFormProps> = ({
           </div>
         </div>
 
-        <div className="form-actions">
-          <button
+        <FormActions alignment="right" withBorder={true}>
+          <Button
             type="button"
+            variant="secondary"
             onClick={onCancel}
-            className="cancel-button"
+            leftIcon={<XIcon />}
             disabled={isSubmitting}
           >
-            <XIcon className="button-icon" />
             Cancel
-          </button>
+          </Button>
 
-          <button type="submit" className="save-button" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <div className="spinner-small"></div>
-                <span>Saving...</span>
-              </>
-            ) : (
-              <>
-                <SaveIcon className="button-icon" />
-                <span>Save Changes</span>
-              </>
-            )}
-          </button>
-        </div>
+          <Button
+            type="submit"
+            variant="primary"
+            leftIcon={!isSubmitting ? <SaveIcon /> : undefined}
+            disabled={isSubmitting}
+            isLoading={isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </FormActions>
       </form>
     </div>
   );

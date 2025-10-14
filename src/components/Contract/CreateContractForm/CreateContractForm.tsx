@@ -15,6 +15,7 @@ import {
   ExclamationCircleIcon,
   PlusCircleIcon,
 } from '@heroicons/react/solid';
+import { Button, FormActions } from '../../UI';
 import './CreateContractForm.css';
 import { Car } from '../../../types/Car';
 import { Customer } from '../../../types/Customer';
@@ -803,31 +804,27 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
           </div>
         </div>
 
-        <div className="form-actions">
-          <button
+        <FormActions alignment="right" withBorder={true}>
+          <Button
             type="button"
+            variant="secondary"
             onClick={onClose}
-            className="cancel-button"
+            leftIcon={<XIcon />}
             disabled={isSubmitting}
           >
-            <XIcon className="button-icon" />
             Cancel
-          </button>
+          </Button>
 
-          <button type="submit" className="save-button" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <div className="spinner-small"></div>
-                <span>Creating...</span>
-              </>
-            ) : (
-              <>
-                <PlusCircleIcon className="button-icon" />
-                <span>Create Contract</span>
-              </>
-            )}
-          </button>
-        </div>
+          <Button
+            type="submit"
+            variant="primary"
+            leftIcon={!isSubmitting ? <PlusCircleIcon /> : undefined}
+            disabled={isSubmitting}
+            isLoading={isSubmitting}
+          >
+            {isSubmitting ? 'Creating...' : 'Create Contract'}
+          </Button>
+        </FormActions>
       </form>
     </div>
   );

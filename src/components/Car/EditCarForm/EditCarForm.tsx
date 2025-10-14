@@ -9,6 +9,7 @@ import {
   Feature,
   RenderFieldOptions,
 } from '../../../types/Car';
+import { Button, FormActions } from '../../UI';
 import './EditCarForm.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -547,34 +548,26 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
           </div>
         </div>
 
-        <div className="edit-car-form-actions">
-          <button
+        <FormActions alignment="right" withBorder={true}>
+          <Button
             type="button"
-            className="cancel-button"
+            variant="secondary"
             onClick={handleCancel}
             disabled={isSubmitting}
           >
             Cancel
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="submit"
-            className="submit-button"
+            variant="primary"
+            leftIcon={!isSubmitting ? <SaveIcon /> : undefined}
             disabled={isSubmitting || !hasChanges()}
+            isLoading={isSubmitting}
           >
-            {isSubmitting ? (
-              <>
-                <div className="spinner"></div>
-                Saving...
-              </>
-            ) : (
-              <>
-                <SaveIcon className="icon" />
-                Save Changes
-              </>
-            )}
-          </button>
-        </div>
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </FormActions>
       </form>
     </div>
   );
