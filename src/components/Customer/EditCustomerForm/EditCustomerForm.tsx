@@ -86,7 +86,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
     }
   };
 
-  // Handle Supabase photo changes
+
   const handlePhotoChange = (field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl', uploadedUrl: string | null) => {
     handleInputChange(field, uploadedUrl || '');
   };
