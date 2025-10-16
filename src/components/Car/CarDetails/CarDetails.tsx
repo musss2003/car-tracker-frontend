@@ -47,9 +47,9 @@ const CarDetails: React.FC<CarDetailsProps> = ({
       </div>
 
       <div className="car-image-container">
-        {car.image ? (
+        {car.photoUrl ? (
           <img
-            src={car.image || '/placeholder.svg'}
+            src={car.photoUrl || '/placeholder.svg'}
             alt={`${car.manufacturer} ${car.model}`}
             className="car-image"
           />
@@ -90,38 +90,54 @@ const CarDetails: React.FC<CarDetailsProps> = ({
             </div>
             <div className="detail-item">
               <span className="detail-label">License Plate</span>
-              <span className="detail-value">{car.license_plate}</span>
+              <span className="detail-value">{car.licensePlate}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Chassis Number</span>
+              <span className="detail-value">{car.chassisNumber || 'N/A'}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Fuel Type</span>
+              <span className="detail-value">{car.fuelType}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Transmission</span>
+              <span className="detail-value">{car.transmission}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Doors</span>
+              <span className="detail-value">{car.doors || 'N/A'}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Mileage</span>
+              <span className="detail-value">{car.mileage ? `${car.mileage} km` : 'N/A'}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Engine Power</span>
+              <span className="detail-value">{car.enginePower ? `${car.enginePower} HP` : 'N/A'}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Category</span>
+              <span className="detail-value">{car.category}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Status</span>
+              <span className="detail-value">{car.status}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Current Location</span>
+              <span className="detail-value">{car.currentLocation || 'N/A'}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Price per Day</span>
               <span className="detail-value">
-                {car.price_per_day
-                  ? formatCurrency(Number(car.price_per_day))
+                {car.pricePerDay
+                  ? formatCurrency(Number(car.pricePerDay))
                   : 'N/A'}
               </span>
             </div>
           </div>
         </div>
-
-        {car.features && car.features.length > 0 && (
-          <div className="car-details-section">
-            <h3 className="section-title">Features</h3>
-            <ul className="features-list">
-              {car.features.map((feature, index) => (
-                <li key={index} className="feature-item">
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {car.description && (
-          <div className="car-details-section">
-            <h3 className="section-title">Description</h3>
-            <p className="car-description">{car.description}</p>
-          </div>
-        )}
       </div>
 
       <div className="car-details-footer">

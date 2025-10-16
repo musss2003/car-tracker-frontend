@@ -50,10 +50,10 @@ import {
 // Define the keys that can be sorted
 type SortableCarKey = keyof Pick<
   Car,
-  'manufacturer' | 'model' | 'year' | 'price_per_day'
+  'manufacturer' | 'model' | 'year' | 'pricePerDay'
 >;
 
-type CarStatus = 'all' | 'available' | 'busy';
+type CarStatusFilter = 'all' | 'available' | 'rented' | 'maintenance' | 'unavailable';
 
 interface SortConfig {
   key: SortableCarKey | null;
@@ -78,7 +78,7 @@ const CarTable = () => {
 
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<CarStatus>('all');
+  const [statusFilter, setStatusFilter] = useState<CarStatusFilter>('all');
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
     direction: 'asc',
@@ -130,10 +130,10 @@ const CarTable = () => {
       activeContracts
         .map((contract) => {
           // Handle both possible contract structures
-          if (typeof contract.car.license_plate === 'string') {
-            return contract.car.license_plate;
-          } else if (contract.car && contract.car.license_plate) {
-            return contract.car.license_plate;
+          if (typeof contract.car.licensePlate === 'string') {
+            return contract.car.licensePlate;
+          } else if (contract.car && contract.car.licensePlate) {
+            return contract.car.licensePlate;
           }
           return '';
         })
@@ -153,17 +153,17 @@ const CarTable = () => {
         (car) =>
           car.manufacturer.toLowerCase().includes(lowerSearchTerm) ||
           car.model.toLowerCase().includes(lowerSearchTerm) ||
-          car.license_plate.toLowerCase().includes(lowerSearchTerm)
+          car.licensePlate.toLowerCase().includes(lowerSearchTerm)
       );
     }
 
     // Apply status filter
     if (statusFilter !== 'all') {
-      const isBusy = statusFilter === 'busy';
+      const isBusy = statusFilter === 'rented';
       result = result.filter((car) =>
         isBusy
-          ? busyCarLicensePlates.has(car.license_plate)
-          : !busyCarLicensePlates.has(car.license_plate)
+          ? busyCarLicensePlates.has(car.licensePlate)
+          : !busyCarLicensePlates.has(car.licensePlate)
       );
     }
 
@@ -214,7 +214,7 @@ const CarTable = () => {
   const handleSave = async (updatedCar: Car) => {
     try {
       setLoading(true);
-      await updateCar(updatedCar.license_plate, updatedCar);
+      await updateCar(updatedCar.licensePlate, updatedCar);
       const updatedCars = await getCars();
       setCars(updatedCars);
       setEditCar(undefined);
@@ -314,7 +314,6 @@ const CarTable = () => {
     );
   };
 
-  // Render action buttons
   // Export to CSV
   const exportToCSV = () => {
     const headers = [
@@ -331,9 +330,9 @@ const CarTable = () => {
       car.model,
       car.year,
       car.color || 'N/A',
-      car.license_plate,
-      car.price_per_day ? `$${car.price_per_day}` : 'N/A',
-      busyCarLicensePlates.has(car.license_plate) ? 'Busy' : 'Available',
+      car.licensePlate,
+      car.pricePerDay ? `$${car.pricePerDay}` : 'N/A',
+      busyCarLicensePlates.has(car.licensePlate) ? 'Busy' : 'Available',
     ]);
 
     const csvContent = [
@@ -354,10 +353,10 @@ const CarTable = () => {
 
   // Render car card for mobile view
   const renderCarCard = (car: Car) => {
-    const isBusy = busyCarLicensePlates.has(car.license_plate);
+    const isBusy = busyCarLicensePlates.has(car.licensePlate);
 
     return (
-      <div key={car.license_plate} className="car-card">
+      <div key={car.licensePlate} className="car-card">
         <div className="car-card-header">
           <div className="car-card-title">
             <h3>
@@ -391,7 +390,7 @@ const CarTable = () => {
           <div className="car-card-detail">
             <TagIcon className="car-card-icon" />
             <span className="car-card-label">License:</span>
-            <span className="car-card-value">{car.license_plate}</span>
+            <span className="car-card-value">{car.licensePlate}</span>
           </div>
 
           <div className="car-card-detail">
@@ -412,7 +411,7 @@ const CarTable = () => {
             <CurrencyDollarIcon className="car-card-icon" />
             <span className="car-card-label">Price/Day:</span>
             <span className="car-card-value">
-              {car.price_per_day ? `$${car.price_per_day}` : 'N/A'}
+              {car.pricePerDay ? `$${car.pricePerDay}` : 'N/A'}
             </span>
           </div>
         </div>
@@ -444,7 +443,7 @@ const CarTable = () => {
           </Button>
           <Button
             variant="ghost"
-            onClick={() => handleDelete(car.license_plate)}
+            onClick={() => handleDelete(car.licensePlate)}
             leftIcon={<TrashIcon />}
             className="action-delete"
             disabled={isBusy}
@@ -506,7 +505,7 @@ const CarTable = () => {
             />
             <CarDetails
               car={selectedCar}
-              isBusy={busyCarLicensePlates.has(selectedCar.license_plate)}
+              isBusy={busyCarLicensePlates.has(selectedCar.licensePlate)}
               onEdit={() => {
                 setEditCar(selectedCar);
                 setSelectedCar(undefined);
@@ -563,12 +562,14 @@ const CarTable = () => {
             <FilterIcon className="filter-icon" />
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as CarStatus)}
+              onChange={(e) => setStatusFilter(e.target.value as CarStatusFilter)}
               className="filter-select"
             >
               <option value="all">All Status</option>
               <option value="available">Available</option>
-              <option value="busy">Busy</option>
+              <option value="rented">Rented</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="unavailable">Unavailable</option>
             </select>
           </div>
         </div>
@@ -623,7 +624,7 @@ const CarTable = () => {
                     <th className="table-heading hide-on-small">
                       License Plate
                     </th>
-                    {renderTableHeader('Price/Day', 'price_per_day')}
+                    {renderTableHeader('Price/Day', 'pricePerDay')}
                     <th className="table-heading">Status</th>
                     <th className="table-heading table-header-center">
                       Actions
@@ -634,11 +635,11 @@ const CarTable = () => {
                   {paginatedCars.length > 0 ? (
                     paginatedCars.map((car) => {
                       const isBusy = busyCarLicensePlates.has(
-                        car.license_plate
+                        car.licensePlate
                       );
 
                       return (
-                        <tr key={car.license_plate} className="car-table-row">
+                        <tr key={car.licensePlate} className="car-table-row">
                           <td className="table-cell">
                             <div className="manufacturer-cell">
                               <div className="car-icon-placeholder"></div>
@@ -663,11 +664,11 @@ const CarTable = () => {
                             </div>
                           </td>
                           <td className="table-cell hide-on-small">
-                            {car.license_plate}
+                            {car.licensePlate}
                           </td>
                           <td className="table-cell">
-                            {car.price_per_day
-                              ? `$${car.price_per_day}`
+                            {car.pricePerDay
+                              ? `$${car.pricePerDay}`
                               : 'N/A'}
                           </td>
                           <td className="table-cell">
@@ -712,7 +713,7 @@ const CarTable = () => {
                               />
                               <Button
                                 variant="ghost"
-                                onClick={() => handleDelete(car.license_plate)}
+                                onClick={() => handleDelete(car.licensePlate)}
                                 leftIcon={<TrashIcon />}
                                 className="car-action-btn delete"
                                 disabled={isBusy}

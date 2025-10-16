@@ -1,18 +1,30 @@
+// Type definitions from backend
+export type FuelType = 'petrol' | 'diesel' | 'hybrid' | 'electric';
+export type TransmissionType = 'manual' | 'automatic';
+export type CarStatus = 'available' | 'rented' | 'maintenance' | 'unavailable';
+export type CarCategory = 'economy' | 'luxury' | 'suv' | 'van' | 'family' | 'business';
+
 export interface Car {
   id: string;
   manufacturer: string;
   model: string;
-  year?: number;
+  year: number;
   color?: string;
-  license_plate: string;
-  chassis_number?: string;
-  price_per_day: string | number;
-  description?: string;
-  features?: Feature[];
-  transmission?: 'automatic' | 'manual' | 'semi-automatic';
-  fuel_type?: 'gasoline' | 'diesel' | 'electric' | 'hybrid';
+  licensePlate: string;
+  chassisNumber?: string;
+  fuelType: FuelType;
+  transmission: TransmissionType;
   seats?: number;
-  image?: string;
+  doors?: number;
+  mileage?: number;
+  enginePower?: number;
+  pricePerDay: number;
+  category: CarCategory;
+  status: CarStatus;
+  currentLocation?: string;
+  photoUrl?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface RenderFieldOptions {
@@ -34,15 +46,19 @@ export interface CarFormErrors {
   model?: string;
   year?: string;
   color?: string;
-  license_plate?: string;
-  chassis_number?: string;
-  price_per_day?: string;
+  licensePlate?: string;
+  chassisNumber?: string;
+  pricePerDay?: string;
   seats?: string;
+  doors?: string;
+  mileage?: string;
+  enginePower?: string;
   transmission?: string;
-  fuel_type?: string;
-  description?: string;
-  image?: string;
-  features?: string;
+  fuelType?: string;
+  category?: string;
+  status?: string;
+  currentLocation?: string;
+  photoUrl?: string;
 }
 
 export interface BookingEvent {

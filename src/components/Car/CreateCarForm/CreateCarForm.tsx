@@ -10,8 +10,6 @@ import './CreateCarForm.css';
 import {
   Car,
   CarFormErrors,
-  commonFeatures,
-  Feature,
   RenderFieldOptions,
 } from '../../../types/Car';
 
@@ -32,28 +30,29 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
   manufacturers = [],
 }) => {
   // Form state
-  const [car, setCar] = useState<Car>({
-    id: '', //
+  const [car, setCar] = useState<Partial<Car>>({
     manufacturer: '',
     model: '',
     year: CURRENT_YEAR,
     color: '#000000',
-    license_plate: '',
-    chassis_number: '',
-    price_per_day: '',
-    description: '',
-    features: [],
+    licensePlate: '',
+    chassisNumber: '',
+    pricePerDay: 0,
     transmission: 'automatic',
-    fuel_type: 'gasoline',
+    fuelType: 'petrol',
     seats: 5,
-    image: '',
+    doors: 4,
+    mileage: 0,
+    enginePower: 0,
+    category: 'economy',
+    currentLocation: '',
+    photoUrl: '',
   });
 
   // Validation state
   const [errors, setErrors] = useState<CarFormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [newFeature, setNewFeature] = useState('');
 
   // Common car manufacturers for suggestions
   const commonManufacturers =
@@ -93,57 +92,6 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
     }
   };
 
-  // Add a new feature to the car
-  const handleAddFeature = () => {
-    const trimmed = newFeature.trim();
-
-    // Check if it's a valid Feature
-    if (trimmed && commonFeatures.includes(trimmed as Feature)) {
-      const validFeature = trimmed as Feature;
-
-      setCar((prev) => {
-        const features = prev.features ?? [];
-        if (!features.includes(validFeature)) {
-          return {
-            ...prev,
-            features: [...features, validFeature],
-          };
-        }
-        return prev; // no change if already exists
-      });
-
-      setNewFeature('');
-    } else {
-      toast.warning('Invalid feature entered.');
-    }
-  };
-
-  // Add a common feature to the car
-  const handleAddCommonFeature = (feature: Feature) => {
-    setCar((prev) => {
-      const features = prev.features ?? []; // fallback to [] if undefined
-
-      if (!features.includes(feature)) {
-        return {
-          ...prev,
-          features: [...features, feature],
-        };
-      }
-      return prev; // no change needed
-    });
-  };
-
-  const handleRemoveFeature = (feature: Feature) => {
-    setCar((prev) => {
-      const features = prev.features ?? []; // fallback to [] if undefined
-
-      return {
-        ...prev,
-        features: features.filter((f) => f !== feature),
-      };
-    });
-  };
-
   // Validate the form
   const validateForm = () => {
     const newErrors: CarFormErrors = {};
@@ -152,28 +100,28 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
     if (!car.manufacturer) newErrors.manufacturer = 'Manufacturer is required';
     if (!car.model) newErrors.model = 'Model is required';
     if (!car.year) newErrors.year = 'Year is required';
-    if (!car.license_plate)
-      newErrors.license_plate = 'License plate is required';
+    if (!car.licensePlate)
+      newErrors.licensePlate = 'License plate is required';
 
     // License plate format
-    if (car.license_plate && !LICENSE_PLATE_REGEX.test(car.license_plate)) {
-      newErrors.license_plate = 'License plate format is invalid';
+    if (car.licensePlate && !LICENSE_PLATE_REGEX.test(car.licensePlate)) {
+      newErrors.licensePlate = 'License plate format is invalid';
     }
 
     // Chassis number format (if provided)
-    if (car.chassis_number && !CHASSIS_NUMBER_REGEX.test(car.chassis_number)) {
-      newErrors.chassis_number =
+    if (car.chassisNumber && !CHASSIS_NUMBER_REGEX.test(car.chassisNumber)) {
+      newErrors.chassisNumber =
         'Chassis number must be 17 characters (excluding I, O, Q)';
     }
 
     // Price validation
-    if (car.price_per_day) {
-      const price = Number.parseFloat(String(car.price_per_day));
+    if (car.pricePerDay !== undefined) {
+      const price = Number.parseFloat(String(car.pricePerDay));
       if (isNaN(price) || price <= 0) {
-        newErrors.price_per_day = 'Price must be a positive number';
+        newErrors.pricePerDay = 'Price must be a positive number';
       }
     } else {
-      newErrors.price_per_day = 'Price per day is required';
+      newErrors.pricePerDay = 'Price per day is required';
     }
 
     // Seats validation
@@ -181,6 +129,14 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
       const seats = Number.parseInt(String(car.seats));
       if (isNaN(seats) || seats < 1 || seats > 10) {
         newErrors.seats = 'Seats must be between 1 and 10';
+      }
+    }
+
+    // Doors validation
+    if (car.doors) {
+      const doors = Number.parseInt(String(car.doors));
+      if (isNaN(doors) || doors < 2 || doors > 6) {
+        newErrors.doors = 'Doors must be between 2 and 6';
       }
     }
 
@@ -198,10 +154,14 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
       model: true,
       year: true,
       color: true,
-      license_plate: true,
-      chassis_number: true,
-      price_per_day: true,
+      licensePlate: true,
+      chassisNumber: true,
+      pricePerDay: true,
       seats: true,
+      doors: true,
+      fuelType: true,
+      transmission: true,
+      category: true,
     });
 
     if (!validateForm()) {
@@ -215,13 +175,26 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
       // Format the data before saving
       const carData = {
         ...car,
-        year: car.year !== undefined ? parseInt(car.year.toString(), 10) : 0,
-        price_per_day:
-          car.price_per_day !== undefined
-            ? parseFloat(String(car.price_per_day))
+        id: car.id || '', // Provide default empty string
+        year: car.year !== undefined ? parseInt(car.year.toString(), 10) : CURRENT_YEAR,
+        pricePerDay:
+          car.pricePerDay !== undefined
+            ? parseFloat(String(car.pricePerDay))
             : 0,
         seats: car.seats !== undefined ? parseInt(car.seats.toString(), 10) : 5,
-      };
+        doors: car.doors !== undefined ? parseInt(car.doors.toString(), 10) : 4,
+        mileage: car.mileage !== undefined ? parseInt(car.mileage.toString(), 10) : 0,
+        enginePower: car.enginePower !== undefined ? parseInt(car.enginePower.toString(), 10) : 0,
+        fuelType: car.fuelType || 'petrol',
+        transmission: car.transmission || 'automatic',
+        category: car.category || 'economy',
+        status: 'available', // Default status when creating a car
+        licensePlate: car.licensePlate || '',
+        manufacturer: car.manufacturer || '',
+        model: car.model || '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as Car;
 
       await onSave(carData);
       toast.success('Car created successfully');
@@ -258,10 +231,10 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
     }
   }, [car, touched]);
 
-  // Render form field with label and error message
+  // Generic field rendering function
   const renderField = (
     label: string,
-    name: keyof Car,
+    name: keyof CarFormErrors,
     type: string = 'text',
     options: RenderFieldOptions = {}
   ) => {
@@ -288,7 +261,7 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
           <select
             id={name}
             name={name}
-            value={car[name] || ''}
+            value={String(car[name as keyof typeof car] || '')}
             onChange={handleChange}
             className={hasError ? 'error' : ''}
             required={required}
@@ -303,7 +276,7 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
           <textarea
             id={name}
             name={name}
-            value={car[name] || ''}
+            value={String(car[name as keyof typeof car] || '')}
             onChange={handleChange}
             placeholder={placeholder}
             className={hasError ? 'error' : ''}
@@ -315,7 +288,7 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
             type={type}
             id={name}
             name={name}
-            value={car[name] || ''}
+            value={String(car[name as keyof typeof car] || '')}
             onChange={handleChange}
             placeholder={placeholder}
             min={min}
@@ -466,16 +439,16 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
 
                   <FormField
                     label="Fuel Type"
-                    error={errors.fuel_type}
+                    error={errors.fuelType}
                   >
                     <select
                       className="ui-input"
-                      value={car.fuel_type}
+                      value={car.fuelType}
                       onChange={handleChange}
-                      name="fuel_type"
+                      name="fuelType"
                       disabled={isSubmitting}
                     >
-                      <option value="gasoline">Gasoline</option>
+                      <option value="petrol">Petrol</option>
                       <option value="diesel">Diesel</option>
                       <option value="electric">Electric</option>
                       <option value="hybrid">Hybrid</option>
@@ -510,14 +483,14 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
                   <FormField
                     label="License Plate"
                     required
-                    error={errors.license_plate}
+                    error={errors.licensePlate}
                   >
                     <input
                       type="text"
                       className="ui-input"
-                      value={car.license_plate}
+                      value={car.licensePlate}
                       onChange={handleChange}
-                      name="license_plate"
+                      name="licensePlate"
                       placeholder="e.g. ABC123"
                       disabled={isSubmitting}
                     />
@@ -525,14 +498,14 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
 
                   <FormField
                     label="Chassis Number"
-                    error={errors.chassis_number}
+                    error={errors.chassisNumber}
                   >
                     <input
                       type="text"
                       className="ui-input"
-                      value={car.chassis_number}
+                      value={car.chassisNumber}
                       onChange={handleChange}
-                      name="chassis_number"
+                      name="chassisNumber"
                       placeholder="e.g. 1HGCM82633A123456"
                       disabled={isSubmitting}
                     />
@@ -548,14 +521,14 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
                   <FormField
                     label="Price Per Day ($)"
                     required
-                    error={errors.price_per_day}
+                    error={errors.pricePerDay}
                   >
                     <input
                       type="number"
                       className="ui-input"
-                      value={car.price_per_day}
+                      value={car.pricePerDay}
                       onChange={handleChange}
-                      name="price_per_day"
+                      name="pricePerDay"
                       min="0"
                       step="0.01"
                       placeholder="e.g. 49.99"
@@ -565,100 +538,92 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
                 </div>
               </div>
 
-              {/* Features Section */}
+              {/* Additional Details Section */}
               <div className="form-section">
-                <h3 className="form-section__title">Features</h3>
+                <h3 className="form-section__title">Additional Details</h3>
 
-            <div className="features-container">
-              <div className="features-input">
-                <input
-                  type="text"
-                  value={newFeature}
-                  onChange={(e) => setNewFeature(e.target.value)}
-                  placeholder="Add a feature..."
-                  onKeyPress={(e) =>
-                    e.key === 'Enter' &&
-                    (e.preventDefault(), handleAddFeature())
-                  }
-                />
-                <button
-                  type="button"
-                  className="add-feature-button"
-                  onClick={handleAddFeature}
-                >
-                  Add
-                </button>
-              </div>
-
-              <div className="common-features">
-                <p className="common-features-label">Common features:</p>
-                <div className="common-features-list">
-                  {commonFeatures.map((feature) => {
-                    const isSelected = (car.features ?? []).includes(feature); // fallback to []
-                    return (
-                      <button
-                        key={feature}
-                        type="button"
-                        className={`common-feature ${
-                          isSelected ? 'selected' : ''
-                        }`}
-                        onClick={() =>
-                          isSelected
-                            ? handleRemoveFeature(feature)
-                            : handleAddCommonFeature(feature)
-                        }
-                      >
-                        {feature} {isSelected ? '✓' : '+'}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {(car.features ?? []).length > 0 && (
-                <div className="selected-features">
-                  <p className="selected-features-label">Selected features:</p>
-                  <div className="features-list">
-                    {(car.features ?? []).map(
-                      (
-                        feature: Feature // fallback to []
-                      ) => (
-                        <div key={feature} className="feature-tag">
-                          <span>{feature}</span>
-                          <button
-                            type="button"
-                            className="remove-feature"
-                            onClick={() =>
-                              handleRemoveFeature(feature as Feature)
-                            }
-                          >
-                            <XIcon className="icon" />
-                          </button>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-              )}
-                </div>
-              </div>
-
-              {/* Additional Information Section */}
-              <div className="form-section">
-                <h3 className="form-section__title">Additional Information</h3>
-
-                <div className="form-row form-row--single">
+                <div className="form-row">
                   <FormField
-                    label="Description"
-                    error={errors.description}
+                    label="Number of Doors"
+                    error={errors.doors}
                   >
-                    <textarea
+                    <input
+                      type="number"
                       className="ui-input"
-                      value={car.description}
+                      value={car.doors}
                       onChange={handleChange}
-                      name="description"
-                      rows={3}
-                      placeholder="Enter a description of the car..."
+                      name="doors"
+                      min="2"
+                      max="6"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Mileage (km)"
+                    error={errors.mileage}
+                  >
+                    <input
+                      type="number"
+                      className="ui-input"
+                      value={car.mileage}
+                      onChange={handleChange}
+                      name="mileage"
+                      min="0"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Engine Power (HP)"
+                    error={errors.enginePower}
+                  >
+                    <input
+                      type="number"
+                      className="ui-input"
+                      value={car.enginePower}
+                      onChange={handleChange}
+                      name="enginePower"
+                      min="0"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Category"
+                    error={errors.category}
+                  >
+                    <select
+                      className="ui-input"
+                      value={car.category}
+                      onChange={handleChange}
+                      name="category"
+                      disabled={isSubmitting}
+                    >
+                      <option value="economy">Economy</option>
+                      <option value="luxury">Luxury</option>
+                      <option value="suv">SUV</option>
+                      <option value="van">Van</option>
+                      <option value="family">Family</option>
+                      <option value="business">Business</option>
+                    </select>
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Current Location"
+                    error={errors.currentLocation}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={car.currentLocation}
+                      onChange={handleChange}
+                      name="currentLocation"
+                      placeholder="e.g. Main Office"
                       disabled={isSubmitting}
                     />
                   </FormField>
@@ -666,15 +631,15 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
 
                 <div className="form-row form-row--single">
                   <FormField
-                    label="Image URL"
-                    error={errors.image}
+                    label="Photo URL"
+                    error={errors.photoUrl}
                   >
                     <input
-                      type="url"
+                      type="text"
                       className="ui-input"
-                      value={car.image}
+                      value={car.photoUrl}
                       onChange={handleChange}
-                      name="image"
+                      name="photoUrl"
                       placeholder="https://example.com/car-image.jpg"
                       disabled={isSubmitting}
                     />

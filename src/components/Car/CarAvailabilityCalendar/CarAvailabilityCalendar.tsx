@@ -89,7 +89,7 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
           setIsLoading(true);
         }
 
-        const availability = await getCarAvailability(car.license_plate);
+        const availability = await getCarAvailability(car.licensePlate);
 
         // Transform the availability data into events for the calendar
         const events: BookingEvent[] = availability.map(
@@ -132,7 +132,7 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
         setIsRefreshing(false);
       }
     },
-    [car.license_plate]
+    [car.licensePlate]
   );
 
   // Initial data fetch
@@ -645,7 +645,7 @@ const CarAvailabilityCalendar: React.FC<CarAvailabilityCalendarProps> = ({
             <div className="calendar-header-text">
               <h2 className="calendar-title">Availability Calendar</h2>
               <p className="calendar-subtitle">
-                {car.manufacturer} {car.model} ({car.license_plate})
+                {car.manufacturer} {car.model} ({car.licensePlate})
               </p>
             </div>
           </div>

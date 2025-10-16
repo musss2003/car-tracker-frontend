@@ -7,8 +7,8 @@ export interface Contract {
     id: string;
     manufacturer: string;
     model: string;
-    license_plate: string;
-    price_per_day: number | string;
+    licensePlate: string;
+    pricePerDay: number | string;
   };
   rentalPeriod: {
     startDate: string | Date;
