@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { uploadDocument } from '../../../services/uploadService';
+import React, { useState, useRef, useEffect } from 'react';
+import { uploadDocument, downloadDocument } from '../../../services/uploadService';
 import './CustomerPhotoField.css';
 
 interface CustomerPhotoFieldProps {
@@ -34,7 +34,39 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
   });
   
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load image from backend when value changes
+  useEffect(() => {
+    const loadImage = async () => {
+      if (value && !previewUrl) {
+        setIsLoadingImage(true);
+        try {
+          const blob = await downloadDocument(value);
+          const objectUrl = URL.createObjectURL(blob);
+          setPreviewUrl(objectUrl);
+        } catch (error) {
+          console.error('Failed to load image:', error);
+          setUploadState(prev => ({
+            ...prev,
+            error: 'Failed to load image preview'
+          }));
+        } finally {
+          setIsLoadingImage(false);
+        }
+      }
+    };
+
+    loadImage();
+
+    // Cleanup object URL when component unmounts or value changes
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [value]);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -117,6 +149,11 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
 
     if (window.confirm('Are you sure you want to remove this photo?')) {
       try {
+        // Revoke object URL before removing
+        if (previewUrl && previewUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(previewUrl);
+        }
+        
         onChange(null);
         setPreviewUrl(null);
         setUploadState({
@@ -140,19 +177,6 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
     }
   };
 
-  // Get the image URL for preview
-  const getImageUrl = () => {
-    if (previewUrl) return previewUrl;
-    if (value) {
-      // If value is a filename, construct download URL
-      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
-      return `${API_URL}/api/documents/${value}`;
-    }
-    return null;
-  };
-
-  const imageUrl = getImageUrl();
-
   return (
     <div className="customer-photo-field">
       <label className="photo-field-label">
@@ -173,10 +197,15 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
 
         {/* Photo preview or upload area */}
         <div className="photo-preview-area">
-          {imageUrl ? (
+          {isLoadingImage ? (
+            <div className="upload-placeholder">
+              <div className="upload-icon">⏳</div>
+              <span className="upload-text">Loading image...</span>
+            </div>
+          ) : previewUrl ? (
             <div className="photo-preview">
               <img
-                src={imageUrl}
+                src={previewUrl}
                 alt="Uploaded photo"
                 className="preview-image"
                 onError={(e) => {

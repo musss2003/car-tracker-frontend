@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DocumentTextIcon, PhotographIcon } from '@heroicons/react/solid';
 import { Customer } from '../../../../types/Customer';
+import { downloadDocument } from '../../../../services/uploadService';
 import './CustomerDocumentsSection.css';
 
 interface CustomerDocumentsSectionProps {
@@ -14,18 +15,80 @@ interface CustomerDocumentsSectionProps {
   onImageClick: (imageUrl: string | null | undefined, type: string) => void;
 }
 
+// Component to display authenticated image
+const AuthenticatedImage: React.FC<{
+  filename: string | number;
+  alt: string;
+  className: string;
+}> = ({ filename, alt, className }) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      if (!filename || filename === 'N/A') {
+        setIsLoading(false);
+        setError(true);
+        return;
+      }
+
+      setIsLoading(true);
+      setError(false);
+
+      try {
+        const blob = await downloadDocument(filename as string);
+        const objectUrl = URL.createObjectURL(blob);
+        setImageUrl(objectUrl);
+      } catch (err) {
+        console.error('Failed to load image:', err);
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadImage();
+
+    // Cleanup
+    return () => {
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [filename]);
+
+  if (isLoading) {
+    return (
+      <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span>⏳</span>
+      </div>
+    );
+  }
+
+  if (error || !imageUrl) {
+    return (
+      <div className={className} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span>❌ Failed to load</span>
+      </div>
+    );
+  }
+
+  return <img src={imageUrl} alt={alt} className={className} />;
+};
+
 const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
   customer,
   getValue,
   getFieldValue,
   onImageClick,
 }) => {
-  const drivingLicenseUrl = getFieldValue(
+  const drivingLicenseFilename = getFieldValue(
     customer.drivingLicensePhotoUrl,
     (customer as any).driving_license_photo_url
   );
   
-  const passportUrl = getFieldValue(
+  const passportFilename = getFieldValue(
     customer.passportPhotoUrl,
     (customer as any).passport_photo_url
   );
@@ -51,13 +114,13 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
           </div>
           
           <div className="document-photo">
-            {drivingLicenseUrl && drivingLicenseUrl !== 'N/A' ? (
+            {drivingLicenseFilename && drivingLicenseFilename !== 'N/A' ? (
               <div 
                 className="photo-container photo-container--clickable"
-                onClick={() => onImageClick(drivingLicenseUrl as string, 'Vozačka dozvola')}
+                onClick={() => onImageClick(drivingLicenseFilename as string, 'Vozačka dozvola')}
               >
-                <img 
-                  src={drivingLicenseUrl as string} 
+                <AuthenticatedImage
+                  filename={drivingLicenseFilename}
                   alt="Vozačka dozvola"
                   className="document-image"
                 />
@@ -88,13 +151,13 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
           </div>
           
           <div className="document-photo">
-            {passportUrl && passportUrl !== 'N/A' ? (
+            {passportFilename && passportFilename !== 'N/A' ? (
               <div 
                 className="photo-container photo-container--clickable"
-                onClick={() => onImageClick(passportUrl as string, 'Pasoš')}
+                onClick={() => onImageClick(passportFilename as string, 'Pasoš')}
               >
-                <img 
-                  src={passportUrl as string} 
+                <AuthenticatedImage
+                  filename={passportFilename}
                   alt="Pasoš"
                   className="document-image"
                 />
