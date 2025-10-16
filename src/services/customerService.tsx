@@ -142,7 +142,7 @@ export const addCustomer = async (
 interface Country {
   name: string;
   flag: string;
-  callingCodes: string[];
+  dialCodes: string[];
   alpha2Code: string;
   alpha3Code: string;
   capital: string;
@@ -166,7 +166,7 @@ interface Country {
 export interface CountryOption {
   name: string;
   flag: string;
-  callingCode: string;
+  dialCode: string;
   code: string;
 }
 
@@ -194,7 +194,7 @@ export const getCountries = async (): Promise<CountryOption[]> => {
       .map((country: any) => ({
         name: country.name?.trim() || 'Unknown',
         flag: country.flag || '🏳️',
-        callingCode: country.callingCode || '+0',
+        dialCode: country.dialCode || '+0',
         code: country.code || 'XX'
       }))
       .filter((country: CountryOption) => country.name !== 'Unknown' && country.name.length > 0)

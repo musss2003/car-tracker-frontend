@@ -18,7 +18,7 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({
   onSelect,
   loading = false,
   error = null,
-  placeholder = 'Izaberite zemlju...'
+  placeholder = 'Izaberite zemlju...',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +27,10 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -50,7 +53,7 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({
   };
 
   // Get selected country data
-  const selectedCountryData = countries.find(c => c.name === selectedCountry);
+  const selectedCountryData = countries.find((c) => c.name === selectedCountry);
 
   if (loading) {
     return (
@@ -82,23 +85,19 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({
         <div className="country-dropdown__selected">
           {selectedCountryData ? (
             <>
-              <img 
-                src={selectedCountryData.flag} 
-                alt={`${selectedCountryData.name} flag`}
-                className="country-dropdown__flag"
-              />
+              <span>
+                {selectedCountryData.flag}
+              </span>
               <span className="country-dropdown__name">
                 {selectedCountryData.name}
               </span>
             </>
           ) : (
-            <span className="country-dropdown__placeholder">
-              {placeholder}
-            </span>
+            <span className="country-dropdown__placeholder">{placeholder}</span>
           )}
         </div>
-        <ChevronDownIcon 
-          className={`country-dropdown__arrow ${isOpen ? 'country-dropdown__arrow--open' : ''}`} 
+        <ChevronDownIcon
+          className={`country-dropdown__arrow ${isOpen ? 'country-dropdown__arrow--open' : ''}`}
         />
       </div>
 
@@ -122,18 +121,14 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({
                 <div
                   key={country.code}
                   className={`country-dropdown__option ${
-                    country.name === selectedCountry ? 'country-dropdown__option--selected' : ''
+                    country.name === selectedCountry
+                      ? 'country-dropdown__option--selected'
+                      : ''
                   }`}
                   onClick={() => handleCountrySelect(country.name)}
                 >
-                  <img 
-                    src={country.flag} 
-                    alt={`${country.name} flag`}
-                    className="country-dropdown__flag"
-                  />
-                  <span className="country-dropdown__name">
-                    {country.name}
-                  </span>
+                  <span>{country.flag}</span>
+                  <span className="country-dropdown__name">{country.name}</span>
                 </div>
               ))
             ) : (

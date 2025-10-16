@@ -40,15 +40,6 @@
   min-width: 0;
 }
 
-.country-dropdown__flag {
-  width: 24px;
-  height: 16px;
-  object-fit: cover;
-  border-radius: 2px;
-  flex-shrink: 0;
-  border: 1px solid var(--black-overlay-light);
-}
-
 .country-dropdown__name {
   flex: 1;
   min-width: 0;
