@@ -45,7 +45,6 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
     mileage: 0,
     enginePower: 0,
     category: 'economy',
-    currentLocation: '',
     photoUrl: '',
   });
 
@@ -609,23 +608,6 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
                       <option value="family">Family</option>
                       <option value="business">Business</option>
                     </select>
-                  </FormField>
-                </div>
-
-                <div className="form-row">
-                  <FormField
-                    label="Current Location"
-                    error={errors.currentLocation}
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={car.currentLocation}
-                      onChange={handleChange}
-                      name="currentLocation"
-                      placeholder="e.g. Main Office"
-                      disabled={isSubmitting}
-                    />
                   </FormField>
                 </div>
 

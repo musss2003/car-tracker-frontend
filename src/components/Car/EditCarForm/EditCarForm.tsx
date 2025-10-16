@@ -51,7 +51,6 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     enginePower: car.enginePower || 0,
     category: car.category || 'economy',
     status: car.status, // Keep existing status, will be calculated by backend
-    currentLocation: car.currentLocation || '',
     photoUrl: car.photoUrl || '',
     createdAt: car.createdAt || new Date(),
     updatedAt: new Date(),
@@ -434,7 +433,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
           </div>
 
           <div className="form-section">
-            <h3 className="section-title">Pricing & Location</h3>
+            <h3 className="section-title">Pricing</h3>
 
             <div className="form-row">
               {renderField('Price Per Day ($)', 'pricePerDay', 'number', {
@@ -442,11 +441,6 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                 min: 0,
                 step: '0.01',
                 placeholder: 'e.g. 49.99',
-              })}
-              
-              {renderField('Current Location', 'currentLocation', 'text', {
-                placeholder: 'e.g. Main Office',
-                helpText: 'Current location of the vehicle',
               })}
             </div>
 
