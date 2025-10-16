@@ -83,7 +83,6 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
     }
   };
 
-  // Handle Supabase photo changes with uploaded URLs
   const handlePhotoChange = (
     field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl', 
     uploadedUrl: string | null

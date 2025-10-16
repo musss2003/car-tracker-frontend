@@ -1,13 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { supabasePhotoUploadService } from '../../../services/supabasePhotoUploadService';
+import { uploadDocument } from '../../../services/uploadService';
 import './CustomerPhotoField.css';
 
-interface CustomerPhotoFieldSupabaseProps {
-  value?: string | null;
-  onChange: (url: string | null) => void;
+interface CustomerPhotoFieldProps {
+  value?: string | null; // filename stored on backend
+  onChange: (filename: string | null) => void;
   label?: string;
   customerId?: string;
-  documentType?: 'license' | 'passport';
+  documentType?: 'license' | 'passport' | 'photo';
   required?: boolean;
   disabled?: boolean;
 }
@@ -18,7 +18,7 @@ interface UploadState {
   error: string | null;
 }
 
-const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
+const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
   value,
   onChange,
   label = 'Upload Photo',
@@ -33,11 +33,33 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
     error: null
   });
   
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setUploadState({
+        isUploading: false,
+        progress: 0,
+        error: 'Please select an image file'
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setUploadState({
+        isUploading: false,
+        progress: 0,
+        error: 'File size must be less than 5MB'
+      });
+      return;
+    }
 
     setUploadState({
       isUploading: true,
@@ -45,42 +67,28 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
       error: null
     });
 
+    // Create local preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreviewUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
     try {
-      let photoUrl: string;
+      // Simulate progress (since backend doesn't support progress tracking)
+      const progressInterval = setInterval(() => {
+        setUploadState(prev => ({
+          ...prev,
+          progress: Math.min(prev.progress + 10, 90)
+        }));
+      }, 200);
 
-      if (customerId && documentType) {
-        // Upload customer document
-        photoUrl = await supabasePhotoUploadService.uploadCustomerDocument(
-          file,
-          customerId,
-          documentType,
-          (progress) => {
-            setUploadState(prev => ({
-              ...prev,
-              progress: progress.progress
-            }));
-          }
-        );
-      } else {
-        // Upload regular photo
-        photoUrl = await supabasePhotoUploadService.uploadPhoto(
-          file,
-          {
-            folder: 'general',
-            maxWidth: 1200,
-            maxHeight: 900,
-            quality: 0.85
-          },
-          (progress) => {
-            setUploadState(prev => ({
-              ...prev,
-              progress: progress.progress
-            }));
-          }
-        );
-      }
+      // Upload to backend
+      const filename = await uploadDocument(file);
 
-      onChange(photoUrl);
+      clearInterval(progressInterval);
+
+      onChange(filename);
       
       setUploadState({
         isUploading: false,
@@ -90,6 +98,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
 
     } catch (error) {
       console.error('Upload failed:', error);
+      setPreviewUrl(null);
       setUploadState({
         isUploading: false,
         progress: 0,
@@ -106,22 +115,22 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
   const handleRemovePhoto = async () => {
     if (!value) return;
 
-    try {
-      const success = await supabasePhotoUploadService.deletePhoto(value);
-      if (success) {
+    if (window.confirm('Are you sure you want to remove this photo?')) {
+      try {
         onChange(null);
+        setPreviewUrl(null);
         setUploadState({
           isUploading: false,
           progress: 0,
           error: null
         });
+      } catch (error) {
+        console.error('Delete failed:', error);
+        setUploadState(prev => ({
+          ...prev,
+          error: 'Failed to delete photo'
+        }));
       }
-    } catch (error) {
-      console.error('Delete failed:', error);
-      setUploadState(prev => ({
-        ...prev,
-        error: 'Failed to delete photo'
-      }));
     }
   };
 
@@ -130,6 +139,19 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
       fileInputRef.current?.click();
     }
   };
+
+  // Get the image URL for preview
+  const getImageUrl = () => {
+    if (previewUrl) return previewUrl;
+    if (value) {
+      // If value is a filename, construct download URL
+      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+      return `${API_URL}/api/documents/${value}`;
+    }
+    return null;
+  };
+
+  const imageUrl = getImageUrl();
 
   return (
     <div className="customer-photo-field">
@@ -151,10 +173,10 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
 
         {/* Photo preview or upload area */}
         <div className="photo-preview-area">
-          {value ? (
+          {imageUrl ? (
             <div className="photo-preview">
               <img
-                src={value}
+                src={imageUrl}
                 alt="Uploaded photo"
                 className="preview-image"
                 onError={(e) => {
@@ -165,7 +187,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldSupabaseProps> = ({
               />
               <div className="photo-error-fallback hidden">
                 <span>⚠️ Image preview not available</span>
-                <small>URL: {value}</small>
+                <small>Filename: {value}</small>
               </div>
             </div>
           ) : (
