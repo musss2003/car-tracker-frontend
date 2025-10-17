@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import {
-  XIcon,
-  PlusCircleIcon,
-} from '@heroicons/react/solid';
-import { Card, CardHeader, Button, FormField, FormActions } from '../../ui';
+import { X, Plus } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import './CreateCarForm.css';
 import {
   Car,
@@ -233,325 +230,368 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
   }, [car, touched]);
 
   return (
-    <div className="edit-customer-form-overlay">
-      <Card className="edit-customer-form-card" size="lg">
-        <CardHeader
-          title="Add New Car"
-          subtitle="Enter details for the new car"
-          actions={
+    <div className="create-car-form-container">
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl">Add New Car</CardTitle>
+              <p className="text-muted-foreground mt-1">Enter details for the new car</p>
+            </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={onCancel}
-              leftIcon={<XIcon />}
               disabled={isSubmitting}
             >
-              Close
+              <X className="h-4 w-4" />
             </Button>
-          }
-        />
+          </div>
+        </CardHeader>
 
-        <div className="edit-customer-form-content">
-          <form onSubmit={handleSubmit} className="edit-customer-form">
-            <div className="form-sections">
-              {/* Basic Information Section */}
-              <div className="form-section">
-                <h3 className="form-section__title">Basic Information</h3>
-                
-                <div className="form-row">
-                  <FormField
-                    label="Manufacturer"
-                    required
-                    error={errors.manufacturer}
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={car.manufacturer}
-                      onChange={handleChange}
-                      name="manufacturer"
-                      list="manufacturers"
-                      placeholder="e.g. Toyota"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Model"
-                    required
-                    error={errors.model}
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={car.model}
-                      onChange={handleChange}
-                      name="model"
-                      placeholder="e.g. Camry"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Basic Information Section */}
+            <div className="space-y-6">
+              <div className="border-b pb-2">
+                <h3 className="text-lg font-semibold text-foreground">Basic Information</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="manufacturer">
+                    Manufacturer <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="manufacturer"
+                    name="manufacturer"
+                    value={car.manufacturer || ''}
+                    onChange={handleChange}
+                    placeholder="e.g. Toyota"
+                    disabled={isSubmitting}
+                    className={errors.manufacturer ? "border-destructive" : ""}
+                    list="manufacturers"
+                  />
+                  {errors.manufacturer && (
+                    <p className="text-sm text-destructive">{errors.manufacturer}</p>
+                  )}
                 </div>
 
-                <datalist id="manufacturers">
-                  {commonManufacturers.map((manufacturer) => (
-                    <option key={manufacturer} value={manufacturer} />
-                  ))}
-                </datalist>
+                <div className="space-y-2">
+                  <Label htmlFor="model">
+                    Model <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="model"
+                    name="model"
+                    value={car.model || ''}
+                    onChange={handleChange}
+                    placeholder="e.g. Camry"
+                    disabled={isSubmitting}
+                    className={errors.model ? "border-destructive" : ""}
+                  />
+                  {errors.model && (
+                    <p className="text-sm text-destructive">{errors.model}</p>
+                  )}
+                </div>
+              </div>
 
-                <div className="form-row">
-                  <FormField
-                    label="Year"
-                    required
-                    error={errors.year}
+              <datalist id="manufacturers">
+                {commonManufacturers.map((manufacturer) => (
+                  <option key={manufacturer} value={manufacturer} />
+                ))}
+              </datalist>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="year">
+                    Year <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={car.year?.toString()}
+                    onValueChange={(value) => handleChange({ target: { name: 'year', value: parseInt(value) } } as any)}
+                    disabled={isSubmitting}
                   >
-                    <select
-                      className="ui-input"
-                      value={car.year}
-                      onChange={handleChange}
-                      name="year"
-                      disabled={isSubmitting}
-                    >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select year" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {YEARS.map((year) => (
-                        <option key={year} value={year}>
+                        <SelectItem key={year} value={year.toString()}>
                           {year}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
-                  </FormField>
-
-                  <FormField
-                    label="Color"
-                    required
-                    error={errors.color}
-                  >
-                    <input
-                      type="color"
-                      className="ui-input"
-                      value={car.color}
-                      onChange={handleChange}
-                      name="color"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
+                    </SelectContent>
+                  </Select>
+                  {errors.year && (
+                    <p className="text-sm text-destructive">{errors.year}</p>
+                  )}
                 </div>
 
-                <div className="form-row">
-                  <FormField
-                    label="Transmission"
-                    error={errors.transmission}
-                  >
-                    <select
-                      className="ui-input"
-                      value={car.transmission}
-                      onChange={handleChange}
-                      name="transmission"
-                      disabled={isSubmitting}
-                    >
-                      <option value="automatic">Automatic</option>
-                      <option value="manual">Manual</option>
-                      <option value="semi-automatic">Semi-Automatic</option>
-                    </select>
-                  </FormField>
-
-                  <FormField
-                    label="Fuel Type"
-                    error={errors.fuelType}
-                  >
-                    <select
-                      className="ui-input"
-                      value={car.fuelType}
-                      onChange={handleChange}
-                      name="fuelType"
-                      disabled={isSubmitting}
-                    >
-                      <option value="petrol">Petrol</option>
-                      <option value="diesel">Diesel</option>
-                      <option value="electric">Electric</option>
-                      <option value="hybrid">Hybrid</option>
-                    </select>
-                  </FormField>
-                </div>
-
-                <div className="form-row form-row--single">
-                  <FormField
-                    label="Number of Seats"
-                    error={errors.seats}
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={car.seats}
-                      onChange={handleChange}
-                      name="seats"
-                      min="1"
-                      max="10"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
+                <div className="space-y-2">
+                  <Label htmlFor="color">Color</Label>
+                  <Input
+                    id="color"
+                    name="color"
+                    type="color"
+                    value={car.color || '#000000'}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                    className="h-10 w-full"
+                  />
+                  {errors.color && (
+                    <p className="text-sm text-destructive">{errors.color}</p>
+                  )}
                 </div>
               </div>
 
-              {/* Registration Details Section */}
-              <div className="form-section">
-                <h3 className="form-section__title">Registration Details</h3>
-
-                <div className="form-row">
-                  <FormField
-                    label="License Plate"
-                    required
-                    error={errors.licensePlate}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="transmission">Transmission</Label>
+                  <Select
+                    value={car.transmission}
+                    onValueChange={(value) => handleChange({ target: { name: 'transmission', value } } as any)}
+                    disabled={isSubmitting}
                   >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={car.licensePlate}
-                      onChange={handleChange}
-                      name="licensePlate"
-                      placeholder="e.g. ABC123"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select transmission" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="automatic">Automatic</SelectItem>
+                      <SelectItem value="manual">Manual</SelectItem>
+                      <SelectItem value="semi-automatic">Semi-Automatic</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.transmission && (
+                    <p className="text-sm text-destructive">{errors.transmission}</p>
+                  )}
+                </div>
 
-                  <FormField
-                    label="Chassis Number"
-                    error={errors.chassisNumber}
+                <div className="space-y-2">
+                  <Label htmlFor="fuelType">Fuel Type</Label>
+                  <Select
+                    value={car.fuelType}
+                    onValueChange={(value) => handleChange({ target: { name: 'fuelType', value } } as any)}
+                    disabled={isSubmitting}
                   >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={car.chassisNumber}
-                      onChange={handleChange}
-                      name="chassisNumber"
-                      placeholder="e.g. 1HGCM82633A123456"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select fuel type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="petrol">Petrol</SelectItem>
+                      <SelectItem value="diesel">Diesel</SelectItem>
+                      <SelectItem value="electric">Electric</SelectItem>
+                      <SelectItem value="hybrid">Hybrid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.fuelType && (
+                    <p className="text-sm text-destructive">{errors.fuelType}</p>
+                  )}
                 </div>
               </div>
 
-              {/* Pricing Section */}
-              <div className="form-section">
-                <h3 className="form-section__title">Pricing</h3>
-
-                <div className="form-row form-row--single">
-                  <FormField
-                    label="Price Per Day ($)"
-                    required
-                    error={errors.pricePerDay}
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={car.pricePerDay}
-                      onChange={handleChange}
-                      name="pricePerDay"
-                      min="0"
-                      step="0.01"
-                      placeholder="e.g. 49.99"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
-              </div>
-
-              {/* Additional Details Section */}
-              <div className="form-section">
-                <h3 className="form-section__title">Additional Details</h3>
-
-                <div className="form-row">
-                  <FormField
-                    label="Number of Doors"
-                    error={errors.doors}
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={car.doors}
-                      onChange={handleChange}
-                      name="doors"
-                      min="2"
-                      max="6"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Mileage (km)"
-                    error={errors.mileage}
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={car.mileage}
-                      onChange={handleChange}
-                      name="mileage"
-                      min="0"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="seats">Number of Seats</Label>
+                  <Input
+                    id="seats"
+                    name="seats"
+                    type="number"
+                    value={car.seats || ''}
+                    onChange={handleChange}
+                    min="1"
+                    max="10"
+                    disabled={isSubmitting}
+                    className={errors.seats ? "border-destructive" : ""}
+                  />
+                  {errors.seats && (
+                    <p className="text-sm text-destructive">{errors.seats}</p>
+                  )}
                 </div>
 
-                <div className="form-row">
-                  <FormField
-                    label="Engine Power (HP)"
-                    error={errors.enginePower}
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={car.enginePower}
-                      onChange={handleChange}
-                      name="enginePower"
-                      min="0"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Category"
-                    error={errors.category}
-                  >
-                    <select
-                      className="ui-input"
-                      value={car.category}
-                      onChange={handleChange}
-                      name="category"
-                      disabled={isSubmitting}
-                    >
-                      <option value="economy">Economy</option>
-                      <option value="luxury">Luxury</option>
-                      <option value="suv">SUV</option>
-                      <option value="van">Van</option>
-                      <option value="family">Family</option>
-                      <option value="business">Business</option>
-                    </select>
-                  </FormField>
-                </div>
-
-                <div className="form-row form-row--single">
-                  <FormField
-                    label="Photo URL"
-                    error={errors.photoUrl}
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={car.photoUrl}
-                      onChange={handleChange}
-                      name="photoUrl"
-                      placeholder="https://example.com/car-image.jpg"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
+                <div className="space-y-2">
+                  <Label htmlFor="doors">Number of Doors</Label>
+                  <Input
+                    id="doors"
+                    name="doors"
+                    type="number"
+                    value={car.doors || ''}
+                    onChange={handleChange}
+                    min="2"
+                    max="6"
+                    disabled={isSubmitting}
+                    className={errors.doors ? "border-destructive" : ""}
+                  />
+                  {errors.doors && (
+                    <p className="text-sm text-destructive">{errors.doors}</p>
+                  )}
                 </div>
               </div>
             </div>
 
-            <FormActions alignment="right" withBorder={true}>
+            {/* Registration Details Section */}
+            <div className="space-y-6">
+              <div className="border-b pb-2">
+                <h3 className="text-lg font-semibold text-foreground">Registration Details</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="licensePlate">
+                    License Plate <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="licensePlate"
+                    name="licensePlate"
+                    value={car.licensePlate || ''}
+                    onChange={handleChange}
+                    placeholder="e.g. ABC123"
+                    disabled={isSubmitting}
+                    className={errors.licensePlate ? "border-destructive" : ""}
+                  />
+                  {errors.licensePlate && (
+                    <p className="text-sm text-destructive">{errors.licensePlate}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="chassisNumber">Chassis Number</Label>
+                  <Input
+                    id="chassisNumber"
+                    name="chassisNumber"
+                    value={car.chassisNumber || ''}
+                    onChange={handleChange}
+                    placeholder="e.g. 1HGCM82633A123456"
+                    disabled={isSubmitting}
+                    className={errors.chassisNumber ? "border-destructive" : ""}
+                  />
+                  {errors.chassisNumber && (
+                    <p className="text-sm text-destructive">{errors.chassisNumber}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing Section */}
+            <div className="space-y-6">
+              <div className="border-b pb-2">
+                <h3 className="text-lg font-semibold text-foreground">Pricing</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="pricePerDay">
+                    Price Per Day ($) <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="pricePerDay"
+                    name="pricePerDay"
+                    type="number"
+                    value={car.pricePerDay || ''}
+                    onChange={handleChange}
+                    min="0"
+                    step="0.01"
+                    placeholder="e.g. 49.99"
+                    disabled={isSubmitting}
+                    className={errors.pricePerDay ? "border-destructive" : ""}
+                  />
+                  {errors.pricePerDay && (
+                    <p className="text-sm text-destructive">{errors.pricePerDay}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Details Section */}
+            <div className="space-y-6">
+              <div className="border-b pb-2">
+                <h3 className="text-lg font-semibold text-foreground">Additional Details</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="mileage">Mileage (km)</Label>
+                  <Input
+                    id="mileage"
+                    name="mileage"
+                    type="number"
+                    value={car.mileage || ''}
+                    onChange={handleChange}
+                    min="0"
+                    disabled={isSubmitting}
+                    className={errors.mileage ? "border-destructive" : ""}
+                  />
+                  {errors.mileage && (
+                    <p className="text-sm text-destructive">{errors.mileage}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="enginePower">Engine Power (HP)</Label>
+                  <Input
+                    id="enginePower"
+                    name="enginePower"
+                    type="number"
+                    value={car.enginePower || ''}
+                    onChange={handleChange}
+                    min="0"
+                    disabled={isSubmitting}
+                    className={errors.enginePower ? "border-destructive" : ""}
+                  />
+                  {errors.enginePower && (
+                    <p className="text-sm text-destructive">{errors.enginePower}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select
+                    value={car.category}
+                    onValueChange={(value) => handleChange({ target: { name: 'category', value } } as any)}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="economy">Economy</SelectItem>
+                      <SelectItem value="luxury">Luxury</SelectItem>
+                      <SelectItem value="suv">SUV</SelectItem>
+                      <SelectItem value="van">Van</SelectItem>
+                      <SelectItem value="family">Family</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.category && (
+                    <p className="text-sm text-destructive">{errors.category}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="photoUrl">Photo URL</Label>
+                  <Input
+                    id="photoUrl"
+                    name="photoUrl"
+                    value={car.photoUrl || ''}
+                    onChange={handleChange}
+                    placeholder="https://example.com/car-image.jpg"
+                    disabled={isSubmitting}
+                    className={errors.photoUrl ? "border-destructive" : ""}
+                  />
+                  {errors.photoUrl && (
+                    <p className="text-sm text-destructive">{errors.photoUrl}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex justify-end space-x-4 pt-6 border-t">
               <Button
                 type="button"
-                variant="secondary"
+                variant="outline"
                 onClick={onCancel}
                 disabled={isSubmitting}
               >
@@ -560,15 +600,23 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
 
               <Button
                 type="submit"
-                variant="primary"
                 disabled={isSubmitting}
-                leftIcon={isSubmitting ? undefined : <PlusCircleIcon />}
               >
-                {isSubmitting ? 'Creating...' : 'Create Car'}
+                {isSubmitting ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Creating...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Plus className="h-4 w-4" />
+                    <span>Create Car</span>
+                  </div>
+                )}
               </Button>
-            </FormActions>
-      </form>
-        </div>
+            </div>
+          </form>
+        </CardContent>
       </Card>
     </div>
   );
