@@ -27,7 +27,7 @@
 
 .page-content {
   flex: 1;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   background-color: var(--bg-secondary);
 }
 

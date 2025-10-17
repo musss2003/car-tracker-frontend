@@ -2,16 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { XIcon, SaveIcon } from '@heroicons/react/solid';
+import { X, Save, Plus } from 'lucide-react';
 import {
   Car,
   CarFormErrors,
 } from '../../../types/Car';
-import { Card, CardHeader, Button, FormField, FormActions } from '../../ui';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import './EditCarForm.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -229,347 +228,395 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
   }, [formData, touched]);
 
   return (
-    <div className="edit-customer-form-overlay">
-      <Card className="edit-customer-form-card" size="lg">
-        <CardHeader
-          title={`Edit Car: ${car.manufacturer} ${car.model}`}
-          subtitle="Update car details"
-          actions={
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onCancel}
-              leftIcon={<XIcon />}
-              disabled={isSubmitting}
-            >
-              Close
-            </Button>
-          }
-        />
+    <div className="edit-car-form-page">
+      {/* Page Header */}
+      <div className="page-header">
+        <div className="header-content">
+          <div className="header-info">
+            <h1 className="page-title">Edit Car: {car.manufacturer} {car.model}</h1>
+            <p className="page-description">Update car details</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCancel}
+            disabled={isSubmitting}
+            className="close-button"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
 
-        <div className="edit-customer-form-content">
-          <form onSubmit={handleSubmit} className="edit-customer-form">
-            <div className="form-sections">
-              {/* Basic Information Section */}
-              <div className="form-section">
-                <h3 className="form-section__title">Basic Information</h3>
-
-                <div className="form-row">
-                  <FormField
-                    label="Manufacturer"
-                    required
-                    error={errors.manufacturer}
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={formData.manufacturer}
-                      onChange={handleChange}
-                      name="manufacturer"
-                      list="manufacturers"
-                      placeholder="e.g. Toyota"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Model"
-                    required
-                    error={errors.model}
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={formData.model}
-                      onChange={handleChange}
-                      name="model"
-                      placeholder="e.g. Camry"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
-
-                <datalist id="manufacturers">
-                  {commonManufacturers.map((manufacturer) => (
-                    <option key={manufacturer} value={manufacturer} />
-                  ))}
-                </datalist>
-
-                <div className="form-row">
-                  <FormField
-                    label="Year"
-                    required
-                    error={errors.year}
-                  >
-                    <select
-                      className="ui-input"
-                      value={formData.year}
-                      onChange={handleChange}
-                      name="year"
-                      disabled={isSubmitting}
-                    >
-                      {YEARS.map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </select>
-                  </FormField>
-
-                  <FormField
-                    label="Color"
-                    required
-                    error={errors.color}
-                    helpText="Select the car color"
-                  >
-                    <input
-                      type="color"
-                      className="ui-input"
-                      value={formData.color}
-                      onChange={handleChange}
-                      name="color"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
-
-                <div className="form-row">
-                  <FormField
-                    label="Transmission"
-                    error={errors.transmission}
-                  >
-                    <select
-                      className="ui-input"
-                      value={formData.transmission}
-                      onChange={handleChange}
-                      name="transmission"
-                      disabled={isSubmitting}
-                    >
-                      <option value="automatic">Automatic</option>
-                      <option value="manual">Manual</option>
-                      <option value="semi-automatic">Semi-Automatic</option>
-                    </select>
-                  </FormField>
-
-                  <FormField
-                    label="Fuel Type"
-                    error={errors.fuelType}
-                  >
-                    <select
-                      className="ui-input"
-                      value={formData.fuelType}
-                      onChange={handleChange}
-                      name="fuelType"
-                      disabled={isSubmitting}
-                    >
-                      <option value="petrol">Petrol</option>
-                      <option value="diesel">Diesel</option>
-                      <option value="electric">Electric</option>
-                      <option value="hybrid">Hybrid</option>
-                    </select>
-                  </FormField>
-                </div>
-
-                <div className="form-row">
-                  <FormField
-                    label="Number of Seats"
-                    error={errors.seats}
-                    helpText="Number of passenger seats"
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={formData.seats}
-                      onChange={handleChange}
-                      name="seats"
-                      min="1"
-                      max="10"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Number of Doors"
-                    error={errors.doors}
-                    helpText="Number of doors"
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={formData.doors}
-                      onChange={handleChange}
-                      name="doors"
-                      min="2"
-                      max="6"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
-
-                <div className="form-row">
-                  <FormField
-                    label="Mileage (km)"
-                    error={errors.mileage}
-                    helpText="Current mileage in kilometers"
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={formData.mileage}
-                      onChange={handleChange}
-                      name="mileage"
-                      min="0"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Engine Power (HP)"
-                    error={errors.enginePower}
-                    helpText="Engine power in horsepower"
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={formData.enginePower}
-                      onChange={handleChange}
-                      name="enginePower"
-                      min="0"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
-
-                <div className="form-row form-row--single">
-                  <FormField
-                    label="Category"
-                    error={errors.category}
-                  >
-                    <select
-                      className="ui-input"
-                      value={formData.category}
-                      onChange={handleChange}
-                      name="category"
-                      disabled={isSubmitting}
-                    >
-                      <option value="economy">Economy</option>
-                      <option value="luxury">Luxury</option>
-                      <option value="suv">SUV</option>
-                      <option value="van">Van</option>
-                      <option value="family">Family</option>
-                      <option value="business">Business</option>
-                    </select>
-                  </FormField>
-                </div>
+      {/* Page Content */}
+      <div className="page-content">
+        <form onSubmit={handleSubmit} className="car-form">
+          {/* Basic Information Section */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2 className="section-title">Basic Information</h2>
+            </div>
+            
+            <div className="form-grid">
+              <div className="form-field">
+                <Label htmlFor="manufacturer">
+                  Manufacturer <span className="required">*</span>
+                </Label>
+                <Input
+                  id="manufacturer"
+                  name="manufacturer"
+                  value={formData.manufacturer || ''}
+                  onChange={handleChange}
+                  placeholder="e.g. Toyota"
+                  disabled={isSubmitting}
+                  className={errors.manufacturer ? "error" : ""}
+                  list="manufacturers"
+                />
+                {errors.manufacturer && (
+                  <p className="error-text">{errors.manufacturer}</p>
+                )}
               </div>
 
-              {/* Registration Details Section */}
-              <div className="form-section">
-                <h3 className="form-section__title">Registration Details</h3>
-
-                <div className="form-row">
-                  <FormField
-                    label="License Plate"
-                    required
-                    error={errors.licensePlate}
-                    helpText="Enter the license plate number"
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={formData.licensePlate}
-                      onChange={handleChange}
-                      name="licensePlate"
-                      placeholder="e.g. ABC123"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-
-                  <FormField
-                    label="Chassis Number"
-                    error={errors.chassisNumber}
-                    helpText="17-character VIN (Vehicle Identification Number)"
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={formData.chassisNumber}
-                      onChange={handleChange}
-                      name="chassisNumber"
-                      placeholder="e.g. 1HGCM82633A123456"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
-              </div>
-
-              {/* Pricing Section */}
-              <div className="form-section">
-                <h3 className="form-section__title">Pricing</h3>
-
-                <div className="form-row">
-                  <FormField
-                    label="Price Per Day ($)"
-                    required
-                    error={errors.pricePerDay}
-                  >
-                    <input
-                      type="number"
-                      className="ui-input"
-                      value={formData.pricePerDay}
-                      onChange={handleChange}
-                      name="pricePerDay"
-                      min="0"
-                      step="0.01"
-                      placeholder="e.g. 49.99"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
-
-                <div className="form-row">
-                  <FormField
-                    label="Photo URL"
-                    error={errors.photoUrl}
-                    helpText="URL of the car photo"
-                  >
-                    <input
-                      type="text"
-                      className="ui-input"
-                      value={formData.photoUrl}
-                      onChange={handleChange}
-                      name="photoUrl"
-                      placeholder="https://example.com/car-image.jpg"
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
+              <div className="form-field">
+                <Label htmlFor="model">
+                  Model <span className="required">*</span>
+                </Label>
+                <Input
+                  id="model"
+                  name="model"
+                  value={formData.model || ''}
+                  onChange={handleChange}
+                  placeholder="e.g. Camry"
+                  disabled={isSubmitting}
+                  className={errors.model ? "error" : ""}
+                />
+                {errors.model && (
+                  <p className="error-text">{errors.model}</p>
+                )}
               </div>
             </div>
 
-            {/* Form Actions */}
-            <FormActions alignment="right" withBorder={true}>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCancel}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
+            <datalist id="manufacturers">
+              {commonManufacturers.map((manufacturer) => (
+                <option key={manufacturer} value={manufacturer} />
+              ))}
+            </datalist>
 
-              <Button
-                type="submit"
-                variant="primary"
-                leftIcon={!isSubmitting ? <SaveIcon /> : undefined}
-                disabled={isSubmitting || !hasChanges()}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </FormActions>
-          </form>
-        </div>
-      </Card>
+            <div className="form-grid">
+              <div className="form-field">
+                <Label htmlFor="year">
+                  Year <span className="required">*</span>
+                </Label>
+                <Select
+                  value={formData.year?.toString()}
+                  onValueChange={(value) => handleChange({ target: { name: 'year', value: parseInt(value) } } as any)}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {YEARS.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.year && (
+                  <p className="error-text">{errors.year}</p>
+                )}
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="color">Color</Label>
+                <Input
+                  id="color"
+                  name="color"
+                  type="color"
+                  value={formData.color || '#000000'}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  className="color-input"
+                />
+                {errors.color && (
+                  <p className="error-text">{errors.color}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="form-grid">
+              <div className="form-field">
+                <Label htmlFor="transmission">Transmission</Label>
+                <Select
+                  value={formData.transmission}
+                  onValueChange={(value) => handleChange({ target: { name: 'transmission', value } } as any)}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select transmission" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="automatic">Automatic</SelectItem>
+                    <SelectItem value="manual">Manual</SelectItem>
+                    <SelectItem value="semi-automatic">Semi-Automatic</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.transmission && (
+                  <p className="error-text">{errors.transmission}</p>
+                )}
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="fuelType">Fuel Type</Label>
+                <Select
+                  value={formData.fuelType}
+                  onValueChange={(value) => handleChange({ target: { name: 'fuelType', value } } as any)}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select fuel type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="petrol">Petrol</SelectItem>
+                    <SelectItem value="diesel">Diesel</SelectItem>
+                    <SelectItem value="electric">Electric</SelectItem>
+                    <SelectItem value="hybrid">Hybrid</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.fuelType && (
+                  <p className="error-text">{errors.fuelType}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="form-grid">
+              <div className="form-field">
+                <Label htmlFor="seats">Number of Seats</Label>
+                <Input
+                  id="seats"
+                  name="seats"
+                  type="number"
+                  value={formData.seats || ''}
+                  onChange={handleChange}
+                  min="1"
+                  max="10"
+                  disabled={isSubmitting}
+                  className={errors.seats ? "error" : ""}
+                />
+                {errors.seats && (
+                  <p className="error-text">{errors.seats}</p>
+                )}
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="doors">Number of Doors</Label>
+                <Input
+                  id="doors"
+                  name="doors"
+                  type="number"
+                  value={formData.doors || ''}
+                  onChange={handleChange}
+                  min="2"
+                  max="6"
+                  disabled={isSubmitting}
+                  className={errors.doors ? "error" : ""}
+                />
+                {errors.doors && (
+                  <p className="error-text">{errors.doors}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Registration Details Section */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2 className="section-title">Registration Details</h2>
+            </div>
+
+            <div className="form-grid">
+              <div className="form-field">
+                <Label htmlFor="licensePlate">
+                  License Plate <span className="required">*</span>
+                </Label>
+                <Input
+                  id="licensePlate"
+                  name="licensePlate"
+                  value={formData.licensePlate || ''}
+                  onChange={handleChange}
+                  placeholder="e.g. ABC123"
+                  disabled={isSubmitting}
+                  className={errors.licensePlate ? "error" : ""}
+                />
+                {errors.licensePlate && (
+                  <p className="error-text">{errors.licensePlate}</p>
+                )}
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="chassisNumber">Chassis Number</Label>
+                <Input
+                  id="chassisNumber"
+                  name="chassisNumber"
+                  value={formData.chassisNumber || ''}
+                  onChange={handleChange}
+                  placeholder="e.g. 1HGCM82633A123456"
+                  disabled={isSubmitting}
+                  className={errors.chassisNumber ? "error" : ""}
+                />
+                {errors.chassisNumber && (
+                  <p className="error-text">{errors.chassisNumber}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Pricing Section */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2 className="section-title">Pricing</h2>
+            </div>
+
+            <div className="form-grid single-column">
+              <div className="form-field">
+                <Label htmlFor="pricePerDay">
+                  Price Per Day ($) <span className="required">*</span>
+                </Label>
+                <Input
+                  id="pricePerDay"
+                  name="pricePerDay"
+                  type="number"
+                  value={formData.pricePerDay || ''}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.01"
+                  placeholder="e.g. 49.99"
+                  disabled={isSubmitting}
+                  className={errors.pricePerDay ? "error" : ""}
+                />
+                {errors.pricePerDay && (
+                  <p className="error-text">{errors.pricePerDay}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Details Section */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2 className="section-title">Additional Details</h2>
+            </div>
+
+            <div className="form-grid">
+              <div className="form-field">
+                <Label htmlFor="mileage">Mileage (km)</Label>
+                <Input
+                  id="mileage"
+                  name="mileage"
+                  type="number"
+                  value={formData.mileage || ''}
+                  onChange={handleChange}
+                  min="0"
+                  disabled={isSubmitting}
+                  className={errors.mileage ? "error" : ""}
+                />
+                {errors.mileage && (
+                  <p className="error-text">{errors.mileage}</p>
+                )}
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="enginePower">Engine Power (HP)</Label>
+                <Input
+                  id="enginePower"
+                  name="enginePower"
+                  type="number"
+                  value={formData.enginePower || ''}
+                  onChange={handleChange}
+                  min="0"
+                  disabled={isSubmitting}
+                  className={errors.enginePower ? "error" : ""}
+                />
+                {errors.enginePower && (
+                  <p className="error-text">{errors.enginePower}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="form-grid">
+              <div className="form-field">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => handleChange({ target: { name: 'category', value } } as any)}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="economy">Economy</SelectItem>
+                    <SelectItem value="luxury">Luxury</SelectItem>
+                    <SelectItem value="suv">SUV</SelectItem>
+                    <SelectItem value="van">Van</SelectItem>
+                    <SelectItem value="family">Family</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.category && (
+                  <p className="error-text">{errors.category}</p>
+                )}
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="photoUrl">Photo URL</Label>
+                <Input
+                  id="photoUrl"
+                  name="photoUrl"
+                  value={formData.photoUrl || ''}
+                  onChange={handleChange}
+                  placeholder="https://example.com/car-image.jpg"
+                  disabled={isSubmitting}
+                  className={errors.photoUrl ? "error" : ""}
+                />
+                {errors.photoUrl && (
+                  <p className="error-text">{errors.photoUrl}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Form Actions */}
+          <div className="form-actions">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              type="submit"
+              disabled={isSubmitting || !hasChanges()}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Saving...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Save className="h-4 w-4" />
+                  <span>Save Changes</span>
+                </div>
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
