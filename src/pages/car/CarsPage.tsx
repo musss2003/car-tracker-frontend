@@ -110,8 +110,8 @@ const CarsPage = () => {
         setError(null);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setError('Failed to load data. Please try again later.');
-        toast.error('Failed to load data');
+        setError('Neuspješno učitavanje podataka. Molimo pokušajte ponovo.');
+        toast.error('Neuspješno učitavanje podataka');
       } finally {
         setLoading(false);
       }
@@ -217,12 +217,12 @@ const CarsPage = () => {
 
   const handleDelete = async (licensePlate: string) => {
     if (busyCarLicensePlates.has(licensePlate)) {
-      toast.error('Cannot delete a car that is currently in use');
+      toast.error('Nije moguće obrisati vozilo koje je trenutno u upotrebi');
       return;
     }
 
     const confirmed = window.confirm(
-      'Are you sure you want to delete this car?'
+      'Da li ste sigurni da želite obrisati ovo vozilo?'
     );
     if (confirmed) {
       try {
@@ -230,10 +230,10 @@ const CarsPage = () => {
         await deleteCar(licensePlate);
         const updatedCars = await getCars();
         setCars(updatedCars);
-        toast.success('Car deleted successfully');
+        toast.success('Vozilo je uspješno obrisano');
       } catch (error) {
         console.error('Error deleting car:', error);
-        toast.error('Failed to delete car');
+        toast.error('Neuspješno brisanje vozila');
       } finally {
         setLoading(false);
       }
@@ -285,12 +285,12 @@ const CarsPage = () => {
   // Export to CSV
   const exportToCSV = () => {
     const headers = [
-      'Manufacturer',
+      'Proizvođač',
       'Model',
-      'Year',
-      'Color',
-      'License Plate',
-      'Price per Day',
+      'Godina',
+      'Boja',
+      'Registarska oznaka',
+      'Cijena po danu',
       'Status',
     ];
     const csvData = filteredAndSortedCars.map((car) => [
@@ -300,7 +300,7 @@ const CarsPage = () => {
       car.color || 'N/A',
       car.licensePlate,
       car.pricePerDay ? `$${car.pricePerDay}` : 'N/A',
-      busyCarLicensePlates.has(car.licensePlate) ? 'Busy' : 'Available',
+      busyCarLicensePlates.has(car.licensePlate) ? 'Zauzeto' : 'Dostupno',
     ]);
 
     const csvContent = [
@@ -339,12 +339,12 @@ const CarsPage = () => {
               {isBusy ? (
                 <>
                   <ExclamationCircleIcon className="w-3 h-3" />
-                  <span>Busy</span>
+                  <span>Zauzeto</span>
                 </>
               ) : (
                 <>
                   <CheckCircleIcon className="w-3 h-3" />
-                  <span>Available</span>
+                  <span>Dostupno</span>
                 </>
               )}
             </Badge>
@@ -354,19 +354,19 @@ const CarsPage = () => {
         <CardContent className="space-y-3 pb-3">
           <div className="flex items-center gap-3 text-sm">
             <CalendarIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground min-w-[80px]">Year:</span>
+            <span className="text-muted-foreground min-w-[80px]">Godina:</span>
             <span className="font-medium">{car.year}</span>
           </div>
 
           <div className="flex items-center gap-3 text-sm">
             <TagIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground min-w-[80px]">License:</span>
+            <span className="text-muted-foreground min-w-[80px]">Registarska:</span>
             <span className="font-medium">{car.licensePlate}</span>
           </div>
 
           <div className="flex items-center gap-3 text-sm">
             <ColorSwatchIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground min-w-[80px]">Color:</span>
+            <span className="text-muted-foreground min-w-[80px]">Boja:</span>
             <div className="flex items-center gap-2">
               {car.color && (
                 <div
@@ -380,7 +380,7 @@ const CarsPage = () => {
 
           <div className="flex items-center gap-3 text-sm">
             <CurrencyDollarIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground min-w-[80px]">Price/Day:</span>
+            <span className="text-muted-foreground min-w-[80px]">Cijena/Dan:</span>
             <span className="font-medium">
               {car.pricePerDay ? `$${car.pricePerDay}` : 'N/A'}
             </span>
@@ -395,7 +395,7 @@ const CarsPage = () => {
             className="flex-1 min-w-[120px]"
           >
             <EyeIcon className="w-4 h-4" />
-            View
+            Pregled
           </Button>
           <Button
             variant="outline"
@@ -404,7 +404,7 @@ const CarsPage = () => {
             className="flex-1 min-w-[120px]"
           >
             <CalendarIcon className="w-4 h-4" />
-            Availability
+            Dostupnost
           </Button>
           <Button
             variant="outline"
@@ -413,7 +413,7 @@ const CarsPage = () => {
             className="flex-1 min-w-[120px]"
           >
             <PencilIcon className="w-4 h-4" />
-            Edit
+            Uredi
           </Button>
           <Button
             variant="outline"
@@ -423,7 +423,7 @@ const CarsPage = () => {
             className="flex-1 min-w-[120px]"
           >
             <TrashIcon className="w-4 h-4" />
-            Delete
+            Obriši
           </Button>
         </CardFooter>
       </Card>
@@ -446,7 +446,7 @@ const CarsPage = () => {
 
       {/* Table Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Cars</h1>
+        <h1 className="text-2xl font-bold">Vozila</h1>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <Button
             variant="outline"
@@ -455,7 +455,7 @@ const CarsPage = () => {
             className="w-full sm:w-auto"
           >
             <DownloadIcon className="w-4 h-4" />
-            <span className="ml-2">Export CSV</span>
+            <span className="ml-2">Izvezi CSV</span>
           </Button>
           <Button
             onClick={handleCreate}
@@ -463,7 +463,7 @@ const CarsPage = () => {
             className="w-full sm:w-auto"
           >
             <PlusCircleIcon className="w-4 h-4" />
-            <span className="ml-2">Add New Car</span>
+            <span className="ml-2">Dodaj novo vozilo</span>
           </Button>
         </div>
       </div>
@@ -475,11 +475,11 @@ const CarsPage = () => {
             <Button
               variant="outline"
               onClick={toggleViewMode}
-              aria-label={`Switch to ${viewMode === 'table' ? 'card' : 'table'} view`}
+              aria-label={`Prebaci na ${viewMode === 'table' ? 'kartice' : 'tabelu'} pregled`}
               className="w-full sm:w-auto"
             >
               {viewMode === 'table' ? <ViewGridIcon className="w-4 h-4" /> : <ViewListIcon className="w-4 h-4" />}
-              <span className="ml-2">{viewMode === 'table' ? 'Card View' : 'Table View'}</span>
+              <span className="ml-2">{viewMode === 'table' ? 'Pregled kartica' : 'Pregled tabele'}</span>
             </Button>
           )}
         </div>
@@ -488,7 +488,7 @@ const CarsPage = () => {
           <div className="relative">
             <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search cars..."
+              placeholder="Pretraži vozila..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8 w-full sm:w-[250px]"
@@ -498,14 +498,14 @@ const CarsPage = () => {
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as CarStatusFilter)}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <FilterIcon className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder="Filtriraj po statusu" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="available">Available</SelectItem>
-              <SelectItem value="rented">Rented</SelectItem>
-              <SelectItem value="maintenance">Maintenance</SelectItem>
-              <SelectItem value="unavailable">Unavailable</SelectItem>
+              <SelectItem value="all">Svi statusi</SelectItem>
+              <SelectItem value="available">Dostupno</SelectItem>
+              <SelectItem value="rented">Iznajmljeno</SelectItem>
+              <SelectItem value="maintenance">Servis</SelectItem>
+              <SelectItem value="unavailable">Nedostupno</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -523,7 +523,7 @@ const CarsPage = () => {
       {loading && (
         <div className="flex items-center justify-center gap-2 p-8">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-          <span>Loading...</span>
+          <span>Učitavanje...</span>
         </div>
       )}
 
@@ -533,11 +533,11 @@ const CarsPage = () => {
           <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
             <PlusCircleIcon className="w-6 h-6 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-semibold mb-2">No cars found</h3>
-          <p className="text-muted-foreground mb-4">Start by adding your first car</p>
+          <h3 className="text-lg font-semibold mb-2">Nema vozila</h3>
+          <p className="text-muted-foreground mb-4">Počnite dodavanjem prvog vozila</p>
           <Button onClick={handleCreate}>
             <PlusCircleIcon className="w-4 h-4" />
-            Add New Car
+            Dodaj novo vozilo
           </Button>
         </div>
       )}
@@ -550,17 +550,13 @@ const CarsPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {renderTableHeader('Manufacturer', 'manufacturer')}
+                    {renderTableHeader('Proizvođač', 'manufacturer')}
                     {renderTableHeader('Model', 'model')}
-                    {renderTableHeader('Year', 'year')}
-                    <TableHead className="hide-on-small">Color</TableHead>
-                    <TableHead className="hide-on-small">
-                      License Plate
-                    </TableHead>
-                    {renderTableHeader('Price/Day', 'pricePerDay')}
+                    {renderTableHeader('Godina', 'year')}
+                    {renderTableHeader('Cijena/Dan', 'pricePerDay')}
                     <TableHead>Status</TableHead>
                     <TableHead className="text-center">
-                      Actions
+                      Akcije
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -583,20 +579,6 @@ const CarsPage = () => {
                           </TableCell>
                           <TableCell>{car.model}</TableCell>
                           <TableCell>{car.year}</TableCell>
-                          <TableCell className="hide-on-small">
-                            <div className="flex items-center gap-2">
-                              {car.color && (
-                                <div
-                                  className="w-4 h-4 rounded-full border"
-                                  style={{ backgroundColor: car.color }}
-                                ></div>
-                              )}
-                              <span>{car.color || 'N/A'}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="hide-on-small">
-                            {car.licensePlate}
-                          </TableCell>
                           <TableCell>
                             {car.pricePerDay
                               ? `$${car.pricePerDay}`
@@ -607,12 +589,12 @@ const CarsPage = () => {
                               {isBusy ? (
                                 <>
                                   <ExclamationCircleIcon className="w-3 h-3" />
-                                  <span>Busy</span>
+                                  <span>Zauzeto</span>
                                 </>
                               ) : (
                                 <>
                                   <CheckCircleIcon className="w-3 h-3" />
-                                  <span>Available</span>
+                                  <span>Dostupno</span>
                                 </>
                               )}
                             </Badge>
@@ -624,7 +606,7 @@ const CarsPage = () => {
                                 size="sm"
                                 onClick={() => handleViewDetails(car)}
                                 className="h-8 w-8 p-0"
-                                aria-label="View"
+                                aria-label="Pregled"
                               >
                                 <EyeIcon className="w-4 h-4" />
                               </Button>
@@ -633,7 +615,7 @@ const CarsPage = () => {
                                 size="sm"
                                 onClick={() => handleViewAvailability(car)}
                                 className="h-8 w-8 p-0"
-                                aria-label="Availability"
+                                aria-label="Dostupnost"
                               >
                                 <CalendarIcon className="w-4 h-4" />
                               </Button>
@@ -642,7 +624,7 @@ const CarsPage = () => {
                                 size="sm"
                                 onClick={() => handleEdit(car)}
                                 className="h-8 w-8 p-0"
-                                aria-label="Edit"
+                                aria-label="Uredi"
                               >
                                 <PencilIcon className="w-4 h-4" />
                               </Button>
@@ -652,7 +634,7 @@ const CarsPage = () => {
                                 onClick={() => handleDelete(car.licensePlate)}
                                 className="h-8 w-8 p-0"
                                 disabled={isBusy}
-                                aria-label="Delete"
+                                aria-label="Obriši"
                               >
                                 <TrashIcon className="w-4 h-4" />
                               </Button>
@@ -663,10 +645,10 @@ const CarsPage = () => {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                         {searchTerm || statusFilter !== 'all'
-                          ? 'No cars match your search criteria'
-                          : 'No cars available'}
+                          ? 'Nema vozila koja odgovaraju kriterijima pretrage'
+                          : 'Nema dostupnih vozila'}
                       </TableCell>
                     </TableRow>
                   )}
@@ -680,8 +662,8 @@ const CarsPage = () => {
               ) : (
                 <div className="col-span-full text-center py-8 text-muted-foreground">
                   {searchTerm || statusFilter !== 'all'
-                    ? 'No cars match your search criteria'
-                    : 'No cars available'}
+                    ? 'Nema vozila koja odgovaraju kriterijima pretrage'
+                    : 'Nema dostupnih vozila'}
                 </div>
               )}
             </div>
@@ -694,13 +676,13 @@ const CarsPage = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <p className="text-sm text-muted-foreground">
-              Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredAndSortedCars.length)} of {filteredAndSortedCars.length} results
+              Prikazuje se {((currentPage - 1) * itemsPerPage) + 1} do {Math.min(currentPage * itemsPerPage, filteredAndSortedCars.length)} od {filteredAndSortedCars.length} rezultata
             </p>
           </div>
           
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Items per page:</span>
+              <span className="text-sm text-muted-foreground">Stavki po stranici:</span>
               <Select 
                 value={itemsPerPage.toString()} 
                 onValueChange={(value) => {
@@ -729,11 +711,11 @@ const CarsPage = () => {
                 className="flex-1 sm:flex-none"
               >
                 <ChevronLeftIcon className="w-4 h-4" />
-                <span className="ml-1">Previous</span>
+                <span className="ml-1">Prethodna</span>
               </Button>
               
               <span className="px-4 py-2 text-sm text-center">
-                Page {currentPage} of {totalPages}
+                Stranica {currentPage} od {totalPages}
               </span>
               
               <Button
@@ -743,7 +725,7 @@ const CarsPage = () => {
                 disabled={currentPage === totalPages}
                 className="flex-1 sm:flex-none"
               >
-                <span className="mr-1">Next</span>
+                <span className="mr-1">Sljedeća</span>
                 <ChevronRightIcon className="w-4 h-4" />
               </Button>
             </div>
@@ -757,7 +739,7 @@ const CarsPage = () => {
           onClick={handleCreate}
           disabled={loading}
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-40 p-0"
-          aria-label="Add New Car"
+          aria-label="Dodaj novo vozilo"
         >
           <PlusCircleIcon className="w-6 h-6" />
         </Button>

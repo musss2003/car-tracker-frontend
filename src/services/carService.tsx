@@ -28,10 +28,10 @@ export const getCars = async (): Promise<Car[]> => {
 };
 
 export const updateCar = async (
-  license_plate: string,
+  licensePlate: string,
   car: Car
 ): Promise<Car> => {
-  const response = await fetch(`${API_URL}cars/${license_plate}`, {
+  const response = await fetch(`${API_URL}cars/${licensePlate}`, {
     method: 'PUT',
     headers: {
       ...getAuthHeaders(),
@@ -46,8 +46,8 @@ export const updateCar = async (
   return await response.json();
 };
 
-export const deleteCar = async (id: string): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}cars/${id}`, {
+export const deleteCar = async (licensePlate: string): Promise<{ message: string }> => {
+  const response = await fetch(`${API_URL}cars/${licensePlate}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
     credentials: 'include',

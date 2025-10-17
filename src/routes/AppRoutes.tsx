@@ -40,8 +40,8 @@ export function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/cars" element={<CarsPage />} />
           <Route path="/cars/new" element={<CreateCarPage />} />
+          <Route path="/cars" element={<CarsPage />} />
           <Route path="/cars/:id" element={<CarDetailsPage />} />
           <Route path="/cars/:id/edit" element={<EditCarPage />} />
           <Route path="/contracts" element={<ContractsPage />} />
