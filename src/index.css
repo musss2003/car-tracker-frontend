@@ -113,9 +113,32 @@ code {
 
 /* Additional utility classes */
 
-/* Responsive utility classes */
-@media (max-width: 768px) {
-  .hide-on-small {
+/* Responsive utility classes - gradually hide columns */
+
+/* Hide price column on screens smaller than 1200px */
+@media (max-width: 1200px) {
+  .hide-on-xl {
+    display: none !important;
+  }
+}
+
+/* Hide year column on screens smaller than 1000px */
+@media (max-width: 1030px) {
+  .hide-on-lg {
+    display: none !important;
+  }
+}
+
+/* Hide model column on screens smaller than 800px */
+@media (max-width: 950px) {
+  .hide-on-md {
+    display: none !important;
+  }
+}
+
+/* Hide additional columns on very small screens */
+@media (max-width: 830px) {
+  .hide-on-sm {
     display: none !important;
   }
 }

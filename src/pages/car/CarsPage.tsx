@@ -302,14 +302,14 @@ const CarsPage = () => {
   };
 
   // Render table header with sort indicators
-  const renderTableHeader = (label: string, key: SortableCarKey) => {
+  const renderTableHeader = (label: string, key: SortableCarKey, className?: string) => {
     const isSorted = sortConfig.key === key;
     const SortIcon =
       sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
 
     return (
       <TableHead
-        className="cursor-pointer"
+        className={`cursor-pointer ${className || ''}`}
         onClick={() => handleSort(key)}
       >
         <div className="flex items-center gap-2">
@@ -341,7 +341,7 @@ const CarsPage = () => {
       car.year,
       car.color || 'N/A',
       car.licensePlate,
-      car.pricePerDay ? `$${car.pricePerDay}` : 'N/A',
+      car.pricePerDay ? `${car.pricePerDay} BAM` : 'N/A',
       busyCarLicensePlates.has(car.licensePlate) ? 'Zauzeto' : 'Dostupno',
     ]);
 
@@ -449,7 +449,7 @@ const CarsPage = () => {
               <div>
                 <p className="text-muted-foreground text-xs">Cijena/Dan</p>
                 <p className="font-medium">
-                  {car.pricePerDay ? `$${car.pricePerDay}` : 'N/A'}
+                  {car.pricePerDay ? `${car.pricePerDay} BAM` : 'N/A'}
                 </p>
               </div>
             </div>
@@ -630,11 +630,11 @@ const CarsPage = () => {
                 <TableHeader>
                   <TableRow>
                     {renderTableHeader('Proizvođač', 'manufacturer')}
-                    {renderTableHeader('Model', 'model')}
-                    {renderTableHeader('Godina', 'year')}
+                    {renderTableHeader('Model', 'model', 'hide-on-md')}
+                    {renderTableHeader('Godina', 'year', 'hide-on-lg')}
                     {renderTableHeader('Registracija', 'licensePlate')}
-                    {renderTableHeader('Cijena/Dan', 'pricePerDay')}
-                    <TableHead>Status</TableHead>
+                    {renderTableHeader('Cijena/Dan', 'pricePerDay', 'hide-on-xl')}
+                    <TableHead className='hide-on-sm'>Status</TableHead>
                     <TableHead className="text-center">
                       Akcije
                     </TableHead>
@@ -659,15 +659,15 @@ const CarsPage = () => {
                               <span>{car.manufacturer}</span>
                             </div>
                           </TableCell>
-                          <TableCell>{car.model}</TableCell>
-                          <TableCell>{car.year}</TableCell>
+                          <TableCell className="hide-on-md">{car.model}</TableCell>
+                          <TableCell className="hide-on-lg">{car.year}</TableCell>
                           <TableCell>{car.licensePlate}</TableCell>
-                          <TableCell>
+                          <TableCell className="hide-on-xl">
                             {car.pricePerDay
-                              ? `$${car.pricePerDay}`
+                              ? `${car.pricePerDay} BAM`
                               : 'N/A'}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className='hide-on-sm'>
                             <Badge variant={isBusy ? "destructive" : "default"} className="gap-1">
                               {isBusy ? (
                                 <>
@@ -728,7 +728,7 @@ const CarsPage = () => {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                         {searchTerm || statusFilter !== 'all'
                           ? 'Nema vozila koja odgovaraju kriterijima pretrage'
                           : 'Nema dostupnih vozila'}
