@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { addCar } from '../../services/carService';
 import { uploadDocument } from '../../services/uploadService';
+import carBrands from '../../assets/car_brands.json';
 import './CreateCarPage.css';
 import {
   Car,
@@ -50,19 +51,12 @@ const CreateCarPage: React.FC = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
-  // Common car manufacturers for suggestions
-  const commonManufacturers = [
-    'Toyota',
-    'Honda',
-    'Ford',
-    'Chevrolet',
-    'BMW',
-    'Mercedes-Benz',
-    'Audi',
-    'Volkswagen',
-    'Nissan',
-    'Hyundai',
-  ];
+  // Car brands from JSON file
+  const popularBrands = carBrands.filter(brand => brand.popular).map(brand => brand.name);
+  const allBrands = carBrands.map(brand => brand.name);
+
+  // Common car manufacturers for suggestions (popular Bosnian market brands)
+  const commonManufacturers = popularBrands;
 
   // Handle form field changes
   const handleChange = (
@@ -329,16 +323,27 @@ const CreateCarPage: React.FC = () => {
                 <Label htmlFor="manufacturer">
                   Proizvođač <span className="required">*</span>
                 </Label>
-                <Input
-                  id="manufacturer"
-                  name="manufacturer"
+                <Select
                   value={car.manufacturer || ''}
-                  onChange={handleChange}
-                  placeholder="npr. Toyota"
+                  onValueChange={(value) => handleChange({ target: { name: 'manufacturer', value } } as any)}
                   disabled={isSubmitting}
-                  className={errors.manufacturer ? "error" : ""}
-                  list="manufacturers"
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Odaberite proizvođača" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px] overflow-y-auto">
+                    {popularBrands.map((manufacturer) => (
+                      <SelectItem key={manufacturer} value={manufacturer}>
+                        {manufacturer}
+                      </SelectItem>
+                    ))}
+                    {allBrands.filter(brand => !popularBrands.includes(brand)).map((manufacturer) => (
+                      <SelectItem key={manufacturer} value={manufacturer}>
+                        {manufacturer}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.manufacturer && (
                   <p className="error-text">{errors.manufacturer}</p>
                 )}
@@ -363,12 +368,6 @@ const CreateCarPage: React.FC = () => {
               </div>
             </div>
 
-            <datalist id="manufacturers">
-              {commonManufacturers.map((manufacturer) => (
-                <option key={manufacturer} value={manufacturer} />
-              ))}
-            </datalist>
-
             <div className="form-grid">
               <div className="form-field">
                 <Label htmlFor="year">
@@ -382,7 +381,7 @@ const CreateCarPage: React.FC = () => {
                   <SelectTrigger>
                     <SelectValue placeholder="Odaberite godinu" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-[200px] overflow-y-auto">
                     {YEARS.map((year) => (
                       <SelectItem key={year} value={year.toString()}>
                         {year}

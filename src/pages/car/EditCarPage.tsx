@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getCar, updateCar } from '../../services/carService';
 import { uploadDocument, downloadDocument } from '../../services/uploadService';
+import carBrands from '../../assets/car_brands.json';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import './EditCarPage.css';
 
@@ -110,19 +111,12 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
   const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
 
-  // Common car manufacturers for suggestions
-  const commonManufacturers = [
-    'Toyota',
-    'Honda',
-    'Ford',
-    'Chevrolet',
-    'BMW',
-    'Mercedes-Benz',
-    'Audi',
-    'Volkswagen',
-    'Nissan',
-    'Hyundai',
-  ];
+  // Car brands from JSON file
+  const popularBrands = carBrands.filter(brand => brand.popular).map(brand => brand.name);
+  const allBrands = carBrands.map(brand => brand.name);
+
+  // Common car manufacturers for suggestions (popular Bosnian market brands)
+  const commonManufacturers = popularBrands;
 
   // Load existing photo from backend
   const loadExistingPhoto = async (photoUrl: string) => {
@@ -418,16 +412,27 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                 <Label htmlFor="manufacturer">
                   Proizvođač <span className="required">*</span>
                 </Label>
-                <Input
-                  id="manufacturer"
-                  name="manufacturer"
+                <Select
                   value={formData.manufacturer || ''}
-                  onChange={handleChange}
-                  placeholder="npr. Toyota"
+                  onValueChange={(value) => handleChange({ target: { name: 'manufacturer', value } } as any)}
                   disabled={isSubmitting}
-                  className={errors.manufacturer ? "error" : ""}
-                  list="manufacturers"
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Odaberite proizvođača" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px] overflow-y-auto">
+                    {popularBrands.map((manufacturer) => (
+                      <SelectItem key={manufacturer} value={manufacturer}>
+                        {manufacturer}
+                      </SelectItem>
+                    ))}
+                    {allBrands.filter(brand => !popularBrands.includes(brand)).map((manufacturer) => (
+                      <SelectItem key={manufacturer} value={manufacturer}>
+                        {manufacturer}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.manufacturer && (
                   <p className="error-text">{errors.manufacturer}</p>
                 )}
@@ -452,12 +457,6 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
               </div>
             </div>
 
-            <datalist id="manufacturers">
-              {commonManufacturers.map((manufacturer) => (
-                <option key={manufacturer} value={manufacturer} />
-              ))}
-            </datalist>
-
             <div className="form-grid">
               <div className="form-field">
                 <Label htmlFor="year">
@@ -471,7 +470,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   <SelectTrigger>
                     <SelectValue placeholder="Odaberite godinu" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-[200px] overflow-y-auto">
                     {YEARS.map((year) => (
                       <SelectItem key={year} value={year.toString()}>
                         {year}

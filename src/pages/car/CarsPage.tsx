@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '@mui/material';
 import { getActiveContracts } from '../../services/contractService';
 import { getCars, deleteCar } from '../../services/carService';
+import { downloadDocument } from '../../services/uploadService';
 import { toast } from 'react-toastify';
 import {
   PencilIcon,
@@ -47,7 +48,7 @@ import CarAvailabilityCalendar from '@/components/Car/CarAvailabilityCalendar/Ca
 // Define the keys that can be sorted
 type SortableCarKey = keyof Pick<
   Car,
-  'manufacturer' | 'model' | 'year' | 'pricePerDay'
+  'manufacturer' | 'model' | 'year' | 'pricePerDay' | 'licensePlate'
 >;
 
 type CarStatusFilter = 'all' | 'available' | 'rented' | 'maintenance' | 'unavailable';
@@ -65,6 +66,7 @@ const CarsPage = () => {
   const [activeContracts, setActiveContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [carPhotos, setCarPhotos] = useState<Record<string, string>>({});
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
   const [showAvailabilityCalendar, setShowAvailabilityCalendar] =
     useState<boolean>(false);
@@ -87,6 +89,33 @@ const CarsPage = () => {
   // Check if on mobile
   const isMobile = useMediaQuery('(max-width: 768px)');
 
+  // Load car photos
+  const loadCarPhotos = async (cars: Car[]) => {
+    const photoPromises = cars
+      .filter(car => car.photoUrl)
+      .map(async (car) => {
+        try {
+          const photoBlob = await downloadDocument(car.photoUrl!);
+          const photoUrl = URL.createObjectURL(photoBlob);
+          return { licensePlate: car.licensePlate, photoUrl };
+        } catch (error) {
+          console.error(`Error loading photo for car ${car.licensePlate}:`, error);
+          return { licensePlate: car.licensePlate, photoUrl: null };
+        }
+      });
+
+    const photoResults = await Promise.all(photoPromises);
+    const photoMap: Record<string, string> = {};
+    
+    photoResults.forEach(result => {
+      if (result.photoUrl) {
+        photoMap[result.licensePlate] = result.photoUrl;
+      }
+    });
+
+    setCarPhotos(photoMap);
+  };
+
   // Set view mode based on screen size
   useEffect(() => {
     if (isMobile) {
@@ -107,6 +136,10 @@ const CarsPage = () => {
         ]);
         setCars(carsData);
         setActiveContracts(contracts);
+        
+        // Load car photos
+        await loadCarPhotos(carsData);
+        
         setError(null);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -119,6 +152,15 @@ const CarsPage = () => {
 
     fetchData();
   }, []);
+
+  // Cleanup photo URLs on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(carPhotos).forEach(photoUrl => {
+        URL.revokeObjectURL(photoUrl);
+      });
+    };
+  }, [carPhotos]);
 
   // Create a set of busy car license plates for quick lookup
   const busyCarLicensePlates = useMemo(() => {
@@ -322,109 +364,146 @@ const CarsPage = () => {
   // Render car card for mobile view
   const renderCarCard = (car: Car) => {
     const isBusy = busyCarLicensePlates.has(car.licensePlate);
+    const carPhoto = carPhotos[car.licensePlate];
 
     return (
       <Card key={car.licensePlate} className="overflow-hidden">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
-                <span className="text-lg">🚗</span>
-              </div>
-              <CardTitle className="text-lg">
-                {car.manufacturer} {car.model}
-              </CardTitle>
+        {/* Car Photo Header */}
+        {carPhoto ? (
+          <div className="relative h-48 bg-muted">
+            <img
+              src={carPhoto}
+              alt={`${car.manufacturer} ${car.model}`}
+              className="w-full h-full object-cover"
+            />
+            {/* Status Badge Overlay */}
+            <div className="absolute top-3 right-3">
+              <Badge variant={isBusy ? "destructive" : "default"} className="gap-1 bg-white/90 backdrop-blur-sm">
+                {isBusy ? (
+                  <>
+                    <ExclamationCircleIcon className="w-3 h-3" />
+                    <span>Zauzeto</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircleIcon className="w-3 h-3" />
+                    <span>Dostupno</span>
+                  </>
+                )}
+              </Badge>
             </div>
-            <Badge variant={isBusy ? "destructive" : "default"} className="gap-1 shrink-0">
-              {isBusy ? (
-                <>
-                  <ExclamationCircleIcon className="w-3 h-3" />
-                  <span>Zauzeto</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircleIcon className="w-3 h-3" />
-                  <span>Dostupno</span>
-                </>
-              )}
-            </Badge>
+            {/* Color Indicator */}
+            {car.color && (
+              <div 
+                className="absolute top-3 left-3 w-6 h-6 rounded-full border-2 border-white shadow-lg"
+                style={{ backgroundColor: car.color }}
+                title={`Color: ${car.color}`}
+              />
+            )}
           </div>
+        ) : (
+          <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-white/50 flex items-center justify-center">
+                <span className="text-2xl">🚗</span>
+              </div>
+              <p className="text-sm text-muted-foreground">No Photo</p>
+            </div>
+            {/* Status Badge Overlay */}
+            <div className="absolute top-3 right-3">
+              <Badge variant={isBusy ? "destructive" : "default"} className="gap-1">
+                {isBusy ? (
+                  <>
+                    <ExclamationCircleIcon className="w-3 h-3" />
+                    <span>Zauzeto</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircleIcon className="w-3 h-3" />
+                    <span>Dostupno</span>
+                  </>
+                )}
+              </Badge>
+            </div>
+          </div>
+        )}
+
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">
+            {car.manufacturer} {car.model}
+          </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-3 pb-3">
-          <div className="flex items-center gap-3 text-sm">
-            <CalendarIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground min-w-[80px]">Godina:</span>
-            <span className="font-medium">{car.year}</span>
-          </div>
-
-          <div className="flex items-center gap-3 text-sm">
-            <TagIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground min-w-[80px]">Registarska:</span>
-            <span className="font-medium">{car.licensePlate}</span>
-          </div>
-
-          <div className="flex items-center gap-3 text-sm">
-            <ColorSwatchIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground min-w-[80px]">Boja:</span>
+          <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2">
-              {car.color && (
-                <div
-                  className="w-4 h-4 rounded-full border"
-                  style={{ backgroundColor: car.color }}
-                />
-              )}
-              <span className="font-medium">{car.color || 'N/A'}</span>
+              <CalendarIcon className="w-4 h-4 text-muted-foreground shrink-0" />
+              <div>
+                <p className="text-muted-foreground text-xs">Godina</p>
+                <p className="font-medium">{car.year}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <CurrencyDollarIcon className="w-4 h-4 text-muted-foreground shrink-0" />
+              <div>
+                <p className="text-muted-foreground text-xs">Cijena/Dan</p>
+                <p className="font-medium">
+                  {car.pricePerDay ? `$${car.pricePerDay}` : 'N/A'}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-sm">
-            <CurrencyDollarIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground min-w-[80px]">Cijena/Dan:</span>
-            <span className="font-medium">
-              {car.pricePerDay ? `$${car.pricePerDay}` : 'N/A'}
-            </span>
+          <div className="flex items-center gap-2 text-sm">
+            <TagIcon className="w-4 h-4 text-muted-foreground shrink-0" />
+            <div>
+              <p className="text-muted-foreground text-xs">Registarska oznaka</p>
+              <p className="font-medium">{car.licensePlate}</p>
+            </div>
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-wrap gap-2 pt-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleViewDetails(car)}
-            className="flex-1 min-w-[120px]"
-          >
-            <EyeIcon className="w-4 h-4" />
-            Pregled
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleViewAvailability(car)}
-            className="flex-1 min-w-[120px]"
-          >
-            <CalendarIcon className="w-4 h-4" />
-            Dostupnost
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleEdit(car)}
-            className="flex-1 min-w-[120px]"
-          >
-            <PencilIcon className="w-4 h-4" />
-            Uredi
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleDelete(car.licensePlate)}
-            disabled={isBusy}
-            className="flex-1 min-w-[120px]"
-          >
-            <TrashIcon className="w-4 h-4" />
-            Obriši
-          </Button>
+        <CardFooter className="pt-3 border-t bg-gray-50/50">
+          <div className="grid grid-cols-2 gap-2 w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleViewDetails(car)}
+              className="w-full"
+            >
+              <EyeIcon className="w-4 h-4 mr-1" />
+              Pregled
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleViewAvailability(car)}
+              className="w-full"
+            >
+              <CalendarIcon className="w-4 h-4 mr-1" />
+              Kalendar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleEdit(car)}
+              className="w-full"
+            >
+              <PencilIcon className="w-4 h-4 mr-1" />
+              Uredi
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDelete(car.licensePlate)}
+              disabled={isBusy}
+              className="w-full"
+            >
+              <TrashIcon className="w-4 h-4 mr-1" />
+              Obriši
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     );
@@ -553,6 +632,7 @@ const CarsPage = () => {
                     {renderTableHeader('Proizvođač', 'manufacturer')}
                     {renderTableHeader('Model', 'model')}
                     {renderTableHeader('Godina', 'year')}
+                    {renderTableHeader('Registracija', 'licensePlate')}
                     {renderTableHeader('Cijena/Dan', 'pricePerDay')}
                     <TableHead>Status</TableHead>
                     <TableHead className="text-center">
@@ -571,14 +651,17 @@ const CarsPage = () => {
                         <TableRow key={car.licensePlate}>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                                <span className="text-xs">🚗</span>
-                              </div>
+                              <div 
+                                className="w-5 h-5 rounded-full border-2 border-gray-300"
+                                style={{ backgroundColor: car.color || '#6b7280' }}
+                                title={`Color: ${car.color || 'Default'}`}
+                              />
                               <span>{car.manufacturer}</span>
                             </div>
                           </TableCell>
                           <TableCell>{car.model}</TableCell>
                           <TableCell>{car.year}</TableCell>
+                          <TableCell>{car.licensePlate}</TableCell>
                           <TableCell>
                             {car.pricePerDay
                               ? `$${car.pricePerDay}`
