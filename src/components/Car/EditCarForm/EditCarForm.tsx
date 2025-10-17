@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { XIcon, ExclamationCircleIcon, SaveIcon } from '@heroicons/react/solid';
+import { XIcon, SaveIcon } from '@heroicons/react/solid';
 import {
   Car,
   CarFormErrors,
-  RenderFieldOptions,
 } from '../../../types/Car';
-import { Button, FormActions } from '../../UI';
+import { Card, CardHeader, Button, FormField, FormActions } from '../../ui';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import './EditCarForm.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -225,255 +228,348 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     }
   }, [formData, touched]);
 
-  // Render form field with label and error message
-  const renderField = (
-    label: string,
-    name: keyof CarFormErrors,
-    type: string = 'text',
-    options: RenderFieldOptions = {}
-  ) => {
-    const {
-      placeholder = '',
-      min,
-      max,
-      step,
-      list,
-      autoComplete = 'off',
-      required = false,
-    } = options;
-
-    const hasError = !!errors[name];
-
-    return (
-      <div className={`form-field ${hasError ? 'has-error' : ''}`}>
-        <label htmlFor={name}>
-          {label}
-          {required && <span className="required-mark">*</span>}
-        </label>
-
-        {type === 'select' ? (
-          <select
-            id={name}
-            name={name}
-            value={String(formData[name as keyof typeof formData] || '')}
-            onChange={handleChange}
-            className={hasError ? 'error' : ''}
-            required={required}
-          >
-            {options.options?.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        ) : type === 'textarea' ? (
-          <textarea
-            id={name}
-            name={name}
-            value={String(formData[name as keyof typeof formData] || '')}
-            onChange={handleChange}
-            placeholder={placeholder}
-            className={hasError ? 'error' : ''}
-            rows={options.rows || 3}
-            required={required}
-          />
-        ) : (
-          <input
-            type={type}
-            id={name}
-            name={name}
-            value={String(formData[name as keyof typeof formData] || '')}
-            onChange={handleChange}
-            placeholder={placeholder}
-            min={min}
-            max={max}
-            step={step}
-            list={list}
-            autoComplete={autoComplete}
-            className={hasError ? 'error' : ''}
-            required={required}
-          />
-        )}
-
-        {hasError && (
-          <div className="error-message">
-            <ExclamationCircleIcon className="error-icon" />
-            {errors[name]}
-          </div>
-        )}
-
-        {options.helpText && !hasError && (
-          <div className="help-text">{options.helpText}</div>
-        )}
-      </div>
-    );
-  };
-
   return (
-    <div className="edit-car-form-container">
-      <div className="form-header">
-        <h2>
-          Edit Car: {car.manufacturer} {car.model}
-        </h2>
-      </div>
+    <div className="edit-customer-form-overlay">
+      <Card className="edit-customer-form-card" size="lg">
+        <CardHeader
+          title={`Edit Car: ${car.manufacturer} ${car.model}`}
+          subtitle="Update car details"
+          actions={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onCancel}
+              leftIcon={<XIcon />}
+              disabled={isSubmitting}
+            >
+              Close
+            </Button>
+          }
+        />
 
-      <form onSubmit={handleSubmit} className="edit-car-form">
-        <div className="form-sections">
-          <div className="form-section">
-            <h3 className="section-title">Basic Information</h3>
+        <div className="edit-customer-form-content">
+          <form onSubmit={handleSubmit} className="edit-customer-form">
+            <div className="form-sections">
+              {/* Basic Information Section */}
+              <div className="form-section">
+                <h3 className="form-section__title">Basic Information</h3>
 
-            <div className="form-row">
-              {renderField('Manufacturer', 'manufacturer', 'text', {
-                required: true,
-                list: 'manufacturers',
-                placeholder: 'e.g. Toyota',
-              })}
+                <div className="form-row">
+                  <FormField
+                    label="Manufacturer"
+                    required
+                    error={errors.manufacturer}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.manufacturer}
+                      onChange={handleChange}
+                      name="manufacturer"
+                      list="manufacturers"
+                      placeholder="e.g. Toyota"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
 
-              {renderField('Model', 'model', 'text', {
-                required: true,
-                placeholder: 'e.g. Camry',
-              })}
+                  <FormField
+                    label="Model"
+                    required
+                    error={errors.model}
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.model}
+                      onChange={handleChange}
+                      name="model"
+                      placeholder="e.g. Camry"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+                </div>
+
+                <datalist id="manufacturers">
+                  {commonManufacturers.map((manufacturer) => (
+                    <option key={manufacturer} value={manufacturer} />
+                  ))}
+                </datalist>
+
+                <div className="form-row">
+                  <FormField
+                    label="Year"
+                    required
+                    error={errors.year}
+                  >
+                    <select
+                      className="ui-input"
+                      value={formData.year}
+                      onChange={handleChange}
+                      name="year"
+                      disabled={isSubmitting}
+                    >
+                      {YEARS.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+
+                  <FormField
+                    label="Color"
+                    required
+                    error={errors.color}
+                    helpText="Select the car color"
+                  >
+                    <input
+                      type="color"
+                      className="ui-input"
+                      value={formData.color}
+                      onChange={handleChange}
+                      name="color"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Transmission"
+                    error={errors.transmission}
+                  >
+                    <select
+                      className="ui-input"
+                      value={formData.transmission}
+                      onChange={handleChange}
+                      name="transmission"
+                      disabled={isSubmitting}
+                    >
+                      <option value="automatic">Automatic</option>
+                      <option value="manual">Manual</option>
+                      <option value="semi-automatic">Semi-Automatic</option>
+                    </select>
+                  </FormField>
+
+                  <FormField
+                    label="Fuel Type"
+                    error={errors.fuelType}
+                  >
+                    <select
+                      className="ui-input"
+                      value={formData.fuelType}
+                      onChange={handleChange}
+                      name="fuelType"
+                      disabled={isSubmitting}
+                    >
+                      <option value="petrol">Petrol</option>
+                      <option value="diesel">Diesel</option>
+                      <option value="electric">Electric</option>
+                      <option value="hybrid">Hybrid</option>
+                    </select>
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Number of Seats"
+                    error={errors.seats}
+                    helpText="Number of passenger seats"
+                  >
+                    <input
+                      type="number"
+                      className="ui-input"
+                      value={formData.seats}
+                      onChange={handleChange}
+                      name="seats"
+                      min="1"
+                      max="10"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Number of Doors"
+                    error={errors.doors}
+                    helpText="Number of doors"
+                  >
+                    <input
+                      type="number"
+                      className="ui-input"
+                      value={formData.doors}
+                      onChange={handleChange}
+                      name="doors"
+                      min="2"
+                      max="6"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Mileage (km)"
+                    error={errors.mileage}
+                    helpText="Current mileage in kilometers"
+                  >
+                    <input
+                      type="number"
+                      className="ui-input"
+                      value={formData.mileage}
+                      onChange={handleChange}
+                      name="mileage"
+                      min="0"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Engine Power (HP)"
+                    error={errors.enginePower}
+                    helpText="Engine power in horsepower"
+                  >
+                    <input
+                      type="number"
+                      className="ui-input"
+                      value={formData.enginePower}
+                      onChange={handleChange}
+                      name="enginePower"
+                      min="0"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row form-row--single">
+                  <FormField
+                    label="Category"
+                    error={errors.category}
+                  >
+                    <select
+                      className="ui-input"
+                      value={formData.category}
+                      onChange={handleChange}
+                      name="category"
+                      disabled={isSubmitting}
+                    >
+                      <option value="economy">Economy</option>
+                      <option value="luxury">Luxury</option>
+                      <option value="suv">SUV</option>
+                      <option value="van">Van</option>
+                      <option value="family">Family</option>
+                      <option value="business">Business</option>
+                    </select>
+                  </FormField>
+                </div>
+              </div>
+
+              {/* Registration Details Section */}
+              <div className="form-section">
+                <h3 className="form-section__title">Registration Details</h3>
+
+                <div className="form-row">
+                  <FormField
+                    label="License Plate"
+                    required
+                    error={errors.licensePlate}
+                    helpText="Enter the license plate number"
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.licensePlate}
+                      onChange={handleChange}
+                      name="licensePlate"
+                      placeholder="e.g. ABC123"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Chassis Number"
+                    error={errors.chassisNumber}
+                    helpText="17-character VIN (Vehicle Identification Number)"
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.chassisNumber}
+                      onChange={handleChange}
+                      name="chassisNumber"
+                      placeholder="e.g. 1HGCM82633A123456"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+                </div>
+              </div>
+
+              {/* Pricing Section */}
+              <div className="form-section">
+                <h3 className="form-section__title">Pricing</h3>
+
+                <div className="form-row">
+                  <FormField
+                    label="Price Per Day ($)"
+                    required
+                    error={errors.pricePerDay}
+                  >
+                    <input
+                      type="number"
+                      className="ui-input"
+                      value={formData.pricePerDay}
+                      onChange={handleChange}
+                      name="pricePerDay"
+                      min="0"
+                      step="0.01"
+                      placeholder="e.g. 49.99"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+                </div>
+
+                <div className="form-row">
+                  <FormField
+                    label="Photo URL"
+                    error={errors.photoUrl}
+                    helpText="URL of the car photo"
+                  >
+                    <input
+                      type="text"
+                      className="ui-input"
+                      value={formData.photoUrl}
+                      onChange={handleChange}
+                      name="photoUrl"
+                      placeholder="https://example.com/car-image.jpg"
+                      disabled={isSubmitting}
+                    />
+                  </FormField>
+                </div>
+              </div>
             </div>
 
-            <datalist id="manufacturers">
-              {commonManufacturers.map((manufacturer) => (
-                <option key={manufacturer} value={manufacturer} />
-              ))}
-            </datalist>
+            {/* Form Actions */}
+            <FormActions alignment="right" withBorder={true}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
 
-            <div className="form-row">
-              {renderField('Year', 'year', 'select', {
-                required: true,
-                options: YEARS.map((year) => ({
-                  value: year,
-                  label: year.toString(),
-                })),
-              })}
-
-              {renderField('Color', 'color', 'color', {
-                required: true,
-                helpText: 'Select the car color',
-              })}
-            </div>
-
-            <div className="form-row">
-              {renderField('Transmission', 'transmission', 'select', {
-                options: [
-                  { value: 'automatic', label: 'Automatic' },
-                  { value: 'manual', label: 'Manual' },
-                  { value: 'semi-automatic', label: 'Semi-Automatic' },
-                ],
-              })}
-
-              {renderField('Fuel Type', 'fuelType', 'select', {
-                options: [
-                  { value: 'petrol', label: 'Petrol' },
-                  { value: 'diesel', label: 'Diesel' },
-                  { value: 'electric', label: 'Electric' },
-                  { value: 'hybrid', label: 'Hybrid' },
-                ],
-              })}
-            </div>
-
-            <div className="form-row">
-              {renderField('Number of Seats', 'seats', 'number', {
-                min: 1,
-                max: 10,
-                helpText: 'Number of passenger seats',
-              })}
-              
-              {renderField('Number of Doors', 'doors', 'number', {
-                min: 2,
-                max: 6,
-                helpText: 'Number of doors',
-              })}
-            </div>
-
-            <div className="form-row">
-              {renderField('Mileage (km)', 'mileage', 'number', {
-                min: 0,
-                helpText: 'Current mileage in kilometers',
-              })}
-              
-              {renderField('Engine Power (HP)', 'enginePower', 'number', {
-                min: 0,
-                helpText: 'Engine power in horsepower',
-              })}
-            </div>
-
-            <div className="form-row">
-              {renderField('Category', 'category', 'select', {
-                options: [
-                  { value: 'economy', label: 'Economy' },
-                  { value: 'luxury', label: 'Luxury' },
-                  { value: 'suv', label: 'SUV' },
-                  { value: 'van', label: 'Van' },
-                  { value: 'family', label: 'Family' },
-                  { value: 'business', label: 'Business' },
-                ],
-              })}
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h3 className="section-title">Registration Details</h3>
-
-            <div className="form-row">
-              {renderField('License Plate', 'licensePlate', 'text', {
-                required: true,
-                placeholder: 'e.g. ABC123',
-                helpText: 'Enter the license plate number',
-              })}
-
-              {renderField('Chassis Number', 'chassisNumber', 'text', {
-                placeholder: 'e.g. 1HGCM82633A123456',
-                helpText: '17-character VIN (Vehicle Identification Number)',
-              })}
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h3 className="section-title">Pricing</h3>
-
-            <div className="form-row">
-              {renderField('Price Per Day ($)', 'pricePerDay', 'number', {
-                required: true,
-                min: 0,
-                step: '0.01',
-                placeholder: 'e.g. 49.99',
-              })}
-            </div>
-
-            <div className="form-row">
-              {renderField('Photo URL', 'photoUrl', 'text', {
-                placeholder: 'https://example.com/car-image.jpg',
-                helpText: 'URL of the car photo',
-              })}
-            </div>
-          </div>
+              <Button
+                type="submit"
+                variant="primary"
+                leftIcon={!isSubmitting ? <SaveIcon /> : undefined}
+                disabled={isSubmitting || !hasChanges()}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </FormActions>
+          </form>
         </div>
-
-        <FormActions alignment="right" withBorder={true}>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleCancel}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            type="submit"
-            variant="primary"
-            leftIcon={!isSubmitting ? <SaveIcon /> : undefined}
-            disabled={isSubmitting || !hasChanges()}
-            isLoading={isSubmitting}
-          >
-            {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </Button>
-        </FormActions>
-      </form>
+      </Card>
     </div>
   );
 };

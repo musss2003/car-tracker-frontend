@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { XIcon, PencilIcon, TrashIcon } from '@heroicons/react/solid';
-import { Card, CardHeader, Button } from '../../UI';
+import { Card, CardHeader, Button } from '../../ui';
 import { Customer } from '../../../types/Customer';
 import './CustomerDetails.css';
 import CustomerInfoSection from './sections/CustomerInfoSection';

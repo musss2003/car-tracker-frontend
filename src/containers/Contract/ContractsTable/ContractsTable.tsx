@@ -40,7 +40,7 @@ import {
   TableActions,
   SearchFilter,
   Pagination
-} from '../../../components/UI';
+} from '../../../components/ui';
 
 const ContractsTable = () => {
   // State management

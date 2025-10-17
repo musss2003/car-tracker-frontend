@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import {
   XIcon,
-  ExclamationCircleIcon,
   PlusCircleIcon,
 } from '@heroicons/react/solid';
-import { Card, CardHeader, Button, FormField, FormActions } from '../../UI';
+import { Card, CardHeader, Button, FormField, FormActions } from '../../ui';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import './CreateCarForm.css';
 import {
   Car,
   CarFormErrors,
-  RenderFieldOptions,
 } from '../../../types/Car';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -229,90 +231,6 @@ const CreateCarForm: React.FC<CreateCarFormProps> = ({
       validateForm();
     }
   }, [car, touched]);
-
-  // Generic field rendering function
-  const renderField = (
-    label: string,
-    name: keyof CarFormErrors,
-    type: string = 'text',
-    options: RenderFieldOptions = {}
-  ) => {
-    const {
-      placeholder = '',
-      min,
-      max,
-      step,
-      list,
-      autoComplete = 'off',
-      required = false,
-    } = options;
-
-    const hasError = !!errors[name];
-
-    return (
-      <div className={`form-field ${hasError ? 'has-error' : ''}`}>
-        <label htmlFor={name}>
-          {label}
-          {required && <span className="required-mark">*</span>}
-        </label>
-
-        {type === 'select' ? (
-          <select
-            id={name}
-            name={name}
-            value={String(car[name as keyof typeof car] || '')}
-            onChange={handleChange}
-            className={hasError ? 'error' : ''}
-            required={required}
-          >
-            {options.options?.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        ) : type === 'textarea' ? (
-          <textarea
-            id={name}
-            name={name}
-            value={String(car[name as keyof typeof car] || '')}
-            onChange={handleChange}
-            placeholder={placeholder}
-            className={hasError ? 'error' : ''}
-            rows={options.rows || 3}
-            required={required}
-          />
-        ) : (
-          <input
-            type={type}
-            id={name}
-            name={name}
-            value={String(car[name as keyof typeof car] || '')}
-            onChange={handleChange}
-            placeholder={placeholder}
-            min={min}
-            max={max}
-            step={step}
-            list={list}
-            autoComplete={autoComplete}
-            className={hasError ? 'error' : ''}
-            required={required}
-          />
-        )}
-
-        {hasError && (
-          <div className="error-message">
-            <ExclamationCircleIcon className="error-icon" />
-            {errors[name]}
-          </div>
-        )}
-
-        {options.helpText && !hasError && (
-          <div className="help-text">{options.helpText}</div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <div className="edit-customer-form-overlay">

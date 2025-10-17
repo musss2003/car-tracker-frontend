@@ -1,6 +1,6 @@
 import React from 'react';
 import { XIcon } from '@heroicons/react/solid';
-import { Button } from '../../../UI';
+import { Button } from '../../../ui';
 import './ImageModal.css';
 
 interface ImageModalProps {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ExclamationIcon } from '@heroicons/react/solid';
-import { Button } from '../../../UI';
+import { Button } from '../../../ui';
 import './DeleteConfirmModal.css';
 
 interface DeleteConfirmModalProps {

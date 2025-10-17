@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, UserAddIcon } from '@heroicons/react/solid';
-import { Card, CardHeader, Button, FormField, FormActions } from '../../UI';
+import { Card, CardHeader, Button, FormField, FormActions } from '../../ui';
 
 import { Customer } from '../../../types/Customer';
 import { getCountries, CountryOption } from '../../../services/customerService';

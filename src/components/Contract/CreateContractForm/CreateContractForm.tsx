@@ -15,7 +15,7 @@ import {
   ExclamationCircleIcon,
   PlusCircleIcon,
 } from '@heroicons/react/solid';
-import { Button, FormActions } from '../../UI';
+import { Button, FormActions } from '../../ui';
 import './CreateContractForm.css';
 import { Car } from '../../../types/Car';
 import { Customer } from '../../../types/Customer';

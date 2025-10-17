@@ -17,7 +17,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
 } from '@heroicons/react/solid';
-import { Button, FormActions } from '../../UI';
+import { Button, FormActions } from '../../ui';
 import './EditContractForm.css';
 import { Contract } from '../../../types/Contract';
 import { Customer } from '../../../types/Customer';

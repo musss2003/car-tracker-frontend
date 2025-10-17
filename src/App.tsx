@@ -5,7 +5,7 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Sidebar from './components/Sidebar/Sidebar';
-import { MobileHeader } from './components/UI';
+import { MobileHeader } from './components/MobileHeader/MobileHeader';
 import { AppRoutes } from './routes/AppRoutes';
 import './utils/themeManager'; // Initialize theme manager
 import './App.css';
