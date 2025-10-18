@@ -2,7 +2,13 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import './ModernSidebar.css';
@@ -51,82 +57,84 @@ const ModernSidebar: React.FC<SidebarProps> = ({
     {
       title: 'Pregled',
       items: [
-        { 
-          to: '/dashboard', 
-          icon: BarChart3, 
+        {
+          to: '/dashboard',
+          icon: BarChart3,
           label: 'Komandna tabela',
-          badge: '2'
+          badge: '2',
         },
-        { 
-          to: '/cars', 
-          icon: Car, 
-          label: 'Vozila' 
+        {
+          to: '/cars',
+          icon: Car,
+          label: 'Vozila',
         },
       ],
     },
     {
       title: 'Upravljanje',
       items: [
-        { 
-          to: '/contracts', 
-          icon: FileText, 
-          label: 'Ugovori' 
+        {
+          to: '/contracts',
+          icon: FileText,
+          label: 'Ugovori',
         },
-        { 
-          to: '/customers', 
-          icon: Users, 
-          label: 'Korisnici' 
+        {
+          to: '/customers',
+          icon: Users,
+          label: 'Korisnici',
         },
       ],
     },
     {
       title: 'Račun',
       items: [
-        { 
-          to: '/notifications', 
-          icon: Bell, 
+        {
+          to: '/notifications',
+          icon: Bell,
           label: 'Notifikacije',
           badge: '3',
-          isNew: true
+          isNew: true,
         },
-        { 
-          to: '/profile', 
-          icon: User, 
-          label: 'Profil' 
+        {
+          to: '/profile',
+          icon: User,
+          label: 'Profil',
         },
       ],
     },
   ];
 
   // Navigation link component
-  const NavLink: React.FC<NavItem & { compact?: boolean }> = ({ 
-    to, 
-    icon: Icon, 
-    label, 
+  const NavLink: React.FC<NavItem & { compact?: boolean }> = ({
+    to,
+    icon: Icon,
+    label,
     badge,
     isNew,
-    compact = false 
+    compact = false,
   }) => {
     const isActive = location.pathname === to;
 
     return (
       <Link to={to} onClick={isSmallScreen ? toggleSidebar : undefined}>
         <Button
-          variant={isActive ? "secondary" : "ghost"}
+          variant={isActive ? 'secondary' : 'ghost'}
           className={cn(
-            "w-full justify-start h-11 mb-1",
-            compact ? "px-2" : "px-3",
-            isActive && "bg-blue-50 text-blue-700 hover:bg-blue-100",
-            !isActive && "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+            'w-full justify-start h-11 mb-1',
+            compact ? 'px-2' : 'px-3',
+            isActive && 'bg-blue-50 text-blue-700 hover:bg-blue-100',
+            !isActive && 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
           )}
         >
-          <Icon className={cn("shrink-0", compact ? "h-5 w-5" : "h-4 w-4 mr-3")} />
+          <Icon
+            className={cn('shrink-0', compact ? 'h-5 w-5' : 'h-4 w-4 mr-3')}
+          />
           {!compact && (
             <>
               <span className="truncate">{label}</span>
               {badge && (
-                <Badge 
-                  variant={isNew ? "destructive" : "secondary"} 
+                <Badge
+                  variant={isNew ? 'destructive' : 'secondary'}
                   className="ml-auto h-5 px-1.5 text-xs"
                 >
                   {badge}
@@ -148,7 +156,10 @@ const ModernSidebar: React.FC<SidebarProps> = ({
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-72 p-0 !bg-white border-r border-gray-200 mobile-sidebar-sheet  data-[state=open]:animate-slide-in-from-left data-[state=closed]:animate-slide-out-to-left">
+        <SheetContent
+          side="left"
+          className="w-72 p-0 !bg-white border-r border-gray-200 mobile-sidebar-sheet  data-[state=open]:animate-slide-in-from-left data-[state=closed]:animate-slide-out-to-left"
+        >
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <SheetDescription className="sr-only">
             Main navigation menu for the Car Tracker application
@@ -156,9 +167,9 @@ const ModernSidebar: React.FC<SidebarProps> = ({
           <SidebarContent />
         </SheetContent>
       </Sheet>
-      
-      <Link 
-        to="/" 
+
+      <Link
+        to="/"
         className="flex items-center gap-2 font-semibold text-gray-900 ml-4"
       >
         <Home className="h-6 w-6 text-blue-600" />
@@ -171,12 +182,17 @@ const ModernSidebar: React.FC<SidebarProps> = ({
   const SidebarContent = ({ compact = false }: { compact?: boolean }) => (
     <div className="flex h-full flex-col bg-white text-gray-900 transition-all duration-300">
       {/* Header */}
-      <div className={cn("flex items-center border-b px-3 py-4", compact && "justify-center px-2")}>
-        <Link 
-          to="/" 
+      <div
+        className={cn(
+          'flex items-center border-b px-3 py-4',
+          compact && 'justify-center px-2'
+        )}
+      >
+        <Link
+          to="/"
           className={cn(
-            "flex items-center font-semibold text-gray-900",
-            compact ? "justify-center" : "gap-2"
+            'flex items-center font-semibold text-gray-900',
+            compact ? 'justify-center' : 'gap-2'
           )}
         >
           <Home className="h-6 w-6 text-blue-600" />
@@ -218,11 +234,7 @@ const ModernSidebar: React.FC<SidebarProps> = ({
               )}
               <div className="space-y-1">
                 {group.items.map((item, idx) => (
-                  <NavLink
-                    key={idx}
-                    {...item}
-                    compact={compact}
-                  />
+                  <NavLink key={idx} {...item} compact={compact} />
                 ))}
               </div>
               {index < navGroups.length - 1 && !compact && (
@@ -234,16 +246,18 @@ const ModernSidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Footer */}
-      <div className={cn("border-t p-3", compact && "px-2")}>
+      <div className={cn('border-t p-3', compact && 'px-2')}>
         <Link to="/settings">
           <Button
             variant="ghost"
             className={cn(
-              "w-full",
-              compact ? "h-11 px-2" : "justify-start h-11 px-3"
+              'w-full',
+              compact ? 'h-11 px-2' : 'justify-start h-11 px-3'
             )}
           >
-            <Settings className={cn("shrink-0", compact ? "h-5 w-5" : "h-4 w-4 mr-3")} />
+            <Settings
+              className={cn('shrink-0', compact ? 'h-5 w-5' : 'h-4 w-4 mr-3')}
+            />
             {!compact && <span>Podešavanja</span>}
           </Button>
         </Link>
@@ -260,8 +274,8 @@ const ModernSidebar: React.FC<SidebarProps> = ({
   return (
     <div
       className={cn(
-        "flex h-screen flex-col border-r bg-white border-gray-200 transition-all duration-300 relative shadow-sm",
-        isOpen ? "w-72" : "w-16"
+        'flex h-screen flex-col border-r bg-white border-gray-200 transition-all duration-300 relative shadow-sm',
+        isOpen ? 'w-72' : 'w-16'
       )}
     >
       <SidebarContent compact={!isOpen} />

@@ -1,18 +1,18 @@
 /* Sheet slide animations - force Tailwind animations */
-[data-state="open"][data-side="left"] {
+[data-state='open'][data-side='left'] {
   animation: slide-in-from-left 0.3s ease-out !important;
 }
 
-[data-state="closed"][data-side="left"] {
+[data-state='closed'][data-side='left'] {
   animation: slide-out-to-left 0.3s ease-out !important;
 }
 
 /* Overlay animations */
-[data-state="open"][data-radix-dialog-overlay] {
+[data-state='open'][data-radix-dialog-overlay] {
   animation: fade-in 0.3s ease-out !important;
 }
 
-[data-state="closed"][data-radix-dialog-overlay] {
+[data-state='closed'][data-radix-dialog-overlay] {
   animation: fade-out 0.3s ease-out !important;
 }
 
