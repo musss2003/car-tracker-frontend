@@ -97,7 +97,8 @@
   display: flex;
   gap: var(--spacing-md);
   justify-content: flex-end;
-  padding: var(--spacing-xl) var(--spacing-2xl) var(--spacing-2xl) var(--spacing-2xl);
+  padding: var(--spacing-xl) var(--spacing-2xl) var(--spacing-2xl)
+    var(--spacing-2xl);
   border-top: var(--border-width-thin) solid var(--color-border);
 }
 
@@ -108,12 +109,13 @@
     flex-direction: column;
     text-align: center;
   }
-  
+
   .delete-confirm-actions {
-    padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+    padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl)
+      var(--spacing-xl);
     flex-direction: column-reverse;
   }
-  
+
   .delete-confirm-actions button {
     width: 100%;
   }

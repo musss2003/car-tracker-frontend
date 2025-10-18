@@ -109,7 +109,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
   }
-  
+
   .form-row--single {
     grid-template-columns: 1fr;
   }
@@ -205,16 +205,16 @@
   .edit-customer-form-overlay {
     padding: 0.5rem;
   }
-  
+
   .edit-customer-form-card {
     max-height: 95vh;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr !important;
     gap: 1.5rem;
   }
-  
+
   .form-row .phone-field {
     z-index: 100;
   }
@@ -228,27 +228,27 @@
   .edit-customer-form-overlay {
     padding: 0.5rem;
   }
-  
+
   .edit-customer-form-card {
     max-height: 95vh;
   }
-  
+
   .edit-customer-form-content {
     padding: 1.5rem;
   }
-  
+
   .form-sections {
     gap: 2rem;
   }
-  
+
   .form-section {
     gap: 1.25rem;
   }
-  
+
   .form-section__title {
     font-size: 1.125rem;
   }
-  
+
   /* Form actions responsive styling now handled by FormActions component */
 }
 
@@ -258,7 +258,7 @@
 .create-customer-form select:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 
+  box-shadow:
     0 0 0 3px var(--primary-color-light-rgba),
     var(--shadow-md);
 }

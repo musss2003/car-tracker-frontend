@@ -150,20 +150,20 @@
     grid-template-columns: 1fr !important;
     gap: var(--spacing-xl);
   }
-  
+
   .document-group {
     padding: var(--spacing-lg-plus);
   }
-  
+
   .photo-container {
     height: var(--photo-container-height-mobile);
   }
-  
+
   .photo-icon {
     width: var(--spacing-xl);
     height: var(--spacing-xl);
   }
-  
+
   .photo-overlay {
     font-size: var(--font-size-xs);
   }
@@ -173,7 +173,7 @@
   .documents-grid {
     gap: var(--spacing-xl);
   }
-  
+
   .document-group {
     padding: var(--spacing-lg-plus);
   }

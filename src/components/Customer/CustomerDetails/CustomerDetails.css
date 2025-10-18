@@ -86,24 +86,24 @@
   .customer-details-overlay {
     padding: var(--spacing-sm);
   }
-  
+
   .customer-details-card {
     max-height: 95vh;
   }
-  
+
   .customer-details-content {
     padding: var(--spacing-xl);
   }
-  
+
   .details-sections {
     gap: var(--spacing-2xl);
   }
-  
+
   .customer-details-actions {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .customer-details-actions button {
     width: 100%;
   }
@@ -113,11 +113,11 @@
   .customer-details-actions {
     gap: var(--spacing-sm);
   }
-  
+
   .customer-details-content {
     padding: var(--spacing-lg);
   }
-  
+
   .details-sections {
     gap: var(--spacing-xl);
   }

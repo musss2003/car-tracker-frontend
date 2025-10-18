@@ -167,11 +167,6 @@
   color: #6b7280;
 }
 
-.filter-container {
-  position: relative;
-  min-width: 180px;
-}
-
 .filter-icon {
   position: absolute;
   left: 0.75rem;

@@ -65,7 +65,7 @@ export const registerAPI = async (
   password: string
 ): Promise<RegisterResult> => {
   try {
-    console.log(API_URL + 'register')
+    console.log(API_URL + 'register');
     const response = await fetch(API_URL + 'register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

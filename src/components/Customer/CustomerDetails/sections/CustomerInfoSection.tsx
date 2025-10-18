@@ -1,11 +1,20 @@
 import React from 'react';
-import { UserIcon, MailIcon, PhoneIcon, LocationMarkerIcon, IdentificationIcon } from '@heroicons/react/solid';
+import {
+  UserIcon,
+  MailIcon,
+  PhoneIcon,
+  LocationMarkerIcon,
+  IdentificationIcon,
+} from '@heroicons/react/solid';
 import { Customer } from '../../../../types/Customer';
 import './CustomerInfoSection.css';
 
 interface CustomerInfoSectionProps {
   customer: Customer;
-  getValue: (value: string | number | null | undefined, defaultValue?: string) => string | number;
+  getValue: (
+    value: string | number | null | undefined,
+    defaultValue?: string
+  ) => string | number;
   getFieldValue: (
     newField: string | number | null | undefined,
     legacyField: string | number | null | undefined,
@@ -24,16 +33,14 @@ const CustomerInfoSection: React.FC<CustomerInfoSectionProps> = ({
         <UserIcon className="section-icon" />
         Lični podaci
       </h3>
-      
+
       <div className="info-grid">
         <div className="info-item">
           <div className="info-item__label">
             <UserIcon className="info-icon" />
             Ime i prezime
           </div>
-          <div className="info-item__value">
-            {getValue(customer.name)}
-          </div>
+          <div className="info-item__value">{getValue(customer.name)}</div>
         </div>
 
         <div className="info-item">
@@ -41,9 +48,7 @@ const CustomerInfoSection: React.FC<CustomerInfoSectionProps> = ({
             <MailIcon className="info-icon" />
             Email adresa
           </div>
-          <div className="info-item__value">
-            {getValue(customer.email)}
-          </div>
+          <div className="info-item__value">{getValue(customer.email)}</div>
         </div>
 
         <div className="info-item">
@@ -52,7 +57,10 @@ const CustomerInfoSection: React.FC<CustomerInfoSectionProps> = ({
             Broj telefona
           </div>
           <div className="info-item__value">
-            {getFieldValue(customer.phoneNumber, (customer as any).phone_number)}
+            {getFieldValue(
+              customer.phoneNumber,
+              (customer as any).phone_number
+            )}
           </div>
         </div>
 
@@ -61,9 +69,7 @@ const CustomerInfoSection: React.FC<CustomerInfoSectionProps> = ({
             <LocationMarkerIcon className="info-icon" />
             Adresa
           </div>
-          <div className="info-item__value">
-            {getValue(customer.address)}
-          </div>
+          <div className="info-item__value">{getValue(customer.address)}</div>
         </div>
 
         <div className="info-item">
@@ -72,12 +78,16 @@ const CustomerInfoSection: React.FC<CustomerInfoSectionProps> = ({
             Zemlja porijekla
           </div>
           <div className="info-item__value">
-            {getFieldValue(customer.countryOfOrigin, (customer as any).country_of_origin)}
+            {getFieldValue(
+              customer.countryOfOrigin,
+              (customer as any).country_of_origin
+            )}
           </div>
         </div>
 
         {/* Bosnia and Herzegovina Additional Fields */}
-        {(customer.countryOfOrigin === 'Bosnia and Herzegovina' || (customer as any).country_of_origin === 'Bosnia and Herzegovina') && (
+        {(customer.countryOfOrigin === 'Bosnia and Herzegovina' ||
+          (customer as any).country_of_origin === 'Bosnia and Herzegovina') && (
           <>
             {(customer.fatherName || (customer as any).father_name) && (
               <div className="info-item">
@@ -86,19 +96,26 @@ const CustomerInfoSection: React.FC<CustomerInfoSectionProps> = ({
                   Ime oca
                 </div>
                 <div className="info-item__value">
-                  {getFieldValue(customer.fatherName, (customer as any).father_name)}
+                  {getFieldValue(
+                    customer.fatherName,
+                    (customer as any).father_name
+                  )}
                 </div>
               </div>
             )}
 
-            {(customer.cityOfResidence || (customer as any).city_of_residence) && (
+            {(customer.cityOfResidence ||
+              (customer as any).city_of_residence) && (
               <div className="info-item">
                 <div className="info-item__label">
                   <LocationMarkerIcon className="info-icon" />
                   Grad prebivališta
                 </div>
                 <div className="info-item__value">
-                  {getFieldValue(customer.cityOfResidence, (customer as any).city_of_residence)}
+                  {getFieldValue(
+                    customer.cityOfResidence,
+                    (customer as any).city_of_residence
+                  )}
                 </div>
               </div>
             )}
@@ -110,7 +127,10 @@ const CustomerInfoSection: React.FC<CustomerInfoSectionProps> = ({
                   JMBG
                 </div>
                 <div className="info-item__value">
-                  {getFieldValue(customer.idOfPerson, (customer as any).id_of_person)}
+                  {getFieldValue(
+                    customer.idOfPerson,
+                    (customer as any).id_of_person
+                  )}
                 </div>
               </div>
             )}

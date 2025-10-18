@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SaveIcon } from '@heroicons/react/solid';
-import { Card, CardHeader, Button, FormField, FormActions } from '../../UI';
+import { Card, CardHeader, Button, FormField, FormActions } from '../../ui';
 import CustomerPhotoField from '../shared/CustomerPhotoField';
 import CountryDropdown from '../shared/CountryDropdown';
 import PhoneNumberField from '../shared/PhoneNumberField';
@@ -32,13 +32,23 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
     email: customer.email || (customer as any).email || '',
     phoneNumber: customer.phoneNumber || (customer as any).phone_number || '',
     address: customer.address || (customer as any).address || '',
-    driverLicenseNumber: customer.driverLicenseNumber || (customer as any).driver_license_number || '',
-    passportNumber: customer.passportNumber || (customer as any).passport_number || '',
-    countryOfOrigin: customer.countryOfOrigin || (customer as any).country_of_origin || '',
-    drivingLicensePhotoUrl: customer.drivingLicensePhotoUrl || (customer as any).driving_license_photo_url || '',
-    passportPhotoUrl: customer.passportPhotoUrl || (customer as any).passport_photo_url || '',
+    driverLicenseNumber:
+      customer.driverLicenseNumber ||
+      (customer as any).driver_license_number ||
+      '',
+    passportNumber:
+      customer.passportNumber || (customer as any).passport_number || '',
+    countryOfOrigin:
+      customer.countryOfOrigin || (customer as any).country_of_origin || '',
+    drivingLicensePhotoUrl:
+      customer.drivingLicensePhotoUrl ||
+      (customer as any).driving_license_photo_url ||
+      '',
+    passportPhotoUrl:
+      customer.passportPhotoUrl || (customer as any).passport_photo_url || '',
     fatherName: customer.fatherName || (customer as any).father_name || '',
-    cityOfResidence: customer.cityOfResidence || (customer as any).city_of_residence || '',
+    cityOfResidence:
+      customer.cityOfResidence || (customer as any).city_of_residence || '',
     idOfPerson: customer.idOfPerson || (customer as any).id_of_person || '',
   });
 
@@ -75,19 +85,21 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
 
   // Handle input changes
   const handleInputChange = (field: keyof Customer, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Track modified fields
-    setModifiedFields(prev => new Set(prev).add(field));
-    
+    setModifiedFields((prev) => new Set(prev).add(field));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors((prev) => ({ ...prev, [field]: null }));
     }
   };
 
-
-  const handlePhotoChange = (field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl', uploadedUrl: string | null) => {
+  const handlePhotoChange = (
+    field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl',
+    uploadedUrl: string | null
+  ) => {
     handleInputChange(field, uploadedUrl || '');
   };
 
@@ -123,7 +135,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -135,7 +147,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
         ...formData,
         updatedAt: new Date(),
       };
-      
+
       await onSave(updatedCustomer);
     } catch (error) {
       console.error('Error updating customer:', error);
@@ -165,7 +177,9 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
         <div className="edit-customer-form-content">
           {!hasChanges && (
             <div className="no-changes-notice">
-              <p>Napravite izmjene u poljima ispod da bi se omogućilo čuvanje.</p>
+              <p>
+                Napravite izmjene u poljima ispod da bi se omogućilo čuvanje.
+              </p>
             </div>
           )}
 
@@ -174,34 +188,30 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
               {/* Personal Information Section */}
               <div className="form-section">
                 <h3 className="form-section__title">Lični podaci</h3>
-                
+
                 <div className="form-row form-row--single">
-                  <FormField
-                    label="Ime i prezime"
-                    required
-                    error={errors.name}
-                  >
+                  <FormField label="Ime i prezime" required error={errors.name}>
                     <input
                       type="text"
                       className="ui-input"
                       value={formData.name || ''}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('name', e.target.value)
+                      }
                       placeholder="Unesite ime i prezime"
                     />
                   </FormField>
                 </div>
 
                 <div className="form-row">
-                  <FormField
-                    label="Email adresa"
-                    required
-                    error={errors.email}
-                  >
+                  <FormField label="Email adresa" required error={errors.email}>
                     <input
                       type="email"
                       className="ui-input"
                       value={formData.email || ''}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('email', e.target.value)
+                      }
                       placeholder="example@email.com"
                     />
                   </FormField>
@@ -214,7 +224,9 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                     <PhoneNumberField
                       countries={countries}
                       value={formData.phoneNumber || ''}
-                      onChange={(value) => handleInputChange('phoneNumber', value)}
+                      onChange={(value) =>
+                        handleInputChange('phoneNumber', value)
+                      }
                       loading={loadingCountries}
                       error={countriesError}
                       placeholder="61123456"
@@ -223,15 +235,14 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                 </div>
 
                 <div className="form-row">
-                  <FormField
-                    label="Adresa"
-                    error={errors.address}
-                  >
+                  <FormField label="Adresa" error={errors.address}>
                     <input
                       type="text"
                       className="ui-input"
                       value={formData.address || ''}
-                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('address', e.target.value)
+                      }
                       placeholder="Unesite adresu"
                     />
                   </FormField>
@@ -244,7 +255,9 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                     <CountryDropdown
                       countries={countries}
                       selectedCountry={formData.countryOfOrigin || ''}
-                      onSelect={(country: string) => handleInputChange('countryOfOrigin', country)}
+                      onSelect={(country: string) =>
+                        handleInputChange('countryOfOrigin', country)
+                      }
                       loading={loadingCountries}
                       error={countriesError}
                     />
@@ -255,18 +268,19 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
               {/* Bosnia and Herzegovina Additional Fields */}
               {formData.countryOfOrigin === 'Bosnia and Herzegovina' && (
                 <div className="form-section">
-                  <h3 className="form-section__title">Dodatni podaci za državljane BiH</h3>
-                  
+                  <h3 className="form-section__title">
+                    Dodatni podaci za državljane BiH
+                  </h3>
+
                   <div className="form-row form-row--single">
-                    <FormField
-                      label="Ime oca"
-                      error={errors.fatherName}
-                    >
+                    <FormField label="Ime oca" error={errors.fatherName}>
                       <input
                         type="text"
                         className="ui-input"
                         value={formData.fatherName || ''}
-                        onChange={(e) => handleInputChange('fatherName', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('fatherName', e.target.value)
+                        }
                         placeholder="Unesite ime oca"
                       />
                     </FormField>
@@ -279,21 +293,22 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                     >
                       <MunicipalityDropdown
                         selectedMunicipality={formData.cityOfResidence || ''}
-                        onSelect={(municipalityName) => handleInputChange('cityOfResidence', municipalityName)}
+                        onSelect={(municipalityName) =>
+                          handleInputChange('cityOfResidence', municipalityName)
+                        }
                         placeholder="Izaberite grad prebivališta"
                         disabled={isSubmitting}
                       />
                     </FormField>
 
-                    <FormField
-                      label="JMBG"
-                      error={errors.idOfPerson}
-                    >
+                    <FormField label="JMBG" error={errors.idOfPerson}>
                       <input
                         type="text"
                         className="ui-input"
                         value={formData.idOfPerson || ''}
-                        onChange={(e) => handleInputChange('idOfPerson', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('idOfPerson', e.target.value)
+                        }
                         placeholder="Unesite JMBG"
                       />
                     </FormField>
@@ -304,7 +319,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
               {/* Documents Section */}
               <div className="form-section">
                 <h3 className="form-section__title">Dokumenti</h3>
-                
+
                 <div className="form-row">
                   <FormField
                     label="Broj vozačke dozvole"
@@ -314,20 +329,21 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                       type="text"
                       className="ui-input"
                       value={formData.driverLicenseNumber || ''}
-                      onChange={(e) => handleInputChange('driverLicenseNumber', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('driverLicenseNumber', e.target.value)
+                      }
                       placeholder="Unesite broj vozačke dozvole"
                     />
                   </FormField>
 
-                  <FormField
-                    label="Broj pasoša"
-                    error={errors.passportNumber}
-                  >
+                  <FormField label="Broj pasoša" error={errors.passportNumber}>
                     <input
                       type="text"
                       className="ui-input"
                       value={formData.passportNumber || ''}
-                      onChange={(e) => handleInputChange('passportNumber', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('passportNumber', e.target.value)
+                      }
                       placeholder="Unesite broj pasoša"
                     />
                   </FormField>
@@ -337,7 +353,9 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                   <CustomerPhotoField
                     label="Slika vozačke dozvole"
                     value={formData.drivingLicensePhotoUrl}
-                    onChange={(url) => handlePhotoChange('drivingLicensePhotoUrl', url)}
+                    onChange={(url) =>
+                      handlePhotoChange('drivingLicensePhotoUrl', url)
+                    }
                     customerId={customer.id}
                     documentType="license"
                     disabled={isSubmitting}
@@ -346,7 +364,9 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
                   <CustomerPhotoField
                     label="Slika pasoša"
                     value={formData.passportPhotoUrl}
-                    onChange={(url) => handlePhotoChange('passportPhotoUrl', url)}
+                    onChange={(url) =>
+                      handlePhotoChange('passportPhotoUrl', url)
+                    }
                     customerId={customer.id}
                     documentType="passport"
                     disabled={isSubmitting}
@@ -365,7 +385,7 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({
               >
                 Otkaži
               </Button>
-              
+
               <Button
                 type="submit"
                 variant="primary"

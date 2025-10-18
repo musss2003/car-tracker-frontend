@@ -122,7 +122,7 @@
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-2xl);
   }
-  
+
   .form-row--single {
     grid-template-columns: 1fr;
   }
@@ -176,7 +176,6 @@
 .form-row .phone-field.phone-field--open {
   z-index: 30;
 }
-
 
 /* Modified field indicator */
 .form-section--modified {
@@ -238,32 +237,32 @@
   .edit-customer-form-overlay {
     padding: var(--spacing-sm);
   }
-  
+
   .edit-customer-form-card {
     max-height: 95vh;
   }
-  
+
   .edit-customer-form-content {
     padding: var(--spacing-xl);
   }
-  
+
   .form-sections {
     gap: var(--spacing-2xl);
   }
-  
+
   .form-section {
     gap: var(--spacing-lg-plus);
   }
-  
+
   .form-row {
     gap: var(--spacing-lg-plus);
     margin-bottom: var(--spacing-lg-plus);
   }
-  
+
   .form-section__title {
     font-size: var(--font-size-lg);
   }
-  
+
   .no-changes-notice {
     padding: var(--spacing-md-plus) var(--spacing-xl);
     margin-bottom: var(--spacing-xl);
@@ -276,7 +275,7 @@
 .edit-customer-form select:focus {
   outline: none;
   border-color: var(--color-focus);
-  box-shadow: 
+  box-shadow:
     0 0 0 var(--focus-ring-width) var(--overlay-focus-ring),
     var(--shadow-focus);
 }

@@ -31,21 +31,21 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     // Initial request with current access token
     let response = await this.makeRequest<T>(url, options);
-    
+
     // If unauthorized and we have a refresh token, try to refresh
     if (response.status === 401) {
       console.log('🔄 Access token expired, attempting refresh...');
-      
+
       const refreshed = await this.refreshAccessToken();
       if (refreshed) {
         // Retry the original request with new token
         response = await this.makeRequest<T>(url, options);
       }
     }
-    
+
     return response;
   }
 
@@ -68,7 +68,7 @@ class ApiClient {
 
       let data: T;
       const contentType = response.headers.get('content-type');
-      
+
       if (contentType && contentType.includes('application/json')) {
         data = await response.json();
       } else {
@@ -91,7 +91,7 @@ class ApiClient {
       if (error && typeof error === 'object' && 'status' in error) {
         throw error; // Re-throw ApiError
       }
-      
+
       throw {
         message: error instanceof Error ? error.message : 'Network error',
         status: 0,
@@ -117,13 +117,13 @@ class ApiClient {
       }
 
       const data = await response.json();
-      
+
       if (data.accessToken) {
         localStorage.setItem('accessToken', data.accessToken);
         console.log('✅ Access token refreshed successfully');
         return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error('❌ Token refresh failed:', error);
@@ -135,11 +135,18 @@ class ApiClient {
   /**
    * Convenience methods for common HTTP verbs
    */
-  async get<T = any>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+  async get<T = any>(
+    endpoint: string,
+    options?: RequestInit
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  async post<T = any>(endpoint: string, body?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+  async post<T = any>(
+    endpoint: string,
+    body?: any,
+    options?: RequestInit
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       ...options,
       method: 'POST',
@@ -147,7 +154,11 @@ class ApiClient {
     });
   }
 
-  async put<T = any>(endpoint: string, body?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+  async put<T = any>(
+    endpoint: string,
+    body?: any,
+    options?: RequestInit
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       ...options,
       method: 'PUT',
@@ -155,7 +166,10 @@ class ApiClient {
     });
   }
 
-  async delete<T = any>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+  async delete<T = any>(
+    endpoint: string,
+    options?: RequestInit
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 }

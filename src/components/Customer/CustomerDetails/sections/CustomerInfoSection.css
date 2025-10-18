@@ -90,11 +90,11 @@
     grid-template-columns: 1fr !important;
     gap: var(--spacing-lg);
   }
-  
+
   .section-title {
     font-size: var(--font-size-lg);
   }
-  
+
   .info-item {
     padding: var(--spacing-lg);
   }
@@ -104,15 +104,15 @@
   .section-title {
     font-size: var(--font-size-lg);
   }
-  
+
   .info-item {
     padding: var(--spacing-lg);
   }
-  
+
   .info-item__label {
     font-size: var(--font-size-xs);
   }
-  
+
   .info-item__value {
     font-size: var(--font-size-notice);
   }

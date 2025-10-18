@@ -4,8 +4,7 @@ import useScreenSize from './hooks/useScreenSize';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import Sidebar from './components/Sidebar/Sidebar';
-import { MobileHeader } from './components/UI';
+import ModernSidebar from './components/ModernSidebar/ModernSidebar';
 import { AppRoutes } from './routes/AppRoutes';
 import './utils/themeManager'; // Initialize theme manager
 import './App.css';
@@ -29,18 +28,10 @@ function App() {
         <ToastContainer position="bottom-right" />
 
         {isLoggedIn() && (
-          <Sidebar
+          <ModernSidebar
             isOpen={isSidebarOpen}
             isSmallScreen={isSmallScreen}
             toggleSidebar={toggleSidebar}
-          />
-        )}
-
-        {/* Mobile Header */}
-        {isLoggedIn() && (
-          <MobileHeader
-            onMenuClick={toggleSidebar}
-            isVisible={isSmallScreen}
           />
         )}
 
@@ -66,6 +57,5 @@ function App() {
     </ErrorBoundary>
   );
 }
-
 
 export default App;

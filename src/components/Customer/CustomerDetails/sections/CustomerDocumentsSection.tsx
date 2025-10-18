@@ -5,7 +5,10 @@ import './CustomerDocumentsSection.css';
 
 interface CustomerDocumentsSectionProps {
   customer: Customer;
-  getValue: (value: string | number | null | undefined, defaultValue?: string) => string | number;
+  getValue: (
+    value: string | number | null | undefined,
+    defaultValue?: string
+  ) => string | number;
   getFieldValue: (
     newField: string | number | null | undefined,
     legacyField: string | number | null | undefined,
@@ -24,7 +27,7 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
     customer.drivingLicensePhotoUrl,
     (customer as any).driving_license_photo_url
   );
-  
+
   const passportUrl = getFieldValue(
     customer.passportPhotoUrl,
     (customer as any).passport_photo_url
@@ -36,7 +39,7 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
         <DocumentTextIcon className="section-icon" />
         Dokumenti
       </h3>
-      
+
       <div className="documents-grid">
         {/* Driver License */}
         <div className="document-group">
@@ -49,15 +52,17 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
               )}
             </div>
           </div>
-          
+
           <div className="document-photo">
             {drivingLicenseUrl && drivingLicenseUrl !== 'N/A' ? (
-              <div 
+              <div
                 className="photo-container photo-container--clickable"
-                onClick={() => onImageClick(drivingLicenseUrl as string, 'Vozačka dozvola')}
+                onClick={() =>
+                  onImageClick(drivingLicenseUrl as string, 'Vozačka dozvola')
+                }
               >
-                <img 
-                  src={drivingLicenseUrl as string} 
+                <img
+                  src={drivingLicenseUrl as string}
                   alt="Vozačka dozvola"
                   className="document-image"
                 />
@@ -86,15 +91,15 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
               )}
             </div>
           </div>
-          
+
           <div className="document-photo">
             {passportUrl && passportUrl !== 'N/A' ? (
-              <div 
+              <div
                 className="photo-container photo-container--clickable"
                 onClick={() => onImageClick(passportUrl as string, 'Pasoš')}
               >
-                <img 
-                  src={passportUrl as string} 
+                <img
+                  src={passportUrl as string}
                   alt="Pasoš"
                   className="document-image"
                 />

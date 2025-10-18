@@ -1,6 +1,6 @@
 /**
  * Theme Manager for Rent A Car System
- * 
+ *
  * This utility manages theme switching throughout the application.
  * Themes are applied by adding CSS classes to the document body.
  */
@@ -21,36 +21,36 @@ export const AVAILABLE_THEMES: Theme[] = [
     displayName: 'Plava (Zadana)',
     description: 'Klasična plava tema',
     className: '',
-    primaryColor: '#0056b3'
+    primaryColor: '#0056b3',
   },
   {
     name: 'green',
     displayName: 'Zelena',
     description: 'Prirodna zelena tema',
     className: 'theme-green',
-    primaryColor: '#28a745'
+    primaryColor: '#28a745',
   },
   {
     name: 'purple',
     displayName: 'Ljubičasta',
     description: 'Elegantna ljubičasta tema',
     className: 'theme-purple',
-    primaryColor: '#6f42c1'
+    primaryColor: '#6f42c1',
   },
   {
     name: 'orange',
     displayName: 'Narandžasta',
     description: 'Energična narandžasta tema',
     className: 'theme-orange',
-    primaryColor: '#fd7e14'
+    primaryColor: '#fd7e14',
   },
   {
     name: 'dark',
     displayName: 'Tamna',
     description: 'Tamna tema za noćni rad',
     className: 'theme-dark',
-    primaryColor: '#0056b3'
-  }
+    primaryColor: '#0056b3',
+  },
 ];
 
 class ThemeManager {
@@ -79,21 +79,21 @@ class ThemeManager {
    * Check if theme name is valid
    */
   private isValidTheme(theme: string): theme is ThemeName {
-    return AVAILABLE_THEMES.some(t => t.name === theme);
+    return AVAILABLE_THEMES.some((t) => t.name === theme);
   }
 
   /**
    * Apply theme to the document
    */
   public applyTheme(themeName: ThemeName): void {
-    const theme = AVAILABLE_THEMES.find(t => t.name === themeName);
+    const theme = AVAILABLE_THEMES.find((t) => t.name === themeName);
     if (!theme) {
       console.error(`Theme "${themeName}" not found`);
       return;
     }
 
     // Remove all theme classes
-    AVAILABLE_THEMES.forEach(t => {
+    AVAILABLE_THEMES.forEach((t) => {
       if (t.className) {
         document.body.classList.remove(t.className);
       }
@@ -115,9 +115,11 @@ class ThemeManager {
     }
 
     // Dispatch custom event for components that need to react to theme changes
-    window.dispatchEvent(new CustomEvent('themeChanged', {
-      detail: { theme: themeName, themeData: theme }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('themeChanged', {
+        detail: { theme: themeName, themeData: theme },
+      })
+    );
   }
 
   /**
@@ -131,7 +133,7 @@ class ThemeManager {
    * Get current theme data
    */
   public getCurrentThemeData(): Theme | undefined {
-    return AVAILABLE_THEMES.find(t => t.name === this.currentTheme);
+    return AVAILABLE_THEMES.find((t) => t.name === this.currentTheme);
   }
 
   /**
@@ -160,7 +162,9 @@ class ThemeManager {
    * Cycle to next theme (useful for testing)
    */
   public cycleTheme(): void {
-    const currentIndex = AVAILABLE_THEMES.findIndex(t => t.name === this.currentTheme);
+    const currentIndex = AVAILABLE_THEMES.findIndex(
+      (t) => t.name === this.currentTheme
+    );
     const nextIndex = (currentIndex + 1) % AVAILABLE_THEMES.length;
     this.applyTheme(AVAILABLE_THEMES[nextIndex].name);
   }
@@ -178,7 +182,7 @@ export const useTheme = () => {
     applyTheme: themeManager.applyTheme.bind(themeManager),
     toggleDarkMode: themeManager.toggleDarkMode.bind(themeManager),
     isDarkMode: themeManager.isDarkMode.bind(themeManager),
-    cycleTheme: themeManager.cycleTheme.bind(themeManager)
+    cycleTheme: themeManager.cycleTheme.bind(themeManager),
   };
 };
 

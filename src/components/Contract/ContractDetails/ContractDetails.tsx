@@ -188,7 +188,8 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
   const finalDriverLicenseNumber = driverLicenseNumber || driver_license_number;
   const finalPhoneNumber = phoneNumber || phone_number;
   const finalCountryOfOrigin = countryOfOrigin || country_of_origin;
-  const finalDrivingLicensePhotoUrl = drivingLicensePhotoUrl || driver_license_photo_url;
+  const finalDrivingLicensePhotoUrl =
+    drivingLicensePhotoUrl || driver_license_photo_url;
   const finalPassportPhotoUrl = passportPhotoUrl || passport_photo_url;
 
   const {
@@ -263,12 +264,16 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
               {finalPhoneNumber && (
                 <div className="info-item">
                   <span className="info-label">Phone Number</span>
-                  <span className="info-value">{getValue(finalPhoneNumber)}</span>
+                  <span className="info-value">
+                    {getValue(finalPhoneNumber)}
+                  </span>
                 </div>
               )}
               <div className="info-item">
                 <span className="info-label">Passport Number</span>
-                <span className="info-value">{getValue(finalPassportNumber)}</span>
+                <span className="info-value">
+                  {getValue(finalPassportNumber)}
+                </span>
               </div>
               <div className="info-item">
                 <span className="info-label">Driver License Number</span>
@@ -279,7 +284,9 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
               {finalCountryOfOrigin && (
                 <div className="info-item">
                   <span className="info-label">Country of Origin</span>
-                  <span className="info-value">{getValue(finalCountryOfOrigin)}</span>
+                  <span className="info-value">
+                    {getValue(finalCountryOfOrigin)}
+                  </span>
                 </div>
               )}
               <div className="info-item full-width">
@@ -443,7 +450,9 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                         src={finalDrivingLicensePhotoUrl}
                         alt="Driver License"
                         className="document-photo"
-                        onClick={() => window.open(finalDrivingLicensePhotoUrl, '_blank')}
+                        onClick={() =>
+                          window.open(finalDrivingLicensePhotoUrl, '_blank')
+                        }
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.onerror = null;
@@ -468,7 +477,9 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                         src={finalPassportPhotoUrl}
                         alt="Passport"
                         className="document-photo"
-                        onClick={() => window.open(finalPassportPhotoUrl, '_blank')}
+                        onClick={() =>
+                          window.open(finalPassportPhotoUrl, '_blank')
+                        }
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.onerror = null;

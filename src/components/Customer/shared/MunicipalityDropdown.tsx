@@ -13,7 +13,7 @@ const MunicipalityDropdown: React.FC<MunicipalityDropdownProps> = ({
   selectedMunicipality,
   onSelect,
   placeholder = 'Izaberite grad...',
-  disabled = false
+  disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,26 +22,30 @@ const MunicipalityDropdown: React.FC<MunicipalityDropdownProps> = ({
   // Flatten all municipalities from the JSON structure
   const getAllMunicipalities = (): string[] => {
     const allMunicipalities: string[] = [];
-    
+
     // Add municipalities from Federacija Bosne i Hercegovine
     if (municipalitiesData['Federacija Bosne i Hercegovine']) {
-      Object.values(municipalitiesData['Federacija Bosne i Hercegovine']).forEach((cantonMunicipalities) => {
+      Object.values(
+        municipalitiesData['Federacija Bosne i Hercegovine']
+      ).forEach((cantonMunicipalities) => {
         allMunicipalities.push(...cantonMunicipalities);
       });
     }
-    
+
     // Add municipalities from Republika Srpska
     if (municipalitiesData['Republika Srpska']) {
       allMunicipalities.push(...municipalitiesData['Republika Srpska']);
     }
-    
+
     // Add municipalities from Brčko distrikt
     if (municipalitiesData['Brčko distrikt']) {
       allMunicipalities.push(...municipalitiesData['Brčko distrikt']);
     }
-    
+
     // Sort alphabetically and remove duplicates
-    return [...new Set(allMunicipalities)].sort((a, b) => a.localeCompare(b, 'bs'));
+    return [...new Set(allMunicipalities)].sort((a, b) =>
+      a.localeCompare(b, 'bs')
+    );
   };
 
   const municipalities = getAllMunicipalities();
@@ -49,7 +53,10 @@ const MunicipalityDropdown: React.FC<MunicipalityDropdownProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -83,13 +90,11 @@ const MunicipalityDropdown: React.FC<MunicipalityDropdownProps> = ({
               {selectedMunicipality}
             </span>
           ) : (
-            <span className="country-dropdown__placeholder">
-              {placeholder}
-            </span>
+            <span className="country-dropdown__placeholder">{placeholder}</span>
           )}
         </div>
-        <ChevronDownIcon 
-          className={`country-dropdown__arrow ${isOpen ? 'country-dropdown__arrow--open' : ''}`} 
+        <ChevronDownIcon
+          className={`country-dropdown__arrow ${isOpen ? 'country-dropdown__arrow--open' : ''}`}
         />
       </div>
 
@@ -113,13 +118,13 @@ const MunicipalityDropdown: React.FC<MunicipalityDropdownProps> = ({
                 <div
                   key={municipality}
                   className={`country-dropdown__option ${
-                    municipality === selectedMunicipality ? 'country-dropdown__option--selected' : ''
+                    municipality === selectedMunicipality
+                      ? 'country-dropdown__option--selected'
+                      : ''
                   }`}
                   onClick={() => handleMunicipalitySelect(municipality)}
                 >
-                  <span className="country-dropdown__name">
-                    {municipality}
-                  </span>
+                  <span className="country-dropdown__name">{municipality}</span>
                 </div>
               ))
             ) : (

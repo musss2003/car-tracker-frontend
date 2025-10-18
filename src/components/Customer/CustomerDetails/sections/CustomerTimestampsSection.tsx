@@ -18,7 +18,7 @@ const CustomerTimestampsSection: React.FC<CustomerTimestampsSectionProps> = ({
         <ClockIcon className="section-icon" />
         Podaci o vremenu
       </h3>
-      
+
       <div className="timestamps-grid">
         <div className="timestamp-item">
           <div className="timestamp-label">

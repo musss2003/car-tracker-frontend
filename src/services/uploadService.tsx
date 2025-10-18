@@ -10,7 +10,7 @@ export const uploadDocument = async (file: File): Promise<string> => {
   try {
     const token = localStorage.getItem('accessToken');
     const headers: Record<string, string> = {};
-    
+
     // Add auth token if exists (don't set Content-Type for FormData)
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -25,7 +25,9 @@ export const uploadDocument = async (file: File): Promise<string> => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || `Failed to upload document: ${response.statusText}`);
+      throw new Error(
+        errorData.message || `Failed to upload document: ${response.statusText}`
+      );
     }
 
     const data: { message: string; filename: string } = await response.json();
@@ -52,7 +54,10 @@ export const downloadDocument = async (filename: string): Promise<Blob> => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || `Failed to download document: ${response.statusText}`);
+      throw new Error(
+        errorData.message ||
+          `Failed to download document: ${response.statusText}`
+      );
     }
 
     const blob = await response.blob();
