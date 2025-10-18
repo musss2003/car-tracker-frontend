@@ -70,6 +70,7 @@ export interface BookingEvent {
   customerPassportNumber?: string;
   totalAmount?: number;
   status: 'active' | 'confirmed' | 'completed';
+  resource?: any;
 }
 
 export type Feature =

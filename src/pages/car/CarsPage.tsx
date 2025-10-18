@@ -43,7 +43,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Car } from '@/types/Car';
 import { Contract } from '@/types/Contract';
-import CarAvailabilityCalendar from '@/components/Car/CarAvailabilityCalendar/CarAvailabilityCalendar';
+
 
 // Define the keys that can be sorted
 type SortableCarKey = keyof Pick<
@@ -68,11 +68,7 @@ const CarsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [carPhotos, setCarPhotos] = useState<Record<string, string>>({});
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
-  const [showAvailabilityCalendar, setShowAvailabilityCalendar] =
-    useState<boolean>(false);
-  const [selectedCarForCalendar, setSelectedCarForCalendar] = useState<
-    Car | undefined
-  >(undefined);
+
 
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -287,14 +283,10 @@ const CarsPage = () => {
   };
 
   const handleViewAvailability = (car: Car) => {
-    setSelectedCarForCalendar(car);
-    setShowAvailabilityCalendar(true);
+    navigate(`/cars/${car.id}/availability`);
   };
 
-  const handleCloseAvailabilityCalendar = () => {
-    setShowAvailabilityCalendar(false);
-    setSelectedCarForCalendar(undefined);
-  };
+
 
   // Toggle view mode
   const toggleViewMode = () => {
@@ -511,17 +503,7 @@ const CarsPage = () => {
 
   return (
     <div className="space-y-4">
-      {/* Availability Calendar Modal (keep this one as it's a utility, not CRUD) */}
-      {showAvailabilityCalendar && selectedCarForCalendar && (
-        <div className="car-modal-overlay">
-          <div className="modal-content modal-content-large">
-            <CarAvailabilityCalendar
-              car={selectedCarForCalendar}
-              onClose={handleCloseAvailabilityCalendar}
-            />
-          </div>
-        </div>
-      )}
+
 
       {/* Table Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

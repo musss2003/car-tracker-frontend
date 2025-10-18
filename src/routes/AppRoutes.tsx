@@ -8,6 +8,7 @@ const CarsPage = lazy(() => import('../pages/car/CarsPage'));
 const CreateCarPage = lazy(() => import('../pages/car/CreateCarPage'));
 const EditCarPage = lazy(() => import('../pages/car/EditCarPage'));
 const CarDetailsPage = lazy(() => import('../pages/car/CarDetailsPage'));
+const CarAvailabilityPage = lazy(() => import('../pages/car/CarAvailabilityPage'));
 const ContractsPage = lazy(() => import('../pages/ContractsPage'));
 const CustomersPage = lazy(() => import('../pages/CustomersPage'));
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
@@ -44,6 +45,7 @@ export function AppRoutes() {
           <Route path="/cars" element={<CarsPage />} />
           <Route path="/cars/:id" element={<CarDetailsPage />} />
           <Route path="/cars/:id/edit" element={<EditCarPage />} />
+          <Route path="/cars/:id/availability" element={<CarAvailabilityPage />} />
           <Route path="/contracts" element={<ContractsPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
