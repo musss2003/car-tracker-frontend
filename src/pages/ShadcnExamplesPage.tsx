@@ -1,19 +1,49 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 export default function ShadcnExamplesPage() {
   return (
     <div className="container mx-auto p-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2">shadcn/ui Components Examples</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          shadcn/ui Components Examples
+        </h1>
         <p className="text-muted-foreground">
           This page demonstrates various shadcn/ui components in your project
         </p>
@@ -49,7 +79,9 @@ export default function ShadcnExamplesPage() {
       <Card>
         <CardHeader>
           <CardTitle>Form Components</CardTitle>
-          <CardDescription>Input, Select, Textarea, and Checkbox examples</CardDescription>
+          <CardDescription>
+            Input, Select, Textarea, and Checkbox examples
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2">
@@ -169,8 +201,8 @@ export default function ShadcnExamplesPage() {
               <DialogHeader>
                 <DialogTitle>Are you sure?</DialogTitle>
                 <DialogDescription>
-                  This action cannot be undone. This will permanently delete the car
-                  from your database.
+                  This action cannot be undone. This will permanently delete the
+                  car from your database.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -218,5 +250,5 @@ export default function ShadcnExamplesPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

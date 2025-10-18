@@ -52,8 +52,6 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-
-
   // Load countries on mount
   useEffect(() => {
     const loadCountries = async () => {
@@ -75,16 +73,16 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 
   // Handle form input changes
   const handleInputChange = (field: keyof Customer, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors((prev) => ({ ...prev, [field]: null }));
     }
   };
 
   const handlePhotoChange = (
-    field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl', 
+    field: 'drivingLicensePhotoUrl' | 'passportPhotoUrl',
     uploadedUrl: string | null
   ) => {
     // Update form data with the uploaded URL
@@ -92,7 +90,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
 
     // Clear any photo-related errors
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors((prev) => ({ ...prev, [field]: null }));
     }
   };
 
@@ -129,7 +127,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -138,7 +136,7 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
     try {
       // Generate a temporary ID for the customer (in real app, this would come from backend)
       const customerId = `temp_${Date.now()}`;
-      
+
       // Create customer data with Firebase URLs
       const customerData: Customer = {
         ...formData,
@@ -155,8 +153,6 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
       setIsSubmitting(false);
     }
   };
-
-
 
   return (
     <div className="edit-customer-form-overlay">
@@ -183,18 +179,16 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
               {/* Personal Information Section */}
               <div className="form-section">
                 <h3 className="form-section__title">Lični podaci</h3>
-                
+
                 <div className="form-row form-row--single">
-                  <FormField
-                    label="Ime i prezime"
-                    required
-                    error={errors.name}
-                  >
+                  <FormField label="Ime i prezime" required error={errors.name}>
                     <input
                       type="text"
                       className="ui-input"
                       value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('name', e.target.value)
+                      }
                       placeholder="Unesite ime i prezime"
                       disabled={isSubmitting}
                     />
@@ -202,16 +196,14 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                 </div>
 
                 <div className="form-row">
-                  <FormField
-                    label="Email adresa"
-                    required
-                    error={errors.email}
-                  >
+                  <FormField label="Email adresa" required error={errors.email}>
                     <input
                       type="email"
                       className="ui-input"
                       value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('email', e.target.value)
+                      }
                       placeholder="Unesite email adresu"
                       disabled={isSubmitting}
                     />
@@ -225,7 +217,9 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                     <PhoneNumberField
                       countries={countries}
                       value={formData.phoneNumber || ''}
-                      onChange={(value) => handleInputChange('phoneNumber', value)}
+                      onChange={(value) =>
+                        handleInputChange('phoneNumber', value)
+                      }
                       loading={loadingCountries}
                       error={countriesError}
                       placeholder="61123456"
@@ -234,15 +228,14 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                 </div>
 
                 <div className="form-row">
-                  <FormField
-                    label="Adresa"
-                    error={errors.address}
-                  >
+                  <FormField label="Adresa" error={errors.address}>
                     <input
                       type="text"
                       className="ui-input"
                       value={formData.address}
-                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('address', e.target.value)
+                      }
                       placeholder="Unesite adresu"
                       disabled={isSubmitting}
                     />
@@ -256,7 +249,9 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                     <CountryDropdown
                       countries={countries}
                       selectedCountry={formData.countryOfOrigin || ''}
-                      onSelect={(countryName) => handleInputChange('countryOfOrigin', countryName)}
+                      onSelect={(countryName) =>
+                        handleInputChange('countryOfOrigin', countryName)
+                      }
                       loading={loadingCountries}
                       error={countriesError || errors.countryOfOrigin}
                     />
@@ -267,18 +262,19 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
               {/* Bosnia and Herzegovina Additional Fields */}
               {formData.countryOfOrigin === 'Bosnia and Herzegovina' && (
                 <div className="form-section">
-                  <h3 className="form-section__title">Dodatni podaci za državljane BiH</h3>
-                  
+                  <h3 className="form-section__title">
+                    Dodatni podaci za državljane BiH
+                  </h3>
+
                   <div className="form-row form-row--single">
-                    <FormField
-                      label="Ime oca"
-                      error={errors.fatherName}
-                    >
+                    <FormField label="Ime oca" error={errors.fatherName}>
                       <input
                         type="text"
                         className="ui-input"
                         value={formData.fatherName || ''}
-                        onChange={(e) => handleInputChange('fatherName', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('fatherName', e.target.value)
+                        }
                         placeholder="Unesite ime oca"
                         disabled={isSubmitting}
                       />
@@ -292,21 +288,22 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                     >
                       <MunicipalityDropdown
                         selectedMunicipality={formData.cityOfResidence || ''}
-                        onSelect={(municipalityName) => handleInputChange('cityOfResidence', municipalityName)}
+                        onSelect={(municipalityName) =>
+                          handleInputChange('cityOfResidence', municipalityName)
+                        }
                         placeholder="Izaberite grad prebivališta"
                         disabled={isSubmitting}
                       />
                     </FormField>
 
-                    <FormField
-                      label="JMBG"
-                      error={errors.idOfPerson}
-                    >
+                    <FormField label="JMBG" error={errors.idOfPerson}>
                       <input
                         type="text"
                         className="ui-input"
                         value={formData.idOfPerson || ''}
-                        onChange={(e) => handleInputChange('idOfPerson', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('idOfPerson', e.target.value)
+                        }
                         placeholder="Unesite JMBG"
                         disabled={isSubmitting}
                       />
@@ -328,7 +325,9 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                       type="text"
                       className="ui-input"
                       value={formData.driverLicenseNumber}
-                      onChange={(e) => handleInputChange('driverLicenseNumber', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('driverLicenseNumber', e.target.value)
+                      }
                       placeholder="Unesite broj vozačke dozvole"
                       disabled={isSubmitting}
                     />
@@ -343,7 +342,9 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                       type="text"
                       className="ui-input"
                       value={formData.passportNumber}
-                      onChange={(e) => handleInputChange('passportNumber', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('passportNumber', e.target.value)
+                      }
                       placeholder="Unesite broj pasoša"
                       disabled={isSubmitting}
                     />
@@ -354,7 +355,9 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                   <CustomerPhotoField
                     label="Slika vozačke dozvole"
                     value={formData.drivingLicensePhotoUrl}
-                    onChange={(url) => handlePhotoChange('drivingLicensePhotoUrl', url)}
+                    onChange={(url) =>
+                      handlePhotoChange('drivingLicensePhotoUrl', url)
+                    }
                     customerId={formData.id || 'temp'}
                     documentType="license"
                     disabled={isSubmitting}
@@ -363,7 +366,9 @@ const CreateCustomerForm: React.FC<CreateCustomerFormProps> = ({
                   <CustomerPhotoField
                     label="Slika pasoša"
                     value={formData.passportPhotoUrl}
-                    onChange={(url) => handlePhotoChange('passportPhotoUrl', url)}
+                    onChange={(url) =>
+                      handlePhotoChange('passportPhotoUrl', url)
+                    }
                     customerId={formData.id || 'temp'}
                     documentType="passport"
                     disabled={isSubmitting}

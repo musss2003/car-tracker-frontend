@@ -28,15 +28,11 @@ const ImageModal: React.FC<ImageModalProps> = ({
             Zatvori
           </Button>
         </div>
-        
+
         <div className="image-modal-content">
-          <img 
-            src={imageUrl} 
-            alt={imageType}
-            className="image-modal-image"
-          />
+          <img src={imageUrl} alt={imageType} className="image-modal-image" />
         </div>
-        
+
         <div className="image-modal-footer">
           <p className="image-modal-hint">
             Kliknite van slike ili pritisnite Escape da zatvorite

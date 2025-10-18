@@ -50,11 +50,7 @@
       "Sapna",
       "Teočak"
     ],
-    "Bosansko-podrinjski kanton": [
-      "Goražde",
-      "Foča-Ustikolina",
-      "Pale-Prača"
-    ],
+    "Bosansko-podrinjski kanton": ["Goražde", "Foča-Ustikolina", "Pale-Prača"],
     "Srednjobosanski kanton": [
       "Bugojno",
       "Busovača",
@@ -77,11 +73,7 @@
       "Bosansko Grahovo",
       "Drvar"
     ],
-    "Posavski kanton": [
-      "Orašje",
-      "Odžak",
-      "Domaljevac-Šamac"
-    ],
+    "Posavski kanton": ["Orašje", "Odžak", "Domaljevac-Šamac"],
     "Zapadnohercegovački kanton": [
       "Široki Brijeg",
       "Grude",
@@ -164,7 +156,5 @@
     "Kostajnica",
     "Skelani"
   ],
-  "Brčko distrikt": [
-    "Brčko"
-  ]
+  "Brčko distrikt": ["Brčko"]
 }

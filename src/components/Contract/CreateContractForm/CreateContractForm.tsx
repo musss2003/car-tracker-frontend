@@ -432,14 +432,21 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                     <div className="customer-details">
                       <p className="customer-name">{formData.customer.name}</p>
                       <p className="customer-passport">
-                        Passport: {formData.customer.passportNumber || formData.customer.passportNumber}
+                        Passport:{' '}
+                        {formData.customer.passportNumber ||
+                          formData.customer.passportNumber}
                       </p>
                       <p className="customer-license">
-                        Driver License: {formData.customer.driverLicenseNumber || formData.customer.driverLicenseNumber}
+                        Driver License:{' '}
+                        {formData.customer.driverLicenseNumber ||
+                          formData.customer.driverLicenseNumber}
                       </p>
-                      {(formData.customer.phoneNumber || formData.customer.phoneNumber) && (
+                      {(formData.customer.phoneNumber ||
+                        formData.customer.phoneNumber) && (
                         <p className="customer-phone">
-                          Phone: {formData.customer.phoneNumber || formData.customer.phoneNumber}
+                          Phone:{' '}
+                          {formData.customer.phoneNumber ||
+                            formData.customer.phoneNumber}
                         </p>
                       )}
                       {formData.customer.email && (
@@ -447,9 +454,12 @@ const CreateContractForm: React.FC<CreateContractFormProps> = ({
                           Email: {formData.customer.email}
                         </p>
                       )}
-                      {(formData.customer.countryOfOrigin || formData.customer.countryOfOrigin) && (
+                      {(formData.customer.countryOfOrigin ||
+                        formData.customer.countryOfOrigin) && (
                         <p className="customer-country">
-                          Country: {formData.customer.countryOfOrigin || formData.customer.countryOfOrigin}
+                          Country:{' '}
+                          {formData.customer.countryOfOrigin ||
+                            formData.customer.countryOfOrigin}
                         </p>
                       )}
                       {formData.customer.address && (

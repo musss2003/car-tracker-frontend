@@ -18,9 +18,15 @@ import { Car, BookingEvent } from '../../types/Car';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  ArrowLeftIcon, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  ArrowLeftIcon,
   CalendarIcon,
   RefreshIcon,
   ChevronLeftIcon,
@@ -31,7 +37,7 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   ViewListIcon,
-  ViewGridIcon
+  ViewGridIcon,
 } from '@heroicons/react/solid';
 
 // Setup the localizer for react-big-calendar
@@ -40,7 +46,7 @@ const localizer = momentLocalizer(moment);
 const CarAvailabilityPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  
+
   // State management
   const [car, setCar] = useState<Car | null>(null);
   const [bookings, setBookings] = useState<BookingEvent[]>([]);
@@ -53,66 +59,74 @@ const CarAvailabilityPage: React.FC = () => {
   const [showAgenda, setShowAgenda] = useState(false);
 
   // Fetch car data and bookings
-  const fetchCarAndBookings = useCallback(async (showRefreshing = false) => {
-    try {
-      if (showRefreshing) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
+  const fetchCarAndBookings = useCallback(
+    async (showRefreshing = false) => {
+      try {
+        if (showRefreshing) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
+
+        // Get car data first
+        const cars = await getCars();
+        const foundCar = cars.find((c: Car) => c.id === id);
+
+        if (!foundCar) {
+          setError('Vozilo nije pronađeno');
+          toast.error('Vozilo nije pronađeno');
+          navigate('/cars');
+          return;
+        }
+
+        setCar(foundCar);
+
+        // Get availability data
+        const availability = await getCarAvailability(foundCar.licensePlate);
+
+        // Transform availability data into calendar events
+        const events: BookingEvent[] = availability.map(
+          (booking): BookingEvent => ({
+            title: `Rezervacija: ${booking.customerName}`,
+            start: new Date(booking.start),
+            end: new Date(booking.end),
+            contractId: booking.contractId,
+            customerName: booking.customerName,
+            customerPassportNumber: booking.customerPassportNumber,
+            totalAmount: booking.totalAmount,
+            status: (() => {
+              const now = new Date();
+              const startDate = new Date(booking.start);
+              const endDate = new Date(booking.end);
+
+              if (startDate.getTime() > now.getTime()) {
+                return 'confirmed';
+              } else if (
+                startDate.getTime() <= now.getTime() &&
+                endDate.getTime() >= now.getTime()
+              ) {
+                return 'active';
+              } else {
+                return 'completed';
+              }
+            })(),
+            resource: booking,
+          })
+        );
+
+        setBookings(events);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching car availability:', error);
+        setError('Neuspješno učitavanje kalendara');
+        toast.error('Neuspješno učitavanje kalendara');
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-
-      // Get car data first
-      const cars = await getCars();
-      const foundCar = cars.find((c: Car) => c.id === id);
-      
-      if (!foundCar) {
-        setError('Vozilo nije pronađeno');
-        toast.error('Vozilo nije pronađeno');
-        navigate('/cars');
-        return;
-      }
-      
-      setCar(foundCar);
-
-      // Get availability data
-      const availability = await getCarAvailability(foundCar.licensePlate);
-      
-      // Transform availability data into calendar events
-      const events: BookingEvent[] = availability.map((booking): BookingEvent => ({
-        title: `Rezervacija: ${booking.customerName}`,
-        start: new Date(booking.start),
-        end: new Date(booking.end),
-        contractId: booking.contractId,
-        customerName: booking.customerName,
-        customerPassportNumber: booking.customerPassportNumber,
-        totalAmount: booking.totalAmount,
-        status: (() => {
-          const now = new Date();
-          const startDate = new Date(booking.start);
-          const endDate = new Date(booking.end);
-          
-          if (startDate.getTime() > now.getTime()) {
-            return 'confirmed';
-          } else if (startDate.getTime() <= now.getTime() && endDate.getTime() >= now.getTime()) {
-            return 'active';
-          } else {
-            return 'completed';
-          }
-        })(),
-        resource: booking
-      }));
-
-      setBookings(events);
-      setError(null);
-    } catch (error) {
-      console.error('Error fetching car availability:', error);
-      setError('Neuspješno učitavanje kalendara');
-      toast.error('Neuspješno učitavanje kalendara');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [id, navigate]);
+    },
+    [id, navigate]
+  );
 
   useEffect(() => {
     if (id) {
@@ -133,31 +147,19 @@ const CarAvailabilityPage: React.FC = () => {
   const CustomToolbar = ({ label, onNavigate, onView }: any) => (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onNavigate('PREV')}
-        >
+        <Button variant="outline" size="sm" onClick={() => onNavigate('PREV')}>
           <ChevronLeftIcon className="w-4 h-4" />
         </Button>
         <h3 className="text-lg font-semibold min-w-[200px] text-center">
           {label}
         </h3>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onNavigate('NEXT')}
-        >
+        <Button variant="outline" size="sm" onClick={() => onNavigate('NEXT')}>
           <ChevronRightIcon className="w-4 h-4" />
         </Button>
       </div>
-      
+
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onNavigate('TODAY')}
-        >
+        <Button variant="outline" size="sm" onClick={() => onNavigate('TODAY')}>
           Danas
         </Button>
         <Select value={view} onValueChange={(value: View) => onView(value)}>
@@ -176,7 +178,11 @@ const CarAvailabilityPage: React.FC = () => {
           size="sm"
           onClick={() => setShowAgenda(!showAgenda)}
         >
-          {showAgenda ? <ViewGridIcon className="w-4 h-4" /> : <ViewListIcon className="w-4 h-4" />}
+          {showAgenda ? (
+            <ViewGridIcon className="w-4 h-4" />
+          ) : (
+            <ViewListIcon className="w-4 h-4" />
+          )}
         </Button>
       </div>
     </div>
@@ -185,7 +191,7 @@ const CarAvailabilityPage: React.FC = () => {
   // Event style getter
   const eventStyleGetter = (event: BookingEvent) => {
     let backgroundColor = '#3174ad';
-    
+
     if (event.status === 'confirmed') {
       backgroundColor = '#10b981'; // Green for confirmed
     } else if (event.status === 'active') {
@@ -201,8 +207,8 @@ const CarAvailabilityPage: React.FC = () => {
         opacity: 0.8,
         color: 'white',
         border: '0px',
-        display: 'block'
-      }
+        display: 'block',
+      },
     };
   };
 
@@ -235,7 +241,9 @@ const CarAvailabilityPage: React.FC = () => {
             <CardTitle className="text-center">Greška</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">{error || 'Vozilo nije pronađeno'}</p>
+            <p className="text-muted-foreground">
+              {error || 'Vozilo nije pronađeno'}
+            </p>
             <Button onClick={() => navigate('/cars')} className="w-full">
               <ArrowLeftIcon className="w-4 h-4 mr-2" />
               Nazad na vozila
@@ -252,8 +260,8 @@ const CarAvailabilityPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => navigate('/cars')}
               className="flex items-center gap-2"
             >
@@ -267,14 +275,16 @@ const CarAvailabilityPage: React.FC = () => {
               </h1>
             </div>
           </div>
-          
+
           <Button
             onClick={() => fetchCarAndBookings(true)}
             disabled={refreshing}
             variant="outline"
             className="flex items-center gap-2"
           >
-            <RefreshIcon className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshIcon
+              className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+            />
             Osvježi
           </Button>
         </div>
@@ -284,21 +294,23 @@ const CarAvailabilityPage: React.FC = () => {
           <CardContent className="flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <div 
+                <div
                   className="w-4 h-4 rounded-full border border-gray-300"
                   style={{ backgroundColor: car.color || '#6b7280' }}
                 />
                 <span className="font-medium">{car.licensePlate}</span>
               </div>
-              <Badge variant="secondary">
-                {car.year}
-              </Badge>
+              <Badge variant="secondary">{car.year}</Badge>
               <span className="text-muted-foreground">
-                {car.pricePerDay ? `${car.pricePerDay} BAM/dan` : 'Cijena nije definirana'}
+                {car.pricePerDay
+                  ? `${car.pricePerDay} BAM/dan`
+                  : 'Cijena nije definirana'}
               </span>
             </div>
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">Ukupno rezervacija</p>
+              <p className="text-sm text-muted-foreground">
+                Ukupno rezervacija
+              </p>
               <p className="text-2xl font-bold">{bookings.length}</p>
             </div>
           </CardContent>
@@ -328,22 +340,30 @@ const CarAvailabilityPage: React.FC = () => {
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
                             <UserIcon className="w-4 h-4 text-muted-foreground" />
-                            <span className="font-medium">{event.customerName}</span>
-                            <Badge 
+                            <span className="font-medium">
+                              {event.customerName}
+                            </span>
+                            <Badge
                               variant={
-                                event.status === 'confirmed' ? 'default' : 
-                                event.status === 'active' ? 'secondary' : 
-                                'outline'
+                                event.status === 'confirmed'
+                                  ? 'default'
+                                  : event.status === 'active'
+                                    ? 'secondary'
+                                    : 'outline'
                               }
                             >
-                              {event.status === 'confirmed' ? 'Potvrđeno' : 
-                               event.status === 'active' ? 'Aktivno' : 'Završeno'}
+                              {event.status === 'confirmed'
+                                ? 'Potvrđeno'
+                                : event.status === 'active'
+                                  ? 'Aktivno'
+                                  : 'Završeno'}
                             </Badge>
                           </div>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <ClockIcon className="w-3 h-3" />
-                              {moment(event.start).format('DD.MM.YYYY')} - {moment(event.end).format('DD.MM.YYYY')}
+                              {moment(event.start).format('DD.MM.YYYY')} -{' '}
+                              {moment(event.end).format('DD.MM.YYYY')}
                             </div>
                             {event.totalAmount && (
                               <div className="flex items-center gap-1">
@@ -396,7 +416,11 @@ const CarAvailabilityPage: React.FC = () => {
                   formats={{
                     monthHeaderFormat: 'MMMM YYYY',
                     dayHeaderFormat: 'dddd, DD MMMM',
-                    dayRangeHeaderFormat: ({ start, end }, culture, localizer) =>
+                    dayRangeHeaderFormat: (
+                      { start, end },
+                      culture,
+                      localizer
+                    ) =>
                       `${localizer?.format(start, 'DD MMMM', culture)} - ${localizer?.format(end, 'DD MMMM YYYY', culture)}`,
                   }}
                 />
@@ -428,51 +452,67 @@ const CarAvailabilityPage: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <UserIcon className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-medium">{selectedEvent.customerName}</span>
+                    <span className="font-medium">
+                      {selectedEvent.customerName}
+                    </span>
                   </div>
-                  
+
                   {selectedEvent.customerPassportNumber && (
                     <div className="flex items-center gap-2">
                       <span className="w-4 h-4 text-muted-foreground">�</span>
-                      <span className="text-sm">{selectedEvent.customerPassportNumber}</span>
+                      <span className="text-sm">
+                        {selectedEvent.customerPassportNumber}
+                      </span>
                     </div>
                   )}
-                  
+
                   <div className="flex items-center gap-2">
                     <ClockIcon className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm">
-                      {moment(selectedEvent.start).format('DD.MM.YYYY')} - {moment(selectedEvent.end).format('DD.MM.YYYY')}
+                      {moment(selectedEvent.start).format('DD.MM.YYYY')} -{' '}
+                      {moment(selectedEvent.end).format('DD.MM.YYYY')}
                     </span>
                   </div>
-                  
+
                   {selectedEvent.totalAmount && (
                     <div className="flex items-center gap-2">
                       <CurrencyDollarIcon className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">{selectedEvent.totalAmount} BAM</span>
+                      <span className="text-sm">
+                        {selectedEvent.totalAmount} BAM
+                      </span>
                     </div>
                   )}
-                  
+
                   <div className="flex items-center gap-2">
                     {selectedEvent.status === 'confirmed' ? (
                       <CheckCircleIcon className="w-4 h-4 text-green-500" />
                     ) : (
                       <ExclamationCircleIcon className="w-4 h-4 text-yellow-500" />
                     )}
-                    <Badge 
+                    <Badge
                       variant={
-                        selectedEvent.status === 'confirmed' ? 'default' : 
-                        selectedEvent.status === 'active' ? 'secondary' : 
-                        'outline'
+                        selectedEvent.status === 'confirmed'
+                          ? 'default'
+                          : selectedEvent.status === 'active'
+                            ? 'secondary'
+                            : 'outline'
                       }
                     >
-                      {selectedEvent.status === 'confirmed' ? 'Potvrđeno' : 
-                       selectedEvent.status === 'active' ? 'Aktivno' : 'Završeno'}
+                      {selectedEvent.status === 'confirmed'
+                        ? 'Potvrđeno'
+                        : selectedEvent.status === 'active'
+                          ? 'Aktivno'
+                          : 'Završeno'}
                     </Badge>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">ID ugovora:</span>
-                    <span className="text-sm font-mono">{selectedEvent.contractId}</span>
+                    <span className="text-sm text-muted-foreground">
+                      ID ugovora:
+                    </span>
+                    <span className="text-sm font-mono">
+                      {selectedEvent.contractId}
+                    </span>
                   </div>
                 </div>
               </CardContent>

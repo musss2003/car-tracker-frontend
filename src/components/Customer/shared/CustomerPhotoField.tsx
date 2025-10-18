@@ -25,18 +25,20 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
   customerId,
   documentType,
   required = false,
-  disabled = false
+  disabled = false,
 }) => {
   const [uploadState, setUploadState] = useState<UploadState>({
     isUploading: false,
     progress: 0,
-    error: null
+    error: null,
   });
-  
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -45,7 +47,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
       setUploadState({
         isUploading: false,
         progress: 0,
-        error: 'Please select an image file'
+        error: 'Please select an image file',
       });
       return;
     }
@@ -56,7 +58,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
       setUploadState({
         isUploading: false,
         progress: 0,
-        error: 'File size must be less than 5MB'
+        error: 'File size must be less than 5MB',
       });
       return;
     }
@@ -64,7 +66,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
     setUploadState({
       isUploading: true,
       progress: 0,
-      error: null
+      error: null,
     });
 
     // Create local preview
@@ -77,9 +79,9 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
     try {
       // Simulate progress (since backend doesn't support progress tracking)
       const progressInterval = setInterval(() => {
-        setUploadState(prev => ({
+        setUploadState((prev) => ({
           ...prev,
-          progress: Math.min(prev.progress + 10, 90)
+          progress: Math.min(prev.progress + 10, 90),
         }));
       }, 200);
 
@@ -89,20 +91,19 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
       clearInterval(progressInterval);
 
       onChange(filename);
-      
+
       setUploadState({
         isUploading: false,
         progress: 100,
-        error: null
+        error: null,
       });
-
     } catch (error) {
       console.error('Upload failed:', error);
       setPreviewUrl(null);
       setUploadState({
         isUploading: false,
         progress: 0,
-        error: error instanceof Error ? error.message : 'Upload failed'
+        error: error instanceof Error ? error.message : 'Upload failed',
       });
     }
 
@@ -122,13 +123,13 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
         setUploadState({
           isUploading: false,
           progress: 0,
-          error: null
+          error: null,
         });
       } catch (error) {
         console.error('Delete failed:', error);
-        setUploadState(prev => ({
+        setUploadState((prev) => ({
           ...prev,
-          error: 'Failed to delete photo'
+          error: 'Failed to delete photo',
         }));
       }
     }
@@ -145,7 +146,8 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
     if (previewUrl) return previewUrl;
     if (value) {
       // If value is a filename, construct download URL
-      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+      const API_URL =
+        import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
       return `${API_URL}/api/documents/${value}`;
     }
     return null;
@@ -159,7 +161,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
         {label}
         {required && <span className="required-asterisk">*</span>}
       </label>
-      
+
       <div className="photo-upload-container">
         {/* Hidden file input */}
         <input
@@ -191,13 +193,15 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
               </div>
             </div>
           ) : (
-            <div 
+            <div
               className={`upload-placeholder ${disabled ? 'disabled' : ''}`}
               onClick={triggerFileSelect}
             >
               <div className="upload-icon">📷</div>
               <span className="upload-text">
-                {uploadState.isUploading ? 'Uploading...' : 'Click to upload photo'}
+                {uploadState.isUploading
+                  ? 'Uploading...'
+                  : 'Click to upload photo'}
               </span>
             </div>
           )}
@@ -207,12 +211,14 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
         {uploadState.isUploading && (
           <div className="upload-progress">
             <div className="progress-bar">
-              <div 
+              <div
                 className="progress-fill"
                 style={{ width: `${uploadState.progress}%` }}
               />
             </div>
-            <span className="progress-text">{Math.round(uploadState.progress)}%</span>
+            <span className="progress-text">
+              {Math.round(uploadState.progress)}%
+            </span>
           </div>
         )}
 
@@ -234,7 +240,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
           >
             {value ? 'Change Photo' : 'Select Photo'}
           </button>
-          
+
           {value && (
             <button
               type="button"
@@ -247,8 +253,6 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
           )}
         </div>
       </div>
-
-
     </div>
   );
 };

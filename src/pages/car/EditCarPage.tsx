@@ -4,14 +4,17 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { X, Save, Upload, Image } from 'lucide-react';
-import {
-  Car,
-  CarFormErrors,
-} from '../../types/Car';
+import { Car, CarFormErrors } from '../../types/Car';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { getCar, updateCar } from '../../services/carService';
 import { uploadDocument, downloadDocument } from '../../services/uploadService';
 import carBrands from '../../assets/car_brands.json';
@@ -95,7 +98,7 @@ const EditCarPage: React.FC = () => {
 // Separate component for the form content
 const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
   const navigate = useNavigate();
-  
+
   // Form state
   const [formData, setFormData] = useState<Car>(initialData);
   const [originalData, setOriginalData] = useState<Car>(initialData);
@@ -112,8 +115,10 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
   const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
 
   // Car brands from JSON file
-  const popularBrands = carBrands.filter(brand => brand.popular).map(brand => brand.name);
-  const allBrands = carBrands.map(brand => brand.name);
+  const popularBrands = carBrands
+    .filter((brand) => brand.popular)
+    .map((brand) => brand.name);
+  const allBrands = carBrands.map((brand) => brand.name);
 
   // Common car manufacturers for suggestions (popular Bosnian market brands)
   const commonManufacturers = popularBrands;
@@ -121,7 +126,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
   // Load existing photo from backend
   const loadExistingPhoto = async (photoUrl: string) => {
     if (!photoUrl) return;
-    
+
     setIsLoadingPhoto(true);
     try {
       const photoBlob = await downloadDocument(photoUrl);
@@ -130,12 +135,12 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
     } catch (error) {
       console.error('Error loading existing photo:', error);
       // Show user-friendly error message
-      setErrors(prev => ({ 
-        ...prev, 
-        photoUrl: `Neuspješno učitavanje postojeće fotografije. Možete unijeti novu.`
+      setErrors((prev) => ({
+        ...prev,
+        photoUrl: `Neuspješno učitavanje postojeće fotografije. Možete unijeti novu.`,
       }));
       // Clear the photo URL from form data since it failed to load
-      setFormData(prev => ({ ...prev, photoUrl: '' }));
+      setFormData((prev) => ({ ...prev, photoUrl: '' }));
     } finally {
       setIsLoadingPhoto(false);
     }
@@ -184,18 +189,24 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        setErrors(prev => ({ ...prev, photoUrl: 'Molimo odaberite validnu sliku' }));
+        setErrors((prev) => ({
+          ...prev,
+          photoUrl: 'Molimo odaberite validnu sliku',
+        }));
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, photoUrl: 'Slika mora biti manja od 5MB' }));
+        setErrors((prev) => ({
+          ...prev,
+          photoUrl: 'Slika mora biti manja od 5MB',
+        }));
         return;
       }
 
       setSelectedPhoto(file);
-      setErrors(prev => ({ ...prev, photoUrl: undefined }));
+      setErrors((prev) => ({ ...prev, photoUrl: undefined }));
 
       // Create preview
       const reader = new FileReader();
@@ -214,11 +225,14 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
     try {
       const filename = await uploadDocument(selectedPhoto);
       // Clear any previous photo upload errors
-      setErrors(prev => ({ ...prev, photoUrl: undefined }));
+      setErrors((prev) => ({ ...prev, photoUrl: undefined }));
       return filename;
     } catch (error) {
       console.error('Error uploading photo:', error);
-      setErrors(prev => ({ ...prev, photoUrl: 'Neuspješno dodavanje fotografije. Molimo pokušajte ponovo.' }));
+      setErrors((prev) => ({
+        ...prev,
+        photoUrl: 'Neuspješno dodavanje fotografije. Molimo pokušajte ponovo.',
+      }));
       return null;
     } finally {
       setIsUploadingPhoto(false);
@@ -229,9 +243,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
   const removePhoto = () => {
     setSelectedPhoto(null);
     setPhotoPreview(null);
-    setFormData(prev => ({ ...prev, photoUrl: '' }));
-    setErrors(prev => ({ ...prev, photoUrl: undefined }));
-    
+    setFormData((prev) => ({ ...prev, photoUrl: '' }));
+    setErrors((prev) => ({ ...prev, photoUrl: undefined }));
+
     // Clean up existing photo URL
     if (existingPhotoUrl) {
       URL.revokeObjectURL(existingPhotoUrl);
@@ -285,11 +299,12 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
   // Check if form has been modified
   const hasChanges = () => {
     // Check if form data has changed
-    const formChanged = JSON.stringify(formData) !== JSON.stringify(originalData);
-    
+    const formChanged =
+      JSON.stringify(formData) !== JSON.stringify(originalData);
+
     // Check if a new photo has been selected
     const photoChanged = selectedPhoto !== null;
-    
+
     return formChanged || photoChanged;
   };
 
@@ -383,7 +398,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
       <div className="page-header">
         <div className="header-content">
           <div className="header-info">
-            <h1 className="page-title">Uredi vozilo: {formData.manufacturer} {formData.model}</h1>
+            <h1 className="page-title">
+              Uredi vozilo: {formData.manufacturer} {formData.model}
+            </h1>
             <p className="page-description">Ažuriraj detalje vozila</p>
           </div>
           <Button
@@ -406,7 +423,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
             <div className="section-header">
               <h2 className="section-title">Osnovne informacije</h2>
             </div>
-            
+
             <div className="form-grid">
               <div className="form-field">
                 <Label htmlFor="manufacturer">
@@ -414,7 +431,11 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                 </Label>
                 <Select
                   value={formData.manufacturer || ''}
-                  onValueChange={(value) => handleChange({ target: { name: 'manufacturer', value } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { name: 'manufacturer', value },
+                    } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -426,11 +447,13 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                         {manufacturer}
                       </SelectItem>
                     ))}
-                    {allBrands.filter(brand => !popularBrands.includes(brand)).map((manufacturer) => (
-                      <SelectItem key={manufacturer} value={manufacturer}>
-                        {manufacturer}
-                      </SelectItem>
-                    ))}
+                    {allBrands
+                      .filter((brand) => !popularBrands.includes(brand))
+                      .map((manufacturer) => (
+                        <SelectItem key={manufacturer} value={manufacturer}>
+                          {manufacturer}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
                 {errors.manufacturer && (
@@ -449,11 +472,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   onChange={handleChange}
                   placeholder="npr. Camry"
                   disabled={isSubmitting}
-                  className={errors.model ? "error" : ""}
+                  className={errors.model ? 'error' : ''}
                 />
-                {errors.model && (
-                  <p className="error-text">{errors.model}</p>
-                )}
+                {errors.model && <p className="error-text">{errors.model}</p>}
               </div>
             </div>
 
@@ -464,7 +485,11 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                 </Label>
                 <Select
                   value={formData.year?.toString()}
-                  onValueChange={(value) => handleChange({ target: { name: 'year', value: parseInt(value) } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { name: 'year', value: parseInt(value) },
+                    } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -478,9 +503,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.year && (
-                  <p className="error-text">{errors.year}</p>
-                )}
+                {errors.year && <p className="error-text">{errors.year}</p>}
               </div>
 
               <div className="form-field">
@@ -494,9 +517,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   disabled={isSubmitting}
                   className="color-input"
                 />
-                {errors.color && (
-                  <p className="error-text">{errors.color}</p>
-                )}
+                {errors.color && <p className="error-text">{errors.color}</p>}
               </div>
             </div>
 
@@ -511,7 +532,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                       type="file"
                       accept="image/*"
                       onChange={handlePhotoChange}
-                      disabled={isSubmitting || isUploadingPhoto || isLoadingPhoto}
+                      disabled={
+                        isSubmitting || isUploadingPhoto || isLoadingPhoto
+                      }
                       className="hidden-file-input"
                     />
                     {isLoadingPhoto ? (
@@ -520,8 +543,12 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                         <div className="upload-content">
                           <div className="progress-spinner large"></div>
                           <div className="upload-text">
-                            <span className="upload-primary-text">Učitavanje postojeće fotografije...</span>
-                            <span className="upload-secondary-text">Molimo sačekajte</span>
+                            <span className="upload-primary-text">
+                              Učitavanje postojeće fotografije...
+                            </span>
+                            <span className="upload-secondary-text">
+                              Molimo sačekajte
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -530,8 +557,12 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                         <div className="upload-content">
                           <Upload className="upload-icon" />
                           <div className="upload-text">
-                            <span className="upload-primary-text">Kliknite da biste dodali fotografiju</span>
-                            <span className="upload-secondary-text">PNG, JPG, JPEG do 5MB</span>
+                            <span className="upload-primary-text">
+                              Kliknite da biste dodali fotografiju
+                            </span>
+                            <span className="upload-secondary-text">
+                              PNG, JPG, JPEG do 5MB
+                            </span>
                           </div>
                         </div>
                       </label>
@@ -545,7 +576,10 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                           />
                           <div className="photo-overlay">
                             <div className="photo-actions">
-                              <label htmlFor="photo" className="change-photo-button">
+                              <label
+                                htmlFor="photo"
+                                className="change-photo-button"
+                              >
                                 <Upload className="h-4 w-4" />
                                 Promijeni
                               </label>
@@ -554,7 +588,11 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                                 variant="outline"
                                 size="sm"
                                 onClick={removePhoto}
-                                disabled={isSubmitting || isUploadingPhoto || isLoadingPhoto}
+                                disabled={
+                                  isSubmitting ||
+                                  isUploadingPhoto ||
+                                  isLoadingPhoto
+                                }
                                 className="remove-photo-button"
                               >
                                 <X className="h-4 w-4" />
@@ -569,7 +607,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   {isUploadingPhoto && (
                     <div className="upload-progress">
                       <div className="progress-spinner"></div>
-                      <span className="progress-text">Dodavanje fotografije...</span>
+                      <span className="progress-text">
+                        Dodavanje fotografije...
+                      </span>
                     </div>
                   )}
                 </div>
@@ -584,7 +624,11 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                 <Label htmlFor="transmission">Menjač</Label>
                 <Select
                   value={formData.transmission}
-                  onValueChange={(value) => handleChange({ target: { name: 'transmission', value } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { name: 'transmission', value },
+                    } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -593,7 +637,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   <SelectContent>
                     <SelectItem value="automatic">Automatski</SelectItem>
                     <SelectItem value="manual">Ručni</SelectItem>
-                    <SelectItem value="semi-automatic">Poluautomatski</SelectItem>
+                    <SelectItem value="semi-automatic">
+                      Poluautomatski
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.transmission && (
@@ -605,7 +651,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                 <Label htmlFor="fuelType">Tip goriva</Label>
                 <Select
                   value={formData.fuelType}
-                  onValueChange={(value) => handleChange({ target: { name: 'fuelType', value } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({ target: { name: 'fuelType', value } } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -636,11 +684,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   min="1"
                   max="10"
                   disabled={isSubmitting}
-                  className={errors.seats ? "error" : ""}
+                  className={errors.seats ? 'error' : ''}
                 />
-                {errors.seats && (
-                  <p className="error-text">{errors.seats}</p>
-                )}
+                {errors.seats && <p className="error-text">{errors.seats}</p>}
               </div>
 
               <div className="form-field">
@@ -654,11 +700,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   min="2"
                   max="6"
                   disabled={isSubmitting}
-                  className={errors.doors ? "error" : ""}
+                  className={errors.doors ? 'error' : ''}
                 />
-                {errors.doors && (
-                  <p className="error-text">{errors.doors}</p>
-                )}
+                {errors.doors && <p className="error-text">{errors.doors}</p>}
               </div>
             </div>
           </div>
@@ -681,7 +725,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   onChange={handleChange}
                   placeholder="npr. ABC123"
                   disabled={isSubmitting}
-                  className={errors.licensePlate ? "error" : ""}
+                  className={errors.licensePlate ? 'error' : ''}
                 />
                 {errors.licensePlate && (
                   <p className="error-text">{errors.licensePlate}</p>
@@ -697,7 +741,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   onChange={handleChange}
                   placeholder="npr. 1HGCM82633A123456"
                   disabled={isSubmitting}
-                  className={errors.chassisNumber ? "error" : ""}
+                  className={errors.chassisNumber ? 'error' : ''}
                 />
                 {errors.chassisNumber && (
                   <p className="error-text">{errors.chassisNumber}</p>
@@ -727,7 +771,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   step="0.01"
                   placeholder="npr. 49.99"
                   disabled={isSubmitting}
-                  className={errors.pricePerDay ? "error" : ""}
+                  className={errors.pricePerDay ? 'error' : ''}
                 />
                 {errors.pricePerDay && (
                   <p className="error-text">{errors.pricePerDay}</p>
@@ -753,7 +797,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   onChange={handleChange}
                   min="0"
                   disabled={isSubmitting}
-                  className={errors.mileage ? "error" : ""}
+                  className={errors.mileage ? 'error' : ''}
                 />
                 {errors.mileage && (
                   <p className="error-text">{errors.mileage}</p>
@@ -770,7 +814,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                   onChange={handleChange}
                   min="0"
                   disabled={isSubmitting}
-                  className={errors.enginePower ? "error" : ""}
+                  className={errors.enginePower ? 'error' : ''}
                 />
                 {errors.enginePower && (
                   <p className="error-text">{errors.enginePower}</p>
@@ -783,7 +827,9 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
                 <Label htmlFor="category">Kategorija</Label>
                 <Select
                   value={formData.category}
-                  onValueChange={(value) => handleChange({ target: { name: 'category', value } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({ target: { name: 'category', value } } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -816,10 +862,7 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
               Otkaži
             </Button>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting || !hasChanges()}
-            >
+            <Button type="submit" disabled={isSubmitting || !hasChanges()}>
               {isSubmitting ? (
                 <div className="flex items-center space-x-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

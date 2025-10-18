@@ -123,16 +123,16 @@
   .rbc-calendar {
     font-size: 0.75rem;
   }
-  
+
   .rbc-header {
     padding: 0.25rem 0.5rem;
   }
-  
+
   .rbc-event {
     font-size: 10px;
     padding: 0.125rem 0.25rem;
   }
-  
+
   .rbc-day-bg {
     min-height: 80px;
   }

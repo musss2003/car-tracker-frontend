@@ -46,7 +46,9 @@ export const updateCar = async (
   return await response.json();
 };
 
-export const deleteCar = async (licensePlate: string): Promise<{ message: string }> => {
+export const deleteCar = async (
+  licensePlate: string
+): Promise<{ message: string }> => {
   const response = await fetch(`${API_URL}cars/${licensePlate}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),

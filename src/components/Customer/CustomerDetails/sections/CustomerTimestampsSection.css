@@ -63,11 +63,11 @@
   .timestamp-item {
     padding: var(--spacing-lg);
   }
-  
+
   .timestamp-label {
     font-size: var(--font-size-xs);
   }
-  
+
   .timestamp-value {
     font-size: var(--font-size-notice);
   }

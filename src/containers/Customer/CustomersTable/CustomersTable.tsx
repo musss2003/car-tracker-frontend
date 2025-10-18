@@ -14,7 +14,7 @@ import {
   PencilIcon,
   TrashIcon,
   EyeIcon,
-  UserAddIcon
+  UserAddIcon,
 } from '@heroicons/react/solid';
 import './CustomersTable.css';
 import CustomerDetails from '../../../components/Customer/CustomerDetails/CustomerDetails';
@@ -26,7 +26,7 @@ import {
   TableContainer,
   TableActions,
   SearchFilter,
-  Pagination
+  Pagination,
 } from '../../../components/ui';
 
 const CustomersTable = () => {
@@ -63,7 +63,7 @@ const CustomersTable = () => {
         const response = await getCustomers();
         setCustomers(response);
       } catch (err) {
-        console.error("Failed to load customers!");
+        console.error('Failed to load customers!');
       } finally {
         setLoading(false);
       }
@@ -84,12 +84,15 @@ const CustomersTable = () => {
           (customer.name &&
             customer.name.toLowerCase().includes(lowerSearchTerm)) ||
           (customer.driverLicenseNumber &&
-            customer.driverLicenseNumber.toLowerCase().includes(lowerSearchTerm)) ||
+            customer.driverLicenseNumber
+              .toLowerCase()
+              .includes(lowerSearchTerm)) ||
           (customer.passportNumber &&
             customer.passportNumber.toLowerCase().includes(lowerSearchTerm)) ||
           (customer.email &&
             customer.email.toLowerCase().includes(lowerSearchTerm)) ||
-          (customer.phoneNumber && customer.phoneNumber.toLowerCase().includes(lowerSearchTerm)) ||
+          (customer.phoneNumber &&
+            customer.phoneNumber.toLowerCase().includes(lowerSearchTerm)) ||
           (customer.address &&
             customer.address.toLowerCase().includes(lowerSearchTerm)) ||
           (customer.countryOfOrigin &&
@@ -229,14 +232,16 @@ const CustomersTable = () => {
       const workbook = XLSX.utils.book_new();
 
       const worksheetData = filteredAndSortedCustomers.map((customer) => ({
-        'Ime': customer.name || 'N/A',
+        Ime: customer.name || 'N/A',
         'Vozačka dozvola': customer.driverLicenseNumber || 'N/A',
         'Broj pasoša': customer.passportNumber || 'N/A',
-        'Email': customer.email || 'N/A',
-        'Telefon': customer.phoneNumber || 'N/A',
-        'Adresa': customer.address || 'N/A',
+        Email: customer.email || 'N/A',
+        Telefon: customer.phoneNumber || 'N/A',
+        Adresa: customer.address || 'N/A',
         'Zemlja porijekla': customer.countryOfOrigin || 'N/A',
-        'Datum kreiranja': customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A',
+        'Datum kreiranja': customer.createdAt
+          ? new Date(customer.createdAt).toLocaleDateString()
+          : 'N/A',
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -367,9 +372,7 @@ const CustomersTable = () => {
                 {renderTableHeader('Email', 'email')}
                 {renderTableHeader('Telefon', 'phoneNumber')}
                 {renderTableHeader('Zemlja', 'countryOfOrigin')}
-                <th className="table-heading actions-column">
-                  Akcije
-                </th>
+                <th className="table-heading actions-column">Akcije</th>
               </tr>
             </thead>
             <tbody>
@@ -392,9 +395,7 @@ const CustomersTable = () => {
                     <td className="table-cell">
                       {customer.passportNumber || 'N/A'}
                     </td>
-                    <td className="table-cell">
-                      {customer.email || 'N/A'}
-                    </td>
+                    <td className="table-cell">{customer.email || 'N/A'}</td>
                     <td className="table-cell">
                       {customer.phoneNumber || 'N/A'}
                     </td>

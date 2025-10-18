@@ -38,10 +38,7 @@ function App() {
 
         {/* Mobile Header */}
         {isLoggedIn() && (
-          <MobileHeader
-            onMenuClick={toggleSidebar}
-            isVisible={isSmallScreen}
-          />
+          <MobileHeader onMenuClick={toggleSidebar} isVisible={isSmallScreen} />
         )}
 
         {/* Main Content Area */}
@@ -66,6 +63,5 @@ function App() {
     </ErrorBoundary>
   );
 }
-
 
 export default App;

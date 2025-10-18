@@ -39,7 +39,7 @@ import {
   TableContainer,
   TableActions,
   SearchFilter,
-  Pagination
+  Pagination,
 } from '../../../components/ui';
 
 const ContractsTable = () => {
@@ -426,13 +426,20 @@ const ContractsTable = () => {
   };
 
   // Render table header with sort indicators
-  const renderTableHeader = (label: string, key: string, additionalClass = '') => {
+  const renderTableHeader = (
+    label: string,
+    key: string,
+    additionalClass = ''
+  ) => {
     const isSorted = sortConfig.key === key;
     const SortIcon =
       sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
 
     return (
-      <th className={`table-heading ${additionalClass}`} onClick={() => handleSort(key)}>
+      <th
+        className={`table-heading ${additionalClass}`}
+        onClick={() => handleSort(key)}
+      >
         <div className="header-content">
           <span>{label}</span>
           {isSorted ? (
@@ -480,14 +487,14 @@ const ContractsTable = () => {
         onExportPDF={exportToPDF}
         onExportExcel={exportToExcel}
       />
-      
+
       <div className="contracts-table-custom-controls">
         <SearchFilter
           searchTerm={searchTerm}
           onSearchChange={(value) => setSearchTerm(value)}
           placeholder="Search by customer, passport, or car..."
         />
-        
+
         <div className="filter-container">
           <FilterIcon className="filter-icon" />
           <select

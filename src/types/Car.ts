@@ -2,7 +2,13 @@
 export type FuelType = 'petrol' | 'diesel' | 'hybrid' | 'electric';
 export type TransmissionType = 'manual' | 'automatic';
 export type CarStatus = 'available' | 'rented' | 'maintenance' | 'unavailable';
-export type CarCategory = 'economy' | 'luxury' | 'suv' | 'van' | 'family' | 'business';
+export type CarCategory =
+  | 'economy'
+  | 'luxury'
+  | 'suv'
+  | 'van'
+  | 'family'
+  | 'business';
 
 export interface Car {
   id: string;

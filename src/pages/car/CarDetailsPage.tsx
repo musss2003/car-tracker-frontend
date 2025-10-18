@@ -9,15 +9,15 @@ import { Contract } from '../../types/Contract';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowLeftIcon, 
+import {
+  ArrowLeftIcon,
   PencilIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
   CurrencyDollarIcon,
   TagIcon,
   CogIcon,
-  CalendarIcon
+  CalendarIcon,
 } from '@heroicons/react/solid';
 
 const CarDetailsPage = () => {
@@ -51,26 +51,26 @@ const CarDetailsPage = () => {
         setLoading(true);
         const [cars, activeContracts] = await Promise.all([
           getCars(),
-          getActiveContracts()
+          getActiveContracts(),
         ]);
-        
+
         const foundCar = cars.find((c: Car) => c.id === id);
-        
+
         if (!foundCar) {
           setError('Vozilo nije pronađeno');
           toast.error('Vozilo nije pronađeno');
           navigate('/cars');
           return;
         }
-        
+
         // Check if car is busy (has active contract)
         const busyCarLicensePlates = new Set(
           activeContracts.map((contract: Contract) => contract.car.licensePlate)
         );
         setIsBusy(busyCarLicensePlates.has(foundCar.licensePlate));
-        
+
         setCar(foundCar);
-        
+
         // Load car photo if available
         if (foundCar.photoUrl) {
           loadCarPhoto(foundCar.photoUrl);
@@ -125,7 +125,9 @@ const CarDetailsPage = () => {
             <CardTitle className="text-center">Greška</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">{error || 'Vozilo nije pronađeno'}</p>
+            <p className="text-muted-foreground">
+              {error || 'Vozilo nije pronađeno'}
+            </p>
             <Button onClick={() => navigate('/cars')} className="w-full">
               <ArrowLeftIcon className="w-4 h-4 mr-2" />
               Nazad na vozila
@@ -142,8 +144,8 @@ const CarDetailsPage = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleClose}
               className="flex items-center gap-2 w-fit"
             >
@@ -154,7 +156,10 @@ const CarDetailsPage = () => {
               <h1 className="text-xl sm:text-2xl font-bold">
                 {car.manufacturer} {car.model}
               </h1>
-              <Badge variant={isBusy ? "destructive" : "default"} className="gap-1 w-fit">
+              <Badge
+                variant={isBusy ? 'destructive' : 'default'}
+                className="gap-1 w-fit"
+              >
                 {isBusy ? (
                   <>
                     <ExclamationCircleIcon className="w-3 h-3" />
@@ -169,15 +174,18 @@ const CarDetailsPage = () => {
               </Badge>
             </div>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button onClick={handleEdit} className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              onClick={handleEdit}
+              className="flex items-center gap-2 w-full sm:w-auto"
+            >
               <PencilIcon className="w-4 h-4" />
               Uredi vozilo
             </Button>
-            <Button 
-              onClick={() => navigate(`/cars/${car.id}/availability`)} 
-              variant="outline" 
+            <Button
+              onClick={() => navigate(`/cars/${car.id}/availability`)}
+              variant="outline"
               className="flex items-center gap-2 w-full sm:w-auto"
             >
               <CalendarIcon className="w-4 h-4" />
@@ -206,14 +214,16 @@ const CarDetailsPage = () => {
                     <div className="w-12 h-12 xl:w-16 xl:h-16 rounded-full bg-white/50 flex items-center justify-center">
                       <span className="text-xl xl:text-2xl">🚗</span>
                     </div>
-                    <p className="text-xs xl:text-sm text-muted-foreground">Nema fotografije</p>
+                    <p className="text-xs xl:text-sm text-muted-foreground">
+                      Nema fotografije
+                    </p>
                   </div>
                 )}
-                
+
                 {/* Color indicator overlay */}
                 {car.color && (
                   <div className="absolute top-3 left-3 xl:top-4 xl:left-4">
-                    <div 
+                    <div
                       className="w-6 h-6 xl:w-8 xl:h-8 rounded-full border-2 border-white shadow-lg"
                       style={{ backgroundColor: car.color }}
                       title={`Boja: ${car.color}`}
@@ -239,7 +249,9 @@ const CarDetailsPage = () => {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Proizvođač</p>
+                      <p className="text-xs text-muted-foreground">
+                        Proizvođač
+                      </p>
                       <p className="font-medium text-sm">{car.manufacturer}</p>
                     </div>
                     <div className="space-y-1">
@@ -251,7 +263,9 @@ const CarDetailsPage = () => {
                       <p className="font-medium text-sm">{car.year}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Registarska oznaka</p>
+                      <p className="text-xs text-muted-foreground">
+                        Registarska oznaka
+                      </p>
                       <p className="font-medium text-sm">{car.licensePlate}</p>
                     </div>
                     <div className="space-y-1">
@@ -263,12 +277,18 @@ const CarDetailsPage = () => {
                             style={{ backgroundColor: car.color }}
                           />
                         )}
-                        <span className="font-medium text-sm">{car.color || 'Nedefinirano'}</span>
+                        <span className="font-medium text-sm">
+                          {car.color || 'Nedefinirano'}
+                        </span>
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Kategorija</p>
-                      <p className="font-medium text-sm">{car.category || 'Nedefinirano'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Kategorija
+                      </p>
+                      <p className="font-medium text-sm">
+                        {car.category || 'Nedefinirano'}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -285,36 +305,66 @@ const CarDetailsPage = () => {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Broj šasije</p>
-                      <p className="font-medium text-sm break-all">{car.chassisNumber || 'Nedefinirano'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Broj šasije
+                      </p>
+                      <p className="font-medium text-sm break-all">
+                        {car.chassisNumber || 'Nedefinirano'}
+                      </p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-xs text-muted-foreground">Gorivo</p>
-                      <p className="font-medium text-sm">{car.fuelType || 'Nedefinirano'}</p>
+                      <p className="font-medium text-sm">
+                        {car.fuelType || 'Nedefinirano'}
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Transmisija</p>
-                      <p className="font-medium text-sm">{car.transmission || 'Nedefinirano'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Transmisija
+                      </p>
+                      <p className="font-medium text-sm">
+                        {car.transmission || 'Nedefinirano'}
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Broj vrata</p>
-                      <p className="font-medium text-sm">{car.doors || 'Nedefinirano'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Broj vrata
+                      </p>
+                      <p className="font-medium text-sm">
+                        {car.doors || 'Nedefinirano'}
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Kilometraža</p>
-                      <p className="font-medium text-sm">{car.mileage ? `${car.mileage} km` : 'Nedefinirano'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Kilometraža
+                      </p>
+                      <p className="font-medium text-sm">
+                        {car.mileage ? `${car.mileage} km` : 'Nedefinirano'}
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Snaga motora</p>
-                      <p className="font-medium text-sm">{car.enginePower ? `${car.enginePower} KS` : 'Nedefinirano'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Snaga motora
+                      </p>
+                      <p className="font-medium text-sm">
+                        {car.enginePower
+                          ? `${car.enginePower} KS`
+                          : 'Nedefinirano'}
+                      </p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-xs text-muted-foreground">Status</p>
-                      <p className="font-medium text-sm">{car.status || 'Nedefinirano'}</p>
+                      <p className="font-medium text-sm">
+                        {car.status || 'Nedefinirano'}
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Trenutna lokacija</p>
-                      <p className="font-medium text-sm">{car.currentLocation || 'Nedefinirano'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Trenutna lokacija
+                      </p>
+                      <p className="font-medium text-sm">
+                        {car.currentLocation || 'Nedefinirano'}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -332,16 +382,23 @@ const CarDetailsPage = () => {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Cijena po danu</p>
+                    <p className="text-xs text-muted-foreground">
+                      Cijena po danu
+                    </p>
                     <p className="text-xl lg:text-2xl font-bold">
-                      {car.pricePerDay ? `${car.pricePerDay} BAM` : 'Nedefinirano'}
+                      {car.pricePerDay
+                        ? `${car.pricePerDay} BAM`
+                        : 'Nedefinirano'}
                     </p>
                   </div>
                   {car.pricePerDay && (
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground">Mjesečno (30 dana)</p>
+                      <p className="text-xs text-muted-foreground">
+                        Mjesečno (30 dana)
+                      </p>
                       <p className="text-lg font-semibold text-muted-foreground">
-                        {(parseFloat(String(car.pricePerDay)) * 30).toFixed(2)} BAM
+                        {(parseFloat(String(car.pricePerDay)) * 30).toFixed(2)}{' '}
+                        BAM
                       </p>
                     </div>
                   )}

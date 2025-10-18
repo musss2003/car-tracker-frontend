@@ -5,15 +5,18 @@ import { X, Plus, Upload, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { addCar } from '../../services/carService';
 import { uploadDocument } from '../../services/uploadService';
 import carBrands from '../../assets/car_brands.json';
 import './CreateCarPage.css';
-import {
-  Car,
-  CarFormErrors,
-} from '../../types/Car';
+import { Car, CarFormErrors } from '../../types/Car';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
@@ -52,8 +55,10 @@ const CreateCarPage: React.FC = () => {
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
   // Car brands from JSON file
-  const popularBrands = carBrands.filter(brand => brand.popular).map(brand => brand.name);
-  const allBrands = carBrands.map(brand => brand.name);
+  const popularBrands = carBrands
+    .filter((brand) => brand.popular)
+    .map((brand) => brand.name);
+  const allBrands = carBrands.map((brand) => brand.name);
 
   // Common car manufacturers for suggestions (popular Bosnian market brands)
   const commonManufacturers = popularBrands;
@@ -85,18 +90,24 @@ const CreateCarPage: React.FC = () => {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        setErrors(prev => ({ ...prev, photoUrl: 'Molimo odaberite validnu sliku' }));
+        setErrors((prev) => ({
+          ...prev,
+          photoUrl: 'Molimo odaberite validnu sliku',
+        }));
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, photoUrl: 'Slika mora biti manja od 5MB' }));
+        setErrors((prev) => ({
+          ...prev,
+          photoUrl: 'Slika mora biti manja od 5MB',
+        }));
         return;
       }
 
       setSelectedPhoto(file);
-      setErrors(prev => ({ ...prev, photoUrl: undefined }));
+      setErrors((prev) => ({ ...prev, photoUrl: undefined }));
 
       // Create preview
       const reader = new FileReader();
@@ -115,11 +126,14 @@ const CreateCarPage: React.FC = () => {
     try {
       const filename = await uploadDocument(selectedPhoto);
       // Clear any previous photo upload errors
-      setErrors(prev => ({ ...prev, photoUrl: undefined }));
+      setErrors((prev) => ({ ...prev, photoUrl: undefined }));
       return filename;
     } catch (error) {
       console.error('Error uploading photo:', error);
-      setErrors(prev => ({ ...prev, photoUrl: 'Neuspješno dodavanje fotografije. Molimo pokušajte ponovo.' }));
+      setErrors((prev) => ({
+        ...prev,
+        photoUrl: 'Neuspješno dodavanje fotografije. Molimo pokušajte ponovo.',
+      }));
       return null;
     } finally {
       setIsUploadingPhoto(false);
@@ -130,8 +144,8 @@ const CreateCarPage: React.FC = () => {
   const removePhoto = () => {
     setSelectedPhoto(null);
     setPhotoPreview(null);
-    setCar(prev => ({ ...prev, photoUrl: '' }));
-    setErrors(prev => ({ ...prev, photoUrl: undefined }));
+    setCar((prev) => ({ ...prev, photoUrl: '' }));
+    setErrors((prev) => ({ ...prev, photoUrl: undefined }));
   };
 
   // Validate the form
@@ -230,15 +244,22 @@ const CreateCarPage: React.FC = () => {
         ...car,
         photoUrl: photoFilename,
         id: car.id || '', // Provide default empty string
-        year: car.year !== undefined ? parseInt(car.year.toString(), 10) : CURRENT_YEAR,
+        year:
+          car.year !== undefined
+            ? parseInt(car.year.toString(), 10)
+            : CURRENT_YEAR,
         pricePerDay:
           car.pricePerDay !== undefined
             ? parseFloat(String(car.pricePerDay))
             : 0,
         seats: car.seats !== undefined ? parseInt(car.seats.toString(), 10) : 5,
         doors: car.doors !== undefined ? parseInt(car.doors.toString(), 10) : 4,
-        mileage: car.mileage !== undefined ? parseInt(car.mileage.toString(), 10) : 0,
-        enginePower: car.enginePower !== undefined ? parseInt(car.enginePower.toString(), 10) : 0,
+        mileage:
+          car.mileage !== undefined ? parseInt(car.mileage.toString(), 10) : 0,
+        enginePower:
+          car.enginePower !== undefined
+            ? parseInt(car.enginePower.toString(), 10)
+            : 0,
         fuelType: car.fuelType || 'petrol',
         transmission: car.transmission || 'automatic',
         category: car.category || 'economy',
@@ -317,7 +338,7 @@ const CreateCarPage: React.FC = () => {
             <div className="section-header">
               <h2 className="section-title">Osnovne informacije</h2>
             </div>
-            
+
             <div className="form-grid">
               <div className="form-field">
                 <Label htmlFor="manufacturer">
@@ -325,7 +346,11 @@ const CreateCarPage: React.FC = () => {
                 </Label>
                 <Select
                   value={car.manufacturer || ''}
-                  onValueChange={(value) => handleChange({ target: { name: 'manufacturer', value } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { name: 'manufacturer', value },
+                    } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -337,11 +362,13 @@ const CreateCarPage: React.FC = () => {
                         {manufacturer}
                       </SelectItem>
                     ))}
-                    {allBrands.filter(brand => !popularBrands.includes(brand)).map((manufacturer) => (
-                      <SelectItem key={manufacturer} value={manufacturer}>
-                        {manufacturer}
-                      </SelectItem>
-                    ))}
+                    {allBrands
+                      .filter((brand) => !popularBrands.includes(brand))
+                      .map((manufacturer) => (
+                        <SelectItem key={manufacturer} value={manufacturer}>
+                          {manufacturer}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
                 {errors.manufacturer && (
@@ -360,11 +387,9 @@ const CreateCarPage: React.FC = () => {
                   onChange={handleChange}
                   placeholder="npr. Camry"
                   disabled={isSubmitting}
-                  className={errors.model ? "error" : ""}
+                  className={errors.model ? 'error' : ''}
                 />
-                {errors.model && (
-                  <p className="error-text">{errors.model}</p>
-                )}
+                {errors.model && <p className="error-text">{errors.model}</p>}
               </div>
             </div>
 
@@ -375,7 +400,11 @@ const CreateCarPage: React.FC = () => {
                 </Label>
                 <Select
                   value={car.year?.toString()}
-                  onValueChange={(value) => handleChange({ target: { name: 'year', value: parseInt(value) } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { name: 'year', value: parseInt(value) },
+                    } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -389,9 +418,7 @@ const CreateCarPage: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.year && (
-                  <p className="error-text">{errors.year}</p>
-                )}
+                {errors.year && <p className="error-text">{errors.year}</p>}
               </div>
 
               <div className="form-field">
@@ -405,9 +432,7 @@ const CreateCarPage: React.FC = () => {
                   disabled={isSubmitting}
                   className="color-input"
                 />
-                {errors.color && (
-                  <p className="error-text">{errors.color}</p>
-                )}
+                {errors.color && <p className="error-text">{errors.color}</p>}
               </div>
             </div>
 
@@ -430,8 +455,12 @@ const CreateCarPage: React.FC = () => {
                         <div className="upload-content">
                           <Upload className="upload-icon" />
                           <div className="upload-text">
-                            <span className="upload-primary-text">Kliknite da biste dodali fotografiju</span>
-                            <span className="upload-secondary-text">PNG, JPG, JPEG do 5MB</span>
+                            <span className="upload-primary-text">
+                              Kliknite da biste dodali fotografiju
+                            </span>
+                            <span className="upload-secondary-text">
+                              PNG, JPG, JPEG do 5MB
+                            </span>
                           </div>
                         </div>
                       </label>
@@ -445,7 +474,10 @@ const CreateCarPage: React.FC = () => {
                           />
                           <div className="photo-overlay">
                             <div className="photo-actions">
-                              <label htmlFor="photo" className="change-photo-button">
+                              <label
+                                htmlFor="photo"
+                                className="change-photo-button"
+                              >
                                 <Upload className="h-4 w-4" />
                                 Promijeni
                               </label>
@@ -469,7 +501,9 @@ const CreateCarPage: React.FC = () => {
                   {isUploadingPhoto && (
                     <div className="upload-progress">
                       <div className="progress-spinner"></div>
-                      <span className="progress-text">Dodavanje fotografije...</span>
+                      <span className="progress-text">
+                        Dodavanje fotografije...
+                      </span>
                     </div>
                   )}
                 </div>
@@ -484,7 +518,11 @@ const CreateCarPage: React.FC = () => {
                 <Label htmlFor="transmission">Menjač</Label>
                 <Select
                   value={car.transmission}
-                  onValueChange={(value) => handleChange({ target: { name: 'transmission', value } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({
+                      target: { name: 'transmission', value },
+                    } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -493,7 +531,9 @@ const CreateCarPage: React.FC = () => {
                   <SelectContent>
                     <SelectItem value="automatic">Automatski</SelectItem>
                     <SelectItem value="manual">Ručni</SelectItem>
-                    <SelectItem value="semi-automatic">Poluautomatski</SelectItem>
+                    <SelectItem value="semi-automatic">
+                      Poluautomatski
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.transmission && (
@@ -505,7 +545,9 @@ const CreateCarPage: React.FC = () => {
                 <Label htmlFor="fuelType">Tip goriva</Label>
                 <Select
                   value={car.fuelType}
-                  onValueChange={(value) => handleChange({ target: { name: 'fuelType', value } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({ target: { name: 'fuelType', value } } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -536,11 +578,9 @@ const CreateCarPage: React.FC = () => {
                   min="1"
                   max="10"
                   disabled={isSubmitting}
-                  className={errors.seats ? "error" : ""}
+                  className={errors.seats ? 'error' : ''}
                 />
-                {errors.seats && (
-                  <p className="error-text">{errors.seats}</p>
-                )}
+                {errors.seats && <p className="error-text">{errors.seats}</p>}
               </div>
 
               <div className="form-field">
@@ -554,11 +594,9 @@ const CreateCarPage: React.FC = () => {
                   min="2"
                   max="6"
                   disabled={isSubmitting}
-                  className={errors.doors ? "error" : ""}
+                  className={errors.doors ? 'error' : ''}
                 />
-                {errors.doors && (
-                  <p className="error-text">{errors.doors}</p>
-                )}
+                {errors.doors && <p className="error-text">{errors.doors}</p>}
               </div>
             </div>
           </div>
@@ -581,7 +619,7 @@ const CreateCarPage: React.FC = () => {
                   onChange={handleChange}
                   placeholder="npr. ABC123"
                   disabled={isSubmitting}
-                  className={errors.licensePlate ? "error" : ""}
+                  className={errors.licensePlate ? 'error' : ''}
                 />
                 {errors.licensePlate && (
                   <p className="error-text">{errors.licensePlate}</p>
@@ -597,7 +635,7 @@ const CreateCarPage: React.FC = () => {
                   onChange={handleChange}
                   placeholder="npr. 1HGCM82633A123456"
                   disabled={isSubmitting}
-                  className={errors.chassisNumber ? "error" : ""}
+                  className={errors.chassisNumber ? 'error' : ''}
                 />
                 {errors.chassisNumber && (
                   <p className="error-text">{errors.chassisNumber}</p>
@@ -627,7 +665,7 @@ const CreateCarPage: React.FC = () => {
                   step="0.01"
                   placeholder="npr. 49.99"
                   disabled={isSubmitting}
-                  className={errors.pricePerDay ? "error" : ""}
+                  className={errors.pricePerDay ? 'error' : ''}
                 />
                 {errors.pricePerDay && (
                   <p className="error-text">{errors.pricePerDay}</p>
@@ -653,7 +691,7 @@ const CreateCarPage: React.FC = () => {
                   onChange={handleChange}
                   min="0"
                   disabled={isSubmitting}
-                  className={errors.mileage ? "error" : ""}
+                  className={errors.mileage ? 'error' : ''}
                 />
                 {errors.mileage && (
                   <p className="error-text">{errors.mileage}</p>
@@ -670,7 +708,7 @@ const CreateCarPage: React.FC = () => {
                   onChange={handleChange}
                   min="0"
                   disabled={isSubmitting}
-                  className={errors.enginePower ? "error" : ""}
+                  className={errors.enginePower ? 'error' : ''}
                 />
                 {errors.enginePower && (
                   <p className="error-text">{errors.enginePower}</p>
@@ -683,7 +721,9 @@ const CreateCarPage: React.FC = () => {
                 <Label htmlFor="category">Kategorija</Label>
                 <Select
                   value={car.category}
-                  onValueChange={(value) => handleChange({ target: { name: 'category', value } } as any)}
+                  onValueChange={(value) =>
+                    handleChange({ target: { name: 'category', value } } as any)
+                  }
                   disabled={isSubmitting}
                 >
                   <SelectTrigger>
@@ -716,11 +756,7 @@ const CreateCarPage: React.FC = () => {
               Otkaži
             </Button>
 
-            <Button
-              type="submit"
-              variant="secondary"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" variant="secondary" disabled={isSubmitting}>
               {isSubmitting ? (
                 <div className="flex items-center space-x-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

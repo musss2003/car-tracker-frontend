@@ -158,20 +158,20 @@
   .page-title {
     font-size: 1.5rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .form-section {
     gap: 1rem;
   }
-  
+
   .car-form {
     gap: 1.5rem;
   }
-  
+
   .form-actions {
     flex-direction: column-reverse;
     align-items: stretch;
@@ -184,7 +184,7 @@
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .close-button {
     align-self: flex-end;
   }

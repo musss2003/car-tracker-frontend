@@ -21,11 +21,9 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           <div className="delete-confirm-icon">
             <ExclamationIcon />
           </div>
-          
+
           <div className="delete-confirm-text">
-            <h3 className="delete-confirm-title">
-              Potvrdi brisanje
-            </h3>
+            <h3 className="delete-confirm-title">Potvrdi brisanje</h3>
             <p className="delete-confirm-message">
               Da li ste sigurni da želite da obrišete korisnika{' '}
               <strong>"{customerName}"</strong>?
@@ -35,18 +33,12 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             </p>
           </div>
         </div>
-        
+
         <div className="delete-confirm-actions">
-          <Button
-            variant="secondary"
-            onClick={onCancel}
-          >
+          <Button variant="secondary" onClick={onCancel}>
             Otkaži
           </Button>
-          <Button
-            variant="danger"
-            onClick={onConfirm}
-          >
+          <Button variant="danger" onClick={onConfirm}>
             Da, obriši
           </Button>
         </div>

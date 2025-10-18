@@ -256,20 +256,21 @@
 }
 
 /* Enhanced mobile responsiveness */
-@media (max-width: 48rem) { /* 768px */
+@media (max-width: 48rem) {
+  /* 768px */
   .sidebar-mobile {
     box-shadow: var(--shadow-xl);
   }
-  
+
   .nav-link {
     padding: var(--spacing-lg);
     margin: 0 var(--spacing-sm);
   }
-  
+
   .sidebar-header {
     padding: 1.25rem var(--spacing-lg);
   }
-  
+
   .sidebar-nav {
     padding: var(--spacing-lg) 0;
   }

@@ -6,9 +6,9 @@ interface MobileHeaderProps {
   isVisible: boolean;
 }
 
-export const MobileHeader: React.FC<MobileHeaderProps> = ({ 
-  onMenuClick, 
-  isVisible 
+export const MobileHeader: React.FC<MobileHeaderProps> = ({
+  onMenuClick,
+  isVisible,
 }) => {
   if (!isVisible) return null;
 
@@ -21,11 +21,21 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         className="mr-2"
         aria-label="Toggle menu"
       >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </Button>
-      
+
       <h1 className="text-lg font-semibold">Car Tracker</h1>
     </header>
   );
