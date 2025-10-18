@@ -35,12 +35,13 @@ import EditContractForm from '../../../components/Contract/EditContractForm/Edit
 import ContractDetails from '../../../components/Contract/ContractDetails/ContractDetails';
 import CreateContractForm from '../../../components/Contract/CreateContractForm/CreateContractForm';
 import { Contract } from '../../../types/Contract';
-import {
-  TableContainer,
-  TableActions,
-  SearchFilter,
-  Pagination,
-} from '../../../components/ui';
+// TODO: Update to use proper shadcn/ui components
+// import {
+//   TableContainer,
+//   TableActions,
+//   SearchFilter,
+//   Pagination,
+// } from '../../../components/ui';
 
 const ContractsTable = () => {
   // State management

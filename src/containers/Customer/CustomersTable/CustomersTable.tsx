@@ -22,12 +22,13 @@ import EditCustomerForm from '../../../components/Customer/EditCustomerForm/Edit
 import * as XLSX from 'xlsx';
 import { Customer } from '../../../types/Customer';
 import CreateCustomerForm from '../../../components/Customer/CreateCustomerForm/CreateCustomerForm';
-import {
-  TableContainer,
-  TableActions,
-  SearchFilter,
-  Pagination,
-} from '../../../components/ui';
+// TODO: Update to use proper shadcn/ui components
+// import {
+//   TableContainer,
+//   TableActions,
+//   SearchFilter,
+//   Pagination,
+// } from '../../../components/ui';
 
 const CustomersTable = () => {
   // State management
