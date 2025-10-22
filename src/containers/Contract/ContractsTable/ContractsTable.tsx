@@ -1,29 +1,73 @@
-import './ContractsTable.css';
 import { useEffect, useState, useMemo } from 'react';
 import {
   createAndDownloadContract,
   deleteContract,
   downloadContract,
-  getContractsPopulated,
+  getContracts,
   updateContract,
 } from '../../../services/contractService';
 import { toast } from 'react-toastify';
 import {
   FilterIcon,
-  SortAscendingIcon,
-  SortDescendingIcon,
   DocumentDownloadIcon,
   PencilIcon,
   TrashIcon,
   EyeIcon,
-  XIcon,
   CheckCircleIcon,
   ClockIcon,
   CheckIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  PlusIcon,
 } from '@heroicons/react/solid';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable'; // This augments jsPDF prototype
+import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+
+// shadcn/ui imports
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import Skeleton from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+import { Contract, ContractFormData } from '../../../types/Contract';
+import path from 'path';
+import { useNavigate } from 'react-router-dom';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -31,29 +75,14 @@ declare module 'jspdf' {
   }
 }
 
-import EditContractForm from '../../../components/Contract/EditContractForm/EditContractForm';
-import ContractDetails from '../../../components/Contract/ContractDetails/ContractDetails';
-import CreateContractForm from '../../../components/Contract/CreateContractForm/CreateContractForm';
-import { Contract } from '../../../types/Contract';
-// TODO: Update to use proper shadcn/ui components
-// import {
-//   TableContainer,
-//   TableActions,
-//   SearchFilter,
-//   Pagination,
-// } from '../../../components/ui';
-
 const ContractsTable = () => {
+
+  const navigate = useNavigate();
   // State management
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedContract, setSelectedContract] = useState<Contract | null>(
-    null
-  );
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isCreating, setIsCreating] = useState<boolean>(false);
-  const [isViewingDetails, setIsViewingDetails] = useState<boolean>(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
 
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -74,7 +103,7 @@ const ContractsTable = () => {
   const fetchContracts = async () => {
     try {
       setLoading(true);
-      const data = await getContractsPopulated();
+      const data = await getContracts();
       setContracts(data);
       setError(null);
     } catch (err) {
@@ -92,7 +121,6 @@ const ContractsTable = () => {
 
   // Filter and sort contracts
   const filteredAndSortedContracts = useMemo(() => {
-    // First, filter the contracts
     let result = [...contracts];
 
     // Apply search filter
@@ -103,7 +131,7 @@ const ContractsTable = () => {
           contract.customer?.name?.toLowerCase().includes(lowerSearchTerm) ||
           contract.customer?.passportNumber?.includes(searchTerm) ||
           contract.car?.model?.toLowerCase().includes(lowerSearchTerm) ||
-          contract.car?.license_plate?.includes(searchTerm)
+          contract.car?.licensePlate?.includes(searchTerm)
       );
     }
 
@@ -111,8 +139,8 @@ const ContractsTable = () => {
     if (filterStatus !== 'all') {
       const now = new Date();
       result = result.filter((contract) => {
-        const startDate = new Date(contract.rentalPeriod.startDate);
-        const endDate = new Date(contract.rentalPeriod.endDate);
+        const startDate = new Date(contract.startDate);
+        const endDate = new Date(contract.endDate);
 
         switch (filterStatus) {
           case 'confirmed':
@@ -127,43 +155,37 @@ const ContractsTable = () => {
       });
     }
 
-    // Then, sort the filtered results
+    // Sort
     if (sortConfig.key) {
       result.sort((a, b) => {
         let aValue: string | number | Date = '';
         let bValue: string | number | Date = '';
 
-        // Handle nested properties
         if (sortConfig.key.includes('.')) {
           const [obj, prop] = sortConfig.key.split('.');
 
-          if (obj === 'customer' && a.customer && b.customer) {
+            if (obj === 'customer' && a.customer && b.customer) {
             aValue = (a.customer as any)[prop] ?? '';
             bValue = (b.customer as any)[prop] ?? '';
-          } else if (obj === 'car' && a.car && b.car) {
+            } else if (obj === 'car' && a.car && b.car) {
             aValue = (a.car as any)[prop] ?? '';
             bValue = (b.car as any)[prop] ?? '';
-          } else if (obj === 'rentalPeriod') {
-            aValue = new Date((a.rentalPeriod as any)[prop]);
-            bValue = new Date((b.rentalPeriod as any)[prop]);
-          }
+            } else if (prop === 'startDate' || prop === 'endDate') {
+            aValue = new Date((a as any)[prop]);
+            bValue = new Date((b as any)[prop]);
+            }
         } else {
           aValue = (a as any)[sortConfig.key] ?? '';
           bValue = (b as any)[sortConfig.key] ?? '';
         }
 
-        // Handle string values
         if (typeof aValue === 'string' && typeof bValue === 'string') {
           aValue = aValue.toLowerCase();
           bValue = bValue.toLowerCase();
         }
 
-        if (aValue < bValue) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
       });
     }
@@ -174,101 +196,31 @@ const ContractsTable = () => {
   // Pagination logic
   const paginatedContracts = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredAndSortedContracts.slice(
-      startIndex,
-      startIndex + itemsPerPage
-    );
+    return filteredAndSortedContracts.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredAndSortedContracts, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(
-    filteredAndSortedContracts.length / itemsPerPage
-  );
+  const totalPages = Math.ceil(filteredAndSortedContracts.length / itemsPerPage);
 
   // Event handlers
   const handleSort = (key: string) => {
     setSortConfig((prevConfig) => ({
       key,
-      direction:
-        prevConfig.key === key && prevConfig.direction === 'asc'
-          ? 'desc'
-          : 'asc',
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleContractClick = (contract: Contract) => {
-    setSelectedContract(contract);
-    setIsViewingDetails(true);
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-    setIsViewingDetails(false);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setSelectedContract(null);
-  };
-
-  const handleSave = async (updatedContract: Contract) => {
+  const handleDeleteContract = async (contract: Contract) => {
     try {
       setLoading(true);
-      if (updatedContract.id) {
-        await updateContract(updatedContract.id, updatedContract);
-      } else {
-        throw new Error('Contract ID is undefined');
-      }
-      await fetchContracts();
-      toast.success('Contract updated successfully');
-      setIsEditing(false);
-      setSelectedContract(null);
-    } catch (error) {
-      console.error('Error updating contract:', error);
-      toast.error('Failed to update contract');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateContract = async (newContractData: Contract) => {
-    try {
-      setLoading(true);
-      const createdContract = await createAndDownloadContract(newContractData);
-      await fetchContracts();
-      toast.success('Contract created successfully');
-      setIsCreating(false);
-    } catch (error) {
-      console.error('Error creating contract:', error);
-      toast.error('Failed to create contract');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteContract = async () => {
-    if (!window.confirm('Are you sure you want to delete this contract?')) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      if (selectedContract?.id) {
-        await deleteContract(selectedContract.id);
+      if (contract.id) {
+        await deleteContract(contract.id);
+        await fetchContracts();
+        toast.success('Contract deleted successfully');
+        setShowDeleteDialog(false);
       } else {
         toast.error('No contract selected or contract ID is missing.');
       }
-      await fetchContracts();
-      toast.success('Contract deleted successfully');
-      setSelectedContract(null);
-      setIsViewingDetails(false);
     } catch (error) {
       console.error('Error deleting contract:', error);
       toast.error('Failed to delete contract');
@@ -278,41 +230,40 @@ const ContractsTable = () => {
   };
 
   const calculateTotalPrice = (contract: Contract): number => {
-    const startDate = new Date(contract.rentalPeriod.startDate);
-    const endDate = new Date(contract.rentalPeriod.endDate);
-
-    // Calculate the number of rental days
-    const rentalDays = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    // Calculate the total price
+    const startDate = new Date(contract.startDate);
+    const endDate = new Date(contract.endDate);
+    const rentalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const dailyRate =
-      typeof contract.car.price_per_day === 'string'
-        ? parseFloat(contract.car.price_per_day)
-        : contract.car.price_per_day;
-
+      typeof contract.car.pricePerDay === 'string'
+        ? parseFloat(contract.car.pricePerDay)
+        : contract.car.pricePerDay;
     return rentalDays * dailyRate;
   };
 
-  const handleDownloadContract = async () => {
+  const handleCreate = () => {
+    navigate('/contracts/new');
+  };
+
+  const handleViewDetails = (contract: Contract) => {
+    navigate(`/contracts/${contract.id}`);
+  }
+
+  const handleEdit = (contract: Contract) => {
+    navigate(`/contracts/${contract.id}/edit`);
+  }
+
+  const handleDownloadContract = async (contract :Contract) => {
     try {
-      if (selectedContract?.id) {
-        await downloadContract(selectedContract.id);
+      if (contract.id) {
+        await downloadContract(contract.id);
+        toast.success('Contract download initiated');
       } else {
         toast.error('No contract selected or contract ID is missing.');
       }
-      toast.success('Contract download initiated');
     } catch (error) {
       console.error('Error downloading contract:', error);
       toast.error('Failed to download contract');
     }
-  };
-
-  const handleCloseDetails = () => {
-    setSelectedContract(null);
-    setIsViewingDetails(false);
-    setIsEditing(false);
   };
 
   // Export functions
@@ -321,34 +272,22 @@ const ContractsTable = () => {
       const doc = new jsPDF();
       doc.text('Contracts List', 20, 10);
 
-      const tableColumn = [
-        'Customer Name',
-        'Passport Number',
-        'Car Model',
-        'License Plate',
-        'Start Date',
-        'End Date',
-        'Status',
-      ];
+      const tableColumn = ['Customer Name', 'Passport Number', 'Car Model', 'License Plate', 'Start Date', 'End Date', 'Status'];
       const tableRows = filteredAndSortedContracts.map((contract) => {
         const now = new Date();
-        const startDate = new Date(contract.rentalPeriod.startDate);
-        const endDate = new Date(contract.rentalPeriod.endDate);
+        const startDate = new Date(contract.startDate);
+        const endDate = new Date(contract.endDate);
 
         let status;
-        if (now < startDate) {
-          status = 'Confirmed';
-        } else if (now >= startDate && now <= endDate) {
-          status = 'Active';
-        } else {
-          status = 'Completed';
-        }
+        if (now < startDate) status = 'Confirmed';
+        else if (now >= startDate && now <= endDate) status = 'Active';
+        else status = 'Completed';
 
         return [
           contract.customer?.name || 'N/A',
           contract.customer?.passportNumber || 'N/A',
           contract.car?.model || 'N/A',
-          contract.car?.license_plate || 'N/A',
+          contract.car?.licensePlate || 'N/A',
           startDate.toLocaleDateString(),
           endDate.toLocaleDateString(),
           status,
@@ -374,26 +313,21 @@ const ContractsTable = () => {
   const exportToExcel = () => {
     try {
       const workbook = XLSX.utils.book_new();
-
       const worksheetData = filteredAndSortedContracts.map((contract) => {
         const now = new Date();
-        const startDate = new Date(contract.rentalPeriod.startDate);
-        const endDate = new Date(contract.rentalPeriod.endDate);
+        const startDate = new Date(contract.startDate);
+        const endDate = new Date(contract.endDate);
 
         let status;
-        if (now < startDate) {
-          status = 'Confirmed';
-        } else if (now >= startDate && now <= endDate) {
-          status = 'Active';
-        } else {
-          status = 'Completed';
-        }
+        if (now < startDate) status = 'Confirmed';
+        else if (now >= startDate && now <= endDate) status = 'Active';
+        else status = 'Completed';
 
         return {
           'Customer Name': contract.customer?.name || 'N/A',
           'Passport Number': contract.customer?.passportNumber || 'N/A',
           'Car Model': contract.car?.model || 'N/A',
-          'License Plate': contract.car?.license_plate || 'N/A',
+          'License Plate': contract.car?.licensePlate || 'N/A',
           'Start Date': startDate.toLocaleDateString(),
           'End Date': endDate.toLocaleDateString(),
           'Total Price': contract ? `$${calculateTotalPrice(contract)}` : 'N/A',
@@ -414,300 +348,325 @@ const ContractsTable = () => {
   // Helper function to determine contract status
   const getContractStatus = (contract: Contract) => {
     const now = new Date();
-    const startDate = new Date(contract.rentalPeriod.startDate);
-    const endDate = new Date(contract.rentalPeriod.endDate);
+    const startDate = new Date(contract.startDate);
+    const endDate = new Date(contract.endDate);
 
-    if (now < startDate) {
-      return { status: 'confirmed', className: 'status-confirmed' };
-    } else if (now >= startDate && now <= endDate) {
-      return { status: 'active', className: 'status-active' };
-    } else {
-      return { status: 'completed', className: 'status-completed' };
-    }
+    if (now < startDate) return { status: 'confirmed', label: 'Confirmed', variant: 'secondary' as const };
+    else if (now >= startDate && now <= endDate) return { status: 'active', label: 'Active', variant: 'default' as const };
+    else return { status: 'completed', label: 'Completed', variant: 'outline' as const };
   };
 
-  // Render table header with sort indicators
-  const renderTableHeader = (
-    label: string,
-    key: string,
-    additionalClass = ''
-  ) => {
+  const renderTableHeader = (label: string, key: string) => {
     const isSorted = sortConfig.key === key;
-    const SortIcon =
-      sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
-
+    
     return (
-      <th
-        className={`table-heading ${additionalClass}`}
-        onClick={() => handleSort(key)}
-      >
-        <div className="header-content">
+      <TableHead className="cursor-pointer select-none" onClick={() => handleSort(key)}>
+        <div className="flex items-center gap-2">
           <span>{label}</span>
           {isSorted ? (
-            <SortIcon className="sort-icon active" />
+            sortConfig.direction === 'asc' ? (
+              <ChevronUpIcon className="w-4 h-4" />
+            ) : (
+              <ChevronDownIcon className="w-4 h-4" />
+            )
           ) : (
-            <SortAscendingIcon className="sort-icon" />
+            <ChevronUpIcon className="w-4 h-4 opacity-30" />
           )}
         </div>
-      </th>
+      </TableHead>
     );
   };
 
-  // Render status badge
-  const renderStatusBadge = (status: string, className: string) => {
-    let icon;
+  const renderStatusBadge = (status: string, label: string, variant: 'default' | 'secondary' | 'outline') => {
+    let Icon;
     switch (status) {
       case 'confirmed':
-        icon = <ClockIcon className="status-icon" />;
+        Icon = ClockIcon;
         break;
       case 'active':
-        icon = <CheckCircleIcon className="status-icon" />;
+        Icon = CheckCircleIcon;
         break;
       case 'completed':
-        icon = <CheckIcon className="status-icon" />;
+        Icon = CheckIcon;
         break;
       default:
-        icon = null;
+        Icon = null;
     }
 
     return (
-      <div className={`status-badge ${className}`}>
-        {icon}
-        <span className="status-text">{status}</span>
-      </div>
+      <Badge variant={variant} className="flex items-center gap-1">
+        {Icon && <Icon className="w-3 h-3" />}
+        <span>{label}</span>
+      </Badge>
     );
   };
 
   return (
-    <TableContainer>
-      <TableActions
-        onCreateClick={() => setIsCreating(true)}
-        createLabel="Create New Contract"
-        loading={loading}
-        showExport={true}
-        onExportPDF={exportToPDF}
-        onExportExcel={exportToExcel}
-      />
+    <div className="space-y-4 p-6">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle className="text-2xl font-bold">Contracts Management</CardTitle>
+            <div className="flex gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <DocumentDownloadIcon className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={exportToPDF}>Export as PDF</DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToExcel}>Export as Excel</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+                <Button
+                onClick={handleCreate}
+                disabled={loading}
+                >
+                <PlusIcon className="w-4 h-4 mr-2" />
+                Create Contract
+                </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Search by customer, passport, or car..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <FilterIcon className="w-4 h-4 text-muted-foreground" />
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-      <div className="contracts-table-custom-controls">
-        <SearchFilter
-          searchTerm={searchTerm}
-          onSearchChange={(value) => setSearchTerm(value)}
-          placeholder="Search by customer, passport, or car..."
-        />
+          {error && (
+            <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
+              {error}
+            </div>
+          )}
 
-        <div className="filter-container">
-          <FilterIcon className="filter-icon" />
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Statuses</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-      </div>
+          {loading ? (
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      {renderTableHeader('Customer', 'customer.name')}
+                      {renderTableHeader('Passport', 'customer.passportNumber')}
+                      {renderTableHeader('Car', 'car.model')}
+                      {renderTableHeader('License Plate', 'car.licensePlate')}
+                      {renderTableHeader('Start Date', 'startDate')}
+                      {renderTableHeader('End Date', 'endDate')}
+                      {renderTableHeader('Status', 'status')}
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedContracts.length > 0 ? (
+                      paginatedContracts.map((contract, index) => {
+                        const { status, label, variant } = getContractStatus(contract);
 
-      {/* Error message */}
-      {error && (
-        <div className="contracts-error-message">
-          <XIcon className="error-icon" />
-          {error}
-        </div>
-      )}
+                        return (
+                          <TableRow key={contract.id || index}>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback>
+                                    {contract.customer?.name?.charAt(0) || '?'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="font-medium">{contract.customer?.name || 'N/A'}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{contract.customer?.passportNumber || 'N/A'}</TableCell>
+                            <TableCell>{contract.car?.model || 'N/A'}</TableCell>
+                            <TableCell>{contract.car?.licensePlate || 'N/A'}</TableCell>
+                            <TableCell>
+                              {contract.startDate
+                                ? new Date(contract.startDate).toLocaleDateString()
+                                : 'N/A'}
+                            </TableCell>
+                            <TableCell>
+                              {contract.endDate
+                                ? new Date(contract.endDate).toLocaleDateString()
+                                : 'N/A'}
+                            </TableCell>
+                            <TableCell>{renderStatusBadge(status, label, variant)}</TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleViewDetails(contract)}
+                                  title="View Details"
+                                >
+                                  <EyeIcon className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    handleEdit(contract);
+                                  }}
+                                  title="Edit Contract"
+                                >
+                                  <PencilIcon className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    handleDownloadContract(contract);
+                                  }}
+                                  title="Download Contract"
+                                >
+                                  <DocumentDownloadIcon className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setShowDeleteDialog(true);
+                                  }}
+                                  title="Delete Contract"
+                                >
+                                  <TrashIcon className="w-4 h-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                          {searchTerm || filterStatus !== 'all'
+                            ? 'No contracts match your search criteria'
+                            : 'No contracts available'}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
 
-      {/* Loading indicator */}
-      {loading && (
-        <div className="contracts-loading-indicator">
-          <div className="contracts-spinner"></div>
-          <span>Loading contracts...</span>
-        </div>
-      )}
-
-      {/* Contracts table */}
-      <div className="contracts-table-wrapper">
-        <table className="contracts-table">
-          <thead>
-            <tr>
-              {renderTableHeader('Customer', 'customer.name')}
-              {renderTableHeader(
-                'Passport',
-                'customer.passport_number',
-                'hide-on-small'
-              )}
-              {renderTableHeader('Car', 'car.model')}
-              {renderTableHeader(
-                'License Plate',
-                'car.license_plate',
-                'hide-on-small'
-              )}
-              {renderTableHeader(
-                'Start Date',
-                'rentalPeriod.startDate',
-                'hide-on-small'
-              )}
-              {renderTableHeader(
-                'End Date',
-                'rentalPeriod.endDate',
-                'hide-on-small'
-              )}
-              {renderTableHeader('Status', 'status')}
-              <th className="table-heading actions-column">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedContracts.length > 0 ? (
-              paginatedContracts.map((contract, index) => {
-                const { status, className } = getContractStatus(contract);
-
-                return (
-                  <tr key={contract.id || index} className="contract-row">
-                    <td className="contracts-table-cell">
-                      <div className="customer-info">
-                        <div className="customer-avatar">
-                          {contract.customer?.name?.charAt(0) || '?'}
-                        </div>
-                        <div className="customer-name">
-                          {contract.customer?.name || 'N/A'}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="contracts-table-cell hide-on-small">
-                      {contract.customer?.passportNumber || 'N/A'}
-                    </td>
-                    <td className="contracts-table-cell">
-                      {contract.car?.model || 'N/A'}
-                    </td>
-                    <td className="contracts-table-cell hide-on-small">
-                      {contract.car?.license_plate || 'N/A'}
-                    </td>
-                    <td className="contracts-table-cell hide-on-small">
-                      {contract.rentalPeriod.startDate
-                        ? new Date(
-                            contract.rentalPeriod.startDate
-                          ).toLocaleDateString()
-                        : 'N/A'}
-                    </td>
-                    <td className="contracts-table-cell hide-on-small">
-                      {contract.rentalPeriod.endDate
-                        ? new Date(
-                            contract.rentalPeriod.endDate
-                          ).toLocaleDateString()
-                        : 'N/A'}
-                    </td>
-                    <td className="contracts-table-cell">
-                      {renderStatusBadge(status, className)}
-                    </td>
-                    <td className="contracts-table-cell actions-cell">
-                      <div className="contracts-action-buttons">
-                        <button
-                          className="contracts-action-btn view"
-                          onClick={() => handleContractClick(contract)}
-                          title="View Details"
-                        >
-                          <EyeIcon className="contracts-action-icon" />
-                        </button>
-                        <button
-                          className="contracts-action-btn edit"
-                          onClick={() => {
-                            setSelectedContract(contract);
-                            handleEdit();
-                          }}
-                          title="Edit Contract"
-                        >
-                          <PencilIcon className="contracts-action-icon" />
-                        </button>
-                        <button
-                          className="contracts-action-btn download"
-                          onClick={() => {
-                            setSelectedContract(contract);
-                            handleDownloadContract();
-                          }}
-                          title="Download Contract"
-                        >
-                          <DocumentDownloadIcon className="contracts-action-icon" />
-                        </button>
-                        <button
-                          className="contracts-action-btn delete"
-                          onClick={() => {
-                            setSelectedContract(contract);
-                            handleDeleteContract();
-                          }}
-                          title="Delete Contract"
-                        >
-                          <TrashIcon className="contracts-action-icon" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan={8} className="empty-table-message">
-                  {searchTerm || filterStatus !== 'all'
-                    ? 'No contracts match your search criteria'
-                    : 'No contracts available'}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={filteredAndSortedContracts.length}
-        itemsPerPage={itemsPerPage}
-        onPageChange={setCurrentPage}
-        onItemsPerPageChange={(value) => {
-          setItemsPerPage(value);
-          setCurrentPage(1);
-        }}
-      />
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm text-muted-foreground">
+                  Showing {paginatedContracts.length} of {filteredAndSortedContracts.length} contracts
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={itemsPerPage.toString()}
+                    onValueChange={(value) => {
+                      setItemsPerPage(Number(value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5 / page</SelectItem>
+                      <SelectItem value="10">10 / page</SelectItem>
+                      <SelectItem value="20">20 / page</SelectItem>
+                      <SelectItem value="50">50 / page</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Modals */}
-      {isViewingDetails && selectedContract && (
-        <div className="contracts-modal-overlay">
-          <div className="modal-content">
+      {/* <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          {selectedContract && (
             <ContractDetails
               contract={selectedContract}
               onEdit={handleEdit}
               onBack={handleCloseDetails}
-              onDelete={handleDeleteContract}
+              onDelete={() => setShowDeleteDialog(true)}
               onDownload={handleDownloadContract}
             />
-          </div>
-        </div>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
 
-      {isEditing && selectedContract && (
-        <div className="contracts-modal-overlay">
-          <div className="modal-content">
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          {selectedContract && (
             <EditContractForm
               contract={selectedContract}
               onSave={handleSave}
               onCancel={handleCancel}
             />
-          </div>
-        </div>
-      )}
+          )}
+        </DialogContent>
+      </Dialog> */}
 
-      {isCreating && (
-        <div className="contracts-modal-overlay">
-          <div className="modal-content">
-            <CreateContractForm
-              onSave={handleCreateContract}
-              onClose={() => setIsCreating(false)}
-            />
-          </div>
-        </div>
-      )}
-    </TableContainer>
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the contract.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            {/* <AlertDialogAction onClick={() => handleDeleteContract()} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction> */}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };
 

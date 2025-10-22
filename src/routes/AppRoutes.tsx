@@ -25,6 +25,9 @@ import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../contexts/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
 import DashboardPage from '../pages/DashboardPage/DashboardPage';
+import CreateContractForm from '@/components/Contract/CreateContractForm/CreateContractForm';
+import CustomerDetails from '@/components/Customer/CustomerDetails/CustomerDetails';
+import EditContractForm from '@/components/Contract/EditContractForm/EditContractForm';
 
 export function AppRoutes() {
   const { isLoggedIn, user } = useAuth();
@@ -53,7 +56,11 @@ export function AppRoutes() {
             path="/cars/:id/availability"
             element={<CarAvailabilityPage />}
           />
+          <Route path="/contracts/new" element={<CreateContractForm />} />
           <Route path="/contracts" element={<ContractsPage />} />
+          {/* <Route path="/contracts/:id/edit" element={<EditContractForm />} /> */}
+          {/* <Route path="/contracts/:id" element={<CustomerDetails />} /> */}
+         
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />

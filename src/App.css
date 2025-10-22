@@ -13,6 +13,8 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
   min-width: 0; /* Allow flex items to shrink below their minimum content size */
 }
 

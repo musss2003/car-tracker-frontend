@@ -17,6 +17,7 @@ import { uploadDocument } from '../../services/uploadService';
 import carBrands from '../../assets/car_brands.json';
 import './CreateCarPage.css';
 import { Car, CarFormErrors } from '../../types/Car';
+import { PhotoUpload } from '@/components/ui/photo-upload';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
@@ -51,8 +52,6 @@ const CreateCarPage: React.FC = () => {
 
   // Photo upload state
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
   // Car brands from JSON file
   const popularBrands = carBrands
@@ -84,45 +83,10 @@ const CreateCarPage: React.FC = () => {
     }
   };
 
-  // Handle photo selection
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setErrors((prev) => ({
-          ...prev,
-          photoUrl: 'Molimo odaberite validnu sliku',
-        }));
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors((prev) => ({
-          ...prev,
-          photoUrl: 'Slika mora biti manja od 5MB',
-        }));
-        return;
-      }
-
-      setSelectedPhoto(file);
-      setErrors((prev) => ({ ...prev, photoUrl: undefined }));
-
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPhotoPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // Upload photo to server
   const uploadPhoto = async (): Promise<string | null> => {
     if (!selectedPhoto) return null;
 
-    setIsUploadingPhoto(true);
     try {
       const filename = await uploadDocument(selectedPhoto);
       // Clear any previous photo upload errors
@@ -135,17 +99,7 @@ const CreateCarPage: React.FC = () => {
         photoUrl: 'Neuspješno dodavanje fotografije. Molimo pokušajte ponovo.',
       }));
       return null;
-    } finally {
-      setIsUploadingPhoto(false);
     }
-  };
-
-  // Remove selected photo
-  const removePhoto = () => {
-    setSelectedPhoto(null);
-    setPhotoPreview(null);
-    setCar((prev) => ({ ...prev, photoUrl: '' }));
-    setErrors((prev) => ({ ...prev, photoUrl: undefined }));
   };
 
   // Validate the form
@@ -302,6 +256,15 @@ const CreateCarPage: React.FC = () => {
     }
   };
 
+  const handlePhotoChange = (file: File | null) => {
+    setSelectedPhoto(file);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.photoUrl;
+      return newErrors;
+    });
+  };
+
   // Validate on field change
   useEffect(() => {
     if (Object.keys(touched).length > 0) {
@@ -437,81 +400,13 @@ const CreateCarPage: React.FC = () => {
             </div>
 
             {/* Car Photo - Full width for better presentation */}
-            <div className="form-grid single-column">
-              <div className="form-field">
-                <Label htmlFor="photo">Fotografija vozila</Label>
-                <div className="photo-upload-container">
-                  <div className="upload-wrapper">
-                    <input
-                      id="photo"
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoChange}
-                      disabled={isSubmitting || isUploadingPhoto}
-                      className="hidden-file-input"
-                    />
-                    {!photoPreview ? (
-                      <label htmlFor="photo" className="upload-area-clickable">
-                        <div className="upload-content">
-                          <Upload className="upload-icon" />
-                          <div className="upload-text">
-                            <span className="upload-primary-text">
-                              Kliknite da biste dodali fotografiju
-                            </span>
-                            <span className="upload-secondary-text">
-                              PNG, JPG, JPEG do 5MB
-                            </span>
-                          </div>
-                        </div>
-                      </label>
-                    ) : (
-                      <div className="photo-preview-container">
-                        <div className="photo-preview-wrapper">
-                          <img
-                            src={photoPreview}
-                            alt="Car preview"
-                            className="photo-preview-image"
-                          />
-                          <div className="photo-overlay">
-                            <div className="photo-actions">
-                              <label
-                                htmlFor="photo"
-                                className="change-photo-button"
-                              >
-                                <Upload className="h-4 w-4" />
-                                Promijeni
-                              </label>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={removePhoto}
-                                disabled={isSubmitting || isUploadingPhoto}
-                                className="remove-photo-button"
-                              >
-                                <X className="h-4 w-4" />
-                                Ukloni
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {isUploadingPhoto && (
-                    <div className="upload-progress">
-                      <div className="progress-spinner"></div>
-                      <span className="progress-text">
-                        Dodavanje fotografije...
-                      </span>
-                    </div>
-                  )}
-                </div>
-                {errors.photoUrl && (
-                  <p className="error-text">{errors.photoUrl}</p>
-                )}
-              </div>
-            </div>
+            {/* Photo Upload */}
+            <PhotoUpload
+              value={selectedPhoto}
+              onChange={(file) => handlePhotoChange(file)}
+              error={errors.photoUrl}
+              disabled={isSubmitting}
+            />
 
             <div className="form-grid">
               <div className="form-field">
