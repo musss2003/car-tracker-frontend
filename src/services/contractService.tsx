@@ -98,7 +98,7 @@ export const createAndDownloadContract = async (
     const { contract, docx } = JSON.parse(text);
 
     const docxBlob = extractDocxBlobFromResponse(docx);
-    triggerDownloadContract(await docxBlob, contract._id);
+    triggerDownloadContract(await docxBlob, contract.id);
     return contract;
   } catch (error) {
     console.error('Error creating and downloading contract:', error);

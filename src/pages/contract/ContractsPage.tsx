@@ -1,11 +1,11 @@
+'use client';
+
 import { useEffect, useState, useMemo } from 'react';
 import {
-  createAndDownloadContract,
+  getContracts,
   deleteContract,
   downloadContract,
-  getContracts,
-  updateContract,
-} from '../../../services/contractService';
+} from '@/services/contractService';
 import { toast } from 'react-toastify';
 import {
   FilterIcon,
@@ -45,7 +45,6 @@ import {
 
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -54,20 +53,18 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Skeleton from '@/components/ui/skeleton';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { Contract, ContractFormData } from '../../../types/Contract';
-import path from 'path';
 import { useNavigate } from 'react-router-dom';
+import type { Contract } from '@/types/Contract';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -75,8 +72,7 @@ declare module 'jspdf' {
   }
 }
 
-const ContractsTable = () => {
-
+const ContractsPage = () => {
   const navigate = useNavigate();
   // State management
   const [contracts, setContracts] = useState<Contract[]>([]);
@@ -164,16 +160,16 @@ const ContractsTable = () => {
         if (sortConfig.key.includes('.')) {
           const [obj, prop] = sortConfig.key.split('.');
 
-            if (obj === 'customer' && a.customer && b.customer) {
+          if (obj === 'customer' && a.customer && b.customer) {
             aValue = (a.customer as any)[prop] ?? '';
             bValue = (b.customer as any)[prop] ?? '';
-            } else if (obj === 'car' && a.car && b.car) {
+          } else if (obj === 'car' && a.car && b.car) {
             aValue = (a.car as any)[prop] ?? '';
             bValue = (b.car as any)[prop] ?? '';
-            } else if (prop === 'startDate' || prop === 'endDate') {
+          } else if (prop === 'startDate' || prop === 'endDate') {
             aValue = new Date((a as any)[prop]);
             bValue = new Date((b as any)[prop]);
-            }
+          }
         } else {
           aValue = (a as any)[sortConfig.key] ?? '';
           bValue = (b as any)[sortConfig.key] ?? '';
@@ -196,19 +192,26 @@ const ContractsTable = () => {
   // Pagination logic
   const paginatedContracts = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredAndSortedContracts.slice(startIndex, startIndex + itemsPerPage);
+    return filteredAndSortedContracts.slice(
+      startIndex,
+      startIndex + itemsPerPage
+    );
   }, [filteredAndSortedContracts, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredAndSortedContracts.length / itemsPerPage);
+  const totalPages = Math.ceil(
+    filteredAndSortedContracts.length / itemsPerPage
+  );
 
   // Event handlers
   const handleSort = (key: string) => {
     setSortConfig((prevConfig) => ({
       key,
-      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
+      direction:
+        prevConfig.key === key && prevConfig.direction === 'asc'
+          ? 'desc'
+          : 'asc',
     }));
   };
-
 
   const handleDeleteContract = async (contract: Contract) => {
     try {
@@ -232,10 +235,12 @@ const ContractsTable = () => {
   const calculateTotalPrice = (contract: Contract): number => {
     const startDate = new Date(contract.startDate);
     const endDate = new Date(contract.endDate);
-    const rentalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const rentalDays = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
     const dailyRate =
       typeof contract.car.pricePerDay === 'string'
-        ? parseFloat(contract.car.pricePerDay)
+        ? Number.parseFloat(contract.car.pricePerDay)
         : contract.car.pricePerDay;
     return rentalDays * dailyRate;
   };
@@ -246,13 +251,13 @@ const ContractsTable = () => {
 
   const handleViewDetails = (contract: Contract) => {
     navigate(`/contracts/${contract.id}`);
-  }
+  };
 
   const handleEdit = (contract: Contract) => {
     navigate(`/contracts/${contract.id}/edit`);
-  }
+  };
 
-  const handleDownloadContract = async (contract :Contract) => {
+  const handleDownloadContract = async (contract: Contract) => {
     try {
       if (contract.id) {
         await downloadContract(contract.id);
@@ -272,7 +277,15 @@ const ContractsTable = () => {
       const doc = new jsPDF();
       doc.text('Contracts List', 20, 10);
 
-      const tableColumn = ['Customer Name', 'Passport Number', 'Car Model', 'License Plate', 'Start Date', 'End Date', 'Status'];
+      const tableColumn = [
+        'Customer Name',
+        'Passport Number',
+        'Car Model',
+        'License Plate',
+        'Start Date',
+        'End Date',
+        'Status',
+      ];
       const tableRows = filteredAndSortedContracts.map((contract) => {
         const now = new Date();
         const startDate = new Date(contract.startDate);
@@ -351,16 +364,30 @@ const ContractsTable = () => {
     const startDate = new Date(contract.startDate);
     const endDate = new Date(contract.endDate);
 
-    if (now < startDate) return { status: 'confirmed', label: 'Confirmed', variant: 'secondary' as const };
-    else if (now >= startDate && now <= endDate) return { status: 'active', label: 'Active', variant: 'default' as const };
-    else return { status: 'completed', label: 'Completed', variant: 'outline' as const };
+    if (now < startDate)
+      return {
+        status: 'confirmed',
+        label: 'Confirmed',
+        variant: 'secondary' as const,
+      };
+    else if (now >= startDate && now <= endDate)
+      return { status: 'active', label: 'Active', variant: 'default' as const };
+    else
+      return {
+        status: 'completed',
+        label: 'Completed',
+        variant: 'outline' as const,
+      };
   };
 
   const renderTableHeader = (label: string, key: string) => {
     const isSorted = sortConfig.key === key;
-    
+
     return (
-      <TableHead className="cursor-pointer select-none" onClick={() => handleSort(key)}>
+      <TableHead
+        className="cursor-pointer select-none"
+        onClick={() => handleSort(key)}
+      >
         <div className="flex items-center gap-2">
           <span>{label}</span>
           {isSorted ? (
@@ -377,7 +404,11 @@ const ContractsTable = () => {
     );
   };
 
-  const renderStatusBadge = (status: string, label: string, variant: 'default' | 'secondary' | 'outline') => {
+  const renderStatusBadge = (
+    status: string,
+    label: string,
+    variant: 'default' | 'secondary' | 'outline'
+  ) => {
     let Icon;
     switch (status) {
       case 'confirmed':
@@ -402,11 +433,14 @@ const ContractsTable = () => {
   };
 
   return (
-    <div className="space-y-4 p-6">
-      <Card>
-        <CardHeader>
+    <div className="min-h-screen w-full bg-background">
+      {/* Header Section */}
+      <div className="border-b bg-card">
+        <div className="px-2 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="text-2xl font-bold">Contracts Management</CardTitle>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Contracts Management
+            </h1>
             <div className="flex gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -416,246 +450,268 @@ const ContractsTable = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onClick={exportToPDF}>Export as PDF</DropdownMenuItem>
-                  <DropdownMenuItem onClick={exportToExcel}>Export as Excel</DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToPDF}>
+                    Export as PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToExcel}>
+                    Export as Excel
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-                <Button
-                onClick={handleCreate}
-                disabled={loading}
-                >
+              <Button onClick={handleCreate} disabled={loading}>
                 <PlusIcon className="w-4 h-4 mr-2" />
                 Create Contract
-                </Button>
+              </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by customer, passport, or car..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <FilterIcon className="w-4 h-4 text-muted-foreground" />
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        </div>
+      </div>
+
+      {/* Filters Section */}
+      <div className="px-2 py-4 border-b bg-card">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <Input
+              placeholder="Search by customer, passport, or car..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full"
+            />
           </div>
+          <div className="flex items-center gap-2">
+            <FilterIcon className="w-4 h-4 text-muted-foreground" />
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
-          {error && (
-            <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mt-4">
+            {error}
+          </div>
+        )}
+      </div>
 
-          {loading ? (
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full" />
-              ))}
-            </div>
-          ) : (
-            <>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
+      {/* Table Section */}
+      <div className="px-2 py-4">
+        {loading ? (
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="rounded-md border bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {renderTableHeader('Customer', 'customer.name')}
+                    {renderTableHeader('Passport', 'customer.passportNumber')}
+                    {renderTableHeader('Car', 'car.model')}
+                    {renderTableHeader('License Plate', 'car.licensePlate')}
+                    {renderTableHeader('Start Date', 'startDate')}
+                    {renderTableHeader('End Date', 'endDate')}
+                    {renderTableHeader('Status', 'status')}
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedContracts.length > 0 ? (
+                    paginatedContracts.map((contract, index) => {
+                      const { status, label, variant } =
+                        getContractStatus(contract);
+
+                      return (
+                        <TableRow key={contract.id || index}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback>
+                                  {contract.customer?.name?.charAt(0) || '?'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium">
+                                {contract.customer?.name || 'N/A'}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {contract.customer?.passportNumber || 'N/A'}
+                          </TableCell>
+                          <TableCell>{contract.car?.model || 'N/A'}</TableCell>
+                          <TableCell>
+                            {contract.car?.licensePlate || 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            {contract.startDate
+                              ? new Date(
+                                  contract.startDate
+                                ).toLocaleDateString()
+                              : 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            {contract.endDate
+                              ? new Date(contract.endDate).toLocaleDateString()
+                              : 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            {renderStatusBadge(status, label, variant)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleViewDetails(contract)}
+                                title="View Details"
+                              >
+                                <EyeIcon className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  handleEdit(contract);
+                                }}
+                                title="Edit Contract"
+                              >
+                                <PencilIcon className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  handleDownloadContract(contract);
+                                }}
+                                title="Download Contract"
+                              >
+                                <DocumentDownloadIcon className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  setShowDeleteDialog(true);
+                                }}
+                                title="Delete Contract"
+                              >
+                                <TrashIcon className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
                     <TableRow>
-                      {renderTableHeader('Customer', 'customer.name')}
-                      {renderTableHeader('Passport', 'customer.passportNumber')}
-                      {renderTableHeader('Car', 'car.model')}
-                      {renderTableHeader('License Plate', 'car.licensePlate')}
-                      {renderTableHeader('Start Date', 'startDate')}
-                      {renderTableHeader('End Date', 'endDate')}
-                      {renderTableHeader('Status', 'status')}
-                      <TableHead>Actions</TableHead>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center py-8 text-muted-foreground"
+                      >
+                        {searchTerm || filterStatus !== 'all'
+                          ? 'No contracts match your search criteria'
+                          : 'No contracts available'}
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedContracts.length > 0 ? (
-                      paginatedContracts.map((contract, index) => {
-                        const { status, label, variant } = getContractStatus(contract);
+                  )}
+                </TableBody>
+              </Table>
+            </div>
 
-                        return (
-                          <TableRow key={contract.id || index}>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-8 w-8">
-                                  <AvatarFallback>
-                                    {contract.customer?.name?.charAt(0) || '?'}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="font-medium">{contract.customer?.name || 'N/A'}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>{contract.customer?.passportNumber || 'N/A'}</TableCell>
-                            <TableCell>{contract.car?.model || 'N/A'}</TableCell>
-                            <TableCell>{contract.car?.licensePlate || 'N/A'}</TableCell>
-                            <TableCell>
-                              {contract.startDate
-                                ? new Date(contract.startDate).toLocaleDateString()
-                                : 'N/A'}
-                            </TableCell>
-                            <TableCell>
-                              {contract.endDate
-                                ? new Date(contract.endDate).toLocaleDateString()
-                                : 'N/A'}
-                            </TableCell>
-                            <TableCell>{renderStatusBadge(status, label, variant)}</TableCell>
-                            <TableCell>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleViewDetails(contract)}
-                                  title="View Details"
-                                >
-                                  <EyeIcon className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => {
-                                    handleEdit(contract);
-                                  }}
-                                  title="Edit Contract"
-                                >
-                                  <PencilIcon className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => {
-                                    handleDownloadContract(contract);
-                                  }}
-                                  title="Download Contract"
-                                >
-                                  <DocumentDownloadIcon className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => {
-                                    setShowDeleteDialog(true);
-                                  }}
-                                  title="Delete Contract"
-                                >
-                                  <TrashIcon className="w-4 h-4 text-destructive" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                          {searchTerm || filterStatus !== 'all'
-                            ? 'No contracts match your search criteria'
-                            : 'No contracts available'}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-sm text-muted-foreground">
-                  Showing {paginatedContracts.length} of {filteredAndSortedContracts.length} contracts
-                </div>
+            {/* Pagination */}
+            {filteredAndSortedContracts.length > 0 && (
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
-                  <Select
-                    value={itemsPerPage.toString()}
-                    onValueChange={(value) => {
-                      setItemsPerPage(Number(value));
-                      setCurrentPage(1);
-                    }}
-                  >
-                    <SelectTrigger className="w-[100px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="5">5 / page</SelectItem>
-                      <SelectItem value="10">10 / page</SelectItem>
-                      <SelectItem value="20">20 / page</SelectItem>
-                      <SelectItem value="50">50 / page</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="flex gap-1">
+                  <p className="text-sm text-muted-foreground">
+                    Prikazuje se {(currentPage - 1) * itemsPerPage + 1} do{' '}
+                    {Math.min(
+                      currentPage * itemsPerPage,
+                      filteredAndSortedContracts.length
+                    )}{' '}
+                    od {filteredAndSortedContracts.length} rezultata
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      Stavki po stranici:
+                    </span>
+                    <Select
+                      value={itemsPerPage.toString()}
+                      onValueChange={(value) => {
+                        setItemsPerPage(Number(value));
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5</SelectItem>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center gap-1">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
                       disabled={currentPage === 1}
+                      className="flex-1 sm:flex-none"
                     >
-                      Previous
+                      <ChevronLeftIcon className="w-4 h-4" />
+                      <span className="ml-1">Prethodna</span>
                     </Button>
+
+                    <span className="px-4 py-2 text-sm text-center">
+                      Stranica {currentPage} od {totalPages}
+                    </span>
+
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
                       disabled={currentPage === totalPages}
+                      className="flex-1 sm:flex-none"
                     >
-                      Next
+                      <span className="mr-1">Sljedeća</span>
+                      <ChevronRightIcon className="w-4 h-4" />
                     </Button>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    Page {currentPage} of {totalPages}
-                  </span>
                 </div>
               </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </div>
+        )}
+      </div>
 
-      {/* Modals */}
-      {/* <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          {selectedContract && (
-            <ContractDetails
-              contract={selectedContract}
-              onEdit={handleEdit}
-              onBack={handleCloseDetails}
-              onDelete={() => setShowDeleteDialog(true)}
-              onDownload={handleDownloadContract}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          {selectedContract && (
-            <EditContractForm
-              contract={selectedContract}
-              onSave={handleSave}
-              onCancel={handleCancel}
-            />
-          )}
-        </DialogContent>
-      </Dialog> */}
-
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the contract.
+              This action cannot be undone. This will permanently delete the
+              contract.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -670,4 +726,4 @@ const ContractsTable = () => {
   );
 };
 
-export default ContractsTable;
+export default ContractsPage;

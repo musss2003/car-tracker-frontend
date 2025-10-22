@@ -13,7 +13,7 @@ const CarDetailsPage = lazy(() => import('../pages/car/CarDetailsPage'));
 const CarAvailabilityPage = lazy(
   () => import('../pages/car/CarAvailabilityPage')
 );
-const ContractsPage = lazy(() => import('../pages/ContractsPage'));
+const ContractsPage = lazy(() => import('../pages/contract/ContractsPage'));
 const CustomersPage = lazy(() => import('../pages/CustomersPage'));
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
 const UserProfile = lazy(
@@ -25,9 +25,9 @@ import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../contexts/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
 import DashboardPage from '../pages/DashboardPage/DashboardPage';
-import CreateContractForm from '@/components/Contract/CreateContractForm/CreateContractForm';
 import CustomerDetails from '@/components/Customer/CustomerDetails/CustomerDetails';
 import EditContractForm from '@/components/Contract/EditContractForm/EditContractForm';
+import CreateContractPage from '@/pages/contract/CreateContractPage';
 
 export function AppRoutes() {
   const { isLoggedIn, user } = useAuth();
@@ -56,7 +56,7 @@ export function AppRoutes() {
             path="/cars/:id/availability"
             element={<CarAvailabilityPage />}
           />
-          <Route path="/contracts/new" element={<CreateContractForm />} />
+          <Route path="/contracts/new" element={<CreateContractPage />} />
           <Route path="/contracts" element={<ContractsPage />} />
           {/* <Route path="/contracts/:id/edit" element={<EditContractForm />} /> */}
           {/* <Route path="/contracts/:id" element={<CustomerDetails />} /> */}
