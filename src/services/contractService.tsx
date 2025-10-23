@@ -1,5 +1,6 @@
 import { Contract, ContractFormData } from '../types/Contract';
 import { getAuthHeaders } from '../utils/getAuthHeaders';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/contracts/';
 
@@ -69,6 +70,7 @@ export const updateContract = async (
   });
 
   if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  toast.success('Contract updated successfully!');
   return res.json();
 };
 

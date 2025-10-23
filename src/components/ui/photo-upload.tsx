@@ -1,20 +1,21 @@
-"use client"
+'use client';
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Upload, X, Loader2 } from "lucide-react"
+import type React from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Upload, X, Loader2 } from 'lucide-react';
+import { downloadDocument } from '@/services/uploadService';
 
 interface PhotoUploadProps {
-  value: File | null
-  onChange: (file: File | null) => void
-  error?: string
-  disabled?: boolean
-  label?: string
-  accept?: string
-  maxSizeMB?: number
-  existingPhotoUrl?: string
+  value: File | null;
+  onChange: (file: File | null) => void;
+  error?: string;
+  disabled?: boolean;
+  label?: string;
+  accept?: string;
+  maxSizeMB?: number;
+  existingPhotoUrl?: string;
 }
 
 export const PhotoUpload: React.FC<PhotoUploadProps> = ({
@@ -22,63 +23,92 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   onChange,
   error,
   disabled = false,
-  label = "Fotografija vozila",
-  accept = "image/*",
+  label = 'Fotografija vozila',
+  accept = 'image/*',
   maxSizeMB = 5,
   existingPhotoUrl,
 }) => {
-  const [photoPreview, setPhotoPreview] = useState<string>("")
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [photoPreview, setPhotoPreview] = useState<string>('');
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const loadExistingPhoto = async (photoUrl: string) => {
+    if (!photoUrl) return;
+
+    setIsLoadingPhoto(true);
+    try {
+      const photoBlob = await downloadDocument(photoUrl);
+      const photoObjectUrl = URL.createObjectURL(photoBlob);
+      setPhotoPreview(photoObjectUrl);
+    } catch (error) {
+      console.error('Error loading existing photo:', error);
+      alert('Failed to load existing photo. Please try again later.');
+    } finally {
+      setIsLoadingPhoto(false);
+    }
+  };
 
   useEffect(() => {
-    if (existingPhotoUrl && !photoPreview) {
-      setPhotoPreview(existingPhotoUrl)
+    if (existingPhotoUrl) {
+      loadExistingPhoto(existingPhotoUrl);
     }
-  }, [existingPhotoUrl])
 
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    // Cleanup function to revoke object URL and prevent memory leaks
+    return () => {
+      if (photoPreview && photoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [existingPhotoUrl]);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
     // Validate file size
-    const maxSizeBytes = maxSizeMB * 1024 * 1024
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
     if (file.size > maxSizeBytes) {
-      alert(`File size must be less than ${maxSizeMB}MB`)
-      return
+      alert(`File size must be less than ${maxSizeMB}MB`);
+      return;
     }
 
     // Validate file type
-    if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file")
-      return
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file');
+      return;
     }
 
-    setIsUploadingPhoto(true)
+    setIsUploadingPhoto(true);
 
-    try {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const result = reader.result as string
-        setPhotoPreview(result)
-        onChange(file) // Pass the actual File object
-      }
-      reader.readAsDataURL(file)
-    } catch (error) {
-      console.error("Error processing photo:", error)
-      alert("Failed to process photo. Please try again.")
-    } finally {
-      setIsUploadingPhoto(false)
-    }
-  }
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      setPhotoPreview(result);
+      onChange(file);
+      setIsUploadingPhoto(false);
+    };
+
+    reader.onerror = () => {
+      console.error('Error reading file:', reader.error);
+      alert('Failed to process photo. Please try again.');
+      setIsUploadingPhoto(false);
+    };
+
+    reader.readAsDataURL(file);
+  };
 
   const removePhoto = () => {
-    setPhotoPreview("")
-    onChange(null) // Pass null instead of empty string
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+    if (photoPreview && photoPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(photoPreview);
     }
-  }
+    setPhotoPreview('');
+    onChange(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   return (
     <div className="space-y-2">
@@ -99,21 +129,29 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
             htmlFor="photo"
             className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
               disabled || isUploadingPhoto
-                ? "bg-muted cursor-not-allowed opacity-60"
-                : "bg-background hover:bg-muted/50 border-border hover:border-primary"
+                ? 'bg-muted cursor-not-allowed opacity-60'
+                : 'bg-background hover:bg-muted/50 border-border hover:border-primary'
             }`}
           >
             <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
               <Upload className="w-12 h-12 text-muted-foreground" />
               <div className="space-y-1">
-                <p className="text-sm font-medium text-foreground">Kliknite da biste dodali fotografiju</p>
-                <p className="text-xs text-muted-foreground">PNG, JPG, JPEG do {maxSizeMB}MB</p>
+                <p className="text-sm font-medium text-foreground">
+                  Kliknite da biste dodali fotografiju
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  PNG, JPG, JPEG do {maxSizeMB}MB
+                </p>
               </div>
             </div>
           </label>
         ) : (
           <div className="relative w-full h-64 rounded-lg overflow-hidden border border-border">
-            <img src={photoPreview || "/placeholder.svg"} alt="Car preview" className="w-full h-full object-cover" />
+            <img
+              src={photoPreview || '/placeholder.svg'}
+              alt="Car preview"
+              className="w-full h-full object-cover"
+            />
             <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <label
                 htmlFor="photo"
@@ -137,11 +175,11 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           </div>
         )}
 
-        {isUploadingPhoto && (
+        {(isUploadingPhoto || isLoadingPhoto) && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
             <div className="flex items-center gap-2 text-sm">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Dodavanje fotografije...</span>
+              <span>Učitavanje fotografije...</span>
             </div>
           </div>
         )}
@@ -149,5 +187,5 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
 
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
-  )
-}
+  );
+};

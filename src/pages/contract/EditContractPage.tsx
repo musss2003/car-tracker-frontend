@@ -15,6 +15,7 @@ import { getContract, updateContract } from "@/services/contractService"
 import { getCustomers } from "@/services/customerService"
 import { getAvailableCarsForPeriod } from "@/services/carService"
 import { uploadDocument } from "@/services/uploadService"
+import { getCar } from "@/services/carService"
 import type { ContractFormData } from "@/types/Contract"
 import type { Customer } from "@/types/Customer"
 import type { Car } from "@/types/Car"
@@ -23,7 +24,7 @@ import { useNavigate, useParams } from "react-router-dom"
 
 export default function EditContractPage() {
   const params = useParams()
-  const router = useNavigate()
+  const navigate = useNavigate()
   const contractId = params.id as string
 
   const [formData, setFormData] = useState<ContractFormData>({
@@ -42,7 +43,8 @@ export default function EditContractPage() {
   const [error, setError] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [customers, setCustomers] = useState<Customer[]>([])
-  const [cars, setCars] = useState<Car[]>([])
+  const [availableCars, setAvailableCars] = useState<Car[]>([])
+  const [currentCar, setCurrentCar] = useState<Car | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
 
   // Fetch contract data
@@ -62,6 +64,15 @@ export default function EditContractPage() {
           additionalNotes: data.additionalNotes || "",
           photoUrl: data.photoUrl,
         })
+
+        if (data.carId) {
+          try {
+            const carData = await getCar(data.carId)
+            setCurrentCar(carData)
+          } catch (err) {
+            console.error("Error fetching car:", err)
+          }
+        }
       } catch (err) {
         console.error("Error fetching contract:", err)
         setError("Failed to load contract. Please try again.")
@@ -93,16 +104,16 @@ export default function EditContractPage() {
   useEffect(() => {
     const fetchAvailableCars = async () => {
       if (!formData.startDate || !formData.endDate) {
-        setCars([])
+        setAvailableCars([])
         return
       }
 
       try {
         const availableCars = await getAvailableCarsForPeriod(formData.startDate, formData.endDate)
-        setCars(availableCars)
+        setAvailableCars(availableCars)
 
         if (formData.carId) {
-          const selectedCar = availableCars.find((car) => car.id === formData.carId)
+          const selectedCar = availableCars.find((car) => car.id === formData.carId) || currentCar
           if (selectedCar) {
             const start = new Date(formData.startDate)
             const end = new Date(formData.endDate)
@@ -122,7 +133,7 @@ export default function EditContractPage() {
     }
 
     fetchAvailableCars()
-  }, [formData.startDate, formData.endDate, formData.carId])
+  }, [formData.startDate, formData.endDate, formData.carId, currentCar])
 
   const handleChange = (field: keyof ContractFormData, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -140,7 +151,7 @@ export default function EditContractPage() {
       const start = new Date(newFormData.startDate)
       const end = new Date(newFormData.endDate)
 
-      if (end < start) {
+      if (end <= start) {
         setErrors((prev) => ({
           ...prev,
           [field]: "End date must be after start date",
@@ -235,7 +246,7 @@ export default function EditContractPage() {
       }
 
       await updateContract(contractId, updatedContract)
-      router("/contracts")
+      navigate("/contracts")
     } catch (err) {
       console.error("Error updating contract:", err)
       setError("Failed to update contract. Please try again.")
@@ -268,7 +279,7 @@ export default function EditContractPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
             <div className="mt-4">
-              <Button variant="outline" onClick={() => router("/contracts")}>
+              <Button variant="outline" onClick={() => navigate("/contracts")}>
                 Back to Contracts
               </Button>
             </div>
@@ -279,7 +290,8 @@ export default function EditContractPage() {
   }
 
   const today = new Date().toISOString().split("T")[0]
-  const selectedCar = cars.find((car) => car.id === formData.carId)
+  const allCars = currentCar ? [currentCar, ...availableCars.filter((car) => car.id !== currentCar.id)] : availableCars
+  const selectedCar = allCars.find((car) => car.id === formData.carId)
 
   return (
     <div className="flex flex-col h-full">
@@ -292,7 +304,7 @@ export default function EditContractPage() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => router("/contracts")}
+            onClick={() => navigate("/contracts")}
             disabled={submitting}
             className="flex items-center gap-2 bg-transparent"
           >
@@ -389,9 +401,12 @@ export default function EditContractPage() {
                     <SelectValue placeholder="Select a car" />
                   </SelectTrigger>
                   <SelectContent>
-                    {cars.map((car) => (
+                    {allCars.map((car) => (
                       <SelectItem key={car.id} value={car.id}>
                         {car.manufacturer} {car.model} ({car.year}) - {formatCurrency(car.pricePerDay)}/day
+                        {car.id === currentCar?.id && !availableCars.find((c) => c.id === car.id) && (
+                          <span className="text-xs text-muted-foreground ml-2">(Current)</span>
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
