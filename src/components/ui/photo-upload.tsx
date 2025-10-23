@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Upload, X, Loader2 } from "lucide-react"
@@ -14,6 +14,7 @@ interface PhotoUploadProps {
   label?: string
   accept?: string
   maxSizeMB?: number
+  existingPhotoUrl?: string
 }
 
 export const PhotoUpload: React.FC<PhotoUploadProps> = ({
@@ -24,10 +25,17 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   label = "Fotografija vozila",
   accept = "image/*",
   maxSizeMB = 5,
+  existingPhotoUrl,
 }) => {
   const [photoPreview, setPhotoPreview] = useState<string>("")
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (existingPhotoUrl && !photoPreview) {
+      setPhotoPreview(existingPhotoUrl)
+    }
+  }, [existingPhotoUrl])
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

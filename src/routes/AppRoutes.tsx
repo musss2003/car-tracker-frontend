@@ -26,8 +26,8 @@ import { useAuth } from '../contexts/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
 import DashboardPage from '../pages/DashboardPage/DashboardPage';
 import CustomerDetails from '@/components/Customer/CustomerDetails/CustomerDetails';
-import EditContractForm from '@/components/Contract/EditContractForm/EditContractForm';
 import CreateContractPage from '@/pages/contract/CreateContractPage';
+import EditContractPage from '@/pages/contract/EditContractPage';
 
 export function AppRoutes() {
   const { isLoggedIn, user } = useAuth();
@@ -58,7 +58,7 @@ export function AppRoutes() {
           />
           <Route path="/contracts/new" element={<CreateContractPage />} />
           <Route path="/contracts" element={<ContractsPage />} />
-          {/* <Route path="/contracts/:id/edit" element={<EditContractForm />} /> */}
+          <Route path="/contracts/:id/edit" element={<EditContractPage />} /> 
           {/* <Route path="/contracts/:id" element={<CustomerDetails />} /> */}
          
           <Route path="/customers" element={<CustomersPage />} />
