@@ -1,237 +1,266 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useEffect, useState } from "react"
-import { Loader2, AlertCircle, X, Save, Calendar, User, Truck, FileText, DollarSign } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { PhotoUpload } from "@/components/ui/photo-upload"
-import { getContract, updateContract } from "@/services/contractService"
-import { getCustomers } from "@/services/customerService"
-import { getAvailableCarsForPeriod } from "@/services/carService"
-import { uploadDocument } from "@/services/uploadService"
-import { getCar } from "@/services/carService"
-import type { ContractFormData } from "@/types/Contract"
-import type { Customer } from "@/types/Customer"
-import type { Car } from "@/types/Car"
-import formatCurrency from "@/utils/formatCurrency"
-import { useNavigate, useParams } from "react-router-dom"
+import { useEffect, useState } from 'react';
+import {
+  Loader2,
+  AlertCircle,
+  X,
+  Save,
+  Calendar,
+  User,
+  Truck,
+  FileText,
+  DollarSign,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { PhotoUpload } from '@/components/ui/photo-upload';
+import { getContract, updateContract } from '@/services/contractService';
+import { getCustomers } from '@/services/customerService';
+import { getAvailableCarsForPeriod } from '@/services/carService';
+import { uploadDocument } from '@/services/uploadService';
+import { getCar } from '@/services/carService';
+import type { ContractFormData } from '@/types/Contract';
+import type { Customer } from '@/types/Customer';
+import type { Car } from '@/types/Car';
+import formatCurrency from '@/utils/formatCurrency';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function EditContractPage() {
-  const params = useParams()
-  const navigate = useNavigate()
-  const contractId = params.id as string
+  const params = useParams();
+  const navigate = useNavigate();
+  const contractId = params.id as string;
 
   const [formData, setFormData] = useState<ContractFormData>({
-    customerId: "",
-    carId: "",
-    startDate: "",
-    endDate: "",
+    customerId: '',
+    carId: '',
+    startDate: '',
+    endDate: '',
     dailyRate: 0,
     totalAmount: 0,
-    additionalNotes: "",
-    photoUrl: "",
-  })
+    additionalNotes: '',
+    photoUrl: ''
+  });
 
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [availableCars, setAvailableCars] = useState<Car[]>([])
-  const [currentCar, setCurrentCar] = useState<Car | null>(null)
-  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [availableCars, setAvailableCars] = useState<Car[]>([]);
+  const [currentCar, setCurrentCar] = useState<Car | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [isUpdated, setIsUpdated] = useState(false);
 
   // Fetch contract data
   useEffect(() => {
     const fetchContract = async () => {
       try {
-        setLoading(true)
-        const data = await getContract(contractId)
+        setLoading(true);
+        const data = await getContract(contractId);
 
         setFormData({
           customerId: data.customerId,
           carId: data.carId,
-          startDate: new Date(data.startDate).toISOString().split("T")[0],
-          endDate: new Date(data.endDate).toISOString().split("T")[0],
+          startDate: new Date(data.startDate).toISOString().split('T')[0],
+          endDate: new Date(data.endDate).toISOString().split('T')[0],
           dailyRate: data.dailyRate,
           totalAmount: data.totalAmount,
-          additionalNotes: data.additionalNotes || "",
+          additionalNotes: data.additionalNotes || '',
           photoUrl: data.photoUrl,
-        })
+        });
 
         if (data.carId) {
           try {
-            const carData = await getCar(data.carId)
-            setCurrentCar(carData)
+            const carData = await getCar(data.carId);
+            setCurrentCar(carData);
           } catch (err) {
-            console.error("Error fetching car:", err)
+            console.error('Error fetching car:', err);
           }
         }
       } catch (err) {
-        console.error("Error fetching contract:", err)
-        setError("Failed to load contract. Please try again.")
+        console.error('Error fetching contract:', err);
+        setError('Failed to load contract. Please try again.');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (contractId) {
-      fetchContract()
+      fetchContract();
     }
-  }, [contractId])
+  }, [contractId]);
 
   // Fetch customers
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const data = await getCustomers()
-        setCustomers(data)
+        const data = await getCustomers();
+        setCustomers(data);
       } catch (error) {
-        console.error("Error fetching customers:", error)
+        console.error('Error fetching customers:', error);
       }
-    }
+    };
 
-    fetchCustomers()
-  }, [])
+    fetchCustomers();
+  }, []);
 
   // Fetch available cars when dates change
   useEffect(() => {
     const fetchAvailableCars = async () => {
       if (!formData.startDate || !formData.endDate) {
-        setAvailableCars([])
-        return
+        setAvailableCars([]);
+        return;
       }
 
       try {
-        const availableCars = await getAvailableCarsForPeriod(formData.startDate, formData.endDate)
-        setAvailableCars(availableCars)
+        const availableCars = await getAvailableCarsForPeriod(
+          formData.startDate,
+          formData.endDate
+        );
+        setAvailableCars(availableCars);
 
         if (formData.carId) {
-          const selectedCar = availableCars.find((car) => car.id === formData.carId) || currentCar
+          const selectedCar =
+            availableCars.find((car) => car.id === formData.carId) ||
+            currentCar;
           if (selectedCar) {
-            const start = new Date(formData.startDate)
-            const end = new Date(formData.endDate)
-            const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-            const total = days * selectedCar.pricePerDay
+            const start = new Date(formData.startDate);
+            const end = new Date(formData.endDate);
+            const days = Math.ceil(
+              (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+            );
+            const total = days * selectedCar.pricePerDay;
 
             setFormData((prev) => ({
               ...prev,
               dailyRate: selectedCar.pricePerDay,
               totalAmount: total > 0 ? total : 0,
-            }))
+            }));
           }
         }
       } catch (error) {
-        console.error("Error fetching cars:", error)
+        console.error('Error fetching cars:', error);
       }
-    }
+    };
 
-    fetchAvailableCars()
-  }, [formData.startDate, formData.endDate, formData.carId, currentCar])
+    fetchAvailableCars();
+  }, [formData.startDate, formData.endDate, formData.carId, currentCar]);
 
-  const handleChange = (field: keyof ContractFormData, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+  const handleChange = (
+    field: keyof ContractFormData,
+    value: string | number
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setIsUpdated(true);
     setErrors((prev) => {
-      const newErrors = { ...prev }
-      delete newErrors[field]
-      return newErrors
-    })
-  }
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
+  };
 
-  const handleDateChange = (field: "startDate" | "endDate", value: string) => {
-    const newFormData = { ...formData, [field]: value }
+  const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
+    const newFormData = { ...formData, [field]: value };
 
     if (newFormData.startDate && newFormData.endDate) {
-      const start = new Date(newFormData.startDate)
-      const end = new Date(newFormData.endDate)
+      const start = new Date(newFormData.startDate);
+      const end = new Date(newFormData.endDate);
 
       if (end <= start) {
         setErrors((prev) => ({
           ...prev,
-          [field]: "End date must be after start date",
-        }))
-        return
+          [field]: 'End date must be after start date',
+        }));
+        return;
       }
     }
 
-    handleChange(field, value)
-  }
+    handleChange(field, value);
+  };
 
   const handlePhotoChange = (file: File | null) => {
-    setPhotoFile(file)
+    setPhotoFile(file);
+    setIsUpdated(true);
     setErrors((prev) => {
-      const newErrors = { ...prev }
-      delete newErrors.photoUrl
-      return newErrors
-    })
-  }
+      const newErrors = { ...prev };
+      delete newErrors.photoUrl;
+      return newErrors;
+    });
+  };
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
-    if (!formData.customerId) newErrors.customerId = "Customer is required"
-    if (!formData.carId) newErrors.carId = "Car is required"
-    if (!formData.startDate) newErrors.startDate = "Start date is required"
-    if (!formData.endDate) newErrors.endDate = "End date is required"
+    if (!formData.customerId) newErrors.customerId = 'Customer is required';
+    if (!formData.carId) newErrors.carId = 'Car is required';
+    if (!formData.startDate) newErrors.startDate = 'Start date is required';
+    if (!formData.endDate) newErrors.endDate = 'End date is required';
 
     if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate)
-      const end = new Date(formData.endDate)
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
       if (end <= start) {
-        newErrors.endDate = "End date must be after start date"
+        newErrors.endDate = 'End date must be after start date';
       }
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const uploadPhoto = async (): Promise<string | null> => {
-    if (!photoFile) return null
+    if (!photoFile) return null;
 
     try {
-      const filename = await uploadDocument(photoFile)
+      const filename = await uploadDocument(photoFile);
       setErrors((prev) => {
-        const newErrors = { ...prev }
-        delete newErrors.photoUrl
-        return newErrors
-      })
-      return filename
+        const newErrors = { ...prev };
+        delete newErrors.photoUrl;
+        return newErrors;
+      });
+      return filename;
     } catch (error) {
-      console.error("Error uploading photo:", error)
+      console.error('Error uploading photo:', error);
       setErrors((prev) => ({
         ...prev,
-        photoUrl: "Failed to upload photo. Please try again.",
-      }))
-      return null
+        photoUrl: 'Failed to upload photo. Please try again.',
+      }));
+      return null;
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setSubmitting(true)
-    setError(null)
+    setSubmitting(true);
+    setError(null);
 
     try {
-      let photoFilename = formData.photoUrl
+      let photoFilename = formData.photoUrl;
 
       if (photoFile) {
-        const uploadedFilename = await uploadPhoto()
+        const uploadedFilename = await uploadPhoto();
         if (!uploadedFilename) {
-          return
+          return;
         }
-        photoFilename = uploadedFilename
+        photoFilename = uploadedFilename;
       }
 
       const updatedContract = {
@@ -243,17 +272,17 @@ export default function EditContractPage() {
         totalAmount: Number(formData.totalAmount),
         additionalNotes: formData.additionalNotes || undefined,
         photoUrl: photoFilename,
-      }
+      };
 
-      await updateContract(contractId, updatedContract)
-      navigate("/contracts")
+      await updateContract(contractId, updatedContract);
+      navigate('/contracts');
     } catch (err) {
-      console.error("Error updating contract:", err)
-      setError("Failed to update contract. Please try again.")
+      console.error('Error updating contract:', err);
+      setError('Failed to update contract. Please try again.');
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -263,7 +292,7 @@ export default function EditContractPage() {
           <p className="text-muted-foreground">Loading contract...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error && !loading) {
@@ -279,19 +308,21 @@ export default function EditContractPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
             <div className="mt-4">
-              <Button variant="outline" onClick={() => navigate("/contracts")}>
+              <Button variant="outline" onClick={() => navigate('/contracts')}>
                 Back to Contracts
               </Button>
             </div>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  const today = new Date().toISOString().split("T")[0]
-  const allCars = currentCar ? [currentCar, ...availableCars.filter((car) => car.id !== currentCar.id)] : availableCars
-  const selectedCar = allCars.find((car) => car.id === formData.carId)
+  const today = new Date().toISOString().split('T')[0];
+  const allCars = currentCar
+    ? [currentCar, ...availableCars.filter((car) => car.id !== currentCar.id)]
+    : availableCars;
+  const selectedCar = allCars.find((car) => car.id === formData.carId);
 
   return (
     <div className="flex flex-col h-full">
@@ -304,7 +335,7 @@ export default function EditContractPage() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/contracts")}
+            onClick={() => navigate('/contracts')}
             disabled={submitting}
             className="flex items-center gap-2 bg-transparent"
           >
@@ -314,7 +345,7 @@ export default function EditContractPage() {
       </div>
 
       <div className="flex-1 overflow-auto bg-muted/30">
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="mx-auto p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Customer Selection */}
             <div className="bg-background border rounded-lg p-6 space-y-4">
@@ -324,7 +355,10 @@ export default function EditContractPage() {
               </h2>
               <div className="space-y-2">
                 <Label htmlFor="customerId">Customer</Label>
-                <Select value={formData.customerId} onValueChange={(value) => handleChange("customerId", value)}>
+                <Select
+                  value={formData.customerId}
+                  onValueChange={(value) => handleChange('customerId', value)}
+                >
                   <SelectTrigger id="customerId">
                     <SelectValue placeholder="Select a customer" />
                   </SelectTrigger>
@@ -359,7 +393,9 @@ export default function EditContractPage() {
                     type="date"
                     min={today}
                     value={formData.startDate}
-                    onChange={(e) => handleDateChange("startDate", e.target.value)}
+                    onChange={(e) =>
+                      handleDateChange('startDate', e.target.value)
+                    }
                   />
                   {errors.startDate && (
                     <p className="text-sm text-destructive flex items-center gap-1">
@@ -376,7 +412,9 @@ export default function EditContractPage() {
                     type="date"
                     min={formData.startDate || today}
                     value={formData.endDate}
-                    onChange={(e) => handleDateChange("endDate", e.target.value)}
+                    onChange={(e) =>
+                      handleDateChange('endDate', e.target.value)
+                    }
                   />
                   {errors.endDate && (
                     <p className="text-sm text-destructive flex items-center gap-1">
@@ -396,17 +434,24 @@ export default function EditContractPage() {
               </h2>
               <div className="space-y-2">
                 <Label htmlFor="carId">Car</Label>
-                <Select value={formData.carId} onValueChange={(value) => handleChange("carId", value)}>
+                <Select
+                  value={formData.carId}
+                  onValueChange={(value) => handleChange('carId', value)}
+                >
                   <SelectTrigger id="carId">
                     <SelectValue placeholder="Select a car" />
                   </SelectTrigger>
                   <SelectContent>
                     {allCars.map((car) => (
                       <SelectItem key={car.id} value={car.id}>
-                        {car.manufacturer} {car.model} ({car.year}) - {formatCurrency(car.pricePerDay)}/day
-                        {car.id === currentCar?.id && !availableCars.find((c) => c.id === car.id) && (
-                          <span className="text-xs text-muted-foreground ml-2">(Current)</span>
-                        )}
+                        {car.manufacturer} {car.model} ({car.year}) -{' '}
+                        {formatCurrency(car.pricePerDay)}/day
+                        {car.id === currentCar?.id &&
+                          !availableCars.find((c) => c.id === car.id) && (
+                            <span className="text-xs text-muted-foreground ml-2">
+                              (Current)
+                            </span>
+                          )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -423,16 +468,23 @@ export default function EditContractPage() {
               {selectedCar && formData.startDate && formData.endDate && (
                 <div className="p-4 bg-muted rounded-lg space-y-2 mt-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Daily Rate:</span>
-                    <span className="font-medium">{formatCurrency(formData.dailyRate)}</span>
+                    <span className="text-sm text-muted-foreground">
+                      Daily Rate:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(formData.dailyRate)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Duration:</span>
+                    <span className="text-sm text-muted-foreground">
+                      Duration:
+                    </span>
                     <span className="font-medium">
                       {Math.ceil(
-                        (new Date(formData.endDate).getTime() - new Date(formData.startDate).getTime()) /
-                          (1000 * 60 * 60 * 24),
-                      )}{" "}
+                        (new Date(formData.endDate).getTime() -
+                          new Date(formData.startDate).getTime()) /
+                          (1000 * 60 * 60 * 24)
+                      )}{' '}
                       days
                     </span>
                   </div>
@@ -441,7 +493,9 @@ export default function EditContractPage() {
                       <DollarSign className="w-4 h-4" />
                       Total Amount:
                     </span>
-                    <span className="text-lg font-bold">{formatCurrency(formData.totalAmount)}</span>
+                    <span className="text-lg font-bold">
+                      {formatCurrency(formData.totalAmount)}
+                    </span>
                   </div>
                 </div>
               )}
@@ -455,13 +509,17 @@ export default function EditContractPage() {
                   Additional Information
                 </h2>
                 <div className="space-y-2">
-                  <Label htmlFor="additionalNotes">Additional Notes (Optional)</Label>
+                  <Label htmlFor="additionalNotes">
+                    Additional Notes (Optional)
+                  </Label>
                   <Textarea
                     id="additionalNotes"
                     placeholder="Any additional notes or special conditions..."
                     rows={4}
                     value={formData.additionalNotes}
-                    onChange={(e) => handleChange("additionalNotes", e.target.value)}
+                    onChange={(e) =>
+                      handleChange('additionalNotes', e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -489,7 +547,12 @@ export default function EditContractPage() {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-              <Button type="submit" disabled={submitting} size="lg" className="flex items-center gap-2">
+              <Button
+                type="submit"
+                disabled={submitting || !isUpdated}
+                size="lg"
+                className="flex items-center gap-2"
+              >
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" /> Updating...
@@ -505,5 +568,5 @@ export default function EditContractPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
