@@ -13,28 +13,25 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  transition: margin-left 0.3s ease;
+  min-width: 0; /* Allow flex items to shrink below their minimum content size */
 }
 
-/* Adjust main content based on sidebar state */
-.with-sidebar-open {
-  margin-left: 0; /* The sidebar is already taking up space as position: sticky */
-}
-
+/* The modern sidebar handles its own spacing, so we don't need margin adjustments */
+.with-sidebar-open,
 .with-sidebar-closed {
-  margin-left: 0; /* The sidebar is already taking up space as position: sticky */
+  margin-left: 0;
 }
 
 .page-content {
   flex: 1;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   background-color: var(--bg-secondary);
 }
 
-/* Adjust page content padding on mobile for header */
-@media (max-width: 768px) {
+/* Mobile padding for header */
+@media (max-width: 1023px) {
   .page-content {
-    padding: 4.5rem var(--spacing-md) var(--spacing-md) var(--spacing-md); /* Extra top padding for mobile header */
+    padding-top: 4rem; /* Add space for mobile header */
   }
 }
 

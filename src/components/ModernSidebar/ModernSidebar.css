@@ -1,0 +1,39 @@
+/* Sheet slide animations - force Tailwind animations */
+[data-state='open'][data-side='left'] {
+  animation: slide-in-from-left 0.3s ease-out !important;
+}
+
+[data-state='closed'][data-side='left'] {
+  animation: slide-out-to-left 0.3s ease-out !important;
+}
+
+/* Overlay animations */
+[data-state='open'][data-radix-dialog-overlay] {
+  animation: fade-in 0.3s ease-out !important;
+}
+
+[data-state='closed'][data-radix-dialog-overlay] {
+  animation: fade-out 0.3s ease-out !important;
+}
+
+/* Force override any conflicting animations */
+.mobile-sidebar-sheet {
+  animation-duration: 0.3s !important;
+  animation-timing-function: ease-out !important;
+}
+
+/* Sidebar consistent white styling */
+.sidebar-sheet-content {
+  background-color: white !important;
+  color: #111827 !important;
+}
+
+/* Ensure proper contrast for navigation */
+.mobile-nav-item {
+  color: #4b5563 !important;
+}
+
+.mobile-nav-item:hover {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}

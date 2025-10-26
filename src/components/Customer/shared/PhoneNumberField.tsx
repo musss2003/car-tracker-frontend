@@ -16,9 +16,9 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
   countries,
   value,
   onChange,
-  placeholder = "61123456",
+  placeholder = '61123456',
   loading = false,
-  error = null
+  error = null,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,17 +30,20 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
   const currentPhoneNumber = value?.split(' ').slice(1).join(' ') || '';
 
   // Find selected country
-  const selectedCountry = countries.find(country => country.callingCode === currentCountryCode);
+  const selectedCountry = countries.find(
+    (country) => country.dialCode === currentCountryCode
+  );
 
   // Filter countries based on search
-  const filteredCountries = countries.filter(country =>
-    country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    country.callingCode.includes(searchTerm)
+  const filteredCountries = countries.filter(
+    (country) =>
+      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.dialCode.includes(searchTerm)
   );
 
   // Handle country code selection
-  const handleCountrySelect = (callingCode: string) => {
-    const newValue = `${callingCode} ${currentPhoneNumber}`.trim();
+  const handleCountrySelect = (dialCode: string) => {
+    const newValue = `${dialCode} ${currentPhoneNumber}`.trim();
     onChange(newValue);
     setIsOpen(false);
     setSearchTerm('');
@@ -55,7 +58,10 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -99,7 +105,11 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
       <div className="phone-field">
         <div className="phone-field__container">
           <div className="phone-field__country-section">
-            <button type="button" className="phone-field__country-trigger" disabled>
+            <button
+              type="button"
+              className="phone-field__country-trigger"
+              disabled
+            >
               <span className="phone-field__code">Loading...</span>
             </button>
           </div>
@@ -118,7 +128,10 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
   }
 
   return (
-    <div className={`phone-field ${isOpen ? 'phone-field--open' : ''}`} ref={dropdownRef}>
+    <div
+      className={`phone-field ${isOpen ? 'phone-field--open' : ''}`}
+      ref={dropdownRef}
+    >
       <div className="phone-field__container">
         {/* Country Code Dropdown */}
         <div className="phone-field__country-section">
@@ -127,22 +140,22 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
             className={`phone-field__country-trigger ${isOpen ? 'phone-field__country-trigger--open' : ''}`}
             onClick={() => {
               console.log('PhoneField button clicked, isOpen was:', isOpen);
-              setIsOpen(prev => !prev);
+              setIsOpen((prev) => !prev);
             }}
           >
             <div className="phone-field__country-content">
               {selectedCountry && (
-                <img
-                  src={selectedCountry.flag}
-                  alt={`${selectedCountry.name} flag`}
-                  className="phone-field__flag"
-                />
+                <span className="phone-field__flag">
+                  {selectedCountry.flag}
+                </span>
               )}
               <span className="phone-field__code">
                 {currentCountryCode || 'Kod'}
               </span>
             </div>
-            <ChevronDownIcon className={`phone-field__arrow ${isOpen ? 'phone-field__arrow--open' : ''}`} />
+            <ChevronDownIcon
+              className={`phone-field__arrow ${isOpen ? 'phone-field__arrow--open' : ''}`}
+            />
           </button>
         </div>
 
@@ -171,7 +184,7 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="phone-field__options">
             {filteredCountries.length > 0 ? (
               filteredCountries.map((country) => (
@@ -179,18 +192,20 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
                   key={country.code}
                   type="button"
                   className={`phone-field__option ${
-                    country.callingCode === currentCountryCode ? 'phone-field__option--selected' : ''
+                    country.dialCode === currentCountryCode
+                      ? 'phone-field__option--selected'
+                      : ''
                   }`}
-                  onClick={() => handleCountrySelect(country.callingCode)}
+                  onClick={() => handleCountrySelect(country.dialCode)}
                 >
-                  <img
-                    src={country.flag}
-                    alt={`${country.name} flag`}
-                    className="phone-field__flag"
-                  />
+                  <span className="phone-field__flag">{country.flag}</span>
                   <div className="phone-field__option-content">
-                    <span className="phone-field__country-name">{country.name}</span>
-                    <span className="phone-field__calling-code">{country.callingCode}</span>
+                    <span className="phone-field__country-name">
+                      {country.name}
+                    </span>
+                    <span className="phone-field__calling-code">
+                      {country.dialCode}
+                    </span>
                   </div>
                 </button>
               ))

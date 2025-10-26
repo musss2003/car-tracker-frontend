@@ -33,8 +33,13 @@ export const getCustomers = async (): Promise<Customer[]> => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Error fetching customers:', errorData.message || `HTTP error! Status: ${response.status}`);
-      throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+      console.error(
+        'Error fetching customers:',
+        errorData.message || `HTTP error! Status: ${response.status}`
+      );
+      throw new Error(
+        errorData.message || `HTTP error! Status: ${response.status}`
+      );
     }
 
     return await response.json();
@@ -125,7 +130,7 @@ export const addCustomer = async (
       body: JSON.stringify(newCustomer),
     });
 
-    console.log(newCustomer)
+    console.log(newCustomer);
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -142,7 +147,7 @@ export const addCustomer = async (
 interface Country {
   name: string;
   flag: string;
-  callingCodes: string[];
+  dialCodes: string[];
   alpha2Code: string;
   alpha3Code: string;
   capital: string;
@@ -166,17 +171,20 @@ interface Country {
 export interface CountryOption {
   name: string;
   flag: string;
-  callingCode: string;
+  dialCode: string;
   code: string;
 }
 
 // Get all countries from local database API
 export const getCountries = async (): Promise<CountryOption[]> => {
   try {
-    const response = await fetch(`${API_URL.replace('customers/', '')}countries`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${API_URL.replace('customers/', '')}countries`,
+      {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -184,7 +192,6 @@ export const getCountries = async (): Promise<CountryOption[]> => {
 
     const countries = await response.json();
 
-    
     if (!Array.isArray(countries) || countries.length === 0) {
       throw new Error('Invalid or empty response data');
     }
@@ -194,20 +201,22 @@ export const getCountries = async (): Promise<CountryOption[]> => {
       .map((country: any) => ({
         name: country.name?.trim() || 'Unknown',
         flag: country.flag || '🏳️',
-        callingCode: country.callingCode || '+0',
-        code: country.code || 'XX'
+        dialCode: country.dialCode || '+0',
+        code: country.code || 'XX',
       }))
-      .filter((country: CountryOption) => country.name !== 'Unknown' && country.name.length > 0)
-      .sort((a: CountryOption, b: CountryOption) => a.name.localeCompare(b.name));
+      .filter(
+        (country: CountryOption) =>
+          country.name !== 'Unknown' && country.name.length > 0
+      )
+      .sort((a: CountryOption, b: CountryOption) =>
+        a.name.localeCompare(b.name)
+      );
 
     return countryOptions;
-
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     console.error('❌ Failed to fetch countries from local API:', errorMessage);
     throw new Error(`Failed to fetch countries: ${errorMessage}`);
   }
 };
-
-
-

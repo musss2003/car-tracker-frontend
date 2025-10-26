@@ -35,12 +35,13 @@ import EditContractForm from '../../../components/Contract/EditContractForm/Edit
 import ContractDetails from '../../../components/Contract/ContractDetails/ContractDetails';
 import CreateContractForm from '../../../components/Contract/CreateContractForm/CreateContractForm';
 import { Contract } from '../../../types/Contract';
-import {
-  TableContainer,
-  TableActions,
-  SearchFilter,
-  Pagination
-} from '../../../components/UI';
+// TODO: Update to use proper shadcn/ui components
+// import {
+//   TableContainer,
+//   TableActions,
+//   SearchFilter,
+//   Pagination,
+// } from '../../../components/ui';
 
 const ContractsTable = () => {
   // State management
@@ -426,13 +427,20 @@ const ContractsTable = () => {
   };
 
   // Render table header with sort indicators
-  const renderTableHeader = (label: string, key: string, additionalClass = '') => {
+  const renderTableHeader = (
+    label: string,
+    key: string,
+    additionalClass = ''
+  ) => {
     const isSorted = sortConfig.key === key;
     const SortIcon =
       sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
 
     return (
-      <th className={`table-heading ${additionalClass}`} onClick={() => handleSort(key)}>
+      <th
+        className={`table-heading ${additionalClass}`}
+        onClick={() => handleSort(key)}
+      >
         <div className="header-content">
           <span>{label}</span>
           {isSorted ? (
@@ -480,14 +488,14 @@ const ContractsTable = () => {
         onExportPDF={exportToPDF}
         onExportExcel={exportToExcel}
       />
-      
+
       <div className="contracts-table-custom-controls">
         <SearchFilter
           searchTerm={searchTerm}
           onSearchChange={(value) => setSearchTerm(value)}
           placeholder="Search by customer, passport, or car..."
         />
-        
+
         <div className="filter-container">
           <FilterIcon className="filter-icon" />
           <select
