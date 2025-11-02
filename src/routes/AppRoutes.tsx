@@ -15,6 +15,7 @@ const CarAvailabilityPage = lazy(
 );
 const ContractsPage = lazy(() => import('../pages/contract/ContractsPage'));
 const CustomersPage = lazy(() => import('../pages/customer/CustomersPage'));
+const CreateCustomerPage = lazy(() => import('../pages/customer/CreateCustomerPage'));
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
 const UserProfile = lazy(
   () => import('../components/User/UserProfile/UserProfile')
@@ -25,7 +26,6 @@ import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../contexts/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
 import DashboardPage from '../pages/DashboardPage/DashboardPage';
-import CustomerDetails from '@/components/Customer/CustomerDetails/CustomerDetails';
 import CreateContractPage from '@/pages/contract/CreateContractPage';
 import EditContractPage from '@/pages/contract/EditContractPage';
 
@@ -61,6 +61,7 @@ export function AppRoutes() {
           <Route path="/contracts/:id/edit" element={<EditContractPage />} /> 
           {/* <Route path="/contracts/:id" element={<CustomerDetails />} /> */}
          
+          <Route path="/customers/new" element={<CreateCustomerPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />
