@@ -85,9 +85,7 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({
         <div className="country-dropdown__selected">
           {selectedCountryData ? (
             <>
-              <span>
-                {selectedCountryData.flag}
-              </span>
+              <span>{selectedCountryData.flag}</span>
               <span className="country-dropdown__name">
                 {selectedCountryData.name}
               </span>

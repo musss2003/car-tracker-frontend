@@ -6,7 +6,10 @@ import './CustomerDocumentsSection.css';
 
 interface CustomerDocumentsSectionProps {
   customer: Customer;
-  getValue: (value: string | number | null | undefined, defaultValue?: string) => string | number;
+  getValue: (
+    value: string | number | null | undefined,
+    defaultValue?: string
+  ) => string | number;
   getFieldValue: (
     newField: string | number | null | undefined,
     legacyField: string | number | null | undefined,
@@ -87,8 +90,8 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
     customer.drivingLicensePhotoUrl,
     (customer as any).driving_license_photo_url
   );
-  
-  const passportFilename = getFieldValue(
+
+  const passportUrl = getFieldValue(
     customer.passportPhotoUrl,
     (customer as any).passport_photo_url
   );
@@ -99,7 +102,7 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
         <DocumentTextIcon className="section-icon" />
         Dokumenti
       </h3>
-      
+
       <div className="documents-grid">
         {/* Driver License */}
         <div className="document-group">
@@ -112,15 +115,17 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
               )}
             </div>
           </div>
-          
+
           <div className="document-photo">
-            {drivingLicenseFilename && drivingLicenseFilename !== 'N/A' ? (
-              <div 
+            {drivingLicenseUrl && drivingLicenseUrl !== 'N/A' ? (
+              <div
                 className="photo-container photo-container--clickable"
-                onClick={() => onImageClick(drivingLicenseFilename as string, 'Vozačka dozvola')}
+                onClick={() =>
+                  onImageClick(drivingLicenseUrl as string, 'Vozačka dozvola')
+                }
               >
-                <AuthenticatedImage
-                  filename={drivingLicenseFilename}
+                <img
+                  src={drivingLicenseUrl as string}
                   alt="Vozačka dozvola"
                   className="document-image"
                 />
@@ -149,15 +154,15 @@ const CustomerDocumentsSection: React.FC<CustomerDocumentsSectionProps> = ({
               )}
             </div>
           </div>
-          
+
           <div className="document-photo">
-            {passportFilename && passportFilename !== 'N/A' ? (
-              <div 
+            {passportUrl && passportUrl !== 'N/A' ? (
+              <div
                 className="photo-container photo-container--clickable"
                 onClick={() => onImageClick(passportFilename as string, 'Pasoš')}
               >
-                <AuthenticatedImage
-                  filename={passportFilename}
+                <img
+                  src={passportUrl as string}
                   alt="Pasoš"
                   className="document-image"
                 />

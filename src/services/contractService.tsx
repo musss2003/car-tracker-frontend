@@ -1,28 +1,20 @@
-import { Contract } from '../types/Contract';
+import { Contract, ContractFormData } from '../types/Contract';
 import { getAuthHeaders } from '../utils/getAuthHeaders';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/contracts/';
 
-// Expected by useDataFetcher:
-// const { data: revenueData } = useDataFetcher<{ totalRevenue: number }>(...)
-export const getTotalRevenue = async (): Promise<number> => {
-  try {
-    const response = await fetch(`${API_URL}revenue`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
+export const getTotalRevenue = async (): Promise<{ totalRevenue: number }> => {
+  const response = await fetch(`${API_URL}revenue`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
 
-    if (!response.ok) {
-      throw new Error(`Error fetching revenue: ${response.statusText}`);
-    }
-
-    const totalRevenue: number = await response.json();
-
-    return totalRevenue;
-  } catch (error) {
-    console.error('Error fetching total revenue:', error);
-    throw error;
+  if (!response.ok) {
+    throw new Error(`Error fetching revenue: ${response.statusText}`);
   }
+
+  return response.json();
 };
 
 export const getContracts = async (): Promise<Contract[]> => {
@@ -55,16 +47,6 @@ export const getContractTemplate = async (): Promise<Response> => {
   return res;
 };
 
-export const getContractsPopulated = async (): Promise<Contract[]> => {
-  const res = await fetch(`${API_URL}populated`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  return res.json();
-};
-
 export const getActiveContracts = async (): Promise<Contract[]> => {
   const res = await fetch(`${API_URL}active`, {
     method: 'GET',
@@ -79,7 +61,7 @@ export const updateContract = async (
   contractId: string,
   updatedContract: Partial<Contract>
 ): Promise<Contract> => {
-  const res = await fetch(`${API_URL}${contractId}`, {
+  const res = await fetch(`${API_URL}${encodeURIComponent(contractId)}`, {
     method: 'PUT',
     headers: {
       ...getAuthHeaders(),
@@ -88,11 +70,12 @@ export const updateContract = async (
   });
 
   if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  toast.success('Contract updated successfully!');
   return res.json();
 };
 
 export const deleteContract = async (contractId: string): Promise<void> => {
-  const res = await fetch(`${API_URL}${contractId}`, {
+  const res = await fetch(`${API_URL}${encodeURIComponent(contractId)}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -101,8 +84,10 @@ export const deleteContract = async (contractId: string): Promise<void> => {
 };
 
 export const createAndDownloadContract = async (
-  contractData: Partial<Contract>
+  contractData: ContractFormData
 ): Promise<Contract | undefined> => {
+
+  console.log(contractData);
   try {
     const res = await fetch(`${API_URL}`, {
       method: 'POST',
@@ -115,7 +100,7 @@ export const createAndDownloadContract = async (
     const { contract, docx } = JSON.parse(text);
 
     const docxBlob = extractDocxBlobFromResponse(docx);
-    triggerDownloadContract(await docxBlob, contract._id);
+    triggerDownloadContract(await docxBlob, contract.id);
     return contract;
   } catch (error) {
     console.error('Error creating and downloading contract:', error);
@@ -123,10 +108,13 @@ export const createAndDownloadContract = async (
 };
 
 export const downloadContract = async (contractId: string): Promise<void> => {
-  const res = await fetch(`${API_URL}download/${contractId}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
+  const res = await fetch(
+    `${API_URL}download/${encodeURIComponent(contractId)}`,
+    {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    }
+  );
 
   if (!res.ok) throw new Error(`Error downloading contract: ${res.statusText}`);
 
@@ -153,12 +141,11 @@ const triggerDownloadContract = async (blob: Blob, contractId: string) => {
 
   const contractData = await getContract(contractId);
 
-  console.log(contractData);
-
   const contract =
-    (a.download = `contract_${contractData.customer.name.replace(/\s+/g, '_')}_${contractData.car.license_plate}_${new Date(contractData.rentalPeriod.startDate).toISOString().split('T')[0]}_${new Date(contractData.rentalPeriod.endDate).toISOString().split('T')[0]}.docx`);
+    (a.download = `contract_${contractData.customer.name.replace(/\s+/g, '_')}_${contractData.car.licensePlate}_${new Date(contractData.startDate).toISOString().split('T')[0]}_${new Date(contractData.endDate).toISOString().split('T')[0]}.docx`);
 
   document.body.appendChild(a);
+
   a.click();
   a.remove();
 };

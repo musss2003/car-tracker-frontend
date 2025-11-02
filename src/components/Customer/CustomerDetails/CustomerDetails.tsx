@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { XIcon, PencilIcon, TrashIcon } from '@heroicons/react/solid';
-import { Card, CardHeader, Button } from '../../UI';
+import { Card, CardHeader, Button } from '../../ui';
 import { Customer } from '../../../types/Customer';
 import './CustomerDetails.css';
 import CustomerInfoSection from './sections/CustomerInfoSection';
@@ -28,7 +28,9 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
   onClose,
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [expandedImage, setExpandedImage] = useState<ExpandedImage | null>(null);
+  const [expandedImage, setExpandedImage] = useState<ExpandedImage | null>(
+    null
+  );
 
   // Get value or fallback
   const getValue = (
@@ -52,18 +54,23 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
     if (!dateString) return 'N/A';
 
     try {
-      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+      const date =
+        typeof dateString === 'string' ? new Date(dateString) : dateString;
       if (isNaN(date.getTime())) return 'N/A';
 
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }) + ' ' + date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
+      return (
+        date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }) +
+        ' ' +
+        date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        })
+      );
     } catch (error) {
       return 'N/A';
     }

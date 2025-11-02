@@ -24,7 +24,6 @@
   background: var(--bg-secondary);
 }
 
-
 .customer-table-row {
   border-bottom: 1px solid var(--border-primary);
   transition: var(--transition-slow);

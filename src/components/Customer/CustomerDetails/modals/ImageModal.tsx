@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon } from '@heroicons/react/solid';
-import { Button } from '../../../UI';
-import { downloadDocument } from '../../../../services/uploadService';
+import { Button } from '../../../ui';
 import './ImageModal.css';
 
 interface ImageModalProps {
@@ -70,27 +69,11 @@ const ImageModal: React.FC<ImageModalProps> = ({
             Zatvori
           </Button>
         </div>
-        
+
         <div className="image-modal-content">
-          {isLoading ? (
-            <div className="image-modal-loading">
-              <div className="spinner"></div>
-              <p>Učitavanje slike...</p>
-            </div>
-          ) : error || !blobUrl ? (
-            <div className="image-modal-error">
-              <p>❌ Greška pri učitavanju slike</p>
-              <small>{imageUrl}</small>
-            </div>
-          ) : (
-            <img 
-              src={blobUrl} 
-              alt={imageType}
-              className="image-modal-image"
-            />
-          )}
+          <img src={imageUrl} alt={imageType} className="image-modal-image" />
         </div>
-        
+
         <div className="image-modal-footer">
           <p className="image-modal-hint">
             Kliknite van slike ili pritisnite Escape da zatvorite

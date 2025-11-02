@@ -27,7 +27,7 @@
 .country-dropdown__trigger--open {
   border-color: var(--primary-color);
   background: var(--bg-primary);
-  box-shadow: 
+  box-shadow:
     0 0 0 3px var(--primary-color-light-rgba),
     var(--shadow-md);
 }
@@ -226,15 +226,15 @@
     padding: 0.875rem 1rem;
     font-size: 0.9rem;
   }
-  
+
   .country-dropdown__search {
     padding: 0.75rem;
   }
-  
+
   .country-dropdown__options {
     max-height: 150px;
   }
-  
+
   .country-dropdown__option {
     padding: 0.75rem;
   }

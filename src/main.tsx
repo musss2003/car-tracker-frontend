@@ -5,7 +5,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom';
-import UserProvider from './contexts/useAuth'; // 
+import UserProvider from './contexts/useAuth'; //
 
 const rootElement = document.getElementById('root');
 

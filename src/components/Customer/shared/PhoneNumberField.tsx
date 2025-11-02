@@ -144,11 +144,11 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
             }}
           >
             <div className="phone-field__country-content">
-                {selectedCountry && (
+              {selectedCountry && (
                 <span className="phone-field__flag">
                   {selectedCountry.flag}
                 </span>
-                )}
+              )}
               <span className="phone-field__code">
                 {currentCountryCode || 'Kod'}
               </span>
@@ -192,22 +192,20 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
                   key={country.code}
                   type="button"
                   className={`phone-field__option ${
-                  country.dialCode === currentCountryCode
-                    ? 'phone-field__option--selected'
-                    : ''
+                    country.dialCode === currentCountryCode
+                      ? 'phone-field__option--selected'
+                      : ''
                   }`}
                   onClick={() => handleCountrySelect(country.dialCode)}
                 >
-                  <span className="phone-field__flag">
-                  {country.flag}
-                  </span>
+                  <span className="phone-field__flag">{country.flag}</span>
                   <div className="phone-field__option-content">
-                  <span className="phone-field__country-name">
-                    {country.name}
-                  </span>
-                  <span className="phone-field__calling-code">
-                    {country.dialCode}
-                  </span>
+                    <span className="phone-field__country-name">
+                      {country.name}
+                    </span>
+                    <span className="phone-field__calling-code">
+                      {country.dialCode}
+                    </span>
                   </div>
                 </button>
               ))
