@@ -16,6 +16,7 @@ const CarAvailabilityPage = lazy(
 const ContractsPage = lazy(() => import('../pages/contract/ContractsPage'));
 const CustomersPage = lazy(() => import('../pages/customer/CustomersPage'));
 const CreateCustomerPage = lazy(() => import('../pages/customer/CreateCustomerPage'));
+const EditCustomerPage = lazy(() => import('../pages/customer/EditCustomerPage'));
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
 const UserProfile = lazy(
   () => import('../components/User/UserProfile/UserProfile')
@@ -62,6 +63,7 @@ export function AppRoutes() {
           {/* <Route path="/contracts/:id" element={<CustomerDetails />} /> */}
          
           <Route path="/customers/new" element={<CreateCustomerPage />} />
+          <Route path="/customers/:id/edit" element={<EditCustomerPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />
