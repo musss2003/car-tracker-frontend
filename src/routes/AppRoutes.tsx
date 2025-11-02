@@ -14,7 +14,7 @@ const CarAvailabilityPage = lazy(
   () => import('../pages/car/CarAvailabilityPage')
 );
 const ContractsPage = lazy(() => import('../pages/contract/ContractsPage'));
-const CustomersPage = lazy(() => import('../pages/CustomersPage'));
+const CustomersPage = lazy(() => import('../pages/customer/CustomersPage'));
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
 const UserProfile = lazy(
   () => import('../components/User/UserProfile/UserProfile')
