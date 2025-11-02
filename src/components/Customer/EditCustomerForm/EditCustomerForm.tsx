@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, SaveIcon } from '@heroicons/react/solid';
-import { Card, CardHeader, Button, FormField, FormActions } from '../../ui';
+import { Card, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { FormField, FormActions } from '../../ui';
 import CustomerPhotoField from '../shared/CustomerPhotoField';
 import CountryDropdown from '../shared/CountryDropdown';
 import PhoneNumberField from '../shared/PhoneNumberField';

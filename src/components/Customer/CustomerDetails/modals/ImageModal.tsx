@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon } from '@heroicons/react/solid';
-import { Button } from '../../../ui';
+import { Button } from '@/components/ui/button';
+import { downloadDocument } from '../../../../services/uploadService';
 import './ImageModal.css';
 
 interface ImageModalProps {
@@ -64,8 +65,8 @@ const ImageModal: React.FC<ImageModalProps> = ({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            leftIcon={<XIcon />}
           >
+            <XIcon className="w-4 h-4 mr-1" />
             Zatvori
           </Button>
         </div>

@@ -14,21 +14,47 @@ import {
   PencilIcon,
   TrashIcon,
   EyeIcon,
-  UserAddIcon,
+  PlusCircleIcon,
+  SearchIcon,
+  DownloadIcon,
+  ExclamationCircleIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/solid';
-import './CustomersTable.css';
+import * as XLSX from 'xlsx';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import CustomerDetails from '../../../components/Customer/CustomerDetails/CustomerDetails';
 import EditCustomerForm from '../../../components/Customer/EditCustomerForm/EditCustomerForm';
-import * as XLSX from 'xlsx';
 import { Customer } from '../../../types/Customer';
 import CreateCustomerForm from '../../../components/Customer/CreateCustomerForm/CreateCustomerForm';
-// TODO: Update to use proper shadcn/ui components
-// import {
-//   TableContainer,
-//   TableActions,
-//   SearchFilter,
-//   Pagination,
-// } from '../../../components/ui';
 
 const CustomersTable = () => {
   // State management
@@ -262,213 +288,294 @@ const CustomersTable = () => {
       sortConfig.direction === 'asc' ? SortAscendingIcon : SortDescendingIcon;
 
     return (
-      <th className="table-heading" onClick={() => handleSort(key)}>
-        <div className="header-content">
+      <TableHead
+        className="cursor-pointer hover:bg-muted/50"
+        onClick={() => handleSort(key)}
+      >
+        <div className="flex items-center gap-2">
           <span>{label}</span>
           {isSorted ? (
-            <SortIcon className="sort-icon active" />
+            <SortIcon className="w-4 h-4" />
           ) : (
-            <SortAscendingIcon className="sort-icon" />
+            <SortAscendingIcon className="w-4 h-4 text-muted-foreground" />
           )}
         </div>
-      </th>
+      </TableHead>
     );
   };
 
-  // If a form or details view is active, show only that
-  if (isCreating) {
-    return (
-      <div className="overlay-container">
-        <div className="form-container">
+
+
+  return (
+    <div className="space-y-6 p-6">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <CardTitle className="text-2xl">Korisnici</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                Upravljanje korisnicima sistema
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={exportToExcel}
+                disabled={loading || customers.length === 0}
+              >
+                <DownloadIcon className="w-4 h-4 mr-2" />
+                Izvoz Excel
+              </Button>
+              <Button onClick={() => setIsCreating(true)}>
+                <PlusCircleIcon className="w-4 h-4 mr-2" />
+                Dodaj novog korisnika
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Search and filters */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Pretraži korisnike..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Loading indicator */}
+          {loading && (
+            <div className="flex items-center justify-center gap-2 p-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              <span>Učitavanje korisnika...</span>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!loading && customers.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                <PlusCircleIcon className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">
+                Nema pronađenih korisnika
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Počnite dodavanjem vašeg prvog korisnika
+              </p>
+              <Button onClick={() => setIsCreating(true)}>
+                <PlusCircleIcon className="w-4 h-4 mr-2" />
+                Dodaj novog korisnika
+              </Button>
+            </div>
+          )}
+
+          {/* Customer table */}
+          {!loading && customers.length > 0 && (
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      {renderTableHeader('Ime', 'name')}
+                      {renderTableHeader(
+                        'Vozačka dozvola',
+                        'driverLicenseNumber'
+                      )}
+                      {renderTableHeader('Broj pasoša', 'passportNumber')}
+                      {renderTableHeader('Email', 'email')}
+                      {renderTableHeader('Telefon', 'phoneNumber')}
+                      {renderTableHeader('Zemlja', 'countryOfOrigin')}
+                      <TableHead className="text-center">Akcije</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedCustomers.length > 0 ? (
+                      paginatedCustomers.map((customer, index) => (
+                        <TableRow key={customer.id || index}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary">
+                                {customer.name
+                                  ? customer.name.charAt(0).toUpperCase()
+                                  : '?'}
+                              </div>
+                              <span>{customer.name || 'N/A'}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {customer.driverLicenseNumber || 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            {customer.passportNumber || 'N/A'}
+                          </TableCell>
+                          <TableCell>{customer.email || 'N/A'}</TableCell>
+                          <TableCell>{customer.phoneNumber || 'N/A'}</TableCell>
+                          <TableCell>
+                            {customer.countryOfOrigin || 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center justify-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedCustomer(customer);
+                                }}
+                                title="Prikaži detalje"
+                              >
+                                <EyeIcon className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(customer);
+                                }}
+                                title="Uredi korisnika"
+                              >
+                                <PencilIcon className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(customer.id ?? '');
+                                }}
+                                title="Izbriši korisnika"
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <TrashIcon className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={7}
+                          className="text-center text-muted-foreground py-8"
+                        >
+                          Nema korisnika koji odgovaraju vašim kriterijima
+                          pretrage
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm text-muted-foreground">
+                  Prikazuje {(currentPage - 1) * itemsPerPage + 1} do{' '}
+                  {Math.min(
+                    currentPage * itemsPerPage,
+                    filteredAndSortedCustomers.length
+                  )}{' '}
+                  od {filteredAndSortedCustomers.length} rezultata
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={itemsPerPage.toString()}
+                    onValueChange={(value) => {
+                      setItemsPerPage(Number(value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeftIcon className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRightIcon className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Create Customer Dialog */}
+      <Dialog open={isCreating} onOpenChange={setIsCreating}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Dodaj novog korisnika</DialogTitle>
+          </DialogHeader>
           <CreateCustomerForm
             onSave={handleCreate}
             onCancel={() => setIsCreating(false)}
           />
-        </div>
-      </div>
-    );
-  }
+        </DialogContent>
+      </Dialog>
 
-  if (isEditing && editCustomer) {
-    return (
-      <div className="overlay-container">
-        <div className="form-container">
-          <EditCustomerForm
-            customer={editCustomer}
-            onSave={handleSave}
-            onCancel={closeEditForm}
-          />
-        </div>
-      </div>
-    );
-  }
+      {/* Edit Customer Dialog */}
+      <Dialog open={isEditing} onOpenChange={(open) => !open && closeEditForm()}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Uredi korisnika</DialogTitle>
+          </DialogHeader>
+          {editCustomer && (
+            <EditCustomerForm
+              customer={editCustomer}
+              onSave={handleSave}
+              onCancel={closeEditForm}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
-  if (selectedCustomer) {
-    return (
-      <div className="overlay-container">
-        <div className="details-container">
-          <CustomerDetails
-            customer={selectedCustomer}
-            onEdit={() => handleEdit(selectedCustomer)}
-            onDelete={() =>
-              selectedCustomer?.id && handleDelete(selectedCustomer.id)
-            }
-            onClose={closeCustomerDetails}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <TableContainer>
-      <TableActions
-        onCreateClick={() => setIsCreating(true)}
-        onExportExcel={exportToExcel}
-        createLabel="Dodaj novog korisnika"
-        createIcon="user"
-        loading={loading}
-        showExport={true}
-      />
-
-      <div className="customers-table-custom-controls">
-        <SearchFilter
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          placeholder="Pretraži korisnike..."
-        />
-      </div>
-
-      {/* Loading indicator */}
-      {loading && (
-        <div className="customers-loading-indicator">
-          <div className="customers-spinner"></div>
-          <span>Učitavanje korisnika...</span>
-        </div>
-      )}
-
-      {/* Empty state */}
-      {!loading && customers.length === 0 && (
-        <div className="empty-state">
-          <div className="empty-icon-container">
-            <UserAddIcon className="empty-icon" />
-          </div>
-          <h3>Nema pronađenih korisnika</h3>
-          <p>Počnite dodavanjem vašeg prvog korisnika</p>
-          <button className="create-btn" onClick={() => setIsCreating(true)}>
-            Dodaj novog korisnika
-          </button>
-        </div>
-      )}
-
-      {/* Customer table */}
-      {!loading && customers.length > 0 && (
-        <div className="customers-table-wrapper">
-          <table className="customer-table">
-            <thead className="customer-table-header">
-              <tr>
-                {renderTableHeader('Ime', 'name')}
-                {renderTableHeader('Vozačka dozvola', 'driverLicenseNumber')}
-                {renderTableHeader('Broj pasoša', 'passportNumber')}
-                {renderTableHeader('Email', 'email')}
-                {renderTableHeader('Telefon', 'phoneNumber')}
-                {renderTableHeader('Zemlja', 'countryOfOrigin')}
-                <th className="table-heading actions-column">Akcije</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedCustomers.length > 0 ? (
-                paginatedCustomers.map((customer, index) => (
-                  <tr key={customer.id || index} className="table-row">
-                    <td className="table-cell">
-                      <div className="customer-name-cell">
-                        <div className="customer-avatar">
-                          {customer.name
-                            ? customer.name.charAt(0).toUpperCase()
-                            : '?'}
-                        </div>
-                        <span>{customer.name || 'N/A'}</span>
-                      </div>
-                    </td>
-                    <td className="table-cell">
-                      {customer.driverLicenseNumber || 'N/A'}
-                    </td>
-                    <td className="table-cell">
-                      {customer.passportNumber || 'N/A'}
-                    </td>
-                    <td className="table-cell">{customer.email || 'N/A'}</td>
-                    <td className="table-cell">
-                      {customer.phoneNumber || 'N/A'}
-                    </td>
-                    <td className="table-cell">
-                      {customer.countryOfOrigin || 'N/A'}
-                    </td>
-                    <td className="table-cell actions-cell">
-                      <div className="customers-action-buttons">
-                        <button
-                          className="customers-action-btn view"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedCustomer(customer);
-                          }}
-                          title="Prikaži detalje"
-                          aria-label="Prikaži detalje korisnika"
-                        >
-                          <EyeIcon className="customers-action-icon" />
-                        </button>
-                        <button
-                          className="customers-action-btn edit"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(customer);
-                          }}
-                          title="Uredi korisnika"
-                          aria-label="Uredi korisnika"
-                        >
-                          <PencilIcon className="customers-action-icon" />
-                        </button>
-                        <button
-                          className="customers-action-btn delete"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(customer.id ?? '');
-                          }}
-                          title="Izbriši korisnika"
-                          aria-label="Izbriši korisnika"
-                        >
-                          <TrashIcon className="customers-action-icon" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="empty-table-message">
-                    Nema korisnika koji odgovaraju vašim kriterijima pretrage
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Pagination */}
-      {filteredAndSortedCustomers.length > 0 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={filteredAndSortedCustomers.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={(newItemsPerPage) => {
-            setItemsPerPage(newItemsPerPage);
-            setCurrentPage(1);
-          }}
-        />
-      )}
-    </TableContainer>
+      {/* Customer Details Dialog */}
+      <Dialog open={!!selectedCustomer} onOpenChange={(open) => !open && closeCustomerDetails()}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalji korisnika</DialogTitle>
+          </DialogHeader>
+          {selectedCustomer && (
+            <CustomerDetails
+              customer={selectedCustomer}
+              onEdit={() => handleEdit(selectedCustomer)}
+              onDelete={() =>
+                selectedCustomer?.id && handleDelete(selectedCustomer.id)
+              }
+              onClose={closeCustomerDetails}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

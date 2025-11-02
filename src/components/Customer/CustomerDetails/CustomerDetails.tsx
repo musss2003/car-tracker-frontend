@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { XIcon, PencilIcon, TrashIcon } from '@heroicons/react/solid';
-import { Card, CardHeader, Button } from '../../ui';
+import { Card, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Customer } from '../../../types/Customer';
 import './CustomerDetails.css';
 import CustomerInfoSection from './sections/CustomerInfoSection';
@@ -102,39 +103,45 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
 
   return (
     <div className="customer-details-overlay">
-      <Card className="customer-details-card" size="lg">
-        <CardHeader
-          title={`Detalji korisnika: ${getValue(customer.name)}`}
-          subtitle={`ID: ${customer.id} • Email: ${getValue(customer.email)}`}
-          actions={
-            <div className="customer-details-actions">
+      <Card className="customer-details-card">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="text-lg font-semibold">
+                Detalji korisnika: {getValue(customer.name)}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                ID: {customer.id} • Email: {getValue(customer.email)}
+              </p>
+            </div>
+            <div className="flex gap-2">
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={onEdit}
-                leftIcon={<PencilIcon />}
               >
+                <PencilIcon className="w-4 h-4 mr-1" />
                 Uredi
               </Button>
               <Button
-                variant="danger"
+                variant="destructive"
                 size="sm"
                 onClick={handleDeleteClick}
-                leftIcon={<TrashIcon />}
               >
+                <TrashIcon className="w-4 h-4 mr-1" />
                 Obriši
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                leftIcon={<XIcon />}
               >
+                <XIcon className="w-4 h-4 mr-1" />
                 Zatvori
               </Button>
             </div>
-          }
-        />
+          </div>
+        </CardHeader>
 
         <div className="customer-details-content">
           <div className="details-sections">
