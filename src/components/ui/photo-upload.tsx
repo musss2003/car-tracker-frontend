@@ -6,9 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { downloadDocument } from '@/services/uploadService';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface PhotoUploadProps {
-  value: File | null;
+  value?: File | null;
   onChange: (file: File | null) => void;
   error?: string;
   disabled?: boolean;
@@ -31,23 +41,41 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Generate a unique ID for this component instance
+  const uniqueId = useRef(`photo-upload-${Math.random().toString(36).substr(2, 9)}`).current;
 
   const loadExistingPhoto = async (photoUrl: string) => {
     if (!photoUrl) return;
 
     setIsLoadingPhoto(true);
     try {
+      console.log(`Attempting to load photo: "${photoUrl}"`);
       const photoBlob = await downloadDocument(photoUrl);
       const photoObjectUrl = URL.createObjectURL(photoBlob);
       setPhotoPreview(photoObjectUrl);
     } catch (error) {
       console.error('Error loading existing photo:', error);
-      alert('Failed to load existing photo. Please try again later.');
+      console.error('Photo URL that failed:', photoUrl);
+      // Don't show alert, just silently fail - the photo field will remain empty
+      // User can upload a new photo if needed
     } finally {
       setIsLoadingPhoto(false);
     }
   };
+
+  // Sync with value prop - clear preview when value is null
+  useEffect(() => {
+    if (!value && photoPreview && !existingPhotoUrl) {
+      // Value was cleared externally, clear the preview
+      if (photoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreview);
+      }
+      setPhotoPreview('');
+    }
+  }, [value]);
 
   useEffect(() => {
     if (existingPhotoUrl) {
@@ -99,7 +127,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const removePhoto = () => {
+  const confirmRemovePhoto = () => {
     if (photoPreview && photoPreview.startsWith('blob:')) {
       URL.revokeObjectURL(photoPreview);
     }
@@ -108,15 +136,20 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    setShowRemoveDialog(false);
+  };
+
+  const handleRemoveClick = () => {
+    setShowRemoveDialog(true);
   };
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="photo">{label}</Label>
+      <Label htmlFor={uniqueId}>{label}</Label>
       <div className="relative">
         <input
           ref={fileInputRef}
-          id="photo"
+          id={uniqueId}
           type="file"
           accept={accept}
           onChange={handlePhotoChange}
@@ -126,7 +159,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
 
         {!photoPreview ? (
           <label
-            htmlFor="photo"
+            htmlFor={uniqueId}
             className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
               disabled || isUploadingPhoto
                 ? 'bg-muted cursor-not-allowed opacity-60'
@@ -153,18 +186,11 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-              <label
-                htmlFor="photo"
-                className="flex items-center gap-2 px-4 py-2 bg-background text-foreground rounded-md cursor-pointer hover:bg-muted transition-colors text-sm font-medium"
-              >
-                <Upload className="h-4 w-4" />
-                Promijeni
-              </label>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={removePhoto}
+                onClick={handleRemoveClick}
                 disabled={disabled || isUploadingPhoto}
                 className="flex items-center gap-2 bg-transparent"
               >
@@ -186,6 +212,23 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+
+      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Ukloniti fotografiju?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Da li ste sigurni da želite ukloniti ovu fotografiju? Ova akcija se ne može poništiti.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogAction className='bg-red-700 text-amber-50' onClick={confirmRemovePhoto}>
+              Ukloni
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

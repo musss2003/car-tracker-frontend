@@ -33,33 +33,59 @@ import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 // Import municipalities data
 import municipalitiesDataRaw from '../../../municipalities.json';
+import { checkDomainOfScale } from 'recharts/types/util/ChartUtils';
 
-// Extract all municipalities from the nested structure
-const getAllMunicipalities = (): string[] => {
-  const municipalities: string[] = [];
+// Type for municipality with region info
+interface MunicipalityOption {
+  name: string;
+  region: string;
+  uniqueKey: string;
+}
+
+// Extract all municipalities from the nested structure with region info
+const getAllMunicipalities = (): MunicipalityOption[] => {
+  const municipalities: MunicipalityOption[] = [];
   const data = municipalitiesDataRaw as any;
 
   // Federation
   if (data['Federacija Bosne i Hercegovine']) {
     const federation = data['Federacija Bosne i Hercegovine'];
-    Object.values(federation).forEach((cantonMunicipalities: any) => {
+    Object.entries(federation).forEach(([canton, cantonMunicipalities]: [string, any]) => {
       if (Array.isArray(cantonMunicipalities)) {
-        municipalities.push(...cantonMunicipalities);
+        cantonMunicipalities.forEach((name: string) => {
+          municipalities.push({
+            name,
+            region: 'FBiH',
+            uniqueKey: `fbih-${name.toLowerCase().replace(/\s/g, '-')}`,
+          });
+        });
       }
     });
   }
 
   // Republika Srpska
   if (data['Republika Srpska'] && Array.isArray(data['Republika Srpska'])) {
-    municipalities.push(...data['Republika Srpska']);
+    data['Republika Srpska'].forEach((name: string) => {
+      municipalities.push({
+        name,
+        region: 'RS',
+        uniqueKey: `rs-${name.toLowerCase().replace(/\s/g, '-')}`,
+      });
+    });
   }
 
   // Brčko District
   if (data['Brčko distrikt'] && Array.isArray(data['Brčko distrikt'])) {
-    municipalities.push(...data['Brčko distrikt']);
+    data['Brčko distrikt'].forEach((name: string) => {
+      municipalities.push({
+        name,
+        region: 'BD',
+        uniqueKey: `bd-${name.toLowerCase().replace(/\s/g, '-')}`,
+      });
+    });
   }
 
-  return municipalities.sort();
+  return municipalities.sort((a, b) => a.name.localeCompare(b.name));
 };
 
 const municipalities = getAllMunicipalities();
@@ -105,6 +131,7 @@ const EditCustomerPage: React.FC = () => {
 
       try {
         const customerData = await getCustomer(id);
+        console.log('Loaded customer data:', customerData);
         setCustomer(customerData);
       } catch (error) {
         console.error('Error loading customer:', error);
@@ -130,8 +157,10 @@ const EditCustomerPage: React.FC = () => {
   const parsePhoneNumber = (fullPhone: string | undefined): { dialCode: string; number: string } => {
     if (!fullPhone) return { dialCode: '+387', number: '' };
     
-    // Try to extract dial code (starts with +, followed by 1-4 digits)
-    const match = fullPhone.match(/^(\+\d{1,4})(.*)$/);
+    // Smart parsing: Find where the dial code ends by looking for common phone number patterns
+    // Most local phone numbers start with 6-9 (mobile) or 1-5 (landline)
+    // This regex matches: + followed by 1-3 digits, then a digit 0-9 that starts the local number
+    const match = fullPhone.match(/^(\+\d{1,3})([0-9].*)$/);
     if (match) {
       return {
         dialCode: match[1],
@@ -196,6 +225,10 @@ const EditCustomerFormContent: React.FC<{
   const [existingPassportPhotoUrl, setExistingPassportPhotoUrl] = useState<string | null>(null);
   const [isLoadingPassportPhoto, setIsLoadingPassportPhoto] = useState(false);
 
+  // Track if photos were explicitly removed
+  const [licensePhotoRemoved, setLicensePhotoRemoved] = useState(false);
+  const [passportPhotoRemoved, setPassportPhotoRemoved] = useState(false);
+
   // Fetch countries on mount
   useEffect(() => {
     const fetchCountries = async () => {
@@ -226,15 +259,18 @@ const EditCustomerFormContent: React.FC<{
 
     setIsLoading(true);
     try {
+      console.log(`Attempting to load ${photoType} photo: "${photoUrl}"`);
       const photoBlob = await downloadDocument(photoUrl);
       const photoObjectUrl = URL.createObjectURL(photoBlob);
       setPhotoUrl(photoObjectUrl);
     } catch (error) {
       console.error(`Error loading existing ${photoType} photo:`, error);
-      setErrors((prev) => ({
-        ...prev,
-        [`${photoType}PhotoUrl`]: `Neuspješno učitavanje postojeće fotografije. Možete unijeti novu.`,
-      }));
+      console.error(`${photoType} photo URL that failed:`, photoUrl);
+      // Don't set error in UI - just log it and let user upload new photo if needed
+      // setErrors((prev) => ({
+      //   ...prev,
+      //   [`${photoType}PhotoUrl`]: `Neuspješno učitavanje postojeće fotografije. Možete unijeti novu.`,
+      // }));
     } finally {
       setIsLoading(false);
     }
@@ -302,11 +338,39 @@ const EditCustomerFormContent: React.FC<{
   // Handle license photo file changes
   const handleLicensePhotoChange = (file: File | null) => {
     setSelectedLicensePhoto(file);
+    
+    if (file === null) {
+      // Photo was removed
+      setLicensePhotoRemoved(true);
+      // Clear from formData and existing photo URL
+      setFormData((prev) => ({
+        ...prev,
+        drivingLicensePhotoUrl: '',
+      }));
+      setExistingLicensePhotoUrl(null);
+    } else {
+      // New photo selected
+      setLicensePhotoRemoved(false);
+    }
   };
 
   // Handle passport photo file changes
   const handlePassportPhotoChange = (file: File | null) => {
     setSelectedPassportPhoto(file);
+    
+    if (file === null) {
+      // Photo was removed
+      setPassportPhotoRemoved(true);
+      // Clear from formData and existing photo URL
+      setFormData((prev) => ({
+        ...prev,
+        passportPhotoUrl: '',
+      }));
+      setExistingPassportPhotoUrl(null);
+    } else {
+      // New photo selected
+      setPassportPhotoRemoved(false);
+    }
   };
 
   // Upload photo helper
@@ -330,15 +394,12 @@ const EditCustomerFormContent: React.FC<{
       newErrors.name = 'Ime je obavezno';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email je obavezan';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    // Email is optional, but if provided, must be valid
+    if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email format nije valjan';
     }
 
-    if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Broj telefona je obavezan';
-    }
+    // Phone number is optional - no validation needed
 
     if (!formData.countryOfOrigin.trim()) {
       newErrors.countryOfOrigin = 'Zemlja porijekla je obavezna';
@@ -384,11 +445,16 @@ const EditCustomerFormContent: React.FC<{
     try {
       setIsSubmitting(true);
 
-      // Upload photos if selected
-      let licensePhotoFilename = formData.drivingLicensePhotoUrl;
-      let passportPhotoFilename = formData.passportPhotoUrl;
+      // Handle photo uploads and removals
+      let licensePhotoFilename: string | undefined = formData.drivingLicensePhotoUrl;
+      let passportPhotoFilename: string | undefined = formData.passportPhotoUrl;
 
-      if (selectedLicensePhoto) {
+      // Handle driving license photo
+      if (licensePhotoRemoved) {
+        // Photo was explicitly removed - set to null to clear it
+        licensePhotoFilename = null as any;
+      } else if (selectedLicensePhoto) {
+        // New photo was selected - upload it
         try {
           const uploadedFilename = await uploadPhoto(selectedLicensePhoto);
           if (uploadedFilename) {
@@ -401,8 +467,14 @@ const EditCustomerFormContent: React.FC<{
           return;
         }
       }
+      // If neither removed nor selected, keep existing photo (licensePhotoFilename unchanged)
 
-      if (selectedPassportPhoto) {
+      // Handle passport photo
+      if (passportPhotoRemoved) {
+        // Photo was explicitly removed - set to null to clear it
+        passportPhotoFilename = null as any;
+      } else if (selectedPassportPhoto) {
+        // New photo was selected - upload it
         try {
           const uploadedFilename = await uploadPhoto(selectedPassportPhoto);
           if (uploadedFilename) {
@@ -415,6 +487,7 @@ const EditCustomerFormContent: React.FC<{
           return;
         }
       }
+      // If neither removed nor selected, keep existing photo (passportPhotoFilename unchanged)
 
       // Combine dial code and phone number
       const fullPhoneNumber = formData.phoneNumber
@@ -432,8 +505,8 @@ const EditCustomerFormContent: React.FC<{
         idOfPerson: formData.idOfPerson || undefined,
         driverLicenseNumber: formData.driverLicenseNumber,
         passportNumber: formData.passportNumber,
-        drivingLicensePhotoUrl: licensePhotoFilename || undefined,
-        passportPhotoUrl: passportPhotoFilename || undefined,
+        drivingLicensePhotoUrl: licensePhotoFilename === null ? null : (licensePhotoFilename || undefined),
+        passportPhotoUrl: passportPhotoFilename === null ? null : (passportPhotoFilename || undefined),
       };
 
       await updateCustomer(customerId, customerData);
@@ -474,7 +547,7 @@ const EditCustomerFormContent: React.FC<{
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex-none px-6 py-4 border-b bg-background">
+      <div className="flex-none px-6 py-4 bg-background">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold flex items-center gap-2">
@@ -499,10 +572,10 @@ const EditCustomerFormContent: React.FC<{
 
       {/* Form Content - Scrollable */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Personal Information Section */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
+            <div className="bg-background p-6 space-y-4">
               <div className="flex items-center gap-2 mb-4">
                 <User className="w-5 h-5" />
                 <h2 className="text-lg font-semibold">Lični podaci</h2>
@@ -530,14 +603,14 @@ const EditCustomerFormContent: React.FC<{
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">
-                    Email adresa <span className="text-destructive">*</span>
+                    Email adresa
                   </Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="primjer@email.com"
+                    placeholder="primjer@email.com (opcionalno)"
                     disabled={isSubmitting}
                     className={errors.email ? 'border-destructive' : ''}
                   />
@@ -548,19 +621,31 @@ const EditCustomerFormContent: React.FC<{
 
                 <div className="space-y-2">
                   <Label htmlFor="phoneNumber">
-                    Broj telefona <span className="text-destructive">*</span>
+                    Broj telefona
                   </Label>
                   <div className="flex gap-2">
                     {/* Dial Code Selector */}
                     <Select
-                      value={formData.phoneDialCode}
-                      onValueChange={(value) =>
-                        handleInputChange('phoneDialCode', value)
-                      }
+                      value={`${formData.phoneDialCode}|||${countries.find(c => c.dialCode === formData.phoneDialCode)?.code || ''}`}
+                      onValueChange={(value) => {
+                        const dialCode = value.split('|||')[0];
+                        // Only update if dialCode is not empty
+                        if (dialCode) {
+                          handleInputChange('phoneDialCode', dialCode);
+                        }
+                      }}
                       disabled={isSubmitting || loadingCountries}
                     >
                       <SelectTrigger className="w-[140px]">
-                        <SelectValue />
+                        <SelectValue>
+                          {loadingCountries ? (
+                            formData.phoneDialCode
+                          ) : (
+                            <>
+                              {countries.find(c => c.dialCode === formData.phoneDialCode)?.flag || ''} {formData.phoneDialCode}
+                            </>
+                          )}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent className="max-h-[300px]">
                         {loadingCountries ? (
@@ -568,14 +653,14 @@ const EditCustomerFormContent: React.FC<{
                             Učitavanje...
                           </SelectItem>
                         ) : countries.length > 0 ? (
-                          countries.map((country) => (
-                            <SelectItem
-                              key={country.code}
-                              value={country.dialCode}
-                            >
-                              {country.flag} {country.dialCode}
-                            </SelectItem>
-                          ))
+                          countries.map((country, index) => {
+                            const uniqueValue = `${country.dialCode}|||${country.code}`;
+                            return (
+                              <SelectItem key={uniqueValue} value={uniqueValue}>
+                                {country.flag} {country.dialCode}
+                              </SelectItem>
+                            );
+                          })
                         ) : (
                           <SelectItem value="_empty" disabled>
                             Nema podataka
@@ -591,7 +676,7 @@ const EditCustomerFormContent: React.FC<{
                       onChange={(e) =>
                         handleInputChange('phoneNumber', e.target.value)
                       }
-                      placeholder="61 123 456"
+                      placeholder="61 123 456 (opcionalno)"
                       disabled={isSubmitting}
                       className={errors.phoneNumber ? 'border-destructive' : ''}
                     />
@@ -643,8 +728,8 @@ const EditCustomerFormContent: React.FC<{
                           Učitavanje...
                         </SelectItem>
                       ) : countries.length > 0 ? (
-                        countries.map((country) => (
-                          <SelectItem key={country.code} value={country.name}>
+                        countries.map((country, index) => (
+                          <SelectItem key={`country-${country.name.replace(/\s/g, '_')}`} value={country.name}>
                             {country.flag} {country.name}
                           </SelectItem>
                         ))
@@ -669,7 +754,7 @@ const EditCustomerFormContent: React.FC<{
 
             {/* Bosnia and Herzegovina Additional Fields */}
             {isBiHCitizen && (
-              <div className="bg-background border rounded-lg p-6 space-y-4">
+              <div className="bg-background p-6 space-y-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Globe className="w-5 h-5" />
                   <h2 className="text-lg font-semibold">
@@ -696,19 +781,23 @@ const EditCustomerFormContent: React.FC<{
                   <div className="space-y-2">
                     <Label htmlFor="cityOfResidence">Grad prebivališta</Label>
                     <Select
-                      value={formData.cityOfResidence}
-                      onValueChange={(value) =>
-                        handleInputChange('cityOfResidence', value)
-                      }
+                      value={municipalities.find(m => m.name === formData.cityOfResidence)?.uniqueKey || formData.cityOfResidence}
+                      onValueChange={(uniqueKey) => {
+                        // Find municipality by uniqueKey and store the name
+                        const municipality = municipalities.find(m => m.uniqueKey === uniqueKey);
+                        if (municipality) {
+                          handleInputChange('cityOfResidence', municipality.name);
+                        }
+                      }}
                       disabled={isSubmitting}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Izaberite grad" />
                       </SelectTrigger>
                       <SelectContent className="max-h-[300px]">
-                        {municipalities.map((municipality: string) => (
-                          <SelectItem key={municipality} value={municipality}>
-                            {municipality}
+                        {municipalities.map((municipality) => (
+                          <SelectItem key={municipality.uniqueKey} value={municipality.uniqueKey}>
+                            {municipality.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -733,7 +822,7 @@ const EditCustomerFormContent: React.FC<{
             )}
 
             {/* Documents Section */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
+            <div className="bg-background p-6 space-y-4">
               <div className="flex items-center gap-2 mb-4">
                 <FileText className="w-5 h-5" />
                 <h2 className="text-lg font-semibold">Dokumenti</h2>
@@ -788,7 +877,7 @@ const EditCustomerFormContent: React.FC<{
             </div>
 
             {/* Photo Uploads Section */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
+            <div className="bg-background p-6 space-y-4">
               <div className="flex items-center gap-2 mb-4">
                 <Camera className="w-5 h-5" />
                 <h2 className="text-lg font-semibold">Slike dokumenata</h2>
@@ -797,7 +886,6 @@ const EditCustomerFormContent: React.FC<{
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Driver License Photo */}
                 <div className="space-y-2">
-                  <Label>Slika vozačke dozvole</Label>
                   <PhotoUpload
                     value={selectedLicensePhoto}
                     onChange={handleLicensePhotoChange}
@@ -809,7 +897,6 @@ const EditCustomerFormContent: React.FC<{
 
                 {/* Passport Photo */}
                 <div className="space-y-2">
-                  <Label>Slika pasoša</Label>
                   <PhotoUpload
                     value={selectedPassportPhoto}
                     onChange={handlePassportPhotoChange}

@@ -50,6 +50,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "clean": "rm -rf node_modules/.vite",
+    "dev:clean": "npm run clean && vite",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "prettier:check": "prettier --check .",

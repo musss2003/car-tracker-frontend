@@ -1,3 +1,4 @@
+// Customer Creation Form with unique keys for country selection
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Label } from '@/components/ui/label';
@@ -33,32 +34,57 @@ import { Customer } from '@/types/Customer';
 // Import municipalities data
 import municipalitiesDataRaw from '../../../municipalities.json';
 
-// Extract all municipalities from the nested structure
-const getAllMunicipalities = (): string[] => {
-  const municipalities: string[] = [];
+// Type for municipality with region info
+interface MunicipalityOption {
+  name: string;
+  region: string;
+  uniqueKey: string;
+}
+
+// Extract all municipalities from the nested structure with region info
+const getAllMunicipalities = (): MunicipalityOption[] => {
+  const municipalities: MunicipalityOption[] = [];
   const data = municipalitiesDataRaw as any;
 
   // Federation
   if (data['Federacija Bosne i Hercegovine']) {
     const federation = data['Federacija Bosne i Hercegovine'];
-    Object.values(federation).forEach((cantonMunicipalities: any) => {
+    Object.entries(federation).forEach(([canton, cantonMunicipalities]: [string, any]) => {
       if (Array.isArray(cantonMunicipalities)) {
-        municipalities.push(...cantonMunicipalities);
+        cantonMunicipalities.forEach((name: string) => {
+          municipalities.push({
+            name,
+            region: 'FBiH',
+            uniqueKey: `fbih-${name.toLowerCase().replace(/\s/g, '-')}`,
+          });
+        });
       }
     });
   }
 
   // Republika Srpska
   if (data['Republika Srpska'] && Array.isArray(data['Republika Srpska'])) {
-    municipalities.push(...data['Republika Srpska']);
+    data['Republika Srpska'].forEach((name: string) => {
+      municipalities.push({
+        name,
+        region: 'RS',
+        uniqueKey: `rs-${name.toLowerCase().replace(/\s/g, '-')}`,
+      });
+    });
   }
 
   // Brčko District
   if (data['Brčko distrikt'] && Array.isArray(data['Brčko distrikt'])) {
-    municipalities.push(...data['Brčko distrikt']);
+    data['Brčko distrikt'].forEach((name: string) => {
+      municipalities.push({
+        name,
+        region: 'BD',
+        uniqueKey: `bd-${name.toLowerCase().replace(/\s/g, '-')}`,
+      });
+    });
   }
 
-  return municipalities.sort();
+  return municipalities.sort((a, b) => a.name.localeCompare(b.name));
 };
 
 const municipalities = getAllMunicipalities();
@@ -122,15 +148,12 @@ const CreateCustomerPage: React.FC = () => {
       newErrors.name = 'Ime je obavezno';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email je obavezan';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    // Email is optional, but if provided, must be valid
+    if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email format nije valjan';
     }
 
-    if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Broj telefona je obavezan';
-    }
+    // Phone number is optional - no validation needed
 
     // Address is optional - no validation needed
 
@@ -248,6 +271,8 @@ const CreateCustomerPage: React.FC = () => {
         passportPhotoUrl: passportPhotoFilename || undefined,
       };
 
+      console.log('Submitting customer data:', customerData);
+
       await addCustomer(customerData);
       navigate('/customers');
     } catch (error) {
@@ -330,14 +355,14 @@ const CreateCustomerPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  Email adresa <span className="text-destructive">*</span>
+                  Email adresa
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="primjer@email.com"
+                  placeholder="primjer@email.com (opcionalno)"
                   disabled={isSubmitting}
                   className={errors.email ? 'border-destructive' : ''}
                 />
@@ -348,19 +373,31 @@ const CreateCustomerPage: React.FC = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber">
-                  Broj telefona <span className="text-destructive">*</span>
+                  Broj telefona
                 </Label>
                 <div className="flex gap-2">
                   {/* Dial Code Selector */}
                   <Select
-                    value={formData.phoneDialCode}
-                    onValueChange={(value) =>
-                      handleInputChange('phoneDialCode', value)
-                    }
+                    value={`${formData.phoneDialCode}|||${countries.find(c => c.dialCode === formData.phoneDialCode)?.code || ''}`}
+                    onValueChange={(value) => {
+                      const dialCode = value.split('|||')[0];
+                      // Only update if dialCode is not empty
+                      if (dialCode) {
+                        handleInputChange('phoneDialCode', dialCode);
+                      }
+                    }}
                     disabled={isSubmitting || loadingCountries}
                   >
                     <SelectTrigger className="w-[140px]">
-                      <SelectValue />
+                      <SelectValue>
+                        {loadingCountries ? (
+                          formData.phoneDialCode
+                        ) : (
+                          <>
+                            {countries.find(c => c.dialCode === formData.phoneDialCode)?.flag || ''} {formData.phoneDialCode}
+                          </>
+                        )}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="max-h-[300px]">
                       {loadingCountries ? (
@@ -368,11 +405,14 @@ const CreateCustomerPage: React.FC = () => {
                           Učitavanje...
                         </SelectItem>
                       ) : countries.length > 0 ? (
-                        countries.map((country) => (
-                          <SelectItem key={country.code} value={country.dialCode}>
-                            {country.flag} {country.dialCode}
-                          </SelectItem>
-                        ))
+                        countries.map((country, index) => {
+                          const uniqueValue = `${country.dialCode}|||${country.code}`;
+                          return (
+                            <SelectItem key={uniqueValue} value={uniqueValue}>
+                              {country.flag} {country.dialCode}
+                            </SelectItem>
+                          );
+                        })
                       ) : (
                         <SelectItem value="_empty" disabled>
                           Nema podataka
@@ -388,7 +428,7 @@ const CreateCustomerPage: React.FC = () => {
                     onChange={(e) =>
                       handleInputChange('phoneNumber', e.target.value)
                     }
-                    placeholder="61 123 456"
+                    placeholder="61 123 456 (opcionalno)"
                     disabled={isSubmitting}
                     className={errors.phoneNumber ? 'border-destructive' : ''}
                   />
@@ -438,8 +478,8 @@ const CreateCustomerPage: React.FC = () => {
                         Učitavanje...
                       </SelectItem>
                     ) : countries.length > 0 ? (
-                      countries.map((country) => (
-                        <SelectItem key={country.code} value={country.name}>
+                      countries.map((country, index) => (
+                        <SelectItem key={`country-${country.name.replace(/\s/g, '_')}`} value={country.name}>
                           {country.flag} {country.name}
                         </SelectItem>
                       ))
@@ -491,19 +531,23 @@ const CreateCustomerPage: React.FC = () => {
                 <div className="space-y-2">
                   <Label htmlFor="cityOfResidence">Grad prebivališta</Label>
                   <Select
-                    value={formData.cityOfResidence}
-                    onValueChange={(value) =>
-                      handleInputChange('cityOfResidence', value)
-                    }
+                    value={municipalities.find(m => m.name === formData.cityOfResidence)?.uniqueKey || formData.cityOfResidence}
+                    onValueChange={(uniqueKey) => {
+                      // Find municipality by uniqueKey and store the name
+                      const municipality = municipalities.find(m => m.uniqueKey === uniqueKey);
+                      if (municipality) {
+                        handleInputChange('cityOfResidence', municipality.name);
+                      }
+                    }}
                     disabled={isSubmitting}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Izaberite grad" />
                     </SelectTrigger>
                     <SelectContent className='max-h-[300px]'>
-                      {municipalities.map((municipality: string) => (
-                        <SelectItem key={municipality} value={municipality}>
-                          {municipality}
+                      {municipalities.map((municipality) => (
+                        <SelectItem key={municipality.uniqueKey} value={municipality.uniqueKey}>
+                          {municipality.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -598,7 +642,6 @@ const CreateCustomerPage: React.FC = () => {
                   onChange={handleLicensePhotoChange}
                   disabled={isSubmitting}
                   label="Slika vozačke dozvole"
-                  existingPhotoUrl={formData.drivingLicensePhotoUrl}
                 />
               </div>
 
@@ -609,7 +652,6 @@ const CreateCustomerPage: React.FC = () => {
                   onChange={handlePassportPhotoChange}
                   disabled={isSubmitting}
                   label="Slika pasoša"
-                  existingPhotoUrl={formData.passportPhotoUrl}
                 />
               </div>
             </div>

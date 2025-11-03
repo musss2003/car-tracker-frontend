@@ -192,27 +192,7 @@ export const getCountries = async (): Promise<CountryOption[]> => {
 
     const countries = await response.json();
 
-    if (!Array.isArray(countries) || countries.length === 0) {
-      throw new Error('Invalid or empty response data');
-    }
-
-    // Transform database countries to CountryOption format
-    const countryOptions: CountryOption[] = countries
-      .map((country: any) => ({
-        name: country.name?.trim() || 'Unknown',
-        flag: country.flag || '🏳️',
-        dialCode: country.dialCode || '+0',
-        code: country.code || 'XX',
-      }))
-      .filter(
-        (country: CountryOption) =>
-          country.name !== 'Unknown' && country.name.length > 0
-      )
-      .sort((a: CountryOption, b: CountryOption) =>
-        a.name.localeCompare(b.name)
-      );
-
-    return countryOptions;
+    return countries;
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
