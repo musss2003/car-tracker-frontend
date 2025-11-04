@@ -86,7 +86,6 @@ export const deleteContract = async (contractId: string): Promise<void> => {
 export const createAndDownloadContract = async (
   contractData: ContractFormData
 ): Promise<Contract | undefined> => {
-
   console.log(contractData);
   try {
     const res = await fetch(`${API_URL}`, {

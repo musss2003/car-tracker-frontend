@@ -29,14 +29,19 @@ const CustomerDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Photo states
-  const [drivingLicensePhoto, setDrivingLicensePhoto] = useState<string | null>(null);
+  const [drivingLicensePhoto, setDrivingLicensePhoto] = useState<string | null>(
+    null
+  );
   const [passportPhoto, setPassportPhoto] = useState<string | null>(null);
   const [loadingLicensePhoto, setLoadingLicensePhoto] = useState(false);
   const [loadingPassportPhoto, setLoadingPassportPhoto] = useState(false);
 
   // Modal state for photo preview
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalPhoto, setModalPhoto] = useState<{ src: string; title: string } | null>(null);
+  const [modalPhoto, setModalPhoto] = useState<{
+    src: string;
+    title: string;
+  } | null>(null);
 
   // Open modal with photo
   const openPhotoModal = (src: string, title: string) => {
@@ -194,7 +199,7 @@ const CustomerDetailsPage = () => {
               <span>Nazad</span>
             </Button>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-lg p-6 shadow-sm border border-gray-200">
             <div className="flex items-start gap-4">
               <div className="hidden sm:flex w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 items-center justify-center text-white text-2xl font-bold shadow-lg">
@@ -250,15 +255,20 @@ const CustomerDetailsPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3">
-                <div 
+                <div
                   className="aspect-video relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden border border-gray-200 group cursor-pointer"
-                  onClick={() => drivingLicensePhoto && openPhotoModal(drivingLicensePhoto, 'Vozačka dozvola')}
+                  onClick={() =>
+                    drivingLicensePhoto &&
+                    openPhotoModal(drivingLicensePhoto, 'Vozačka dozvola')
+                  }
                 >
                   {loadingLicensePhoto ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm">
                       <div className="flex flex-col items-center gap-2">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
-                        <span className="text-xs text-gray-600">Učitavanje...</span>
+                        <span className="text-xs text-gray-600">
+                          Učitavanje...
+                        </span>
                       </div>
                     </div>
                   ) : drivingLicensePhoto ? (
@@ -271,7 +281,9 @@ const CustomerDetailsPage = () => {
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center gap-2">
                           <ZoomInIcon className="w-8 h-8 text-white" />
-                          <span className="text-white text-sm font-medium">Klikni za uvećanje</span>
+                          <span className="text-white text-sm font-medium">
+                            Klikni za uvećanje
+                          </span>
                         </div>
                       </div>
                     </>
@@ -298,15 +310,19 @@ const CustomerDetailsPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3">
-                <div 
+                <div
                   className="aspect-video relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden border border-gray-200 group cursor-pointer"
-                  onClick={() => passportPhoto && openPhotoModal(passportPhoto, 'Pasoš')}
+                  onClick={() =>
+                    passportPhoto && openPhotoModal(passportPhoto, 'Pasoš')
+                  }
                 >
                   {loadingPassportPhoto ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm">
                       <div className="flex flex-col items-center gap-2">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
-                        <span className="text-xs text-gray-600">Učitavanje...</span>
+                        <span className="text-xs text-gray-600">
+                          Učitavanje...
+                        </span>
                       </div>
                     </div>
                   ) : passportPhoto ? (
@@ -319,7 +335,9 @@ const CustomerDetailsPage = () => {
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center gap-2">
                           <ZoomInIcon className="w-8 h-8 text-white" />
-                          <span className="text-white text-sm font-medium">Klikni za uvećanje</span>
+                          <span className="text-white text-sm font-medium">
+                            Klikni za uvećanje
+                          </span>
                         </div>
                       </div>
                     </>
@@ -358,10 +376,12 @@ const CustomerDetailsPage = () => {
                         <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                           Ime i prezime
                         </p>
-                        <p className="font-semibold text-gray-900">{customer.name}</p>
+                        <p className="font-semibold text-gray-900">
+                          {customer.name}
+                        </p>
                       </div>
                     </div>
-                    
+
                     {customer.email && (
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                         <MailIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -369,11 +389,13 @@ const CustomerDetailsPage = () => {
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                             Email adresa
                           </p>
-                          <p className="font-medium text-gray-900 truncate">{customer.email}</p>
+                          <p className="font-medium text-gray-900 truncate">
+                            {customer.email}
+                          </p>
                         </div>
                       </div>
                     )}
-                    
+
                     {customer.phoneNumber && (
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                         <PhoneIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -381,11 +403,13 @@ const CustomerDetailsPage = () => {
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                             Broj telefona
                           </p>
-                          <p className="font-medium text-gray-900">{customer.phoneNumber}</p>
+                          <p className="font-medium text-gray-900">
+                            {customer.phoneNumber}
+                          </p>
                         </div>
                       </div>
                     )}
-                    
+
                     {customer.address && (
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                         <LocationMarkerIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -393,11 +417,13 @@ const CustomerDetailsPage = () => {
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                             Adresa
                           </p>
-                          <p className="font-medium text-gray-900">{customer.address}</p>
+                          <p className="font-medium text-gray-900">
+                            {customer.address}
+                          </p>
                         </div>
                       </div>
                     )}
-                    
+
                     {customer.countryOfOrigin && (
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                         <GlobeAltIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -405,7 +431,9 @@ const CustomerDetailsPage = () => {
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                             Zemlja porijekla
                           </p>
-                          <p className="font-medium text-gray-900">{customer.countryOfOrigin}</p>
+                          <p className="font-medium text-gray-900">
+                            {customer.countryOfOrigin}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -434,7 +462,7 @@ const CustomerDetailsPage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-purple-50 to-purple-100/50 border border-purple-200">
                       <DocumentTextIcon className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
@@ -452,66 +480,69 @@ const CustomerDetailsPage = () => {
             </div>
 
             {/* BiH Specific Information - Full Width */}
-            {isBiHCitizen && (customer.fatherName || customer.cityOfResidence || customer.idOfPerson) && (
-              <Card className="lg:col-span-2 border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader className="pb-4 bg-gradient-to-r from-indigo-50 to-indigo-100/50 border-b border-gray-200">
-                  <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                    <GlobeAltIcon className="w-5 h-5 text-indigo-600" />
-                    Dodatni podaci za državljane BiH
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {customer.fatherName && (
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                        <UserIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                            Ime oca
-                          </p>
-                          <p className="font-medium text-gray-900">
-                            {customer.fatherName}
-                          </p>
+            {isBiHCitizen &&
+              (customer.fatherName ||
+                customer.cityOfResidence ||
+                customer.idOfPerson) && (
+                <Card className="lg:col-span-2 border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-4 bg-gradient-to-r from-indigo-50 to-indigo-100/50 border-b border-gray-200">
+                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                      <GlobeAltIcon className="w-5 h-5 text-indigo-600" />
+                      Dodatni podaci za državljane BiH
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {customer.fatherName && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                          <UserIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                              Ime oca
+                            </p>
+                            <p className="font-medium text-gray-900">
+                              {customer.fatherName}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {customer.cityOfResidence && (
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                        <LocationMarkerIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                            Grad prebivališta
-                          </p>
-                          <p className="font-medium text-gray-900">
-                            {customer.cityOfResidence}
-                          </p>
+                      )}
+                      {customer.cityOfResidence && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                          <LocationMarkerIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                              Grad prebivališta
+                            </p>
+                            <p className="font-medium text-gray-900">
+                              {customer.cityOfResidence}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {customer.idOfPerson && (
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors border border-indigo-200">
-                        <IdentificationIcon className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-indigo-700 uppercase tracking-wide mb-1">
-                            JMBG
-                          </p>
-                          <p className="font-bold text-indigo-900">
-                            {customer.idOfPerson}
-                          </p>
+                      )}
+                      {customer.idOfPerson && (
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors border border-indigo-200">
+                          <IdentificationIcon className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-indigo-700 uppercase tracking-wide mb-1">
+                              JMBG
+                            </p>
+                            <p className="font-bold text-indigo-900">
+                              {customer.idOfPerson}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
           </div>
         </div>
       </div>
 
       {/* Photo Modal/Lightbox */}
       {modalOpen && modalPhoto && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300"
           onClick={closePhotoModal}
         >
@@ -533,7 +564,7 @@ const CustomerDetailsPage = () => {
             </div>
 
             {/* Photo Container */}
-            <div 
+            <div
               className="flex-1 flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >

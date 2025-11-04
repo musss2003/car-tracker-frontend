@@ -51,7 +51,7 @@ export default function EditContractPage() {
     dailyRate: 0,
     totalAmount: 0,
     additionalNotes: '',
-    photoUrl: ''
+    photoUrl: '',
   });
 
   const [loading, setLoading] = useState(true);

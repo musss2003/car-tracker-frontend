@@ -1,8 +1,8 @@
-"use client"
+'use client';
 
-import { useState, useEffect, useMemo } from "react"
-import { deleteCustomer, getCustomers } from "../../services/customerService"
-import { toast } from "react-toastify"
+import { useState, useEffect, useMemo } from 'react';
+import { deleteCustomer, getCustomers } from '../../services/customerService';
+import { toast } from 'react-toastify';
 import {
   PencilIcon,
   TrashIcon,
@@ -11,15 +11,28 @@ import {
   ChevronDownIcon,
   PlusIcon,
   DownloadIcon,
-} from "@heroicons/react/solid"
-import { useNavigate } from "react-router-dom"
-import * as XLSX from "xlsx"
+} from '@heroicons/react/solid';
+import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 
 // shadcn/ui imports
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -28,56 +41,63 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import Skeleton from "@/components/ui/skeleton"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+} from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import Skeleton from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-import type { Customer } from "@/types/Customer"
+import type { Customer } from '@/types/Customer';
 
 const CustomersPage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // State management
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false)
-  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null)
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
+    null
+  );
 
   // Filtering and sorting state
-  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof Customer
-    direction: "asc" | "desc"
+    key: keyof Customer;
+    direction: 'asc' | 'desc';
   }>({
-    key: "name",
-    direction: "asc",
-  })
+    key: 'name',
+    direction: 'asc',
+  });
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10)
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Fetch customers data
   const fetchCustomers = async () => {
     try {
-      setLoading(true)
-      const data = await getCustomers()
-      setCustomers(data)
-      setError(null)
+      setLoading(true);
+      const data = await getCustomers();
+      setCustomers(data);
+      setError(null);
     } catch (err) {
-      console.error("Failed to fetch customers:", err)
-      setError("Failed to load customers. Please try again later.")
-      toast.error("Failed to load customers")
+      console.error('Failed to fetch customers:', err);
+      setError('Failed to load customers. Please try again later.');
+      toast.error('Failed to load customers');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchCustomers()
-  }, [])
+    fetchCustomers();
+  }, []);
 
   // Filter and sort customers
   const filteredAndSortedCustomers = useMemo(() => {
@@ -157,41 +177,44 @@ const CustomersPage = () => {
   const handleSort = (key: keyof Customer) => {
     setSortConfig((prevConfig) => ({
       key,
-      direction: prevConfig.key === key && prevConfig.direction === "asc" ? "desc" : "asc",
-    }))
-  }
+      direction:
+        prevConfig.key === key && prevConfig.direction === 'asc'
+          ? 'desc'
+          : 'asc',
+    }));
+  };
 
   const handleDeleteCustomer = async (customer: Customer) => {
     try {
-      setLoading(true)
+      setLoading(true);
       if (customer.id) {
-        await deleteCustomer(customer.id)
-        await fetchCustomers()
-        toast.success("Customer deleted successfully")
-        setShowDeleteDialog(false)
-        setCustomerToDelete(null)
+        await deleteCustomer(customer.id);
+        await fetchCustomers();
+        toast.success('Customer deleted successfully');
+        setShowDeleteDialog(false);
+        setCustomerToDelete(null);
       } else {
-        toast.error("No customer selected or customer ID is missing.")
+        toast.error('No customer selected or customer ID is missing.');
       }
     } catch (error) {
-      console.error("Error deleting customer:", error)
-      toast.error("Failed to delete customer")
+      console.error('Error deleting customer:', error);
+      toast.error('Failed to delete customer');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleCreate = () => {
-    navigate("/customers/new")
-  }
+    navigate('/customers/new');
+  };
 
   const handleViewDetails = (customer: Customer) => {
-    navigate(`/customers/${customer.id}`)
-  }
+    navigate(`/customers/${customer.id}`);
+  };
 
   const handleEdit = (customer: Customer) => {
-    navigate(`/customers/${customer.id}/edit`)
-  }
+    navigate(`/customers/${customer.id}/edit`);
+  };
 
   // Export to Excel
   const exportToExcel = () => {
@@ -223,14 +246,17 @@ const CustomersPage = () => {
 
   // Render table header with sort indicators
   const renderTableHeader = (label: string, key: keyof Customer) => {
-    const isSorted = sortConfig.key === key
+    const isSorted = sortConfig.key === key;
 
     return (
-      <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort(key)}>
+      <TableHead
+        className="cursor-pointer hover:bg-muted/50"
+        onClick={() => handleSort(key)}
+      >
         <div className="flex items-center gap-2">
           <span>{label}</span>
           {isSorted ? (
-            sortConfig.direction === "asc" ? (
+            sortConfig.direction === 'asc' ? (
               <ChevronUpIcon className="w-4 h-4" />
             ) : (
               <ChevronDownIcon className="w-4 h-4" />
@@ -240,8 +266,8 @@ const CustomersPage = () => {
           )}
         </div>
       </TableHead>
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen w-full bg-background">
@@ -249,7 +275,9 @@ const CustomersPage = () => {
       <div className="border-b bg-card">
         <div className="px-6 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h1 className="text-3xl font-bold tracking-tight">Customers Management</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Customers Management
+            </h1>
             <div className="flex gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -259,7 +287,9 @@ const CustomersPage = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onClick={exportToExcel}>Export as Excel</DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToExcel}>
+                    Export as Excel
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button onClick={handleCreate} disabled={loading}>
@@ -284,7 +314,11 @@ const CustomersPage = () => {
           </div>
         </div>
 
-        {error && <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mt-4">{error}</div>}
+        {error && (
+          <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md mt-4">
+            {error}
+          </div>
+        )}
       </div>
 
       {/* Table Section */}
@@ -301,12 +335,12 @@ const CustomersPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {renderTableHeader("Name", "name")}
-                    {renderTableHeader("Driver License", "driverLicenseNumber")}
-                    {renderTableHeader("Passport", "passportNumber")}
-                    {renderTableHeader("Email", "email")}
-                    {renderTableHeader("Phone", "phoneNumber")}
-                    {renderTableHeader("Country", "countryOfOrigin")}
+                    {renderTableHeader('Name', 'name')}
+                    {renderTableHeader('Driver License', 'driverLicenseNumber')}
+                    {renderTableHeader('Passport', 'passportNumber')}
+                    {renderTableHeader('Email', 'email')}
+                    {renderTableHeader('Phone', 'phoneNumber')}
+                    {renderTableHeader('Country', 'countryOfOrigin')}
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -318,16 +352,26 @@ const CustomersPage = () => {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
-                                <AvatarFallback>{customer.name?.charAt(0) || "?"}</AvatarFallback>
+                                <AvatarFallback>
+                                  {customer.name?.charAt(0) || '?'}
+                                </AvatarFallback>
                               </Avatar>
-                              <span className="font-medium">{customer.name || "N/A"}</span>
+                              <span className="font-medium">
+                                {customer.name || 'N/A'}
+                              </span>
                             </div>
                           </TableCell>
-                          <TableCell>{customer.driverLicenseNumber || "N/A"}</TableCell>
-                          <TableCell>{customer.passportNumber || "N/A"}</TableCell>
-                          <TableCell>{customer.email || "N/A"}</TableCell>
-                          <TableCell>{customer.phoneNumber || "N/A"}</TableCell>
-                          <TableCell>{customer.countryOfOrigin || "N/A"}</TableCell>
+                          <TableCell>
+                            {customer.driverLicenseNumber || 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            {customer.passportNumber || 'N/A'}
+                          </TableCell>
+                          <TableCell>{customer.email || 'N/A'}</TableCell>
+                          <TableCell>{customer.phoneNumber || 'N/A'}</TableCell>
+                          <TableCell>
+                            {customer.countryOfOrigin || 'N/A'}
+                          </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
                               <Button
@@ -342,7 +386,7 @@ const CustomersPage = () => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => {
-                                  handleEdit(customer)
+                                  handleEdit(customer);
                                 }}
                                 title="Edit Customer"
                               >
@@ -352,8 +396,8 @@ const CustomersPage = () => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => {
-                                  setCustomerToDelete(customer)
-                                  setShowDeleteDialog(true)
+                                  setCustomerToDelete(customer);
+                                  setShowDeleteDialog(true);
                                 }}
                                 title="Delete Customer"
                               >
@@ -362,12 +406,17 @@ const CustomersPage = () => {
                             </div>
                           </TableCell>
                         </TableRow>
-                      )
+                      );
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                        {searchTerm ? "No customers match your search criteria" : "No customers available"}
+                      <TableCell
+                        colSpan={7}
+                        className="text-center py-8 text-muted-foreground"
+                      >
+                        {searchTerm
+                          ? 'No customers match your search criteria'
+                          : 'No customers available'}
                       </TableCell>
                     </TableRow>
                   )}
@@ -378,14 +427,15 @@ const CustomersPage = () => {
             {/* Pagination Section */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-muted-foreground">
-                Showing {paginatedCustomers.length} of {filteredAndSortedCustomers.length} customers
+                Showing {paginatedCustomers.length} of{' '}
+                {filteredAndSortedCustomers.length} customers
               </div>
               <div className="flex items-center gap-2">
                 <Select
                   value={itemsPerPage.toString()}
                   onValueChange={(value) => {
-                    setItemsPerPage(Number(value))
-                    setCurrentPage(1)
+                    setItemsPerPage(Number(value));
+                    setCurrentPage(1);
                   }}
                 >
                   <SelectTrigger className="w-[100px]">
@@ -402,7 +452,9 @@ const CustomersPage = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(1, prev - 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     Previous
@@ -410,7 +462,9 @@ const CustomersPage = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     Next
@@ -431,10 +485,11 @@ const CustomersPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the customer
+              This action cannot be undone. This will permanently delete the
+              customer
               {customerToDelete && (
                 <span className="font-medium">
-                  {" "}
+                  {' '}
                   {customerToDelete.name} ({customerToDelete.email})
                 </span>
               )}
@@ -444,7 +499,7 @@ const CustomersPage = () => {
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={() => {
-                setCustomerToDelete(null)
+                setCustomerToDelete(null);
               }}
             >
               Cancel
@@ -454,7 +509,7 @@ const CustomersPage = () => {
               className="bg-red-500 text-white"
               onClick={() => {
                 if (customerToDelete) {
-                  handleDeleteCustomer(customerToDelete)
+                  handleDeleteCustomer(customerToDelete);
                 }
               }}
               disabled={!customerToDelete}
@@ -465,7 +520,7 @@ const CustomersPage = () => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
-}
+  );
+};
 
 export default CustomersPage;

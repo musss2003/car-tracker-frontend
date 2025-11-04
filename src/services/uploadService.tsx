@@ -49,19 +49,22 @@ export const downloadDocument = async (filename: string): Promise<Blob> => {
 
   try {
     const authHeaders = getAuthHeaders();
-    const response = await fetch(`${API_URL}/documents/${encodeURIComponent(filename)}`, {
-      method: 'GET',
-      headers: {
-        ...authHeaders,
-      },
-      credentials: 'include',
-    });
+    const response = await fetch(
+      `${API_URL}/documents/${encodeURIComponent(filename)}`,
+      {
+        method: 'GET',
+        headers: {
+          ...authHeaders,
+        },
+        credentials: 'include',
+      }
+    );
 
     if (!response.ok) {
       // Check if response is JSON before trying to parse
       const contentType = response.headers.get('content-type');
       let errorMessage = `Failed to download document: ${response.statusText}`;
-      
+
       if (contentType && contentType.includes('application/json')) {
         try {
           const errorData = await response.json();
@@ -71,7 +74,7 @@ export const downloadDocument = async (filename: string): Promise<Blob> => {
           console.warn('Failed to parse error response as JSON');
         }
       }
-      
+
       throw new Error(errorMessage);
     }
 

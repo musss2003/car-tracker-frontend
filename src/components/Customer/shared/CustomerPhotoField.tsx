@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { uploadDocument, downloadDocument } from '../../../services/uploadService';
+import {
+  uploadDocument,
+  downloadDocument,
+} from '../../../services/uploadService';
 import './CustomerPhotoField.css';
 
 interface CustomerPhotoFieldProps {
@@ -123,7 +126,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
         if (previewUrl && previewUrl.startsWith('blob:')) {
           URL.revokeObjectURL(previewUrl);
         }
-        
+
         onChange(null);
         setPreviewUrl(null);
         setUploadState({

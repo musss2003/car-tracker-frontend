@@ -43,9 +43,11 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Generate a unique ID for this component instance
-  const uniqueId = useRef(`photo-upload-${Math.random().toString(36).substr(2, 9)}`).current;
+  const uniqueId = useRef(
+    `photo-upload-${Math.random().toString(36).substr(2, 9)}`
+  ).current;
 
   const loadExistingPhoto = async (photoUrl: string) => {
     if (!photoUrl) return;
@@ -218,12 +220,16 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Ukloniti fotografiju?</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li ste sigurni da želite ukloniti ovu fotografiju? Ova akcija se ne može poništiti.
+              Da li ste sigurni da želite ukloniti ovu fotografiju? Ova akcija
+              se ne može poništiti.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Otkaži</AlertDialogCancel>
-            <AlertDialogAction className='bg-red-700 text-amber-50' onClick={confirmRemovePhoto}>
+            <AlertDialogAction
+              className="bg-red-700 text-amber-50"
+              onClick={confirmRemovePhoto}
+            >
               Ukloni
             </AlertDialogAction>
           </AlertDialogFooter>

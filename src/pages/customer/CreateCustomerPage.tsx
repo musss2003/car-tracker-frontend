@@ -49,17 +49,19 @@ const getAllMunicipalities = (): MunicipalityOption[] => {
   // Federation
   if (data['Federacija Bosne i Hercegovine']) {
     const federation = data['Federacija Bosne i Hercegovine'];
-    Object.entries(federation).forEach(([canton, cantonMunicipalities]: [string, any]) => {
-      if (Array.isArray(cantonMunicipalities)) {
-        cantonMunicipalities.forEach((name: string) => {
-          municipalities.push({
-            name,
-            region: 'FBiH',
-            uniqueKey: `fbih-${name.toLowerCase().replace(/\s/g, '-')}`,
+    Object.entries(federation).forEach(
+      ([canton, cantonMunicipalities]: [string, any]) => {
+        if (Array.isArray(cantonMunicipalities)) {
+          cantonMunicipalities.forEach((name: string) => {
+            municipalities.push({
+              name,
+              region: 'FBiH',
+              uniqueKey: `fbih-${name.toLowerCase().replace(/\s/g, '-')}`,
+            });
           });
-        });
+        }
       }
-    });
+    );
   }
 
   // Republika Srpska
@@ -252,7 +254,7 @@ const CreateCustomerPage: React.FC = () => {
       }
 
       // Combine dial code and phone number
-      const fullPhoneNumber = formData.phoneNumber 
+      const fullPhoneNumber = formData.phoneNumber
         ? `${formData.phoneDialCode}${formData.phoneNumber}`
         : undefined;
 
@@ -354,9 +356,7 @@ const CreateCustomerPage: React.FC = () => {
             {/* Email and Phone */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email">
-                  Email adresa
-                </Label>
+                <Label htmlFor="email">Email adresa</Label>
                 <Input
                   id="email"
                   type="email"
@@ -372,13 +372,11 @@ const CreateCustomerPage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phoneNumber">
-                  Broj telefona
-                </Label>
+                <Label htmlFor="phoneNumber">Broj telefona</Label>
                 <div className="flex gap-2">
                   {/* Dial Code Selector */}
                   <Select
-                    value={`${formData.phoneDialCode}|||${countries.find(c => c.dialCode === formData.phoneDialCode)?.code || ''}`}
+                    value={`${formData.phoneDialCode}|||${countries.find((c) => c.dialCode === formData.phoneDialCode)?.code || ''}`}
                     onValueChange={(value) => {
                       const dialCode = value.split('|||')[0];
                       // Only update if dialCode is not empty
@@ -394,7 +392,10 @@ const CreateCustomerPage: React.FC = () => {
                           formData.phoneDialCode
                         ) : (
                           <>
-                            {countries.find(c => c.dialCode === formData.phoneDialCode)?.flag || ''} {formData.phoneDialCode}
+                            {countries.find(
+                              (c) => c.dialCode === formData.phoneDialCode
+                            )?.flag || ''}{' '}
+                            {formData.phoneDialCode}
                           </>
                         )}
                       </SelectValue>
@@ -479,7 +480,10 @@ const CreateCustomerPage: React.FC = () => {
                       </SelectItem>
                     ) : countries.length > 0 ? (
                       countries.map((country, index) => (
-                        <SelectItem key={`country-${country.name.replace(/\s/g, '_')}`} value={country.name}>
+                        <SelectItem
+                          key={`country-${country.name.replace(/\s/g, '_')}`}
+                          value={country.name}
+                        >
                           {country.flag} {country.name}
                         </SelectItem>
                       ))
@@ -531,10 +535,16 @@ const CreateCustomerPage: React.FC = () => {
                 <div className="space-y-2">
                   <Label htmlFor="cityOfResidence">Grad prebivališta</Label>
                   <Select
-                    value={municipalities.find(m => m.name === formData.cityOfResidence)?.uniqueKey || formData.cityOfResidence}
+                    value={
+                      municipalities.find(
+                        (m) => m.name === formData.cityOfResidence
+                      )?.uniqueKey || formData.cityOfResidence
+                    }
                     onValueChange={(uniqueKey) => {
                       // Find municipality by uniqueKey and store the name
-                      const municipality = municipalities.find(m => m.uniqueKey === uniqueKey);
+                      const municipality = municipalities.find(
+                        (m) => m.uniqueKey === uniqueKey
+                      );
                       if (municipality) {
                         handleInputChange('cityOfResidence', municipality.name);
                       }
@@ -544,9 +554,12 @@ const CreateCustomerPage: React.FC = () => {
                     <SelectTrigger>
                       <SelectValue placeholder="Izaberite grad" />
                     </SelectTrigger>
-                    <SelectContent className='max-h-[300px]'>
+                    <SelectContent className="max-h-[300px]">
                       {municipalities.map((municipality) => (
-                        <SelectItem key={municipality.uniqueKey} value={municipality.uniqueKey}>
+                        <SelectItem
+                          key={municipality.uniqueKey}
+                          value={municipality.uniqueKey}
+                        >
                           {municipality.name}
                         </SelectItem>
                       ))}

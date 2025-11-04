@@ -16,12 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PhotoUpload } from '@/components/ui/photo-upload';
-import {
-  User,
-  FileText,
-  Camera,
-  Globe,
-} from 'lucide-react';
+import { User, FileText, Camera, Globe } from 'lucide-react';
 import {
   getCustomer,
   updateCustomer,
@@ -50,17 +45,19 @@ const getAllMunicipalities = (): MunicipalityOption[] => {
   // Federation
   if (data['Federacija Bosne i Hercegovine']) {
     const federation = data['Federacija Bosne i Hercegovine'];
-    Object.entries(federation).forEach(([canton, cantonMunicipalities]: [string, any]) => {
-      if (Array.isArray(cantonMunicipalities)) {
-        cantonMunicipalities.forEach((name: string) => {
-          municipalities.push({
-            name,
-            region: 'FBiH',
-            uniqueKey: `fbih-${name.toLowerCase().replace(/\s/g, '-')}`,
+    Object.entries(federation).forEach(
+      ([canton, cantonMunicipalities]: [string, any]) => {
+        if (Array.isArray(cantonMunicipalities)) {
+          cantonMunicipalities.forEach((name: string) => {
+            municipalities.push({
+              name,
+              region: 'FBiH',
+              uniqueKey: `fbih-${name.toLowerCase().replace(/\s/g, '-')}`,
+            });
           });
-        });
+        }
       }
-    });
+    );
   }
 
   // Republika Srpska
@@ -154,9 +151,11 @@ const EditCustomerPage: React.FC = () => {
   }
 
   // Parse phone number to extract dial code and number
-  const parsePhoneNumber = (fullPhone: string | undefined): { dialCode: string; number: string } => {
+  const parsePhoneNumber = (
+    fullPhone: string | undefined
+  ): { dialCode: string; number: string } => {
     if (!fullPhone) return { dialCode: '+387', number: '' };
-    
+
     // Smart parsing: Find where the dial code ends by looking for common phone number patterns
     // Most local phone numbers start with 6-9 (mobile) or 1-5 (landline)
     // This regex matches: + followed by 1-3 digits, then a digit 0-9 that starts the local number
@@ -167,7 +166,7 @@ const EditCustomerPage: React.FC = () => {
         number: match[2].trim(),
       };
     }
-    
+
     // Default if no match
     return { dialCode: '+387', number: fullPhone };
   };
@@ -202,7 +201,8 @@ const EditCustomerFormContent: React.FC<{
 
   // Form state
   const [formData, setFormData] = useState<CustomerFormData>(initialData);
-  const [originalData, setOriginalData] = useState<CustomerFormData>(initialData);
+  const [originalData, setOriginalData] =
+    useState<CustomerFormData>(initialData);
 
   const [errors, setErrors] = useState<CustomerFormErrors>({});
   const [touched, setTouched] = useState<CustomerTouchedFields>({});
@@ -214,15 +214,26 @@ const EditCustomerFormContent: React.FC<{
   const [countriesError, setCountriesError] = useState<string | null>(null);
 
   // Photo upload state for license
-  const [selectedLicensePhoto, setSelectedLicensePhoto] = useState<File | null>(null);
-  const [licensePhotoPreview, setLicensePhotoPreview] = useState<string | null>(null);
-  const [existingLicensePhotoUrl, setExistingLicensePhotoUrl] = useState<string | null>(null);
+  const [selectedLicensePhoto, setSelectedLicensePhoto] = useState<File | null>(
+    null
+  );
+  const [licensePhotoPreview, setLicensePhotoPreview] = useState<string | null>(
+    null
+  );
+  const [existingLicensePhotoUrl, setExistingLicensePhotoUrl] = useState<
+    string | null
+  >(null);
   const [isLoadingLicensePhoto, setIsLoadingLicensePhoto] = useState(false);
 
   // Photo upload state for passport
-  const [selectedPassportPhoto, setSelectedPassportPhoto] = useState<File | null>(null);
-  const [passportPhotoPreview, setPassportPhotoPreview] = useState<string | null>(null);
-  const [existingPassportPhotoUrl, setExistingPassportPhotoUrl] = useState<string | null>(null);
+  const [selectedPassportPhoto, setSelectedPassportPhoto] =
+    useState<File | null>(null);
+  const [passportPhotoPreview, setPassportPhotoPreview] = useState<
+    string | null
+  >(null);
+  const [existingPassportPhotoUrl, setExistingPassportPhotoUrl] = useState<
+    string | null
+  >(null);
   const [isLoadingPassportPhoto, setIsLoadingPassportPhoto] = useState(false);
 
   // Track if photos were explicitly removed
@@ -315,12 +326,17 @@ const EditCustomerFormContent: React.FC<{
         URL.revokeObjectURL(passportPhotoPreview);
       }
     };
-  }, [existingLicensePhotoUrl, licensePhotoPreview, existingPassportPhotoUrl, passportPhotoPreview]);
+  }, [
+    existingLicensePhotoUrl,
+    licensePhotoPreview,
+    existingPassportPhotoUrl,
+    passportPhotoPreview,
+  ]);
 
   // Handle form field changes
   const handleInputChange = (field: keyof CustomerFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    
+
     if (!touched[field]) {
       setTouched((prev) => ({ ...prev, [field]: true }));
     }
@@ -338,7 +354,7 @@ const EditCustomerFormContent: React.FC<{
   // Handle license photo file changes
   const handleLicensePhotoChange = (file: File | null) => {
     setSelectedLicensePhoto(file);
-    
+
     if (file === null) {
       // Photo was removed
       setLicensePhotoRemoved(true);
@@ -357,7 +373,7 @@ const EditCustomerFormContent: React.FC<{
   // Handle passport photo file changes
   const handlePassportPhotoChange = (file: File | null) => {
     setSelectedPassportPhoto(file);
-    
+
     if (file === null) {
       // Photo was removed
       setPassportPhotoRemoved(true);
@@ -419,8 +435,10 @@ const EditCustomerFormContent: React.FC<{
 
   // Check if form has been modified
   const hasChanges = () => {
-    const formChanged = JSON.stringify(formData) !== JSON.stringify(originalData);
-    const photoChanged = selectedLicensePhoto !== null || selectedPassportPhoto !== null;
+    const formChanged =
+      JSON.stringify(formData) !== JSON.stringify(originalData);
+    const photoChanged =
+      selectedLicensePhoto !== null || selectedPassportPhoto !== null;
     return formChanged || photoChanged;
   };
 
@@ -446,7 +464,8 @@ const EditCustomerFormContent: React.FC<{
       setIsSubmitting(true);
 
       // Handle photo uploads and removals
-      let licensePhotoFilename: string | undefined = formData.drivingLicensePhotoUrl;
+      let licensePhotoFilename: string | undefined =
+        formData.drivingLicensePhotoUrl;
       let passportPhotoFilename: string | undefined = formData.passportPhotoUrl;
 
       // Handle driving license photo
@@ -505,8 +524,14 @@ const EditCustomerFormContent: React.FC<{
         idOfPerson: formData.idOfPerson || undefined,
         driverLicenseNumber: formData.driverLicenseNumber,
         passportNumber: formData.passportNumber,
-        drivingLicensePhotoUrl: licensePhotoFilename === null ? null : (licensePhotoFilename || undefined),
-        passportPhotoUrl: passportPhotoFilename === null ? null : (passportPhotoFilename || undefined),
+        drivingLicensePhotoUrl:
+          licensePhotoFilename === null
+            ? null
+            : licensePhotoFilename || undefined,
+        passportPhotoUrl:
+          passportPhotoFilename === null
+            ? null
+            : passportPhotoFilename || undefined,
       };
 
       await updateCustomer(customerId, customerData);
@@ -602,9 +627,7 @@ const EditCustomerFormContent: React.FC<{
               {/* Email and Phone */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">
-                    Email adresa
-                  </Label>
+                  <Label htmlFor="email">Email adresa</Label>
                   <Input
                     id="email"
                     type="email"
@@ -620,13 +643,11 @@ const EditCustomerFormContent: React.FC<{
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phoneNumber">
-                    Broj telefona
-                  </Label>
+                  <Label htmlFor="phoneNumber">Broj telefona</Label>
                   <div className="flex gap-2">
                     {/* Dial Code Selector */}
                     <Select
-                      value={`${formData.phoneDialCode}|||${countries.find(c => c.dialCode === formData.phoneDialCode)?.code || ''}`}
+                      value={`${formData.phoneDialCode}|||${countries.find((c) => c.dialCode === formData.phoneDialCode)?.code || ''}`}
                       onValueChange={(value) => {
                         const dialCode = value.split('|||')[0];
                         // Only update if dialCode is not empty
@@ -642,7 +663,10 @@ const EditCustomerFormContent: React.FC<{
                             formData.phoneDialCode
                           ) : (
                             <>
-                              {countries.find(c => c.dialCode === formData.phoneDialCode)?.flag || ''} {formData.phoneDialCode}
+                              {countries.find(
+                                (c) => c.dialCode === formData.phoneDialCode
+                              )?.flag || ''}{' '}
+                              {formData.phoneDialCode}
                             </>
                           )}
                         </SelectValue>
@@ -729,7 +753,10 @@ const EditCustomerFormContent: React.FC<{
                         </SelectItem>
                       ) : countries.length > 0 ? (
                         countries.map((country, index) => (
-                          <SelectItem key={`country-${country.name.replace(/\s/g, '_')}`} value={country.name}>
+                          <SelectItem
+                            key={`country-${country.name.replace(/\s/g, '_')}`}
+                            value={country.name}
+                          >
                             {country.flag} {country.name}
                           </SelectItem>
                         ))
@@ -781,12 +808,21 @@ const EditCustomerFormContent: React.FC<{
                   <div className="space-y-2">
                     <Label htmlFor="cityOfResidence">Grad prebivališta</Label>
                     <Select
-                      value={municipalities.find(m => m.name === formData.cityOfResidence)?.uniqueKey || formData.cityOfResidence}
+                      value={
+                        municipalities.find(
+                          (m) => m.name === formData.cityOfResidence
+                        )?.uniqueKey || formData.cityOfResidence
+                      }
                       onValueChange={(uniqueKey) => {
                         // Find municipality by uniqueKey and store the name
-                        const municipality = municipalities.find(m => m.uniqueKey === uniqueKey);
+                        const municipality = municipalities.find(
+                          (m) => m.uniqueKey === uniqueKey
+                        );
                         if (municipality) {
-                          handleInputChange('cityOfResidence', municipality.name);
+                          handleInputChange(
+                            'cityOfResidence',
+                            municipality.name
+                          );
                         }
                       }}
                       disabled={isSubmitting}
@@ -796,7 +832,10 @@ const EditCustomerFormContent: React.FC<{
                       </SelectTrigger>
                       <SelectContent className="max-h-[300px]">
                         {municipalities.map((municipality) => (
-                          <SelectItem key={municipality.uniqueKey} value={municipality.uniqueKey}>
+                          <SelectItem
+                            key={municipality.uniqueKey}
+                            value={municipality.uniqueKey}
+                          >
                             {municipality.name}
                           </SelectItem>
                         ))}
@@ -832,7 +871,8 @@ const EditCustomerFormContent: React.FC<{
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="driverLicenseNumber">
-                    Broj vozačke dozvole <span className="text-destructive">*</span>
+                    Broj vozačke dozvole{' '}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="driverLicenseNumber"
@@ -846,11 +886,12 @@ const EditCustomerFormContent: React.FC<{
                       errors.driverLicenseNumber ? 'border-destructive' : ''
                     }
                   />
-                  {touched.driverLicenseNumber && errors.driverLicenseNumber && (
-                    <p className="text-sm text-destructive">
-                      {errors.driverLicenseNumber}
-                    </p>
-                  )}
+                  {touched.driverLicenseNumber &&
+                    errors.driverLicenseNumber && (
+                      <p className="text-sm text-destructive">
+                        {errors.driverLicenseNumber}
+                      </p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -865,7 +906,9 @@ const EditCustomerFormContent: React.FC<{
                     }
                     placeholder="Unesite broj pasoša"
                     disabled={isSubmitting}
-                    className={errors.passportNumber ? 'border-destructive' : ''}
+                    className={
+                      errors.passportNumber ? 'border-destructive' : ''
+                    }
                   />
                   {touched.passportNumber && errors.passportNumber && (
                     <p className="text-sm text-destructive">

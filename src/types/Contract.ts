@@ -23,12 +23,12 @@ export interface Contract {
 }
 
 export interface ContractFormData {
-  customerId: string
-  carId: string
-  startDate: string
-  endDate: string
-  dailyRate: number
-  totalAmount: number
-  additionalNotes?: string
-  photoUrl: string
+  customerId: string;
+  carId: string;
+  startDate: string;
+  endDate: string;
+  dailyRate: number;
+  totalAmount: number;
+  additionalNotes?: string;
+  photoUrl: string;
 }
