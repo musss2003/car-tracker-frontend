@@ -8,35 +8,30 @@ import {
   AlertCircle,
   X,
   Save,
-  Calendar,
   User,
-  Truck,
   FileText,
-  DollarSign,
+  Camera,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Toast } from '@/components/ui/toast';
 import { PhotoUpload } from '@/components/ui/photo-upload';
+import { CustomerSearchSelect } from '@/components/ui/customer-search-select';
+import { DateRangeValidator } from '@/components/ui/date-range-validator';
+import { CarAvailabilitySelect } from '@/components/ui/car-availability-select';
+import { FormSection } from '@/components/ui/form-section';
+import { FormField } from '@/components/ui/form-field';
+import { LoadingState } from '@/components/ui/loading-state';
+import { PageHeader } from '@/components/ui/page-header';
 import { getContract, updateContract } from '@/services/contractService';
 import { getCustomers } from '@/services/customerService';
-import { getAvailableCarsForPeriod } from '@/services/carService';
-import { uploadDocument } from '@/services/uploadService';
-import { getCar } from '@/services/carService';
+import { getCarAvailability, getCar } from '@/services/carService';
 import type { ContractFormData } from '@/types/Contract';
 import type { Customer } from '@/types/Customer';
 import type { Car } from '@/types/Car';
-import formatCurrency from '@/utils/formatCurrency';
 import { useNavigate, useParams } from 'react-router-dom';
+import { usePhotoUpload } from '@/hooks/usePhotoUpload';
 
 export default function EditContractPage() {
   const params = useParams();
@@ -59,10 +54,20 @@ export default function EditContractPage() {
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [availableCars, setAvailableCars] = useState<Car[]>([]);
   const [currentCar, setCurrentCar] = useState<Car | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [isUpdated, setIsUpdated] = useState(false);
+  const [carBookings, setCarBookings] = useState<any[]>([]);
+  const [hasDateConflict, setHasDateConflict] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  // Use the custom hook
+  const {
+    photoFile,
+    setPhotoFile,
+    uploadPhoto,
+    error: photoError,
+  } = usePhotoUpload();
 
   // Fetch contract data
   useEffect(() => {
@@ -117,47 +122,69 @@ export default function EditContractPage() {
     fetchCustomers();
   }, []);
 
-  // Fetch available cars when dates change
+  // Fetch car bookings when car is selected
   useEffect(() => {
-    const fetchAvailableCars = async () => {
-      if (!formData.startDate || !formData.endDate) {
-        setAvailableCars([]);
+    const fetchCarBookings = async () => {
+      if (!formData.carId) {
+        setCarBookings([]);
         return;
       }
 
       try {
-        const availableCars = await getAvailableCarsForPeriod(
-          formData.startDate,
-          formData.endDate
-        );
-        setAvailableCars(availableCars);
-
-        if (formData.carId) {
-          const selectedCar =
-            availableCars.find((car) => car.id === formData.carId) ||
-            currentCar;
-          if (selectedCar) {
-            const start = new Date(formData.startDate);
-            const end = new Date(formData.endDate);
-            const days = Math.ceil(
-              (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-            );
-            const total = days * selectedCar.pricePerDay;
-
-            setFormData((prev) => ({
-              ...prev,
-              dailyRate: selectedCar.pricePerDay,
-              totalAmount: total > 0 ? total : 0,
-            }));
-          }
+        const car = await getCar(formData.carId);
+        if (car?.licensePlate) {
+          const bookings = await getCarAvailability(car.licensePlate);
+          setCarBookings(bookings);
         }
       } catch (error) {
-        console.error('Error fetching cars:', error);
+        console.error('Error fetching car bookings:', error);
       }
     };
 
-    fetchAvailableCars();
-  }, [formData.startDate, formData.endDate, formData.carId, currentCar]);
+    fetchCarBookings();
+  }, [formData.carId]);
+
+  // Validate dates against car bookings
+  useEffect(() => {
+    if (
+      !formData.carId ||
+      !formData.startDate ||
+      !formData.endDate ||
+      carBookings.length === 0
+    ) {
+      setHasDateConflict(false);
+      return;
+    }
+
+    const selectedStart = new Date(formData.startDate);
+    const selectedEnd = new Date(formData.endDate);
+
+    // Check for conflicts with existing bookings (excluding current contract)
+    const hasConflict = carBookings.some((booking) => {
+      // Skip the current contract being edited
+      if (booking.contractId === contractId) {
+        return false;
+      }
+
+      const bookingStart = new Date(booking.start);
+      const bookingEnd = new Date(booking.end);
+
+      // Check if dates overlap
+      return (
+        (selectedStart >= bookingStart && selectedStart < bookingEnd) ||
+        (selectedEnd > bookingStart && selectedEnd <= bookingEnd) ||
+        (selectedStart <= bookingStart && selectedEnd >= bookingEnd)
+      );
+    });
+
+    setHasDateConflict(hasConflict);
+  }, [
+    formData.startDate,
+    formData.endDate,
+    formData.carId,
+    carBookings,
+    contractId,
+  ]);
 
   const handleChange = (
     field: keyof ContractFormData,
@@ -186,6 +213,35 @@ export default function EditContractPage() {
         }));
         return;
       }
+
+      // Check if the new date range conflicts with existing bookings
+      if (formData.carId && carBookings.length > 0) {
+        const selectedStart = start;
+        const selectedEnd = end;
+
+        const wouldConflict = carBookings.some((booking) => {
+          if (booking.contractId === contractId) {
+            return false;
+          }
+
+          const bookingStart = new Date(booking.start);
+          const bookingEnd = new Date(booking.end);
+
+          return (
+            (selectedStart >= bookingStart && selectedStart < bookingEnd) ||
+            (selectedEnd > bookingStart && selectedEnd <= bookingEnd) ||
+            (selectedStart <= bookingStart && selectedEnd >= bookingEnd)
+          );
+        });
+
+        if (wouldConflict) {
+          // Don't update the date if it would cause a conflict
+          setToastMessage('Cannot select these dates - car is already booked');
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 3000);
+          return;
+        }
+      }
     }
 
     handleChange(field, value);
@@ -209,37 +265,13 @@ export default function EditContractPage() {
     if (!formData.startDate) newErrors.startDate = 'Start date is required';
     if (!formData.endDate) newErrors.endDate = 'End date is required';
 
-    if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate);
-      const end = new Date(formData.endDate);
-      if (end <= start) {
-        newErrors.endDate = 'End date must be after start date';
-      }
+    // Check for date conflicts
+    if (hasDateConflict) {
+      newErrors.dates = 'The selected dates conflict with existing bookings';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const uploadPhoto = async (): Promise<string | null> => {
-    if (!photoFile) return null;
-
-    try {
-      const filename = await uploadDocument(photoFile);
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.photoUrl;
-        return newErrors;
-      });
-      return filename;
-    } catch (error) {
-      console.error('Error uploading photo:', error);
-      setErrors((prev) => ({
-        ...prev,
-        photoUrl: 'Failed to upload photo. Please try again.',
-      }));
-      return null;
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -285,14 +317,7 @@ export default function EditContractPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading contract...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState text="Loading contract..." />;
   }
 
   if (error && !loading) {
@@ -318,215 +343,130 @@ export default function EditContractPage() {
     );
   }
 
-  const today = new Date().toISOString().split('T')[0];
-  const allCars = currentCar
-    ? [currentCar, ...availableCars.filter((car) => car.id !== currentCar.id)]
-    : availableCars;
-  const selectedCar = allCars.find((car) => car.id === formData.carId);
-
   return (
     <div className="flex flex-col h-full">
-      <div className="border-b bg-background px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold flex items-center gap-2">
-            <FileText className="w-6 h-6" />
-            Edit Contract
-          </h1>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate('/contracts')}
-            disabled={submitting}
-            className="flex items-center gap-2 bg-transparent"
-          >
-            <X className="w-4 h-4" /> Cancel
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Edit Contract"
+        subtitle="Update the contract details"
+        onBack={() => navigate('/contracts')}
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/contracts')}
+              disabled={submitting}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={submitting || !isUpdated || hasDateConflict}
+              form="edit-contract-form"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </>
+        }
+      />
 
       <div className="flex-1 overflow-auto bg-muted/30">
         <div className="mx-auto p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Customer Selection */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Customer Information
-              </h2>
-              <div className="space-y-2">
-                <Label htmlFor="customerId">Customer</Label>
-                <Select
+          <form
+            id="edit-contract-form"
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            <FormSection
+              title="Customer Information"
+              icon={<User className="w-5 h-5" />}
+            >
+              <FormField
+                label="Customer"
+                id="customerId"
+                error={errors.customerId}
+                required
+              >
+                <CustomerSearchSelect
                   value={formData.customerId}
-                  onValueChange={(value) => handleChange('customerId', value)}
-                >
-                  <SelectTrigger id="customerId">
-                    <SelectValue placeholder="Select a customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.customerId && (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.customerId}
-                  </p>
-                )}
-              </div>
-            </div>
+                  onChange={(value) => handleChange('customerId', value)}
+                  customers={customers}
+                  disabled={submitting}
+                />
+              </FormField>
+            </FormSection>
 
-            {/* Rental Period */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Rental Period
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    min={today}
-                    value={formData.startDate}
-                    onChange={(e) =>
-                      handleDateChange('startDate', e.target.value)
-                    }
-                  />
-                  {errors.startDate && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.startDate}
-                    </p>
-                  )}
-                </div>
+            <DateRangeValidator
+              startDate={formData.startDate}
+              endDate={formData.endDate}
+              onStartDateChange={(date) => handleDateChange('startDate', date)}
+              onEndDateChange={(date) => handleDateChange('endDate', date)}
+              startDateError={errors.startDate}
+              endDateError={errors.endDate}
+              disabled={submitting}
+              checkConflicts
+              existingBookings={carBookings}
+              currentBookingId={contractId}
+              onConflictDetected={(hasConflict, message) => {
+                setHasDateConflict(hasConflict);
+                if (hasConflict && message) {
+                  setToastMessage(message);
+                  setShowToast(true);
+                }
+              }}
+            />
 
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    min={formData.startDate || today}
-                    value={formData.endDate}
-                    onChange={(e) =>
-                      handleDateChange('endDate', e.target.value)
-                    }
-                  />
-                  {errors.endDate && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.endDate}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Car Selection */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Truck className="w-5 h-5" />
-                Vehicle Selection
-              </h2>
-              <div className="space-y-2">
-                <Label htmlFor="carId">Car</Label>
-                <Select
-                  value={formData.carId}
-                  onValueChange={(value) => handleChange('carId', value)}
-                >
-                  <SelectTrigger id="carId">
-                    <SelectValue placeholder="Select a car" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allCars.map((car) => (
-                      <SelectItem key={car.id} value={car.id}>
-                        {car.manufacturer} {car.model} ({car.year}) -{' '}
-                        {formatCurrency(car.pricePerDay)}/day
-                        {car.id === currentCar?.id &&
-                          !availableCars.find((c) => c.id === car.id) && (
-                            <span className="text-xs text-muted-foreground ml-2">
-                              (Current)
-                            </span>
-                          )}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.carId && (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.carId}
-                  </p>
-                )}
-              </div>
-
-              {/* Pricing Summary */}
-              {selectedCar && formData.startDate && formData.endDate && (
-                <div className="p-4 bg-muted rounded-lg space-y-2 mt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Daily Rate:
-                    </span>
-                    <span className="font-medium">
-                      {formatCurrency(formData.dailyRate)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Duration:
-                    </span>
-                    <span className="font-medium">
-                      {Math.ceil(
-                        (new Date(formData.endDate).getTime() -
-                          new Date(formData.startDate).getTime()) /
-                          (1000 * 60 * 60 * 24)
-                      )}{' '}
-                      days
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className="font-semibold flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />
-                      Total Amount:
-                    </span>
-                    <span className="text-lg font-bold">
-                      {formatCurrency(formData.totalAmount)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+            <CarAvailabilitySelect
+              value={formData.carId}
+              onChange={(carId) => handleChange('carId', carId)}
+              startDate={formData.startDate}
+              endDate={formData.endDate}
+              currentCar={currentCar}
+              error={errors.carId}
+              required
+              onPriceCalculated={(dailyRate, totalAmount) => {
+                setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
+              }}
+              showPricingSummary
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Additional Notes */}
-              <div className="bg-background border rounded-lg p-6 space-y-4">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Additional Information
-                </h2>
-                <div className="space-y-2">
-                  <Label htmlFor="additionalNotes">
-                    Additional Notes (Optional)
-                  </Label>
+              <FormSection
+                title="Additional Information"
+                icon={<FileText className="w-5 h-5" />}
+              >
+                <FormField
+                  label="Additional Notes"
+                  id="additionalNotes"
+                  helperText="Any additional notes or special conditions"
+                >
                   <Textarea
                     id="additionalNotes"
-                    placeholder="Any additional notes or special conditions..."
+                    placeholder="Enter any additional notes..."
                     rows={4}
                     value={formData.additionalNotes}
                     onChange={(e) =>
                       handleChange('additionalNotes', e.target.value)
                     }
                   />
-                </div>
-              </div>
+                </FormField>
+              </FormSection>
 
-              {/* Photo Upload */}
-              <div className="bg-background border rounded-lg p-6 space-y-4">
-                <h2 className="text-lg font-semibold">Contract Photo</h2>
+              <FormSection
+                title="Contract Photo"
+                icon={<Camera className="w-5 h-5" />}
+              >
                 <PhotoUpload
                   value={photoFile}
                   onChange={handlePhotoChange}
@@ -534,7 +474,7 @@ export default function EditContractPage() {
                   disabled={submitting}
                   existingPhotoUrl={formData.photoUrl}
                 />
-              </div>
+              </FormSection>
             </div>
 
             {/* Error Alert */}
@@ -544,29 +484,16 @@ export default function EditContractPage() {
                 <AlertDescription>{errors.submit}</AlertDescription>
               </Alert>
             )}
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={submitting || !isUpdated}
-                size="lg"
-                className="flex items-center gap-2"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Updating...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" /> Update Contract
-                  </>
-                )}
-              </Button>
-            </div>
           </form>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <Toast variant="destructive" onClose={() => setShowToast(false)}>
+          {toastMessage}
+        </Toast>
+      )}
     </div>
   );
 }
