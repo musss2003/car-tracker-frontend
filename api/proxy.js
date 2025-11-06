@@ -112,18 +112,44 @@ export default async function handler(req, res) {
 
     const response = await fetch(backendUrl, fetchOptions);
     
-    // Handle non-JSON responses
+    // Handle different content types
     const contentType = response.headers.get('content-type');
-    let data;
     
-    if (contentType?.includes('application/json')) {
-      data = await response.json();
-    } else {
-      data = await response.text();
+    // For images and binary data, stream the response directly
+    if (contentType?.startsWith('image/') || 
+        contentType?.startsWith('application/octet-stream') ||
+        contentType?.startsWith('application/pdf')) {
+      
+      // Set the same content type
+      res.setHeader('Content-Type', contentType);
+      
+      // Set other important headers
+      const contentLength = response.headers.get('content-length');
+      if (contentLength) {
+        res.setHeader('Content-Length', contentLength);
+      }
+      
+      const contentDisposition = response.headers.get('content-disposition');
+      if (contentDisposition) {
+        res.setHeader('Content-Disposition', contentDisposition);
+      }
+      
+      // Stream the binary data
+      const buffer = await response.arrayBuffer();
+      res.status(response.status).send(Buffer.from(buffer));
+      return;
     }
-
-    // Forward the status code from backend
-    res.status(response.status).json(data);
+    
+    // For JSON responses
+    if (contentType?.includes('application/json')) {
+      const data = await response.json();
+      res.status(response.status).json(data);
+      return;
+    }
+    
+    // For text responses
+    const data = await response.text();
+    res.status(response.status).send(data);
   } catch (error) {
     console.error('❌ Proxy error:', error.message);
     res.status(500).json({ 
