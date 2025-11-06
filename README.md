@@ -2,13 +2,17 @@
 
 
 
-[![React](https://img.shields.io/badge/React-18.3-blue?logo=react)](https://reactjs.org/)A modern, responsive frontend application for managing **car rental contracts**, **customers**, and **vehicles**.  
+[![React](https://img.shields.io/badge/React-18.3-blue?logo=react)](https://reactjs.org/)
+A modern, responsive frontend application for managing **car rental contracts**, **customers**, and **vehicles**.  
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)Built with **React**, **TypeScript**, and **Vite**, and styled using **Chakra UI** and **TailwindCSS**.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
+
+Built with **React**, **TypeScript**, and **Vite**, and styled using **Chakra UI** and **TailwindCSS**.
 
 [![Vite](https://img.shields.io/badge/Vite-6.3-purple?logo=vite)](https://vitejs.dev/)
 
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)> ⚠️ This is the **frontend only**. You’ll need to run the **backend repository** alongside it for full functionality.
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)> 
+⚠️ This is the **frontend only**. You’ll need to run the **backend repository** alongside it for full functionality.
 
 
 
@@ -20,7 +24,7 @@ A modern, responsive **car rental management system** for managing contracts, cu
 
 
 
----### 🧩 Core
+### 🧩 Core
 
 - ⚛️ **React 18.3** – Modern React with hooks and concurrent features  
 
@@ -70,11 +74,11 @@ A modern, responsive **car rental management system** for managing contracts, cu
 
 - 🧪 **@testing-library/react** – Component testing  
 
----- ✨ **ESLint** + **Prettier** – Code linting and formatting  
+- ✨ **ESLint** + **Prettier** – Code linting and formatting  
 
 
 
-## 🛠️ Tech Stack---
+## 🛠️ Tech Stack
 
 
 
