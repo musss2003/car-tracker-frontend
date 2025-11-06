@@ -3,15 +3,6 @@
 import type React from 'react';
 
 import { useState, useEffect } from 'react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { CustomerSearchSelect } from '@/components/ui/customer-search-select';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -19,12 +10,12 @@ import { FormSection } from '@/components/ui/form-section';
 import { FormField } from '@/components/ui/form-field';
 import { LoadingState } from '@/components/ui/loading-state';
 import { PageHeader } from '@/components/ui/page-header';
+import { CustomerSearchSelect } from '@/components/ui/customer-search-select';
+import { DateRangeValidator } from '@/components/ui/date-range-validator';
+import { CarAvailabilitySelect } from '@/components/ui/car-availability-select';
 import {
-  Calendar,
   FileText,
-  Truck,
   User,
-  DollarSign,
   Camera,
   X,
   Loader2,
@@ -32,16 +23,13 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import type { Customer } from '@/types/Customer';
-import type { Car } from '@/types/Car';
-import { getAvailableCarsForPeriod } from '@/services/carService';
 import type { ContractFormData } from '@/types/Contract';
 import { getCustomers } from '@/services/customerService';
 import { createAndDownloadContract } from '@/services/contractService';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { PhotoUpload } from '@/components/ui/photo-upload';
-import { uploadDocument } from '@/services/uploadService';
-import formatCurrency from '@/utils/formatCurrency';
+import { usePhotoUpload } from '@/hooks/usePhotoUpload';
 
 const CreateContractPage = ({}) => {
   const navigate = useNavigate();
@@ -59,9 +47,10 @@ const CreateContractPage = ({}) => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cars, setCars] = useState<Car[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  
+  // Use the custom hooks
+  const { photoFile, setPhotoFile, uploadPhoto, error: photoError } = usePhotoUpload();
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -74,42 +63,6 @@ const CreateContractPage = ({}) => {
     };
 
     fetchCustomers();
-
-    const fetchAvailableCars = async () => {
-      // Only fetch if both dates are selected
-      if (!formData.startDate || !formData.endDate) {
-        setCars([]);
-        return;
-      }
-
-      const availableCars = await getAvailableCarsForPeriod(
-        formData.startDate,
-        formData.endDate
-      );
-      setCars(availableCars);
-
-      if (formData.carId) {
-        const selectedCar = availableCars.find(
-          (car) => car.id === formData.carId
-        );
-        if (selectedCar) {
-          const start = new Date(formData.startDate);
-          const end = new Date(formData.endDate);
-          const days = Math.ceil(
-            (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-          );
-          const total = days * selectedCar.pricePerDay;
-
-          setFormData((prev) => ({
-            ...prev,
-            dailyRate: selectedCar.pricePerDay,
-            totalAmount: total > 0 ? total : 0,
-          }));
-        }
-      }
-    };
-
-    fetchAvailableCars();
   }, [formData.startDate, formData.endDate, formData.carId]);
 
   const handleChange = (field: keyof ContractFormData, value: string) => {
@@ -250,31 +203,6 @@ const CreateContractPage = ({}) => {
     });
   };
 
-  // Upload photo to server
-  const uploadPhoto = async (): Promise<string | null> => {
-    if (!photoFile) return null;
-
-    try {
-      const filename = await uploadDocument(photoFile);
-      // Clear any previous photo upload errors
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.photoUrl;
-        return newErrors;
-      });
-      return filename;
-    } catch (error) {
-      console.error('Error uploading photo:', error);
-      setErrors((prev) => ({
-        ...prev,
-        photoUrl: 'Neuspješno dodavanje fotografije. Molimo pokušajte ponovo.',
-      }));
-      return null;
-    }
-  };
-
-  const selectedCar = cars.find((car) => car.id === formData.carId);
-
   return (
     <div className="flex flex-col h-full">
       <PageHeader
@@ -333,106 +261,28 @@ const CreateContractPage = ({}) => {
               </FormField>
             </FormSection>
 
-            <FormSection title="Rental Period" icon={<Calendar className="w-5 h-5" />}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  label="Start Date"
-                  id="startDate"
-                  error={errors.startDate}
-                  required
-                >
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) =>
-                      handleDateChange('startDate', e.target.value)
-                    }
-                  />
-                </FormField>
+            <DateRangeValidator
+              startDate={formData.startDate}
+              endDate={formData.endDate}
+              onStartDateChange={(date) => handleDateChange('startDate', date)}
+              onEndDateChange={(date) => handleDateChange('endDate', date)}
+              startDateError={errors.startDate}
+              endDateError={errors.endDate}
+              disabled={isSubmitting}
+            />
 
-                <FormField
-                  label="End Date"
-                  id="endDate"
-                  error={errors.endDate}
-                  required
-                >
-                  <Input
-                    id="endDate"
-                    type="date"
-                    min={formData.startDate}
-                    value={formData.endDate}
-                    onChange={(e) =>
-                      handleDateChange('endDate', e.target.value)
-                    }
-                  />
-                </FormField>
-              </div>
-            </FormSection>
-
-            <FormSection title="Vehicle Selection" icon={<Truck className="w-5 h-5" />}>
-              <FormField
-                label="Car"
-                id="carId"
-                error={errors.carId}
-                required
-                helperText={cars.length === 0 && formData.startDate && formData.endDate ? "No cars available for selected dates" : undefined}
-              >
-                <Select
-                  value={formData.carId}
-                  onValueChange={(value) => handleChange('carId', value)}
-                  disabled={cars.length === 0}
-                >
-                  <SelectTrigger id="carId">
-                    <SelectValue placeholder="Select a car" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cars.map((car) => (
-                      <SelectItem key={car.id} value={car.id}>
-                        {car.manufacturer} {car.model} ({car.year}) -{' '}
-                        {formatCurrency(car.pricePerDay)}/day
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-
-              {/* Pricing Summary */}
-              {selectedCar && formData.startDate && formData.endDate && (
-                <div className="p-4 bg-muted rounded-lg space-y-2 mt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Daily Rate:
-                    </span>
-                    <span className="font-medium">
-                      {formatCurrency(formData.dailyRate)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Duration:
-                    </span>
-                    <span className="font-medium">
-                      {Math.ceil(
-                        (new Date(formData.endDate).getTime() -
-                          new Date(formData.startDate).getTime()) /
-                          (1000 * 60 * 60 * 24)
-                      )}{' '}
-                      days
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className="font-semibold flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />
-                      Total Amount:
-                    </span>
-                    <span className="text-lg font-bold">
-                      {formatCurrency(formData.totalAmount)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </FormSection>
+            <CarAvailabilitySelect
+              value={formData.carId}
+              onChange={(carId) => handleChange('carId', carId)}
+              startDate={formData.startDate}
+              endDate={formData.endDate}
+              error={errors.carId}
+              required
+              onPriceCalculated={(dailyRate, totalAmount) => {
+                setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
+              }}
+              showPricingSummary
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormSection title="Additional Information" icon={<FileText className="w-5 h-5" />}>
