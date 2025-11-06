@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Search, Check, ChevronsUpDown } from 'lucide-react';
 import { Customer } from '../types/customer.types';
 
-
 interface CustomerSearchSelectProps {
   value: string;
   onChange: (customerId: string) => void;
@@ -23,7 +22,10 @@ export function CustomerSearchSelect({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchQuery('');
       }

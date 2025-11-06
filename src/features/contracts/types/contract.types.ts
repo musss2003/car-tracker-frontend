@@ -1,7 +1,6 @@
-import { Car } from "@/features/cars";
-import { Customer } from "@/features/customers";
-import { User } from "@/features/users";
-
+import { Car } from '@/features/cars';
+import { Customer } from '@/features/customers';
+import { User } from '@/features/users';
 
 export interface Contract {
   id: string;

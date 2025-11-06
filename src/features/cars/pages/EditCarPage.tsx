@@ -14,7 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
-import { uploadDocument, downloadDocument } from '@/shared/services/uploadService';
+import {
+  uploadDocument,
+  downloadDocument,
+} from '@/shared/services/uploadService';
 import carBrands from '@/assets/car_brands.json';
 
 import './EditCarPage.css';

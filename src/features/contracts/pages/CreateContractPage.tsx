@@ -23,7 +23,6 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
-
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { ContractFormData } from '../types/contract.types';
@@ -31,7 +30,6 @@ import { Customer, getCustomers } from '@/features/customers';
 import { usePhotoUpload } from '@/shared/hooks/usePhotoUpload';
 import { createAndDownloadContract } from '../services/contractService';
 import { PhotoUpload } from '@/shared/components/ui/photo-upload';
-
 
 const CreateContractPage = ({}) => {
   const navigate = useNavigate();
@@ -50,9 +48,14 @@ const CreateContractPage = ({}) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  
+
   // Use the custom hooks
-  const { photoFile, setPhotoFile, uploadPhoto, error: photoError } = usePhotoUpload();
+  const {
+    photoFile,
+    setPhotoFile,
+    uploadPhoto,
+    error: photoError,
+  } = usePhotoUpload();
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -246,8 +249,15 @@ const CreateContractPage = ({}) => {
       {/* Form Section */}
       <div className="flex-1 overflow-auto bg-muted/30">
         <div className="mx-auto p-4">
-          <form id="contract-form" onSubmit={handleSubmit} className="space-y-6">
-            <FormSection title="Customer Information" icon={<User className="w-5 h-5" />}>
+          <form
+            id="contract-form"
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            <FormSection
+              title="Customer Information"
+              icon={<User className="w-5 h-5" />}
+            >
               <FormField
                 label="Customer"
                 id="customerId"
@@ -287,7 +297,10 @@ const CreateContractPage = ({}) => {
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormSection title="Additional Information" icon={<FileText className="w-5 h-5" />}>
+              <FormSection
+                title="Additional Information"
+                icon={<FileText className="w-5 h-5" />}
+              >
                 <FormField
                   label="Additional Notes"
                   id="additionalNotes"
@@ -305,7 +318,10 @@ const CreateContractPage = ({}) => {
                 </FormField>
               </FormSection>
 
-              <FormSection title="Contract Photo" icon={<Camera className="w-5 h-5" />}>
+              <FormSection
+                title="Contract Photo"
+                icon={<Camera className="w-5 h-5" />}
+              >
                 <PhotoUpload
                   value={photoFile}
                   onChange={(file) => handlePhotoChange(file)}

@@ -14,10 +14,10 @@ export interface UsePhotoUploadReturn {
 
 /**
  * usePhotoUpload Hook
- * 
+ *
  * A reusable hook for handling photo uploads with file management,
  * upload progress, and error handling.
- * 
+ *
  * @example
  * const {
  *   photoFile,
@@ -27,7 +27,7 @@ export interface UsePhotoUploadReturn {
  *   uploadPhoto,
  *   clearError
  * } = usePhotoUpload();
- * 
+ *
  * // In form submit
  * const handleSubmit = async () => {
  *   const photoFilename = await uploadPhoto();
@@ -50,17 +50,18 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
     try {
       setUploading(true);
       setError(null);
-      
+
       const filename = await uploadDocument(photoFile);
-      
+
       if (filename) {
         setPhotoUrl(filename);
         return filename;
       }
-      
+
       throw new Error('Upload failed - no filename returned');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to upload photo';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to upload photo';
       setError(errorMessage);
       console.error('Error uploading photo:', err);
       return null;

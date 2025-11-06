@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import { useAuth } from '../../hooks/useAuth';
 
-
 interface LoginFormInputs {
   username: string;
   password: string;

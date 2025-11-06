@@ -23,21 +23,25 @@ interface CarAvailabilitySelectProps {
   disabled?: boolean;
   required?: boolean;
   onCarsLoaded?: (cars: Car[]) => void;
-  onPriceCalculated?: (dailyRate: number, totalAmount: number, days: number) => void;
+  onPriceCalculated?: (
+    dailyRate: number,
+    totalAmount: number,
+    days: number
+  ) => void;
   showPricingSummary?: boolean;
   className?: string;
 }
 
 /**
  * CarAvailabilitySelect Component
- * 
+ *
  * A smart car selector that:
  * - Fetches available cars based on date range
  * - Shows car details (make, model, year, price)
  * - Automatically calculates pricing
  * - Handles loading and error states
  * - Includes current car in edit mode
- * 
+ *
  * @example
  * <CarAvailabilitySelect
  *   value={formData.carId}
@@ -96,7 +100,10 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
         setLoading(true);
         setFetchError(null);
 
-        const availableCars = await getAvailableCarsForPeriod(startDate, endDate);
+        const availableCars = await getAvailableCarsForPeriod(
+          startDate,
+          endDate
+        );
         setCars(availableCars);
         onCarsLoaded?.(availableCars);
       } catch (err) {
@@ -127,7 +134,9 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
     if (selectedCar) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      const days = Math.ceil(
+        (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+      );
       const total = days * selectedCar.pricePerDay;
 
       onPriceCalculated?.(selectedCar.pricePerDay, total, days);
@@ -143,10 +152,10 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
   const helperText = loading
     ? 'Loading available cars...'
     : !startDate || !endDate
-    ? 'Please select dates first'
-    : cars.length === 0 && !loading
-    ? 'No cars available for selected dates'
-    : undefined;
+      ? 'Please select dates first'
+      : cars.length === 0 && !loading
+        ? 'No cars available for selected dates'
+        : undefined;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -164,7 +173,9 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
             disabled={disabled || loading || allCars.length === 0}
           >
             <SelectTrigger id="carId" className={cn(loading && 'cursor-wait')}>
-              <SelectValue placeholder={loading ? 'Loading...' : 'Select a vehicle'} />
+              <SelectValue
+                placeholder={loading ? 'Loading...' : 'Select a vehicle'}
+              />
             </SelectTrigger>
             <SelectContent>
               {allCars.map((car) => (
@@ -177,9 +188,12 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
                     <span className="text-muted-foreground">
                       - {formatCurrency(car.pricePerDay)}/day
                     </span>
-                    {currentCar?.id === car.id && !cars.find((c) => c.id === car.id) && (
-                      <span className="text-xs text-muted-foreground ml-1">(Current)</span>
-                    )}
+                    {currentCar?.id === car.id &&
+                      !cars.find((c) => c.id === car.id) && (
+                        <span className="text-xs text-muted-foreground ml-1">
+                          (Current)
+                        </span>
+                      )}
                   </div>
                 </SelectItem>
               ))}
@@ -204,7 +218,9 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
         <div className="p-4 bg-muted rounded-lg space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Daily Rate:</span>
-            <span className="font-medium">{formatCurrency(selectedCar.pricePerDay)}</span>
+            <span className="font-medium">
+              {formatCurrency(selectedCar.pricePerDay)}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Duration:</span>
@@ -224,7 +240,8 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
             <span className="text-lg font-bold">
               {formatCurrency(
                 Math.ceil(
-                  (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+                  (new Date(endDate).getTime() -
+                    new Date(startDate).getTime()) /
                     (1000 * 60 * 60 * 24)
                 ) * selectedCar.pricePerDay
               )}

@@ -20,7 +20,12 @@ import {
 import defaultAvatar from '../../../../assets/default_avatar.png';
 import './UserProfile.css';
 import { User } from '../../types/user.types';
-import { deleteUser, getUser, updateUser, uploadProfilePhoto } from '../../services/userService';
+import {
+  deleteUser,
+  getUser,
+  updateUser,
+  uploadProfilePhoto,
+} from '../../services/userService';
 
 const UserProfile = ({ id }: { id: string }) => {
   // State management

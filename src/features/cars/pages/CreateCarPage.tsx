@@ -18,7 +18,6 @@ import { addCar } from '../services/carService';
 import { PhotoUpload } from '@/shared/components/ui/photo-upload';
 import carBrands from '@/assets/car_brands.json';
 
-
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
 const LICENSE_PLATE_REGEX = /^[A-Z0-9]{1,10}$/i;

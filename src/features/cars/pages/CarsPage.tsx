@@ -19,7 +19,6 @@ import {
   CurrencyDollarIcon,
   CalendarIcon,
   TagIcon,
-
   ViewGridIcon,
   ViewListIcon,
 } from '@heroicons/react/solid';

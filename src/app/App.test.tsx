@@ -1,6 +1,10 @@
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import App from '../App';
+import { screen } from '@testing-library/react';
+import {
+  renderWithProviders,
+  mockMatchMedia,
+  mockLocalStorage,
+} from '../test-utils';
+import App from './App';
 
 // Define routes for the application
 const routes = [
@@ -20,35 +24,15 @@ createBrowserRouter(routes, {
 
 beforeAll(() => {
   // Mock matchMedia for tests
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation((query) => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(), // deprecated
-      removeListener: vi.fn(), // deprecated
-      dispatchEvent: vi.fn(),
-    })),
-  });
-});
+  mockMatchMedia();
 
-// 🧪 Mock the useAuth hook
-vi.mock('./contexts/useAuth', () => ({
-  useAuth: () => ({
-    isLoggedIn: () => true,
-  }),
-}));
+  // Mock localStorage
+  mockLocalStorage();
+});
 
 describe('App Component', () => {
   it('should render the App component correctly', async () => {
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+    renderWithProviders(<App />);
 
     // wait for main content to appear
     const mainContent = await screen.findByTestId('main-content');

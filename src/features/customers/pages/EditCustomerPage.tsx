@@ -17,14 +17,20 @@ import {
 import { PhotoUpload } from '@/shared/components/ui/photo-upload';
 import { User, FileText, Camera, Globe } from 'lucide-react';
 
-
-
 // Import municipalities data
 import municipalitiesDataRaw from '@/assets/municipalities.json';
 import { Customer } from '../types/customer.types';
-import { CountryOption, getCountries, getCustomer, updateCustomer } from '../services/customerService';
+import {
+  CountryOption,
+  getCountries,
+  getCustomer,
+  updateCustomer,
+} from '../services/customerService';
 import LoadingSpinner from '@/shared/components/feedback/LoadingSpinner/LoadingSpinner';
-import { downloadDocument, uploadDocument } from '@/shared/services/uploadService';
+import {
+  downloadDocument,
+  uploadDocument,
+} from '@/shared/services/uploadService';
 
 // Type for municipality with region info
 interface MunicipalityOption {

@@ -1,4 +1,3 @@
-
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import { toast } from 'react-toastify';
 import { Contract, ContractFormData } from '../types/contract.types';

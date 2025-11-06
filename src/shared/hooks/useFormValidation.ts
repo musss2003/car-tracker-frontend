@@ -23,10 +23,10 @@ export interface UseFormValidationReturn<T> {
 
 /**
  * useFormValidation Hook
- * 
+ *
  * A reusable hook for form validation with customizable rules.
  * Supports required fields, length validation, regex patterns, and custom validators.
- * 
+ *
  * @example
  * const { errors, validateForm, validateField, clearError } = useFormValidation<FormData>({
  *   email: {
@@ -59,7 +59,10 @@ export function useFormValidation<T extends Record<string, any>>(
       if (!rule) return true;
 
       // Required validation
-      if (rule.required && (!value || (typeof value === 'string' && value.trim() === ''))) {
+      if (
+        rule.required &&
+        (!value || (typeof value === 'string' && value.trim() === ''))
+      ) {
         return false;
       }
 
@@ -69,17 +72,29 @@ export function useFormValidation<T extends Record<string, any>>(
       }
 
       // Min length validation
-      if (rule.minLength && typeof value === 'string' && value.length < rule.minLength) {
+      if (
+        rule.minLength &&
+        typeof value === 'string' &&
+        value.length < rule.minLength
+      ) {
         return false;
       }
 
       // Max length validation
-      if (rule.maxLength && typeof value === 'string' && value.length > rule.maxLength) {
+      if (
+        rule.maxLength &&
+        typeof value === 'string' &&
+        value.length > rule.maxLength
+      ) {
         return false;
       }
 
       // Pattern validation
-      if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
+      if (
+        rule.pattern &&
+        typeof value === 'string' &&
+        !rule.pattern.test(value)
+      ) {
         return false;
       }
 
@@ -105,7 +120,10 @@ export function useFormValidation<T extends Record<string, any>>(
         const value = formData[field];
 
         // Required validation
-        if (rule.required && (!value || (typeof value === 'string' && value.trim() === ''))) {
+        if (
+          rule.required &&
+          (!value || (typeof value === 'string' && value.trim() === ''))
+        ) {
           newErrors[field] = rule.message || `${field} is required`;
           return;
         }
@@ -116,19 +134,35 @@ export function useFormValidation<T extends Record<string, any>>(
         }
 
         // Min length validation
-        if (rule.minLength && typeof value === 'string' && value.length < rule.minLength) {
-          newErrors[field] = rule.message || `${field} must be at least ${rule.minLength} characters`;
+        if (
+          rule.minLength &&
+          typeof value === 'string' &&
+          value.length < rule.minLength
+        ) {
+          newErrors[field] =
+            rule.message ||
+            `${field} must be at least ${rule.minLength} characters`;
           return;
         }
 
         // Max length validation
-        if (rule.maxLength && typeof value === 'string' && value.length > rule.maxLength) {
-          newErrors[field] = rule.message || `${field} must be at most ${rule.maxLength} characters`;
+        if (
+          rule.maxLength &&
+          typeof value === 'string' &&
+          value.length > rule.maxLength
+        ) {
+          newErrors[field] =
+            rule.message ||
+            `${field} must be at most ${rule.maxLength} characters`;
           return;
         }
 
         // Pattern validation
-        if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
+        if (
+          rule.pattern &&
+          typeof value === 'string' &&
+          !rule.pattern.test(value)
+        ) {
           newErrors[field] = rule.message || `${field} format is invalid`;
           return;
         }

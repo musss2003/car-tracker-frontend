@@ -1,5 +1,5 @@
-import { getAuthHeaders } from "@/shared/utils/getAuthHeaders";
-import { Customer } from "../types/customer.types";
+import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
+import { Customer } from '../types/customer.types';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + `/api/customers/`;
 

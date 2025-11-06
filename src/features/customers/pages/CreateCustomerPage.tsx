@@ -25,7 +25,11 @@ import {
 
 // Import municipalities data
 import municipalitiesDataRaw from '@/assets/municipalities.json';
-import { addCustomer, CountryOption, getCountries } from '../services/customerService';
+import {
+  addCustomer,
+  CountryOption,
+  getCountries,
+} from '../services/customerService';
 import { uploadDocument } from '@/shared/services/uploadService';
 import { Customer } from '../types/customer.types';
 

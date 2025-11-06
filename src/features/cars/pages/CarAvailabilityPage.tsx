@@ -28,8 +28,19 @@ import {
 import { BookingEvent, Car } from '../types/car.types';
 import { getCarAvailability, getCars } from '../services/carService';
 import { Button } from '@/shared/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 
 // Setup the localizer for react-big-calendar

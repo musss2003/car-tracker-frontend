@@ -1,6 +1,5 @@
-import { getAuthHeaders } from "@/shared/utils/getAuthHeaders";
-import { BookingEvent, Car } from "../types/car.types";
-
+import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
+import { BookingEvent, Car } from '../types/car.types';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
