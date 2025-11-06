@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { FormField } from '@/components/ui/form-field';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/shared/components/ui/input';
+import { FormField } from '@/shared/components/ui/form-field';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { AlertCircle, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 
 export interface DateRange {
   startDate: string;

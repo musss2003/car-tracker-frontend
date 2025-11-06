@@ -48,11 +48,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
-import { Car } from '@/types/Car';
-import { Contract } from '@/types/Contract';
+
 import { downloadDocument } from '@/shared/services/uploadService';
 import { deleteCar, getCars } from '../services/carService';
-import { getActiveContracts } from '@/features/contracts';
+import { Contract, getActiveContracts } from '@/features/contracts';
+import { Car } from '../types/car.types';
 
 // Define the keys that can be sorted
 type SortableCarKey = keyof Pick<

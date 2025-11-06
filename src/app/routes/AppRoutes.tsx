@@ -26,7 +26,7 @@ const EditCustomerPage = lazy(() => import('../../features/customers/pages/EditC
 const CustomerDetailsPage = lazy(() => import('../../features/customers/pages/CustomerDetailsPage'));
 
 // Notifications Pages - Feature-based imports
-const NotificationsPage = lazy(() => import('../../features/notifications/pages/NotificationsPage'));
+// const NotificationsPage = lazy(() => import('../../features/notifications/pages/NotificationsPage'));
 
 // Dashboard Pages - Feature-based imports
 const DashboardPage = lazy(() => import('../../features/dashboard/pages/DashboardPage'));
@@ -77,7 +77,7 @@ export function AppRoutes() {
           <Route path="/customers/:id" element={<CustomerDetailsPage />} />
           <Route path="/customers/:id/edit" element={<EditCustomerPage />} />
           <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
+          {/* <Route path="/notifications" element={<NotificationsPage />} /> */}
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />
           {user && (
             <Route path="/profile" element={<UserProfile id={user.id} />} />

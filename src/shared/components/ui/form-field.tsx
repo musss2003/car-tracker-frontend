@@ -1,7 +1,7 @@
 import React from 'react';
-import { Label } from '@/components/ui/label';
+import { Label } from '@/shared/components/ui/label';
 import { AlertCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 
 interface FormFieldProps {
   label: string;

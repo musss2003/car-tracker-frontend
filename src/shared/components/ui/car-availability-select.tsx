@@ -5,14 +5,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { FormField } from '@/components/ui/form-field';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+} from '@/shared/components/ui/select';
+import { FormField } from '@/shared/components/ui/form-field';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { Loader2, AlertCircle, Car as CarIcon, DollarSign } from 'lucide-react';
-import { getAvailableCarsForPeriod } from '@/services/carService';
-import type { Car } from '@/types/Car';
-import formatCurrency from '@/utils/formatCurrency';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
+import { Car, getAvailableCarsForPeriod } from '@/features/cars';
+import formatCurrency from '@/shared/utils/formatCurrency';
 
 interface CarAvailabilitySelectProps {
   value: string;

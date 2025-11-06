@@ -56,8 +56,8 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 
 import { useNavigate } from 'react-router-dom';
-import type { Contract } from '@/types/Contract';
 import { deleteContract, downloadContract, getContracts } from '../services/contractService';
+import { Contract } from '../types/contract.types';
 
 declare module 'jspdf' {
   interface jsPDF {

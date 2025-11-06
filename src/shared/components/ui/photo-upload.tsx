@@ -2,10 +2,9 @@
 
 import type React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/shared/components/ui/button';
+import { Label } from '@/shared/components/ui/label';
 import { Upload, X, Loader2 } from 'lucide-react';
-import { downloadDocument } from '@/services/uploadService';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +14,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@/shared/components/ui/alert-dialog';
+import { downloadDocument } from '@/shared/services/uploadService';
 
 interface PhotoUploadProps {
   value?: File | null;

@@ -17,7 +17,7 @@ import {
   CheckIcon,
   ExclamationCircleIcon,
 } from '@heroicons/react/solid';
-import defaultAvatar from '../../../assets/default_avatar.png';
+import defaultAvatar from '../../../../assets/default_avatar.png';
 import './UserProfile.css';
 import { User } from '../../types/user.types';
 import { deleteUser, getUser, updateUser, uploadProfilePhoto } from '../../services/userService';

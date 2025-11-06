@@ -25,11 +25,11 @@ import { FormField } from '@/shared/components/ui/form-field';
 import { LoadingState } from '@/shared/components/ui/loading-state';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePhotoUpload } from '@/hooks/usePhotoUpload';
 import { ContractFormData } from '../types/contract.types';
 import { Customer, getCustomers } from '@/features/customers';
 import { Car, getCar, getCarAvailability } from '@/features/cars';
 import { getContract, updateContract } from '../services/contractService';
+import { usePhotoUpload } from '@/shared/hooks/usePhotoUpload';
 
 export default function EditContractPage() {
   const params = useParams();

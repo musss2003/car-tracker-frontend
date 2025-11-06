@@ -1,6 +1,6 @@
 import * as React from "react"
 import { X } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib/utils"
 
 export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "destructive"

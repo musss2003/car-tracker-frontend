@@ -9,10 +9,10 @@ import {
 import { FormField } from '@/shared/components/ui/form-field';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { Loader2, AlertCircle, Car as CarIcon, DollarSign } from 'lucide-react';
-import type { Car } from '@/types/Car';
 import { getAvailableCarsForPeriod } from '../services/carService';
 import { cn } from '@/shared/lib/utils';
 import { formatCurrency } from '@/shared/utils/contractUtils';
+import { Car } from '../types/car.types';
 
 
 interface CarAvailabilitySelectProps {
