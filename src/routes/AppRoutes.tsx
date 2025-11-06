@@ -14,6 +14,9 @@ const CarAvailabilityPage = lazy(
   () => import('../pages/car/CarAvailabilityPage')
 );
 const ContractsPage = lazy(() => import('../pages/contract/ContractsPage'));
+const ContractDetailsPage = lazy(
+  () => import('../pages/contract/ContractDetailsPage')
+);
 const CustomersPage = lazy(() => import('../pages/customer/CustomersPage'));
 const CreateCustomerPage = lazy(
   () => import('../pages/customer/CreateCustomerPage')
@@ -65,9 +68,9 @@ export function AppRoutes() {
             element={<CarAvailabilityPage />}
           />
           <Route path="/contracts/new" element={<CreateContractPage />} />
-          <Route path="/contracts" element={<ContractsPage />} />
+          <Route path="/contracts/:id" element={<ContractDetailsPage />} />
           <Route path="/contracts/:id/edit" element={<EditContractPage />} />
-          {/* <Route path="/contracts/:id" element={<CustomerDetails />} /> */}
+          <Route path="/contracts" element={<ContractsPage />} />
 
           <Route path="/customers/new" element={<CreateCustomerPage />} />
           <Route path="/customers/:id" element={<CustomerDetailsPage />} />

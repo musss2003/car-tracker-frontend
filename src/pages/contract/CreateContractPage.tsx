@@ -3,7 +3,6 @@
 import type React from 'react';
 
 import { useState, useEffect } from 'react';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -12,19 +11,25 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { CustomerSearchSelect } from '@/components/ui/customer-search-select';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { FormSection } from '@/components/ui/form-section';
+import { FormField } from '@/components/ui/form-field';
+import { LoadingState } from '@/components/ui/loading-state';
+import { PageHeader } from '@/components/ui/page-header';
 import {
-  AlertCircle,
   Calendar,
   FileText,
-  Loader2,
-  PlusCircle,
   Truck,
   User,
-  X,
   DollarSign,
+  Camera,
+  X,
+  Loader2,
+  PlusCircle,
+  AlertCircle,
 } from 'lucide-react';
 import type { Customer } from '@/types/Customer';
 import type { Car } from '@/types/Car';
@@ -268,124 +273,115 @@ const CreateContractPage = ({}) => {
     }
   };
 
-  const today = new Date().toISOString().split('T')[0];
   const selectedCar = cars.find((car) => car.id === formData.carId);
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header Section */}
-      <div className="border-b bg-background px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold flex items-center gap-2">
-            <FileText className="w-6 h-6" />
-            Create Contract
-          </h1>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSubmitting}
-            className="flex items-center gap-2 bg-transparent"
-          >
-            <X className="w-4 h-4" /> Cancel
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Create Contract"
+        subtitle="Fill in the details to create a new rental contract"
+        onBack={handleClose}
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !formData.customerId || !formData.carId}
+              form="contract-form"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                  Create Contract
+                </>
+              )}
+            </Button>
+          </>
+        }
+      />
 
       {/* Form Section */}
       <div className="flex-1 overflow-auto bg-muted/30">
         <div className="mx-auto p-4">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Customer Selection */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Customer Information
-              </h2>
-              <div className="space-y-2">
-                <Label htmlFor="customerId">Customer</Label>
-                <Select
+          <form id="contract-form" onSubmit={handleSubmit} className="space-y-6">
+            <FormSection title="Customer Information" icon={<User className="w-5 h-5" />}>
+              <FormField
+                label="Customer"
+                id="customerId"
+                error={errors.customerId}
+                required
+              >
+                <CustomerSearchSelect
                   value={formData.customerId}
-                  onValueChange={(value) => handleChange('customerId', value)}
-                >
-                  <SelectTrigger id="customerId">
-                    <SelectValue placeholder="Select a customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.customerId && (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.customerId}
-                  </p>
-                )}
-              </div>
-            </div>
+                  onChange={(value) => handleChange('customerId', value)}
+                  customers={customers}
+                  disabled={isSubmitting}
+                />
+              </FormField>
+            </FormSection>
 
-            {/* Rental Period */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Rental Period
-              </h2>
+            <FormSection title="Rental Period" icon={<Calendar className="w-5 h-5" />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date</Label>
+                <FormField
+                  label="Start Date"
+                  id="startDate"
+                  error={errors.startDate}
+                  required
+                >
                   <Input
                     id="startDate"
                     type="date"
-                    min={today}
                     value={formData.startDate}
                     onChange={(e) =>
                       handleDateChange('startDate', e.target.value)
                     }
                   />
-                  {errors.startDate && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.startDate}
-                    </p>
-                  )}
-                </div>
+                </FormField>
 
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date</Label>
+                <FormField
+                  label="End Date"
+                  id="endDate"
+                  error={errors.endDate}
+                  required
+                >
                   <Input
                     id="endDate"
                     type="date"
-                    min={formData.startDate || today}
+                    min={formData.startDate}
                     value={formData.endDate}
                     onChange={(e) =>
                       handleDateChange('endDate', e.target.value)
                     }
                   />
-                  {errors.endDate && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.endDate}
-                    </p>
-                  )}
-                </div>
+                </FormField>
               </div>
-            </div>
+            </FormSection>
 
-            {/* Car Selection */}
-            <div className="bg-background border rounded-lg p-6 space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Truck className="w-5 h-5" />
-                Vehicle Selection
-              </h2>
-              <div className="space-y-2">
-                <Label htmlFor="carId">Car</Label>
+            <FormSection title="Vehicle Selection" icon={<Truck className="w-5 h-5" />}>
+              <FormField
+                label="Car"
+                id="carId"
+                error={errors.carId}
+                required
+                helperText={cars.length === 0 && formData.startDate && formData.endDate ? "No cars available for selected dates" : undefined}
+              >
                 <Select
                   value={formData.carId}
                   onValueChange={(value) => handleChange('carId', value)}
+                  disabled={cars.length === 0}
                 >
                   <SelectTrigger id="carId">
                     <SelectValue placeholder="Select a car" />
@@ -399,13 +395,7 @@ const CreateContractPage = ({}) => {
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.carId && (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.carId}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
               {/* Pricing Summary */}
               {selectedCar && formData.startDate && formData.endDate && (
@@ -442,41 +432,35 @@ const CreateContractPage = ({}) => {
                   </div>
                 </div>
               )}
-            </div>
+            </FormSection>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Additional Notes */}
-              <div className="bg-background border rounded-lg p-6 space-y-4">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Additional Information
-                </h2>
-                <div className="space-y-2">
-                  <Label htmlFor="additionalNotes">
-                    Additional Notes (Optional)
-                  </Label>
+              <FormSection title="Additional Information" icon={<FileText className="w-5 h-5" />}>
+                <FormField
+                  label="Additional Notes"
+                  id="additionalNotes"
+                  helperText="Any additional notes or special conditions"
+                >
                   <Textarea
                     id="additionalNotes"
-                    placeholder="Any additional notes or special conditions..."
+                    placeholder="Enter any additional notes..."
                     rows={12}
                     value={formData.additionalNotes}
                     onChange={(e) =>
                       handleChange('additionalNotes', e.target.value)
                     }
                   />
-                </div>
-              </div>
+                </FormField>
+              </FormSection>
 
-              {/* Photo Upload */}
-              <div className="bg-background border rounded-lg p-6 space-y-4">
-                <h2 className="text-lg font-semibold">Contract Photo</h2>
+              <FormSection title="Contract Photo" icon={<Camera className="w-5 h-5" />}>
                 <PhotoUpload
                   value={photoFile}
                   onChange={(file) => handlePhotoChange(file)}
                   error={errors.photoUrl}
                   disabled={isSubmitting}
                 />
-              </div>
+              </FormSection>
             </div>
 
             {/* Error Alert */}
@@ -486,26 +470,6 @@ const CreateContractPage = ({}) => {
                 <AlertDescription>{errors.submit}</AlertDescription>
               </Alert>
             )}
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                size="lg"
-                className="flex items-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Creating...
-                  </>
-                ) : (
-                  <>
-                    <PlusCircle className="w-4 h-4" /> Create Contract
-                  </>
-                )}
-              </Button>
-            </div>
           </form>
         </div>
       </div>
