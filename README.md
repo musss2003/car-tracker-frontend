@@ -1,26 +1,26 @@
-# 🚗 Car Tracker – Vehicle Rental Management System# 🚗 Car Tracker – Vehicle Rental Management System (Frontend)
+# 🚗 Vehicle Rental Management System (Frontend)
 
-
-
-[![React](https://img.shields.io/badge/React-18.3-blue?logo=react)](https://reactjs.org/)
-A modern, responsive frontend application for managing **car rental contracts**, **customers**, and **vehicles**.  
-
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
-
-Built with **React**, **TypeScript**, and **Vite**, and styled using **Chakra UI** and **TailwindCSS**.
 
 [![Vite](https://img.shields.io/badge/Vite-6.3-purple?logo=vite)](https://vitejs.dev/)
 
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)> 
+[![React](https://img.shields.io/badge/React-18.3-blue?logo=react)](https://reactjs.org/)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
+
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/) 
+
+Built with **React**, **TypeScript**, and **Vite**, and styled using **Chakra UI** and **TailwindCSS**.
+
+
+A modern, responsive frontend application for managing **car rental contracts**, **customers**, and **vehicles**.  
+
+
 ⚠️ This is the **frontend only**. You’ll need to run the **backend repository** alongside it for full functionality.
 
 
 
-A modern, responsive **car rental management system** for managing contracts, customers, and vehicle fleets. Built with cutting-edge technologies and best practices for scalability and maintainability.---
-
-
-
-> 🔗 **Full Stack Application**: This is the frontend. Pair it with the [Car Tracker Backend](https://github.com/musss2003/car-tracker-backend) for complete functionality.## 📦 Tech Stack
+> 🔗 **Full Stack Application**: This is the frontend. Pair it with the [Car Tracker Backend](https://github.com/musss2003/car-tracker-backend) for complete functionality.
+## 📦 Tech Stack
 
 
 
@@ -28,13 +28,15 @@ A modern, responsive **car rental management system** for managing contracts, cu
 
 - ⚛️ **React 18.3** – Modern React with hooks and concurrent features  
 
-## ✨ Features- 🟦 **TypeScript 5.x** – Type-safe development  
+## ✨ Features
+- 🟦 **TypeScript 5.x** – Type-safe development  
 
 - ⚡ **Vite 6.3** – Next-generation frontend tooling  
 
-### 🎯 Core Functionality- 🌐 **React Router v6** – Client-side routing with lazy loading  
+### 🎯 Core Functionality
 
 
+- 🌐 **React Router v6** – Client-side routing with lazy loading  
 
 - 🔐 **Secure Authentication** - JWT-based auth with session management### 🎨 UI & Styling
 
@@ -58,17 +60,20 @@ A modern, responsive **car rental management system** for managing contracts, cu
 
 
 
-### 🎨 UI/UX Excellence### 📈 Visualization & Documents
+### 🎨 UI/UX Excellence
+### 📈 Visualization & Documents
 
 - 📊 **Recharts** – Analytics and dashboards  
 
 - ⚡ **Lightning Fast** - Optimized with Vite and lazy loading- 📅 **React Big Calendar** – Contract timeline visualization  
 
-- 🎭 **Modern Components** - Built with Radix UI and shadcn/ui design system- 📄 **jsPDF**, **jsPDF-AutoTable**, **docx** – PDF & Word document generation  
+- 🎭 **Modern Components** - Built with Radix UI and shadcn/ui design system
+- 📄 **jsPDF**, **jsPDF-AutoTable**, **docx** – PDF & Word document generation  
 
 - 🌗 **Theme Support** - Light/dark mode with theme manager
 
-- ♿ **Accessible** - WCAG compliant components### 🧪 Development & Testing
+- ♿ **Accessible** - WCAG compliant components
+### 🧪 Development & Testing
 
 - 📐 **Consistent Design** - Reusable component library- 🧩 **Vitest** – Unit testing  
 
@@ -82,9 +87,8 @@ A modern, responsive **car rental management system** for managing contracts, cu
 
 
 
-### Frontend Core## 🚀 Getting Started
-
-
+### Frontend Core
+## 🚀 Getting Started
 
 - **React 18.3** - Modern React with hooks and concurrent features### 1️⃣ Clone the repository
 
