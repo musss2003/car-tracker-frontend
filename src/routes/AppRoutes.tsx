@@ -13,8 +13,17 @@ const CarDetailsPage = lazy(() => import('../pages/car/CarDetailsPage'));
 const CarAvailabilityPage = lazy(
   () => import('../pages/car/CarAvailabilityPage')
 );
-const ContractsPage = lazy(() => import('../pages/ContractsPage'));
-const CustomersPage = lazy(() => import('../pages/CustomersPage'));
+const ContractsPage = lazy(() => import('../pages/contract/ContractsPage'));
+const CustomersPage = lazy(() => import('../pages/customer/CustomersPage'));
+const CreateCustomerPage = lazy(
+  () => import('../pages/customer/CreateCustomerPage')
+);
+const EditCustomerPage = lazy(
+  () => import('../pages/customer/EditCustomerPage')
+);
+const CustomerDetailsPage = lazy(
+  () => import('../pages/customer/CustomerDetailsPage')
+);
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
 const UserProfile = lazy(
   () => import('../components/User/UserProfile/UserProfile')
@@ -25,6 +34,8 @@ import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../contexts/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
 import DashboardPage from '../pages/DashboardPage/DashboardPage';
+import CreateContractPage from '@/pages/contract/CreateContractPage';
+import EditContractPage from '@/pages/contract/EditContractPage';
 
 export function AppRoutes() {
   const { isLoggedIn, user } = useAuth();
@@ -53,7 +64,14 @@ export function AppRoutes() {
             path="/cars/:id/availability"
             element={<CarAvailabilityPage />}
           />
+          <Route path="/contracts/new" element={<CreateContractPage />} />
           <Route path="/contracts" element={<ContractsPage />} />
+          <Route path="/contracts/:id/edit" element={<EditContractPage />} />
+          {/* <Route path="/contracts/:id" element={<CustomerDetails />} /> */}
+
+          <Route path="/customers/new" element={<CreateCustomerPage />} />
+          <Route path="/customers/:id" element={<CustomerDetailsPage />} />
+          <Route path="/customers/:id/edit" element={<EditCustomerPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />

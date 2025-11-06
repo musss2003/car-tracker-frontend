@@ -1,5 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { uploadDocument } from '../../../services/uploadService';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  uploadDocument,
+  downloadDocument,
+} from '../../../services/uploadService';
 import './CustomerPhotoField.css';
 
 interface CustomerPhotoFieldProps {
@@ -34,6 +37,7 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (
@@ -118,6 +122,11 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
 
     if (window.confirm('Are you sure you want to remove this photo?')) {
       try {
+        // Revoke object URL before removing
+        if (previewUrl && previewUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(previewUrl);
+        }
+
         onChange(null);
         setPreviewUrl(null);
         setUploadState({
@@ -175,10 +184,15 @@ const CustomerPhotoField: React.FC<CustomerPhotoFieldProps> = ({
 
         {/* Photo preview or upload area */}
         <div className="photo-preview-area">
-          {imageUrl ? (
+          {isLoadingImage ? (
+            <div className="upload-placeholder">
+              <div className="upload-icon">⏳</div>
+              <span className="upload-text">Loading image...</span>
+            </div>
+          ) : previewUrl ? (
             <div className="photo-preview">
               <img
-                src={imageUrl}
+                src={previewUrl}
                 alt="Uploaded photo"
                 className="preview-image"
                 onError={(e) => {

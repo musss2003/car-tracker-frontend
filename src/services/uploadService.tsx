@@ -42,22 +42,40 @@ export const uploadDocument = async (file: File): Promise<string> => {
 
 // Download a document by filename
 export const downloadDocument = async (filename: string): Promise<Blob> => {
+  // Validate filename
+  if (!filename || filename.trim() === '') {
+    throw new Error('Invalid filename: filename is empty');
+  }
+
   try {
     const authHeaders = getAuthHeaders();
-    const response = await fetch(`${API_URL}/documents/${filename}`, {
-      method: 'GET',
-      headers: {
-        ...authHeaders,
-      },
-      credentials: 'include',
-    });
+    const response = await fetch(
+      `${API_URL}/documents/${encodeURIComponent(filename)}`,
+      {
+        method: 'GET',
+        headers: {
+          ...authHeaders,
+        },
+        credentials: 'include',
+      }
+    );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message ||
-          `Failed to download document: ${response.statusText}`
-      );
+      // Check if response is JSON before trying to parse
+      const contentType = response.headers.get('content-type');
+      let errorMessage = `Failed to download document: ${response.statusText}`;
+
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (parseError) {
+          // If JSON parsing fails, use the default error message
+          console.warn('Failed to parse error response as JSON');
+        }
+      }
+
+      throw new Error(errorMessage);
     }
 
     const blob = await response.blob();

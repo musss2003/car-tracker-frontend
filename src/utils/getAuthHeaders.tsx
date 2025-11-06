@@ -7,7 +7,7 @@ export const getAuthHeaders = () => {
 
   // Only add Authorization header if token exists
   if (token) {
-    headers.Authorization = `Bearer ${token}`;
+    headers.authorization = `Bearer ${token}`;
   }
 
   return headers;

@@ -1,30 +1,34 @@
 import { Customer } from './Customer';
+import { User } from './User';
+import { Car } from './Car';
 
 export interface Contract {
-  id?: string; // optional for newly created contracts before save
+  id: string;
+  createdById: string;
+  createdBy: User;
+  createdAt: Date;
+  customerId: string;
   customer: Customer;
-  car: {
-    id: string;
-    manufacturer: string;
-    model: string;
-    licensePlate: string;
-    pricePerDay: number | string;
-  };
-  rentalPeriod: {
-    startDate: string | Date;
-    endDate: string | Date;
-  };
-  rentalPrice: {
-    dailyRate: number;
-    totalAmount: number;
-  };
-  paymentDetails: {
-    paymentMethod: string;
-    paymentStatus: 'pending' | 'paid';
-  };
+  carId: string;
+  car: Car;
+  startDate: Date;
+  endDate: Date;
+  dailyRate: number;
+  totalAmount: number;
   additionalNotes?: string;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-  contractPhoto?: string;
-  status: string;
+  photoUrl: string;
+  updatedById?: string;
+  updatedBy?: User;
+  updatedAt?: Date;
+}
+
+export interface ContractFormData {
+  customerId: string;
+  carId: string;
+  startDate: string;
+  endDate: string;
+  dailyRate: number;
+  totalAmount: number;
+  additionalNotes?: string;
+  photoUrl: string;
 }
