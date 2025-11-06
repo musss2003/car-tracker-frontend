@@ -13,9 +13,9 @@ interface PageHeaderProps {
 
 /**
  * PageHeader Component
- * 
+ *
  * A standardized page header with back button, title, subtitle, and action buttons.
- * 
+ *
  * @example
  * <PageHeader
  *   title="Create Contract"

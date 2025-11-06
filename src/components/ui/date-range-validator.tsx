@@ -36,13 +36,13 @@ interface DateRangeValidatorProps {
 
 /**
  * DateRangeValidator Component
- * 
+ *
  * A reusable date range picker with built-in validation:
  * - Start date must be before end date
  * - Optional minimum start date
  * - Optional conflict detection with existing bookings
  * - Visual feedback for conflicts
- * 
+ *
  * @example
  * <DateRangeValidator
  *   startDate={formData.startDate}
@@ -111,14 +111,22 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
     });
 
     if (hasConflict) {
-      const message = 'This date range conflicts with an existing booking for this vehicle';
+      const message =
+        'This date range conflicts with an existing booking for this vehicle';
       setConflictMessage(message);
       onConflictDetected?.(true, message);
     } else {
       setConflictMessage(null);
       onConflictDetected?.(false);
     }
-  }, [startDate, endDate, checkConflicts, existingBookings, currentBookingId, onConflictDetected]);
+  }, [
+    startDate,
+    endDate,
+    checkConflicts,
+    existingBookings,
+    currentBookingId,
+    onConflictDetected,
+  ]);
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newStartDate = e.target.value;
@@ -158,19 +166,15 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
               disabled={disabled}
               min={minStartDate}
               className={cn(
-                conflictMessage && 'border-destructive focus-visible:ring-destructive'
+                conflictMessage &&
+                  'border-destructive focus-visible:ring-destructive'
               )}
             />
             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           </div>
         </FormField>
 
-        <FormField
-          label="End Date"
-          id="endDate"
-          error={endDateError}
-          required
-        >
+        <FormField label="End Date" id="endDate" error={endDateError} required>
           <div className="relative">
             <Input
               id="endDate"
@@ -180,7 +184,8 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
               disabled={disabled}
               min={startDate || minStartDate}
               className={cn(
-                conflictMessage && 'border-destructive focus-visible:ring-destructive'
+                conflictMessage &&
+                  'border-destructive focus-visible:ring-destructive'
               )}
             />
             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />

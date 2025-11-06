@@ -15,26 +15,26 @@ interface FormFieldProps {
 
 /**
  * FormField Component
- * 
+ *
  * A reusable form field wrapper that includes:
  * - Label with optional required indicator
  * - Error message display with icon
  * - Optional helper text
  * - Consistent spacing and styling
- * 
+ *
  * @example
- * <FormField 
- *   label="Email" 
- *   id="email" 
- *   error={errors.email} 
+ * <FormField
+ *   label="Email"
+ *   id="email"
+ *   error={errors.email}
  *   required
  *   helperText="We'll never share your email"
  * >
- *   <Input 
- *     id="email" 
- *     type="email" 
- *     value={formData.email} 
- *     onChange={handleChange} 
+ *   <Input
+ *     id="email"
+ *     type="email"
+ *     value={formData.email}
+ *     onChange={handleChange}
  *   />
  * </FormField>
  */

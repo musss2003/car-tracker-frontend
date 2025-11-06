@@ -17,14 +17,14 @@ const sizeClasses = {
 
 /**
  * LoadingState Component
- * 
+ *
  * A reusable loading indicator with optional text.
  * Can be displayed full-screen or inline.
- * 
+ *
  * @example
  * // Full screen loading
  * if (loading) return <LoadingState text="Loading contract..." />;
- * 
+ *
  * // Inline loading
  * <LoadingState size="sm" fullScreen={false} />
  */
@@ -43,7 +43,12 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 
   if (fullScreen) {
     return (
-      <div className={cn('flex flex-col justify-center items-center h-screen', className)}>
+      <div
+        className={cn(
+          'flex flex-col justify-center items-center h-screen',
+          className
+        )}
+      >
         {content}
       </div>
     );

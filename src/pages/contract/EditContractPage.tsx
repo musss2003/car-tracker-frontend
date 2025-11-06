@@ -60,9 +60,14 @@ export default function EditContractPage() {
   const [hasDateConflict, setHasDateConflict] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  
+
   // Use the custom hook
-  const { photoFile, setPhotoFile, uploadPhoto, error: photoError } = usePhotoUpload();
+  const {
+    photoFile,
+    setPhotoFile,
+    uploadPhoto,
+    error: photoError,
+  } = usePhotoUpload();
 
   // Fetch contract data
   useEffect(() => {
@@ -117,8 +122,6 @@ export default function EditContractPage() {
     fetchCustomers();
   }, []);
 
-
-
   // Fetch car bookings when car is selected
   useEffect(() => {
     const fetchCarBookings = async () => {
@@ -143,7 +146,12 @@ export default function EditContractPage() {
 
   // Validate dates against car bookings
   useEffect(() => {
-    if (!formData.carId || !formData.startDate || !formData.endDate || carBookings.length === 0) {
+    if (
+      !formData.carId ||
+      !formData.startDate ||
+      !formData.endDate ||
+      carBookings.length === 0
+    ) {
       setHasDateConflict(false);
       return;
     }
@@ -170,7 +178,13 @@ export default function EditContractPage() {
     });
 
     setHasDateConflict(hasConflict);
-  }, [formData.startDate, formData.endDate, formData.carId, carBookings, contractId]);
+  }, [
+    formData.startDate,
+    formData.endDate,
+    formData.carId,
+    carBookings,
+    contractId,
+  ]);
 
   const handleChange = (
     field: keyof ContractFormData,
@@ -329,8 +343,6 @@ export default function EditContractPage() {
     );
   }
 
-
-
   return (
     <div className="flex flex-col h-full">
       <PageHeader
@@ -371,8 +383,15 @@ export default function EditContractPage() {
 
       <div className="flex-1 overflow-auto bg-muted/30">
         <div className="mx-auto p-6">
-          <form id="edit-contract-form" onSubmit={handleSubmit} className="space-y-6">
-            <FormSection title="Customer Information" icon={<User className="w-5 h-5" />}>
+          <form
+            id="edit-contract-form"
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            <FormSection
+              title="Customer Information"
+              icon={<User className="w-5 h-5" />}
+            >
               <FormField
                 label="Customer"
                 id="customerId"
@@ -417,13 +436,16 @@ export default function EditContractPage() {
               error={errors.carId}
               required
               onPriceCalculated={(dailyRate, totalAmount) => {
-                setFormData(prev => ({ ...prev, dailyRate, totalAmount }));
+                setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
               }}
               showPricingSummary
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormSection title="Additional Information" icon={<FileText className="w-5 h-5" />}>
+              <FormSection
+                title="Additional Information"
+                icon={<FileText className="w-5 h-5" />}
+              >
                 <FormField
                   label="Additional Notes"
                   id="additionalNotes"
@@ -441,7 +463,10 @@ export default function EditContractPage() {
                 </FormField>
               </FormSection>
 
-              <FormSection title="Contract Photo" icon={<Camera className="w-5 h-5" />}>
+              <FormSection
+                title="Contract Photo"
+                icon={<Camera className="w-5 h-5" />}
+              >
                 <PhotoUpload
                   value={photoFile}
                   onChange={handlePhotoChange}
