@@ -16,8 +16,25 @@ function cleanupOldEntries() {
   }
 }
 
-module.exports = async (req, res) => {
-  const { method, body, url } = req;
+export default async function handler(req, res) {
+  // Add CORS headers first
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  const { method, body } = req;
+  
+  // Get the path from query parameter (more reliable than URL parsing)
+  const path = req.query.path || req.url;
+  
+  console.log('🔍 DEBUG - req.url:', req.url);
+  console.log('🔍 DEBUG - req.query:', req.query);
+  console.log('🔍 DEBUG - extracted path:', path);
   
   // Security: Get client IP
   const clientIp = req.headers['x-forwarded-for']?.split(',')[0] || 
@@ -70,16 +87,7 @@ module.exports = async (req, res) => {
     });
   }
   
-  // Extract the path after /api/proxy
-  // req.url might be just the path like /api/proxy/api/customers/
-  // or the full URL - we need to handle both cases
-  let path = url;
-  
-  // Remove /api/proxy prefix if present
-  if (path.startsWith('/api/proxy')) {
-    path = path.replace('/api/proxy', '');
-  }
-  
+  // Path is already extracted at the top
   // Ensure path starts with /
   if (!path.startsWith('/')) {
     path = '/' + path;
