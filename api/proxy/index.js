@@ -2,7 +2,7 @@
 // This bypasses CORS and SSL certificate issues
 
 export const config = {
-  runtime: 'nodejs20.x',
+  runtime: 'nodejs',
 };
 
 // Rate limiting: Track requests by IP (in-memory, resets on cold start)
