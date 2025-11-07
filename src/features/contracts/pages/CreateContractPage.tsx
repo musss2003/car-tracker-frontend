@@ -91,7 +91,7 @@ const CreateContractPage = ({}) => {
       if (end < start) {
         setErrors((prev) => ({
           ...prev,
-          [field]: 'End date must be after start date',
+          [field]: 'Datum završetka mora biti nakon datuma početka',
         }));
         return;
       }
@@ -117,19 +117,19 @@ const CreateContractPage = ({}) => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.customerId) {
-      newErrors.customerId = 'Customer is required';
+      newErrors.customerId = 'Kupac je obavezan';
     }
 
     if (!formData.carId) {
-      newErrors.carId = 'Car is required';
+      newErrors.carId = 'Automobil je obavezan';
     }
 
     if (!formData.startDate) {
-      newErrors.startDate = 'Start date is required';
+      newErrors.startDate = 'Datum početka je obavezan';
     }
 
     if (!formData.endDate) {
-      newErrors.endDate = 'End date is required';
+      newErrors.endDate = 'Datum završetka je obavezan';
     }
 
     if (formData.startDate && formData.endDate) {
@@ -137,7 +137,7 @@ const CreateContractPage = ({}) => {
       const end = new Date(formData.endDate);
 
       if (end < start) {
-        newErrors.endDate = 'End date must be after start date';
+        newErrors.endDate = 'Datum završetka mora biti nakon datuma početka';
       }
     }
 
@@ -191,7 +191,7 @@ const CreateContractPage = ({}) => {
       console.error('Error creating contract:', error);
       setErrors((prev) => ({
         ...prev,
-        submit: 'Failed to create contract. Please try again.',
+        submit: 'Kreiranje ugovora nije uspjelo. Molimo pokušajte ponovo.',
       }));
     } finally {
       setIsSubmitting(false);
@@ -211,8 +211,8 @@ const CreateContractPage = ({}) => {
   return (
     <div className="flex flex-col h-full">
       <PageHeader
-        title="Create Contract"
-        subtitle="Fill in the details to create a new rental contract"
+        title="Kreiraj ugovor"
+        subtitle="Popunite detalje kako biste kreirali novi ugovor o iznajmljivanju"
         onBack={handleClose}
         actions={
           <>
@@ -223,7 +223,7 @@ const CreateContractPage = ({}) => {
               disabled={isSubmitting}
             >
               <X className="w-4 h-4 mr-2" />
-              Cancel
+              Otkaži
             </Button>
             <Button
               type="submit"
@@ -233,12 +233,12 @@ const CreateContractPage = ({}) => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creating...
+                  Kreiranje...
                 </>
               ) : (
                 <>
                   <PlusCircle className="w-4 h-4 mr-2" />
-                  Create Contract
+                  Kreiraj ugovor
                 </>
               )}
             </Button>
@@ -255,11 +255,11 @@ const CreateContractPage = ({}) => {
             className="space-y-6"
           >
             <FormSection
-              title="Customer Information"
+              title="Informacije o kupcu"
               icon={<User className="w-5 h-5" />}
             >
               <FormField
-                label="Customer"
+                label="Kupac"
                 id="customerId"
                 error={errors.customerId}
                 required
@@ -298,17 +298,17 @@ const CreateContractPage = ({}) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormSection
-                title="Additional Information"
+                title="Dodatne informacije"
                 icon={<FileText className="w-5 h-5" />}
               >
                 <FormField
-                  label="Additional Notes"
+                  label="Dodatne napomene"
                   id="additionalNotes"
-                  helperText="Any additional notes or special conditions"
+                  helperText="Bilo kakve dodatne napomene ili posebni uslovi"
                 >
                   <Textarea
                     id="additionalNotes"
-                    placeholder="Enter any additional notes..."
+                    placeholder="Unesite dodatne napomene..."
                     rows={12}
                     value={formData.additionalNotes}
                     onChange={(e) =>
@@ -319,7 +319,7 @@ const CreateContractPage = ({}) => {
               </FormSection>
 
               <FormSection
-                title="Contract Photo"
+                title="Slika ugovora"
                 icon={<Camera className="w-5 h-5" />}
               >
                 <PhotoUpload

@@ -95,7 +95,7 @@ export default function EditContractPage() {
         }
       } catch (err) {
         console.error('Error fetching contract:', err);
-        setError('Failed to load contract. Please try again.');
+        setError('Učitavanje ugovora nije uspjelo. Molimo pokušajte ponovo.');
       } finally {
         setLoading(false);
       }
@@ -207,7 +207,7 @@ export default function EditContractPage() {
       if (end <= start) {
         setErrors((prev) => ({
           ...prev,
-          [field]: 'End date must be after start date',
+          [field]: 'Datum završetka mora biti nakon datuma početka',
         }));
         return;
       }
@@ -234,7 +234,7 @@ export default function EditContractPage() {
 
         if (wouldConflict) {
           // Don't update the date if it would cause a conflict
-          setToastMessage('Cannot select these dates - car is already booked');
+          setToastMessage('Ne mogu se odabrati ovi datumi - automobil je već rezervisan');
           setShowToast(true);
           setTimeout(() => setShowToast(false), 3000);
           return;
@@ -258,14 +258,14 @@ export default function EditContractPage() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.customerId) newErrors.customerId = 'Customer is required';
-    if (!formData.carId) newErrors.carId = 'Car is required';
-    if (!formData.startDate) newErrors.startDate = 'Start date is required';
-    if (!formData.endDate) newErrors.endDate = 'End date is required';
+    if (!formData.customerId) newErrors.customerId = 'Kupac je obavezan';
+    if (!formData.carId) newErrors.carId = 'Automobil je obavezan';
+    if (!formData.startDate) newErrors.startDate = 'Datum početka je obavezan';
+    if (!formData.endDate) newErrors.endDate = 'Datum završetka je obavezan';
 
     // Check for date conflicts
     if (hasDateConflict) {
-      newErrors.dates = 'The selected dates conflict with existing bookings';
+      newErrors.dates = 'Odabrani datumi se sukobljavaju sa postojećim rezervacijama';
     }
 
     setErrors(newErrors);
@@ -308,21 +308,21 @@ export default function EditContractPage() {
       navigate('/contracts');
     } catch (err) {
       console.error('Error updating contract:', err);
-      setError('Failed to update contract. Please try again.');
+      setError('Ažuriranje ugovora nije uspjelo. Molimo pokušajte ponovo.');
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <LoadingState text="Loading contract..." />;
+    return <LoadingState text="Učitavanje ugovora..." />;
   }
 
   if (error && !loading) {
     return (
       <div className="flex flex-col h-full">
         <div className="border-b bg-background px-6 py-4">
-          <h1 className="text-2xl font-semibold">Error</h1>
+          <h1 className="text-2xl font-semibold">Greška</h1>
         </div>
         <div className="flex-1 overflow-auto bg-muted/30 p-6">
           <div className="max-w-4xl mx-auto">
@@ -332,7 +332,7 @@ export default function EditContractPage() {
             </Alert>
             <div className="mt-4">
               <Button variant="outline" onClick={() => navigate('/contracts')}>
-                Back to Contracts
+                Nazad na ugovore
               </Button>
             </div>
           </div>
@@ -344,8 +344,8 @@ export default function EditContractPage() {
   return (
     <div className="flex flex-col h-full">
       <PageHeader
-        title="Edit Contract"
-        subtitle="Update the contract details"
+        title="Uredi ugovor"
+        subtitle="Ažurirajte detalje ugovora"
         onBack={() => navigate('/contracts')}
         actions={
           <>
@@ -356,7 +356,7 @@ export default function EditContractPage() {
               disabled={submitting}
             >
               <X className="w-4 h-4 mr-2" />
-              Cancel
+              Otkaži
             </Button>
             <Button
               type="submit"
@@ -366,12 +366,12 @@ export default function EditContractPage() {
               {submitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
+                  Čuvanje...
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4 mr-2" />
-                  Save Changes
+                  Sačuvaj promjene
                 </>
               )}
             </Button>
@@ -387,11 +387,11 @@ export default function EditContractPage() {
             className="space-y-6"
           >
             <FormSection
-              title="Customer Information"
+              title="Informacije o kupcu"
               icon={<User className="w-5 h-5" />}
             >
               <FormField
-                label="Customer"
+                label="Kupac"
                 id="customerId"
                 error={errors.customerId}
                 required
@@ -441,17 +441,17 @@ export default function EditContractPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormSection
-                title="Additional Information"
+                title="Dodatne informacije"
                 icon={<FileText className="w-5 h-5" />}
               >
                 <FormField
-                  label="Additional Notes"
+                  label="Dodatne napomene"
                   id="additionalNotes"
-                  helperText="Any additional notes or special conditions"
+                  helperText="Bilo kakve dodatne napomene ili posebni uslovi"
                 >
                   <Textarea
                     id="additionalNotes"
-                    placeholder="Enter any additional notes..."
+                    placeholder="Unesite dodatne napomene..."
                     rows={4}
                     value={formData.additionalNotes}
                     onChange={(e) =>
@@ -462,7 +462,7 @@ export default function EditContractPage() {
               </FormSection>
 
               <FormSection
-                title="Contract Photo"
+                title="Slika ugovora"
                 icon={<Camera className="w-5 h-5" />}
               >
                 <PhotoUpload

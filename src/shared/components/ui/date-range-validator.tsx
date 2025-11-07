@@ -112,7 +112,7 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
 
     if (hasConflict) {
       const message =
-        'This date range conflicts with an existing booking for this vehicle';
+        'Ovaj period datuma se sukobljava sa postojećom rezervacijom za ovo vozilo';
       setConflictMessage(message);
       onConflictDetected?.(true, message);
     } else {
@@ -152,7 +152,7 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
     <div className={cn('space-y-4', className)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
-          label="Start Date"
+          label="Datum početka"
           id="startDate"
           error={startDateError}
           required
@@ -174,7 +174,7 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
           </div>
         </FormField>
 
-        <FormField label="End Date" id="endDate" error={endDateError} required>
+        <FormField label="Datum završetka" id="endDate" error={endDateError} required>
           <div className="relative">
             <Input
               id="endDate"
@@ -204,13 +204,13 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
       {/* Date Range Summary */}
       {startDate && endDate && !conflictMessage && (
         <div className="text-sm text-muted-foreground">
-          Duration:{' '}
+          Trajanje:{' '}
           <span className="font-medium text-foreground">
             {Math.ceil(
               (new Date(endDate).getTime() - new Date(startDate).getTime()) /
                 (1000 * 60 * 60 * 24)
             )}{' '}
-            day(s)
+            dan(a)
           </span>
         </div>
       )}

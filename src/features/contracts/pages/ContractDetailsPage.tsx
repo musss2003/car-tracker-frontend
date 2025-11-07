@@ -100,6 +100,14 @@ const ContractDetailsPage = () => {
   ) => {
     try {
       setLoadingPhoto(true);
+      
+      // Check if it's a placeholder/invalid URL
+      if (!photoUrl || photoUrl.startsWith('http://example.com') || photoUrl.startsWith('https://example.com')) {
+        setPhoto(null);
+        setLoadingPhoto(false);
+        return;
+      }
+      
       const photoBlob = await downloadDocument(photoUrl);
       const photoUrlObject = URL.createObjectURL(photoBlob);
       setPhoto(photoUrlObject);
@@ -123,8 +131,6 @@ const ContractDetailsPage = () => {
           navigate('/contracts');
           return;
         }
-
-        console.log(fetchedContract);
         setContract(fetchedContract);
 
         // Load photos if they exist and are not empty/null
@@ -218,7 +224,6 @@ const ContractDetailsPage = () => {
     return String(value);
   };
 
-  // Calculate contract status
   const getContractStatus = () => {
     if (!contract?.startDate || !contract?.endDate) {
       return {
@@ -302,7 +307,7 @@ const ContractDetailsPage = () => {
     <div className="h-full w-full flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
       <div className="flex-none px-6 py-6 bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -355,7 +360,7 @@ const ContractDetailsPage = () => {
 
       {/* Content - Scrollable */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="mx-auto p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Customer Information */}
             <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-green-500">
@@ -706,7 +711,7 @@ const ContractDetailsPage = () => {
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={closePhotoModal}
         >
-          <div className="relative max-w-7xl max-h-[90vh] w-full h-full flex items-center justify-center">
+          <div className="relative max-h-[90vh] w-full h-full flex items-center justify-center">
             <button
               onClick={closePhotoModal}
               className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
