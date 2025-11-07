@@ -1,6 +1,10 @@
 // Vercel Serverless Function to Proxy Backend Requests
 // This bypasses CORS and SSL certificate issues
 
+export const config = {
+  runtime: 'nodejs20.x',
+};
+
 // Rate limiting: Track requests by IP (in-memory, resets on cold start)
 const requestCounts = new Map();
 const RATE_LIMIT = 100; // requests per window
