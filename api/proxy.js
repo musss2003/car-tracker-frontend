@@ -68,10 +68,22 @@ export default async function handler(req, res) {
   }
   
   // Extract the path after /api/proxy
-  const path = url.replace('/api/proxy', '');
+  // req.url might be just the path like /api/proxy/api/customers/
+  // or the full URL - we need to handle both cases
+  let path = url;
+  
+  // Remove /api/proxy prefix if present
+  if (path.startsWith('/api/proxy')) {
+    path = path.replace('/api/proxy', '');
+  }
+  
+  // Ensure path starts with /
+  if (!path.startsWith('/')) {
+    path = '/' + path;
+  }
   
   // Security: Validate path (prevent path traversal)
-  if (path.includes('..') || path.includes('//')) {
+  if (path.includes('..')) {
     console.warn(`❌ Suspicious path detected: ${path} from IP: ${clientIp}`);
     return res.status(400).json({ 
       error: 'Bad request',
