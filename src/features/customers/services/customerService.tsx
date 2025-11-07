@@ -25,20 +25,34 @@ export const getCustomer = async (customerId: string): Promise<Customer> => {
 // Get all customers
 export const getCustomers = async (): Promise<Customer[]> => {
   try {
+    console.log('🔍 Fetching customers from:', API_URL);
+    console.log('🔍 VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
+    
     const response = await fetch(API_URL, {
       method: 'GET',
       headers: getAuthHeaders(),
     });
 
+    console.log('📡 Response status:', response.status);
+    console.log('📡 Response content-type:', response.headers.get('content-type'));
+
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error(
-        'Error fetching customers:',
-        errorData.message || `HTTP error! Status: ${response.status}`
-      );
-      throw new Error(
-        errorData.message || `HTTP error! Status: ${response.status}`
-      );
+      const contentType = response.headers.get('content-type');
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      
+      // Try to get more error details
+      if (contentType?.includes('application/json')) {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } else {
+        // It's HTML or other non-JSON response (likely 404 page)
+        const errorText = await response.text();
+        console.error('Non-JSON error response:', errorText.substring(0, 200));
+        errorMessage = `Server returned ${response.status}. Expected JSON but got ${contentType}`;
+      }
+      
+      console.error('Error fetching customers:', errorMessage);
+      throw new Error(errorMessage);
     }
 
     return await response.json();
