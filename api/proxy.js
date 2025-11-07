@@ -1,22 +1,22 @@
 // Vercel Serverless Function to Proxy Backend Requests
 // This bypasses CORS and SSL certificate issues
 
-// Rate limiting: Track requests by IP
+// Rate limiting: Track requests by IP (in-memory, resets on cold start)
 const requestCounts = new Map();
-const RATE_LIMIT = 100; // requests
-const RATE_WINDOW = 60 * 1000; // per 60 seconds
+const RATE_LIMIT = 100; // requests per window
+const RATE_WINDOW = 60 * 1000; // 60 seconds
 
-// Security: Clean up old entries every 5 minutes
-setInterval(() => {
+// Note: setInterval doesn't work in serverless, cleanup happens on access
+function cleanupOldEntries() {
   const now = Date.now();
   for (const [ip, data] of requestCounts.entries()) {
     if (now - data.timestamp > RATE_WINDOW) {
       requestCounts.delete(ip);
     }
   }
-}, 5 * 60 * 1000);
+}
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   const { method, body, url } = req;
   
   // Security: Get client IP
@@ -24,6 +24,9 @@ export default async function handler(req, res) {
                    req.headers['x-real-ip'] || 
                    req.connection?.remoteAddress || 
                    'unknown';
+  
+  // Clean up old entries first
+  cleanupOldEntries();
   
   // Security: Rate limiting
   const now = Date.now();
