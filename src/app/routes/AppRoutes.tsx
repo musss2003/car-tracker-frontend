@@ -83,12 +83,12 @@ export function AppRoutes() {
           path="/login"
           element={isLoggedIn() ? <Navigate to="/dashboard" /> : <LoginPage />}
         />
-        <Route
+        {/* <Route
           path="/register"
           element={
             isLoggedIn() ? <Navigate to="/dashboard" /> : <RegisterPage />
           }
-        />
+        /> */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<DashboardPage />} />
