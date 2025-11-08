@@ -130,7 +130,6 @@ const EditCustomerPage: React.FC = () => {
 
       try {
         const customerData = await getCustomer(id);
-        console.log('Loaded customer data:', customerData);
         setCustomer(customerData);
       } catch (error) {
         console.error('Error loading customer:', error);
@@ -272,14 +271,12 @@ const EditCustomerFormContent: React.FC<{
     
     // Check if it's a placeholder/invalid URL
     if (photoUrl.startsWith('http://example.com') || photoUrl.startsWith('https://example.com')) {
-      console.log(`Skipping placeholder ${photoType} photo URL: "${photoUrl}"`);
       setPhotoUrl('');
       return;
     }
 
     setIsLoading(true);
     try {
-      console.log(`Attempting to load ${photoType} photo: "${photoUrl}"`);
       const photoBlob = await downloadDocument(photoUrl);
       const photoObjectUrl = URL.createObjectURL(photoBlob);
       setPhotoUrl(photoObjectUrl);

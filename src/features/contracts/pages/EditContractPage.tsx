@@ -380,99 +380,109 @@ export default function EditContractPage() {
       />
 
       <div className="flex-1 overflow-auto bg-muted/30">
-        <div className="mx-auto p-6">
+        <div className="w-full p-6">
           <form
             id="edit-contract-form"
             onSubmit={handleSubmit}
             className="space-y-6"
           >
-            <FormSection
-              title="Informacije o kupcu"
-              icon={<User className="w-5 h-5" />}
-            >
-              <FormField
-                label="Kupac"
-                id="customerId"
-                error={errors.customerId}
-                required
-              >
-                <CustomerSearchSelect
-                  value={formData.customerId}
-                  onChange={(value) => handleChange('customerId', value)}
-                  customers={customers}
-                  disabled={submitting}
-                />
-              </FormField>
-            </FormSection>
-
-            <DateRangeValidator
-              startDate={formData.startDate}
-              endDate={formData.endDate}
-              onStartDateChange={(date) => handleDateChange('startDate', date)}
-              onEndDateChange={(date) => handleDateChange('endDate', date)}
-              startDateError={errors.startDate}
-              endDateError={errors.endDate}
-              disabled={submitting}
-              checkConflicts
-              existingBookings={carBookings}
-              currentBookingId={contractId}
-              onConflictDetected={(hasConflict, message) => {
-                setHasDateConflict(hasConflict);
-                if (hasConflict && message) {
-                  setToastMessage(message);
-                  setShowToast(true);
-                }
-              }}
-            />
-
-            <CarAvailabilitySelect
-              value={formData.carId}
-              onChange={(carId) => handleChange('carId', carId)}
-              startDate={formData.startDate}
-              endDate={formData.endDate}
-              currentCar={currentCar}
-              error={errors.carId}
-              required
-              onPriceCalculated={(dailyRate, totalAmount) => {
-                setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
-              }}
-              showPricingSummary
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="w-full">
               <FormSection
-                title="Dodatne informacije"
-                icon={<FileText className="w-5 h-5" />}
+                title="Informacije o kupcu"
+                icon={<User className="w-5 h-5" />}
               >
                 <FormField
-                  label="Dodatne napomene"
-                  id="additionalNotes"
-                  helperText="Bilo kakve dodatne napomene ili posebni uslovi"
+                  label="Kupac"
+                  id="customerId"
+                  error={errors.customerId}
+                  required
                 >
-                  <Textarea
-                    id="additionalNotes"
-                    placeholder="Unesite dodatne napomene..."
-                    rows={4}
-                    value={formData.additionalNotes}
-                    onChange={(e) =>
-                      handleChange('additionalNotes', e.target.value)
-                    }
+                  <CustomerSearchSelect
+                    value={formData.customerId}
+                    onChange={(value) => handleChange('customerId', value)}
+                    customers={customers}
+                    disabled={submitting}
                   />
                 </FormField>
               </FormSection>
+            </div>
 
-              <FormSection
-                title="Slika ugovora"
-                icon={<Camera className="w-5 h-5" />}
-              >
-                <PhotoUpload
-                  value={photoFile}
-                  onChange={handlePhotoChange}
-                  error={errors.photoUrl}
-                  disabled={submitting}
-                  existingPhotoUrl={formData.photoUrl}
-                />
-              </FormSection>
+            <div className="w-full">
+              <DateRangeValidator
+                startDate={formData.startDate}
+                endDate={formData.endDate}
+                onStartDateChange={(date) => handleDateChange('startDate', date)}
+                onEndDateChange={(date) => handleDateChange('endDate', date)}
+                startDateError={errors.startDate}
+                endDateError={errors.endDate}
+                disabled={submitting}
+                checkConflicts
+                existingBookings={carBookings}
+                currentBookingId={contractId}
+                onConflictDetected={(hasConflict, message) => {
+                  setHasDateConflict(hasConflict);
+                  if (hasConflict && message) {
+                    setToastMessage(message);
+                    setShowToast(true);
+                  }
+                }}
+              />
+            </div>
+
+            <div className="w-full">
+              <CarAvailabilitySelect
+                value={formData.carId}
+                onChange={(carId) => handleChange('carId', carId)}
+                startDate={formData.startDate}
+                endDate={formData.endDate}
+                currentCar={currentCar}
+                error={errors.carId}
+                required
+                onPriceCalculated={(dailyRate, totalAmount) => {
+                  setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
+                }}
+                showPricingSummary
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+              <div className="w-full">
+                <FormSection
+                  title="Dodatne informacije"
+                  icon={<FileText className="w-5 h-5" />}
+                >
+                  <FormField
+                    label="Dodatne napomene"
+                    id="additionalNotes"
+                    helperText="Bilo kakve dodatne napomene ili posebni uslovi"
+                  >
+                    <Textarea
+                      id="additionalNotes"
+                      placeholder="Unesite dodatne napomene..."
+                      rows={4}
+                      value={formData.additionalNotes}
+                      onChange={(e) =>
+                        handleChange('additionalNotes', e.target.value)
+                      }
+                    />
+                  </FormField>
+                </FormSection>
+              </div>
+
+              <div className="w-full">
+                <FormSection
+                  title="Slika ugovora"
+                  icon={<Camera className="w-5 h-5" />}
+                >
+                  <PhotoUpload
+                    value={photoFile}
+                    onChange={handlePhotoChange}
+                    error={errors.photoUrl}
+                    disabled={submitting}
+                    existingPhotoUrl={formData.photoUrl}
+                  />
+                </FormSection>
+              </div>
             </div>
 
             {/* Error Alert */}

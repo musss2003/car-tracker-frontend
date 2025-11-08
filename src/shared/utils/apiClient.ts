@@ -37,7 +37,6 @@ class ApiClient {
 
     // If unauthorized and we have a refresh token, try to refresh
     if (response.status === 401) {
-      console.log('🔄 Access token expired, attempting refresh...');
 
       const refreshed = await this.refreshAccessToken();
       if (refreshed) {
@@ -120,7 +119,7 @@ class ApiClient {
 
       if (data.accessToken) {
         localStorage.setItem('accessToken', data.accessToken);
-        console.log('✅ Access token refreshed successfully');
+
         return true;
       }
 

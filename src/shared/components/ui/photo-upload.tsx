@@ -35,7 +35,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   disabled = false,
   label = 'Fotografija vozila',
   accept = 'image/*',
-  maxSizeMB = 5,
+  maxSizeMB = 10,
   existingPhotoUrl,
 }) => {
   const [photoPreview, setPhotoPreview] = useState<string>('');
@@ -54,7 +54,6 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
 
     setIsLoadingPhoto(true);
     try {
-      console.log(`Attempting to load photo: "${photoUrl}"`);
       const photoBlob = await downloadDocument(photoUrl);
       const photoObjectUrl = URL.createObjectURL(photoBlob);
       setPhotoPreview(photoObjectUrl);
@@ -99,13 +98,14 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
     // Validate file size
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
     if (file.size > maxSizeBytes) {
-      alert(`File size must be less than ${maxSizeMB}MB`);
+      const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+      alert(`Fajl je prevelik (${sizeInMB}MB). Maksimalna veličina je ${maxSizeMB}MB.`);
       return;
     }
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select a valid image file');
+      alert('Molimo odaberite validnu sliku');
       return;
     }
 

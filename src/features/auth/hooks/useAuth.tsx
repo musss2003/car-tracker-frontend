@@ -59,7 +59,6 @@ const UserProvider: React.FC<Props> = ({ children }) => {
       // If backend returned a new access token, store it
       if (data.accessToken) {
         localStorage.setItem('accessToken', data.accessToken);
-        console.log('🔄 Access token refreshed successfully');
       }
 
       setUser({

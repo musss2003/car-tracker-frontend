@@ -100,7 +100,11 @@ export const createAndDownloadContract = async (
       headers: getAuthHeaders(),
       body: JSON.stringify(contractData),
     });
-    if (!res.ok) throw new Error(`Error creating contract: ${res.statusText}`);
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Server error:', errorText);
+      throw new Error(`Error creating contract: ${res.statusText}`);
+    }
 
     const text = await res.text();
     const { contract, docx } = JSON.parse(text);
@@ -110,6 +114,7 @@ export const createAndDownloadContract = async (
     return contract;
   } catch (error) {
     console.error('Error creating and downloading contract:', error);
+    throw error; // Re-throw the error so it can be caught by the calling function
   }
 };
 

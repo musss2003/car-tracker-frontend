@@ -94,7 +94,6 @@ const EditCarPage: React.FC = () => {
     updatedAt: new Date(),
   };
 
-  console.log(initialData);
 
   return <EditCarFormContent car={initialData} />;
 };
