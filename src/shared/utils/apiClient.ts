@@ -37,7 +37,6 @@ class ApiClient {
 
     // If unauthorized and we have a refresh token, try to refresh
     if (response.status === 401) {
-
       const refreshed = await this.refreshAccessToken();
       if (refreshed) {
         // Retry the original request with new token

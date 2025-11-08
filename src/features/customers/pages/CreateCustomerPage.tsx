@@ -272,7 +272,6 @@ const CreateCustomerPage: React.FC = () => {
         passportPhotoUrl: passportPhotoFilename || undefined,
       };
 
-
       await addCustomer(customerData);
       navigate('/customers');
     } catch (error) {

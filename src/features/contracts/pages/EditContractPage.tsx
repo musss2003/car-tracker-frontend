@@ -234,7 +234,9 @@ export default function EditContractPage() {
 
         if (wouldConflict) {
           // Don't update the date if it would cause a conflict
-          setToastMessage('Ne mogu se odabrati ovi datumi - automobil je već rezervisan');
+          setToastMessage(
+            'Ne mogu se odabrati ovi datumi - automobil je već rezervisan'
+          );
           setShowToast(true);
           setTimeout(() => setShowToast(false), 3000);
           return;
@@ -265,7 +267,8 @@ export default function EditContractPage() {
 
     // Check for date conflicts
     if (hasDateConflict) {
-      newErrors.dates = 'Odabrani datumi se sukobljavaju sa postojećim rezervacijama';
+      newErrors.dates =
+        'Odabrani datumi se sukobljavaju sa postojećim rezervacijama';
     }
 
     setErrors(newErrors);
@@ -411,7 +414,9 @@ export default function EditContractPage() {
               <DateRangeValidator
                 startDate={formData.startDate}
                 endDate={formData.endDate}
-                onStartDateChange={(date) => handleDateChange('startDate', date)}
+                onStartDateChange={(date) =>
+                  handleDateChange('startDate', date)
+                }
                 onEndDateChange={(date) => handleDateChange('endDate', date)}
                 startDateError={errors.startDate}
                 endDateError={errors.endDate}

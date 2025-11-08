@@ -268,9 +268,12 @@ const EditCustomerFormContent: React.FC<{
     photoType: string
   ) => {
     if (!photoUrl) return;
-    
+
     // Check if it's a placeholder/invalid URL
-    if (photoUrl.startsWith('http://example.com') || photoUrl.startsWith('https://example.com')) {
+    if (
+      photoUrl.startsWith('http://example.com') ||
+      photoUrl.startsWith('https://example.com')
+    ) {
       setPhotoUrl('');
       return;
     }

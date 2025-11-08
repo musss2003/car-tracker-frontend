@@ -100,14 +100,18 @@ const ContractDetailsPage = () => {
   ) => {
     try {
       setLoadingPhoto(true);
-      
+
       // Check if it's a placeholder/invalid URL
-      if (!photoUrl || photoUrl.startsWith('http://example.com') || photoUrl.startsWith('https://example.com')) {
+      if (
+        !photoUrl ||
+        photoUrl.startsWith('http://example.com') ||
+        photoUrl.startsWith('https://example.com')
+      ) {
         setPhoto(null);
         setLoadingPhoto(false);
         return;
       }
-      
+
       const photoBlob = await downloadDocument(photoUrl);
       const photoUrlObject = URL.createObjectURL(photoBlob);
       setPhoto(photoUrlObject);

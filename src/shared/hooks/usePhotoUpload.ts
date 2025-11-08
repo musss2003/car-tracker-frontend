@@ -71,7 +71,9 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
       throw new Error('Upload failed - no filename returned');
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Neuspješno postavljanje fotografije';
+        err instanceof Error
+          ? err.message
+          : 'Neuspješno postavljanje fotografije';
       setError(errorMessage);
       console.error('Error uploading photo:', err);
       return null;

@@ -99,7 +99,9 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
     if (file.size > maxSizeBytes) {
       const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-      alert(`Fajl je prevelik (${sizeInMB}MB). Maksimalna veličina je ${maxSizeMB}MB.`);
+      alert(
+        `Fajl je prevelik (${sizeInMB}MB). Maksimalna veličina je ${maxSizeMB}MB.`
+      );
       return;
     }
 

@@ -174,7 +174,12 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
           </div>
         </FormField>
 
-        <FormField label="Datum završetka" id="endDate" error={endDateError} required>
+        <FormField
+          label="Datum završetka"
+          id="endDate"
+          error={endDateError}
+          required
+        >
           <div className="relative">
             <Input
               id="endDate"

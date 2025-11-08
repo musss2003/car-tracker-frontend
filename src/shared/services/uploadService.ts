@@ -9,7 +9,9 @@ export const uploadDocument = async (file: File): Promise<string> => {
 
   // Log file info for debugging
   const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-  console.log(`Uploading file: ${file.name}, Size: ${fileSizeMB}MB (${file.size} bytes)`);
+  console.log(
+    `Uploading file: ${file.name}, Size: ${fileSizeMB}MB (${file.size} bytes)`
+  );
 
   try {
     const token = localStorage.getItem('accessToken');
@@ -30,12 +32,15 @@ export const uploadDocument = async (file: File): Promise<string> => {
     if (!response.ok) {
       // Handle 413 Payload Too Large specifically
       if (response.status === 413) {
-        throw new Error(`Fajl je prevelik (${fileSizeMB}MB). Maksimalna veličina je 10MB.`);
+        throw new Error(
+          `Fajl je prevelik (${fileSizeMB}MB). Maksimalna veličina je 10MB.`
+        );
       }
-      
+
       const errorData = await response.json();
       throw new Error(
-        errorData.message || `Neuspješno postavljanje dokumenta: ${response.statusText}`
+        errorData.message ||
+          `Neuspješno postavljanje dokumenta: ${response.statusText}`
       );
     }
 

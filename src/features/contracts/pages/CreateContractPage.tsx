@@ -100,7 +100,9 @@ const CreateContractPage = ({}) => {
     handleChange(field, value);
   };
 
-  const handleCreateContract = async (newContractData: ContractFormData): Promise<boolean> => {
+  const handleCreateContract = async (
+    newContractData: ContractFormData
+  ): Promise<boolean> => {
     try {
       const contract = await createAndDownloadContract(newContractData);
       if (!contract) {
@@ -194,7 +196,7 @@ const CreateContractPage = ({}) => {
       };
 
       const result = await handleCreateContract(contractData);
-      
+
       // Only navigate if contract was created successfully
       if (result !== false) {
         toast.success('Ugovor uspješno kreiran');
@@ -291,7 +293,9 @@ const CreateContractPage = ({}) => {
               <DateRangeValidator
                 startDate={formData.startDate}
                 endDate={formData.endDate}
-                onStartDateChange={(date) => handleDateChange('startDate', date)}
+                onStartDateChange={(date) =>
+                  handleDateChange('startDate', date)
+                }
                 onEndDateChange={(date) => handleDateChange('endDate', date)}
                 startDateError={errors.startDate}
                 endDateError={errors.endDate}

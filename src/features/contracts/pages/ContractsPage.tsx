@@ -372,7 +372,11 @@ const ContractsPage = () => {
         variant: 'secondary' as const,
       };
     else if (now >= startDate && now <= endDate)
-      return { status: 'active', label: 'Aktivan', variant: 'default' as const };
+      return {
+        status: 'active',
+        label: 'Aktivan',
+        variant: 'default' as const,
+      };
     else
       return {
         status: 'completed',
@@ -516,7 +520,10 @@ const ContractsPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="hidden min-[1300px]:table-cell cursor-pointer select-none" onClick={() => handleSort('customer.name')}>
+                    <TableHead
+                      className="hidden min-[1300px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('customer.name')}
+                    >
                       <div className="flex items-center gap-2">
                         <span>Kupac</span>
                         {sortConfig.key === 'customer.name' ? (
@@ -530,7 +537,10 @@ const ContractsPage = () => {
                         )}
                       </div>
                     </TableHead>
-                    <TableHead className="hidden min-[1050px]:table-cell cursor-pointer select-none" onClick={() => handleSort('customer.passportNumber')}>
+                    <TableHead
+                      className="hidden min-[1050px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('customer.passportNumber')}
+                    >
                       <div className="flex items-center gap-2">
                         <span>Pasoš</span>
                         {sortConfig.key === 'customer.passportNumber' ? (
@@ -545,7 +555,10 @@ const ContractsPage = () => {
                       </div>
                     </TableHead>
                     {renderTableHeader('Automobil', 'car.model')}
-                    <TableHead className="max-md:table-cell hidden min-[1400px]:table-cell cursor-pointer select-none" onClick={() => handleSort('car.licensePlate')}>
+                    <TableHead
+                      className="max-md:table-cell hidden min-[1400px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('car.licensePlate')}
+                    >
                       <div className="flex items-center gap-2">
                         <span>Registarska tablica</span>
                         {sortConfig.key === 'car.licensePlate' ? (
@@ -559,7 +572,10 @@ const ContractsPage = () => {
                         )}
                       </div>
                     </TableHead>
-                    <TableHead className="cursor-pointer select-none" onClick={() => handleSort('startDate')}>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort('startDate')}
+                    >
                       <div className="flex items-center gap-2">
                         <span>Datum početka</span>
                         {sortConfig.key === 'startDate' ? (
@@ -573,7 +589,10 @@ const ContractsPage = () => {
                         )}
                       </div>
                     </TableHead>
-                    <TableHead className="hidden min-[900px]:table-cell cursor-pointer select-none" onClick={() => handleSort('endDate')}>
+                    <TableHead
+                      className="hidden min-[900px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('endDate')}
+                    >
                       <div className="flex items-center gap-2">
                         <span>Datum završetka</span>
                         {sortConfig.key === 'endDate' ? (
@@ -587,7 +606,10 @@ const ContractsPage = () => {
                         )}
                       </div>
                     </TableHead>
-                    <TableHead className="hidden min-[1150px]:table-cell cursor-pointer select-none" onClick={() => handleSort('status')}>
+                    <TableHead
+                      className="hidden min-[1150px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('status')}
+                    >
                       <div className="flex items-center gap-2">
                         <span>Status</span>
                         {sortConfig.key === 'status' ? (

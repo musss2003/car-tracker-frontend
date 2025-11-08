@@ -1,93 +1,84 @@
 # 🚗 Vehicle Rental Management System (Frontend)
 
-
 [![Vite](https://img.shields.io/badge/Vite-6.3-purple?logo=vite)](https://vitejs.dev/)
 
 [![React](https://img.shields.io/badge/React-18.3-blue?logo=react)](https://reactjs.org/)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/) 
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
 Built with **React**, **TypeScript**, and **Vite**, and styled using **Chakra UI** and **TailwindCSS**.
 
-
-A modern, responsive frontend application for managing **car rental contracts**, **customers**, and **vehicles**.  
-
+A modern, responsive frontend application for managing **car rental contracts**, **customers**, and **vehicles**.
 
 ⚠️ This is the **frontend only**. You’ll need to run the **backend repository** alongside it for full functionality.
 
-
-
 > 🔗 **Full Stack Application**: This is the frontend. Pair it with the [Car Tracker Backend](https://github.com/musss2003/car-tracker-backend) for complete functionality.
+
 ## 📦 Tech Stack
-
-
 
 ### 🧩 Core
 
-- ⚛️ **React 18.3** – Modern React with hooks and concurrent features  
+- ⚛️ **React 18.3** – Modern React with hooks and concurrent features
 
 ## ✨ Features
-- 🟦 **TypeScript 5.x** – Type-safe development  
 
-- ⚡ **Vite 6.3** – Next-generation frontend tooling  
+- 🟦 **TypeScript 5.x** – Type-safe development
+
+- ⚡ **Vite 6.3** – Next-generation frontend tooling
 
 ### 🎯 Core Functionality
 
-
-- 🌐 **React Router v6** – Client-side routing with lazy loading  
+- 🌐 **React Router v6** – Client-side routing with lazy loading
 
 - 🔐 **Secure Authentication** - JWT-based auth with session management### 🎨 UI & Styling
 
-- 📋 **Contract Management** - Create, edit, and track rental contracts with conflict detection- 💅 **TailwindCSS 4.1** – Utility-first CSS framework  
+- 📋 **Contract Management** - Create, edit, and track rental contracts with conflict detection- 💅 **TailwindCSS 4.1** – Utility-first CSS framework
 
-- 👥 **Customer Management** - Complete customer profiles with document uploads- 🎭 **Chakra UI** – Modern UI components and animations  
+- 👥 **Customer Management** - Complete customer profiles with document uploads- 🎭 **Chakra UI** – Modern UI components and animations
 
-- 🚘 **Vehicle Fleet Management** - Track cars, availability, and maintenance- 🧩 **Radix UI** + **shadcn/ui** – Accessible, reusable components  
+- 🚘 **Vehicle Fleet Management** - Track cars, availability, and maintenance- 🧩 **Radix UI** + **shadcn/ui** – Accessible, reusable components
 
-- 📊 **Dashboard Analytics** - Real-time insights with charts and statistics- 🖼️ **Lucide React** – Modern icon library  
+- 📊 **Dashboard Analytics** - Real-time insights with charts and statistics- 🖼️ **Lucide React** – Modern icon library
 
 - 🔔 **Smart Notifications** - Grouped by time (Today, Yesterday, Older)
 
 - 📄 **Document Generation** - Export contracts as PDF with jsPDF### 📊 Data & State
 
-- 📅 **Calendar View** - Visual contract timeline with React Big Calendar- 📋 **React Hook Form** + **Yup** – Form management and validation  
+- 📅 **Calendar View** - Visual contract timeline with React Big Calendar- 📋 **React Hook Form** + **Yup** – Form management and validation
 
-- 🔍 **Advanced Search & Filtering** - Multi-criteria search across all modules- 📡 **Axios** – HTTP client with interceptors  
+- 🔍 **Advanced Search & Filtering** - Multi-criteria search across all modules- 📡 **Axios** – HTTP client with interceptors
 
-- 📱 **Responsive Design** - Mobile-first approach with Tailwind CSS- 🔐 **JWT Decode** – Token management  
-
-
+- 📱 **Responsive Design** - Mobile-first approach with Tailwind CSS- 🔐 **JWT Decode** – Token management
 
 ### 🎨 UI/UX Excellence
+
 ### 📈 Visualization & Documents
 
-- 📊 **Recharts** – Analytics and dashboards  
+- 📊 **Recharts** – Analytics and dashboards
 
-- ⚡ **Lightning Fast** - Optimized with Vite and lazy loading- 📅 **React Big Calendar** – Contract timeline visualization  
+- ⚡ **Lightning Fast** - Optimized with Vite and lazy loading- 📅 **React Big Calendar** – Contract timeline visualization
 
 - 🎭 **Modern Components** - Built with Radix UI and shadcn/ui design system
-- 📄 **jsPDF**, **jsPDF-AutoTable**, **docx** – PDF & Word document generation  
+- 📄 **jsPDF**, **jsPDF-AutoTable**, **docx** – PDF & Word document generation
 
 - 🌗 **Theme Support** - Light/dark mode with theme manager
 
 - ♿ **Accessible** - WCAG compliant components
+
 ### 🧪 Development & Testing
 
-- 📐 **Consistent Design** - Reusable component library- 🧩 **Vitest** – Unit testing  
+- 📐 **Consistent Design** - Reusable component library- 🧩 **Vitest** – Unit testing
 
-- 🧪 **@testing-library/react** – Component testing  
+- 🧪 **@testing-library/react** – Component testing
 
-- ✨ **ESLint** + **Prettier** – Code linting and formatting  
-
-
+- ✨ **ESLint** + **Prettier** – Code linting and formatting
 
 ## 🛠️ Tech Stack
 
-
-
 ### Frontend Core
+
 ## 🚀 Getting Started
 
 - **React 18.3** - Modern React with hooks and concurrent features### 1️⃣ Clone the repository
@@ -97,7 +88,6 @@ A modern, responsive frontend application for managing **car rental contracts**,
 - **Vite 6.3** - Next-generation frontend toolinggit clone https://github.com/musss2003/car-tracker-frontend.git
 
 - **React Router v6** - Client-side routing with lazy loadingcd car-tracker-frontend
-
 
 ### UI & Styling
 
@@ -229,15 +219,15 @@ The app will open at **http://localhost:5173**
 
 ## 📜 Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server with hot reload |
-| `npm run build` | Build optimized production bundle |
-| `npm run preview` | Preview production build locally |
-| `npm run test` | Run test suite with Vitest |
-| `npm run test:coverage` | Run tests with coverage report |
-| `npm run prettier:check` | Check code formatting |
-| `npm run prettier:write` | Format code with Prettier |
+| Command                  | Description                              |
+| ------------------------ | ---------------------------------------- |
+| `npm run dev`            | Start development server with hot reload |
+| `npm run build`          | Build optimized production bundle        |
+| `npm run preview`        | Preview production build locally         |
+| `npm run test`           | Run test suite with Vitest               |
+| `npm run test:coverage`  | Run tests with coverage report           |
+| `npm run prettier:check` | Check code formatting                    |
+| `npm run prettier:write` | Format code with Prettier                |
 
 ---
 
