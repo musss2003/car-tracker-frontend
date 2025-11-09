@@ -126,8 +126,8 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
     }
 
     const allCars = currentCar
-      ? [currentCar, ...cars.filter((car) => car.id !== currentCar.id)]
-      : cars;
+      ? [currentCar, ...(cars || []).filter((car) => car.id !== currentCar.id)]
+      : (cars || []);
 
     const selectedCar = allCars.find((car) => car.id === value);
 
@@ -144,8 +144,8 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
   }, [value, startDate, endDate, cars, currentCar, onPriceCalculated]);
 
   const allCars = currentCar
-    ? [currentCar, ...cars.filter((car) => car.id !== currentCar.id)]
-    : cars;
+    ? [currentCar, ...(cars || []).filter((car) => car.id !== currentCar.id)]
+    : (cars || []);
 
   const selectedCar = allCars.find((car) => car.id === value);
 
@@ -153,7 +153,7 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
     ? 'Loading available cars...'
     : !startDate || !endDate
       ? 'Please select dates first'
-      : cars.length === 0 && !loading
+      : (cars || []).length === 0 && !loading
         ? 'No cars available for selected dates'
         : undefined;
 
@@ -189,7 +189,7 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
                       - {formatCurrency(car.pricePerDay)}/day
                     </span>
                     {currentCar?.id === car.id &&
-                      !cars.find((c) => c.id === car.id) && (
+                      !(cars || []).find((c) => c.id === car.id) && (
                         <span className="text-xs text-muted-foreground ml-1">
                           (Current)
                         </span>
