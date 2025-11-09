@@ -149,7 +149,9 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
   };
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div
+      className={cn('bg-background border rounded-lg p-6 space-y-4', className)}
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
           label="Datum početka"
@@ -187,7 +189,6 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
               value={endDate}
               onChange={handleEndDateChange}
               disabled={disabled}
-              min={startDate || minStartDate}
               className={cn(
                 conflictMessage &&
                   'border-destructive focus-visible:ring-destructive'
@@ -204,20 +205,6 @@ export const DateRangeValidator: React.FC<DateRangeValidatorProps> = ({
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{conflictMessage}</AlertDescription>
         </Alert>
-      )}
-
-      {/* Date Range Summary */}
-      {startDate && endDate && !conflictMessage && (
-        <div className="text-sm text-muted-foreground">
-          Trajanje:{' '}
-          <span className="font-medium text-foreground">
-            {Math.ceil(
-              (new Date(endDate).getTime() - new Date(startDate).getTime()) /
-                (1000 * 60 * 60 * 24)
-            )}{' '}
-            dan(a)
-          </span>
-        </div>
       )}
     </div>
   );

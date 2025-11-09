@@ -85,13 +85,13 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
         return;
       }
 
-      // Validate date range
+      // Validate date range - allow same day rentals
       const start = new Date(startDate);
       const end = new Date(endDate);
 
-      if (end <= start) {
+      if (end < start) {
         setCars([]);
-        setFetchError('Invalid date range');
+        setFetchError(null);
         onCarsLoaded?.([]);
         return;
       }
@@ -134,12 +134,18 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
     if (selectedCar) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      const days = Math.ceil(
-        (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      const total = days * selectedCar.pricePerDay;
+      
+      // Only calculate if end date is not before start date
+      if (end >= start) {
+        // For same-day rentals, count as 1 day minimum
+        const days = Math.max(
+          1,
+          Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+        );
+        const total = days * selectedCar.pricePerDay;
 
-      onPriceCalculated?.(selectedCar.pricePerDay, total, days);
+        onPriceCalculated?.(selectedCar.pricePerDay, total, days);
+      }
     }
   }, [value, startDate, endDate, cars, currentCar, onPriceCalculated]);
 
@@ -158,7 +164,7 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
         : undefined;
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('bg-background border rounded-lg p-6 space-y-4', className)}>
       <FormField
         label="Vehicle"
         id="carId"
@@ -214,41 +220,53 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
       )}
 
       {/* Pricing Summary */}
-      {showPricingSummary && selectedCar && startDate && endDate && !error && (
-        <div className="p-4 bg-muted rounded-lg space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Daily Rate:</span>
-            <span className="font-medium">
-              {formatCurrency(selectedCar.pricePerDay)}
-            </span>
+      {showPricingSummary &&
+        selectedCar &&
+        startDate &&
+        endDate &&
+        !error &&
+        new Date(endDate) >= new Date(startDate) && (
+          <div className="p-4 bg-muted rounded-lg space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Dnevna cijena:</span>
+              <span className="font-medium">
+                {formatCurrency(selectedCar.pricePerDay)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Trajanje:</span>
+              <span className="font-medium">
+                {Math.max(
+                  1,
+                  Math.ceil(
+                    (new Date(endDate).getTime() -
+                      new Date(startDate).getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )
+                )}{' '}
+                day(s)
+              </span>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t border-border">
+              <span className="font-semibold flex items-center gap-1">
+                <DollarSign className="w-4 h-4" />
+                Ukupan iznos:
+              </span>
+              <span className="text-lg font-bold">
+                {formatCurrency(
+                  Math.max(
+                    1,
+                    Math.ceil(
+                      (new Date(endDate).getTime() -
+                        new Date(startDate).getTime()) /
+                        (1000 * 60 * 60 * 24)
+                    )
+                  ) * selectedCar.pricePerDay
+                )}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Duration:</span>
-            <span className="font-medium">
-              {Math.ceil(
-                (new Date(endDate).getTime() - new Date(startDate).getTime()) /
-                  (1000 * 60 * 60 * 24)
-              )}{' '}
-              day(s)
-            </span>
-          </div>
-          <div className="flex items-center justify-between pt-2 border-t border-border">
-            <span className="font-semibold flex items-center gap-1">
-              <DollarSign className="w-4 h-4" />
-              Total Amount:
-            </span>
-            <span className="text-lg font-bold">
-              {formatCurrency(
-                Math.ceil(
-                  (new Date(endDate).getTime() -
-                    new Date(startDate).getTime()) /
-                    (1000 * 60 * 60 * 24)
-                ) * selectedCar.pricePerDay
-              )}
-            </span>
-          </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

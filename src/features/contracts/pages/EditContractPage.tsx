@@ -56,6 +56,7 @@ export default function EditContractPage() {
   const [isUpdated, setIsUpdated] = useState(false);
   const [carBookings, setCarBookings] = useState<any[]>([]);
   const [hasDateConflict, setHasDateConflict] = useState(false);
+  const [hasInvalidDateRange, setHasInvalidDateRange] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -142,6 +143,17 @@ export default function EditContractPage() {
     fetchCarBookings();
   }, [formData.carId]);
 
+  // Validate date range (start date must not be after end date, but can be same day)
+  useEffect(() => {
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
+      setHasInvalidDateRange(end < start);
+    } else {
+      setHasInvalidDateRange(false);
+    }
+  }, [formData.startDate, formData.endDate]);
+
   // Validate dates against car bookings
   useEffect(() => {
     if (
@@ -158,6 +170,7 @@ export default function EditContractPage() {
     const selectedEnd = new Date(formData.endDate);
 
     // Check for conflicts with existing bookings (excluding current contract)
+    // Allow contracts to share the same date (end of one = start of another)
     const hasConflict = carBookings.some((booking) => {
       // Skip the current contract being edited
       if (booking.contractId === contractId) {
@@ -167,10 +180,11 @@ export default function EditContractPage() {
       const bookingStart = new Date(booking.start);
       const bookingEnd = new Date(booking.end);
 
-      // Check if dates overlap
+      // Check if dates overlap (excluding boundaries - allow same-day end/start)
+      // Conflict exists only if there's actual overlap, not just touching dates
       return (
-        (selectedStart >= bookingStart && selectedStart < bookingEnd) ||
-        (selectedEnd > bookingStart && selectedEnd <= bookingEnd) ||
+        (selectedStart > bookingStart && selectedStart < bookingEnd) ||
+        (selectedEnd > bookingStart && selectedEnd < bookingEnd) ||
         (selectedStart <= bookingStart && selectedEnd >= bookingEnd)
       );
     });
@@ -198,52 +212,6 @@ export default function EditContractPage() {
   };
 
   const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
-    const newFormData = { ...formData, [field]: value };
-
-    if (newFormData.startDate && newFormData.endDate) {
-      const start = new Date(newFormData.startDate);
-      const end = new Date(newFormData.endDate);
-
-      if (end <= start) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: 'Datum završetka mora biti nakon datuma početka',
-        }));
-        return;
-      }
-
-      // Check if the new date range conflicts with existing bookings
-      if (formData.carId && carBookings.length > 0) {
-        const selectedStart = start;
-        const selectedEnd = end;
-
-        const wouldConflict = carBookings.some((booking) => {
-          if (booking.contractId === contractId) {
-            return false;
-          }
-
-          const bookingStart = new Date(booking.start);
-          const bookingEnd = new Date(booking.end);
-
-          return (
-            (selectedStart >= bookingStart && selectedStart < bookingEnd) ||
-            (selectedEnd > bookingStart && selectedEnd <= bookingEnd) ||
-            (selectedStart <= bookingStart && selectedEnd >= bookingEnd)
-          );
-        });
-
-        if (wouldConflict) {
-          // Don't update the date if it would cause a conflict
-          setToastMessage(
-            'Ne mogu se odabrati ovi datumi - automobil je već rezervisan'
-          );
-          setShowToast(true);
-          setTimeout(() => setShowToast(false), 3000);
-          return;
-        }
-      }
-    }
-
     handleChange(field, value);
   };
 
@@ -265,8 +233,13 @@ export default function EditContractPage() {
     if (!formData.startDate) newErrors.startDate = 'Datum početka je obavezan';
     if (!formData.endDate) newErrors.endDate = 'Datum završetka je obavezan';
 
-    // Check for date conflicts
+    // Check for date conflicts - show toast warning
     if (hasDateConflict) {
+      setToastMessage(
+        'Ne možete sačuvati promjene - odabrani datumi se preklapaju sa postojećim rezervacijama za ovaj automobil'
+      );
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
       newErrors.dates =
         'Odabrani datumi se sukobljavaju sa postojećim rezervacijama';
     }
@@ -363,7 +336,7 @@ export default function EditContractPage() {
             </Button>
             <Button
               type="submit"
-              disabled={submitting || !isUpdated || hasDateConflict}
+              disabled={submitting || !isUpdated || hasDateConflict || hasInvalidDateRange}
               form="edit-contract-form"
             >
               {submitting ? (
@@ -432,6 +405,16 @@ export default function EditContractPage() {
                   }
                 }}
               />
+              
+              {/* Invalid Date Range Warning */}
+              {hasInvalidDateRange && formData.startDate && formData.endDate && (
+                <Alert variant="destructive" className="mt-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Datum završetka ne može biti prije datuma početka. Molimo odaberite ispravne datume kako biste mogli sačuvati promjene. (Napomena: Iznajmljivanje u trajanju jednog dana je dozvoljeno)
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             <div className="w-full">
@@ -459,7 +442,6 @@ export default function EditContractPage() {
                   <FormField
                     label="Dodatne napomene"
                     id="additionalNotes"
-                    helperText="Bilo kakve dodatne napomene ili posebni uslovi"
                   >
                     <Textarea
                       id="additionalNotes"
@@ -503,7 +485,7 @@ export default function EditContractPage() {
 
       {/* Toast Notification */}
       {showToast && (
-        <Toast variant="destructive" onClose={() => setShowToast(false)}>
+        <Toast variant="warning" onClose={() => setShowToast(false)}>
           {toastMessage}
         </Toast>
       )}

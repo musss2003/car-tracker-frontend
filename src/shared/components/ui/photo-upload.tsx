@@ -33,7 +33,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   onChange,
   error,
   disabled = false,
-  label = 'Fotografija vozila',
+  label = '',
   accept = 'image/*',
   maxSizeMB = 10,
   existingPhotoUrl,
@@ -215,7 +215,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
         )}
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
       <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
         <AlertDialogContent>
