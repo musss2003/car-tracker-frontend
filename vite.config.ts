@@ -9,9 +9,19 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    // Force re-optimization on every server start to avoid stale cache issues
+    force: true,
+  },
+  server: {
+    // Clear cache on startup to prevent stale dependency issues
+    fs: {
+      strict: false,
+    },
+  },
   test: {
     environment: 'jsdom',
-    setupFiles: './src/setupTests.ts',
+    setupFiles: './src/setup-test.ts',
     globals: true,
     include: ['src/**/*.test.{ts,tsx}'],
     coverage: {
