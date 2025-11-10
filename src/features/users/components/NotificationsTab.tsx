@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/sha
 import { Label } from '@/shared/components/ui/label';
 import { Switch } from '@/shared/components/ui/switch';
 import { Bell } from 'lucide-react';
-import { User } from '../../types/user.types';
+import { User } from '../types/user.types';
 import { useState } from 'react';
 
 interface NotificationsTabProps {
