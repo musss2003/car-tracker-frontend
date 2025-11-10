@@ -19,10 +19,12 @@ import {
 } from '@/shared/components/ui/alert-dialog';
 import { User } from '../types/user.types';
 import * as userService from '../services/userService';
+import { OnlineStatus } from '../components/OnlineStatus';
+import { getUsersWithStatus, UserWithStatus } from '../services/activityService';
 
 const UsersPage = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserWithStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -34,12 +36,19 @@ const UsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
+    
+    // Refresh user status every 30 seconds
+    const interval = setInterval(() => {
+      fetchUsers();
+    }, 30 * 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await userService.getUsers();
+      const data = await getUsersWithStatus();
       setUsers(Array.isArray(data) ? data : []);
     } catch (error: any) {
       console.error('Error fetching users:', error);
@@ -176,6 +185,7 @@ const UsersPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Status</TableHead>
                     <TableHead>Ime</TableHead>
                     <TableHead>Korisničko ime</TableHead>
                     <TableHead>Email</TableHead>
@@ -187,6 +197,13 @@ const UsersPage = () => {
                 <TableBody>
                   {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
+                      <TableCell>
+                        <OnlineStatus 
+                          isOnline={user.isOnline} 
+                          lastActiveAt={user.lastActiveAt}
+                          showText
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{user.name || 'N/A'}</TableCell>
                       <TableCell>{user.username}</TableCell>
                       <TableCell>{user.email}</TableCell>
