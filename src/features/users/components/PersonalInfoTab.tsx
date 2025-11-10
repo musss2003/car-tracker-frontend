@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -6,9 +6,10 @@ import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { PhotoUpload } from '@/shared/components/ui/photo-upload';
 import { Separator } from '@/shared/components/ui/separator';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Upload } from 'lucide-react';
 import { User } from '../types/user.types';
-import { updateUser, uploadProfilePhoto } from '../services/userService';
+import { updateUser } from '../services/userService';
+import { uploadDocument, downloadDocument } from '@/shared/services/uploadService';
 import { toast } from 'react-toastify';
 
 interface PersonalInfoTabProps {
@@ -20,6 +21,8 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>('');
+  const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
   const [formData, setFormData] = useState({
     name: user.name || '',
     email: user.email || '',
@@ -29,20 +32,51 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
     citizenshipId: user.citizenshipId || '',
   });
 
-  const handlePhotoChange = async (file: File | null) => {
-    if (!file) {
-      setPhotoFile(null);
-      return;
-    }
+  // Load existing profile photo
+  useEffect(() => {
+    const loadExistingPhoto = async () => {
+      if (!user.profilePhotoUrl) {
+        setPhotoPreview('');
+        return;
+      }
 
+      setIsLoadingPhoto(true);
+      try {
+        const photoBlob = await downloadDocument(user.profilePhotoUrl);
+        const photoObjectUrl = URL.createObjectURL(photoBlob);
+        setPhotoPreview(photoObjectUrl);
+      } catch (error) {
+        console.error('Error loading profile photo:', error);
+        setPhotoPreview('');
+      } finally {
+        setIsLoadingPhoto(false);
+      }
+    };
+
+    loadExistingPhoto();
+
+    // Cleanup function to revoke object URL
+    return () => {
+      if (photoPreview && photoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [user.profilePhotoUrl]);
+
+  const handlePhotoChange = (file: File | null) => {
+    setPhotoFile(file);
+  };
+
+  const uploadPhoto = async (): Promise<string | null> => {
+    if (!photoFile) return user.profilePhotoUrl || null;
+    
     try {
-      const updatedUser = await uploadProfilePhoto(user.id, file);
-      onUpdate(updatedUser);
-      setPhotoFile(null);
-      toast.success('Profilna slika je uspješno ažurirana');
+      const filename = await uploadDocument(photoFile);
+      return filename;
     } catch (error) {
-      console.error('Failed to upload photo:', error);
+      console.error('Error uploading photo:', error);
       toast.error('Greška pri upload-u slike');
+      return null;
     }
   };
 
@@ -58,8 +92,27 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      const updatedUser = await updateUser(user.id, formData);
+      
+      // Upload photo first if a new one was selected
+      let photoFilename = user.profilePhotoUrl;
+      if (photoFile) {
+        const uploadedFilename = await uploadPhoto();
+        if (!uploadedFilename) {
+          // Photo upload failed, don't proceed
+          return;
+        }
+        photoFilename = uploadedFilename;
+      }
+      
+      // Update user with new data including photo
+      const updatedData = {
+        ...formData,
+        profilePhotoUrl: photoFilename,
+      };
+      
+      const updatedUser = await updateUser(user.id, updatedData);
       onUpdate(updatedUser);
+      setPhotoFile(null); // Clear the selected photo after successful save
       setIsEditing(false);
       toast.success('Profil je uspješno ažuriran');
     } catch (error) {
@@ -79,6 +132,7 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
       address: user.address || '',
       citizenshipId: user.citizenshipId || '',
     });
+    setPhotoFile(null); // Clear selected photo on cancel
     setIsEditing(false);
   };
 
@@ -98,26 +152,78 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
     <div className="space-y-6">
       {/* Profile Photo Card */}
       <Card>
-        <CardHeader>
-          <CardTitle>Profilna slika</CardTitle>
-          <CardDescription>
-            Kliknite da promijenite profilnu fotografiju
-          </CardDescription>
-        </CardHeader>
         <CardContent>
-          <PhotoUpload
-            value={photoFile}
-            onChange={handlePhotoChange}
-            label=""
-            maxSizeMB={5}
-            existingPhotoUrl={user.profilePhotoUrl}
-          />
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold">{user.name || user.username}</h3>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {user.role === 'admin' ? 'Administrator' : 'Zaposlenik'}
-            </p>
+          <div className="flex items-center gap-6 mt-5">
+            {/* Circular Avatar Photo Upload */}
+            <div className="relative group">
+              <input
+                ref={(ref) => {
+                  if (ref) (window as any)._profilePhotoInput = ref;
+                }}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // Validate file size (5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                      toast.error('Slika je prevelika. Maksimalna veličina je 5MB.');
+                      return;
+                    }
+                    handlePhotoChange(file);
+                  }
+                }}
+                className="hidden"
+                id="profile-photo-input"
+              />
+              <label
+                htmlFor="profile-photo-input"
+                className="cursor-pointer block"
+              >
+                <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-border bg-muted group-hover:border-primary transition-colors">
+                  {isLoadingPhoto ? (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : photoFile ? (
+                    <img
+                      src={URL.createObjectURL(photoFile)}
+                      alt={user.name || user.username}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : photoPreview ? (
+                    <img
+                      src={photoPreview}
+                      alt={user.name || user.username}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-2xl font-semibold">
+                      {getInitials()}
+                    </div>
+                  )}
+                  {!isLoadingPhoto && (
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Upload className="w-8 h-8 text-white" />
+                    </div>
+                  )}
+                </div>
+              </label>
+            </div>
+
+            {/* User Info */}
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">{user.name || user.username}</h3>
+              <p className="text-sm text-muted-foreground">{user.email}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {user.role === 'admin' ? 'Administrator' : 'Zaposlenik'}
+              </p>
+              {photoFile && (
+                <p className="text-xs text-primary mt-2">
+                  Nova slika odabrana - kliknite Sačuvaj za potvrdu
+                </p>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
