@@ -23,8 +23,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
+  ClipboardList,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -38,11 +41,13 @@ interface NavItem {
   label: string;
   badge?: string | number;
   isNew?: boolean;
+  adminOnly?: boolean;
 }
 
 interface NavGroup {
   title: string;
   items: NavItem[];
+  adminOnly?: boolean;
 }
 
 const ModernSidebar: React.FC<SidebarProps> = ({
@@ -51,6 +56,8 @@ const ModernSidebar: React.FC<SidebarProps> = ({
   toggleSidebar,
 }) => {
   const location = useLocation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   // Navigation structure with updated icons and Bosnian labels
   const navGroups: NavGroup[] = [
@@ -81,7 +88,25 @@ const ModernSidebar: React.FC<SidebarProps> = ({
         {
           to: '/customers',
           icon: Users,
-          label: 'Korisnici',
+          label: 'Kupci',
+        },
+      ],
+    },
+    {
+      title: 'Administracija',
+      adminOnly: true,
+      items: [
+        {
+          to: '/users',
+          icon: UserCog,
+          label: 'Upravljanje korisnicima',
+          adminOnly: true,
+        },
+        {
+          to: '/audit-logs',
+          icon: ClipboardList,
+          label: 'Audit logovi',
+          adminOnly: true,
         },
       ],
     },
@@ -102,7 +127,7 @@ const ModernSidebar: React.FC<SidebarProps> = ({
         },
       ],
     },
-  ];
+  ].filter((group) => !group.adminOnly || isAdmin);
 
   // Navigation link component
   const NavLink: React.FC<NavItem & { compact?: boolean }> = ({
@@ -233,9 +258,11 @@ const ModernSidebar: React.FC<SidebarProps> = ({
                 </h3>
               )}
               <div className="space-y-1">
-                {group.items.map((item, idx) => (
-                  <NavLink key={idx} {...item} compact={compact} />
-                ))}
+                {group.items
+                  .filter((item) => !item.adminOnly || isAdmin)
+                  .map((item, idx) => (
+                    <NavLink key={idx} {...item} compact={compact} />
+                  ))}
               </div>
               {index < navGroups.length - 1 && !compact && (
                 <Separator className="mt-4" />
