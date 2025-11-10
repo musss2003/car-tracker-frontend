@@ -121,18 +121,22 @@ export const uploadProfilePhoto = async (userId: string, photoFile: File): Promi
   const formData = new FormData();
   formData.append('document', photoFile);
 
+  // Get auth headers but remove Content-Type for FormData
+  const authHeaders = getAuthHeaders();
+  const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders;
+
   // First upload the file
   const uploadResponse = await fetch(`${API_URL}upload/upload`, {
     method: 'POST',
     credentials: 'include',
-    headers: {
-      ...getAuthHeaders(),
-    },
+    headers: headersWithoutContentType, // Don't set Content-Type - let browser set it with boundary
     body: formData,
   });
 
   if (!uploadResponse.ok) {
-    throw new Error('Failed to upload profile photo');
+    const errorData = await uploadResponse.json().catch(() => ({ message: 'Unknown error' }));
+    console.error('Upload failed:', errorData);
+    throw new Error(errorData.message || 'Failed to upload profile photo');
   }
 
   const uploadResult = await uploadResponse.json();
