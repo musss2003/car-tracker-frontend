@@ -40,7 +40,6 @@ const UsersPage = () => {
 
     // Listen for real-time user status changes via WebSocket
     socketService.onUserStatusChange((data) => {
-      console.log('User status changed:', data);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === data.userId

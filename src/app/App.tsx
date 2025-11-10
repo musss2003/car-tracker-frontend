@@ -20,11 +20,9 @@ function App() {
     if (isLoggedIn() && user?.id) {
       // Connect to Socket.IO and mark user as online
       socketService.connect(user.id);
-      console.log('🟢 User presence: Online');
     } else {
       // Disconnect when logged out
       socketService.disconnect();
-      console.log('⚫ User presence: Offline');
     }
 
     // Cleanup on unmount

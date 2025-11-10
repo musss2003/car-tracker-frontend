@@ -11,7 +11,6 @@ class SocketService {
    */
   connect(userId: string) {
     if (this.socket?.connected) {
-      console.log('Socket already connected');
       return;
     }
 
@@ -27,8 +26,6 @@ class SocketService {
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ Socket connected:', this.socket?.id);
-      
       // Mark user as online
       if (this.userId) {
         this.socket?.emit('user:online', this.userId);
@@ -39,7 +36,7 @@ class SocketService {
     });
 
     this.socket.on('disconnect', () => {
-      console.log('❌ Socket disconnected');
+      // Socket disconnected
     });
 
     this.socket.on('connect_error', (error) => {
@@ -47,7 +44,6 @@ class SocketService {
     });
 
     this.socket.on('reconnect', (attemptNumber) => {
-      console.log(`🔄 Socket reconnected after ${attemptNumber} attempts`);
       if (this.userId) {
         this.socket?.emit('user:online', this.userId);
       }
@@ -64,7 +60,6 @@ class SocketService {
       this.socket.disconnect();
       this.socket = null;
       this.userId = null;
-      console.log('Socket disconnected manually');
     }
   }
 
