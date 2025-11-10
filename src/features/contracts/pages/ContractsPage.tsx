@@ -472,7 +472,7 @@ const ContractsPage = () => {
                     Izvoz
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="bg-background-100/80 dark:bg-background-100/80 backdrop-blur-sm rounded-md shadow-md">
                   <DropdownMenuItem onClick={exportToPDF}>
                     Izvezi kao PDF
                   </DropdownMenuItem>
