@@ -1,12 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
+import { PhotoUpload } from '@/shared/components/ui/photo-upload';
 import { Separator } from '@/shared/components/ui/separator';
-import { Camera, Loader2, Save } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import { User } from '../types/user.types';
 import { updateUser, uploadProfilePhoto } from '../services/userService';
 import { toast } from 'react-toastify';
@@ -19,7 +19,7 @@ interface PersonalInfoTabProps {
 const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: user.name || '',
     email: user.email || '',
@@ -29,41 +29,20 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
     citizenshipId: user.citizenshipId || '',
   });
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handlePhotoClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Molimo odaberite sliku');
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Slika ne smije biti veća od 5MB');
+  const handlePhotoChange = async (file: File | null) => {
+    if (!file) {
+      setPhotoFile(null);
       return;
     }
 
     try {
-      setIsUploadingPhoto(true);
       const updatedUser = await uploadProfilePhoto(user.id, file);
       onUpdate(updatedUser);
+      setPhotoFile(null);
       toast.success('Profilna slika je uspješno ažurirana');
     } catch (error) {
       console.error('Failed to upload photo:', error);
       toast.error('Greška pri upload-u slike');
-    } finally {
-      setIsUploadingPhoto(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
@@ -122,43 +101,24 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
         <CardHeader>
           <CardTitle>Profilna slika</CardTitle>
           <CardDescription>
-            Kliknite na sliku da promijenite profilnu fotografiju
+            Kliknite da promijenite profilnu fotografiju
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-6">
-            <div className="relative group">
-              <Avatar className="h-32 w-32">
-                <AvatarImage src={user.profilePhotoUrl} alt={user.name || user.username} />
-                <AvatarFallback className="text-2xl">{getInitials()}</AvatarFallback>
-              </Avatar>
-              <button
-                onClick={handlePhotoClick}
-                disabled={isUploadingPhoto}
-                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed"
-              >
-                {isUploadingPhoto ? (
-                  <Loader2 className="h-8 w-8 text-white animate-spin" />
-                ) : (
-                  <Camera className="h-8 w-8 text-white" />
-                )}
-              </button>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold">{user.name || user.username}</h3>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                {user.role === 'admin' ? 'Administrator' : 'Zaposlenik'}
-              </p>
-            </div>
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
+          <PhotoUpload
+            value={photoFile}
             onChange={handlePhotoChange}
+            label=""
+            maxSizeMB={5}
+            existingPhotoUrl={user.profilePhotoUrl}
           />
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">{user.name || user.username}</h3>
+            <p className="text-sm text-muted-foreground">{user.email}</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {user.role === 'admin' ? 'Administrator' : 'Zaposlenik'}
+            </p>
+          </div>
         </CardContent>
       </Card>
 

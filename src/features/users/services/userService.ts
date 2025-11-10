@@ -98,6 +98,20 @@ export const resetUserPassword = async (
 };
 
 /**
+ * Change user password (requires current password verification)
+ */
+export const changePassword = async (
+  userId: string,
+  currentPassword: string,
+  newPassword: string
+): Promise<void> => {
+  await apiClient.put(`${BASE_URL}/${userId}/password`, {
+    currentPassword,
+    newPassword,
+  });
+};
+
+/**
  * Upload user profile photo
  */
 export const uploadProfilePhoto = async (userId: string, photoFile: File) => {
