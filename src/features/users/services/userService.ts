@@ -10,7 +10,7 @@ export interface CreateUserData {
   username: string;
   email: string;
   password: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'employee' | 'user';
   citizenshipId?: string;
   sendCredentials?: boolean;
 }
@@ -19,7 +19,7 @@ export interface UpdateUserData {
   name?: string;
   username?: string;
   email?: string;
-  role?: 'admin' | 'user';
+  role?: 'admin' | 'employee' | 'user';
   citizenshipId?: string;
 }
 

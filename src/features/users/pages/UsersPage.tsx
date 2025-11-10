@@ -7,6 +7,16 @@ import { Input } from '@/shared/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { Badge } from '@/shared/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shared/components/ui/alert-dialog';
 import { User } from '../types/user.types';
 import * as userService from '../services/userService';
 
@@ -16,6 +26,11 @@ const UsersPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  
+  // AlertDialog states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<{ id: string; username: string } | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -35,34 +50,45 @@ const UsersPage = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Da li ste sigurni da želite obrisati ovog korisnika?')) {
-      return;
-    }
+  const openDeleteDialog = (id: string, username: string) => {
+    setSelectedUser({ id, username });
+    setDeleteDialogOpen(true);
+  };
+
+  const openResetPasswordDialog = (id: string, username: string) => {
+    setSelectedUser({ id, username });
+    setResetPasswordDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedUser) return;
 
     try {
-      setDeletingId(id);
-      await userService.deleteUser(id);
+      setDeletingId(selectedUser.id);
+      await userService.deleteUser(selectedUser.id);
       toast.success('Korisnik je uspješno obrisan');
       fetchUsers();
+      setDeleteDialogOpen(false);
     } catch (error: any) {
       toast.error(error.message || 'Greška pri brisanju korisnika');
     } finally {
       setDeletingId(null);
+      setSelectedUser(null);
     }
   };
 
-  const handleResetPassword = async (id: string, username: string) => {
-    if (!window.confirm(`Resetovati lozinku za korisnika ${username}?`)) {
-      return;
-    }
+  const handleResetPassword = async () => {
+    if (!selectedUser) return;
 
     try {
       const newPassword = Math.random().toString(36).slice(-12);
-      await userService.resetUserPassword(id, newPassword, true);
+      await userService.resetUserPassword(selectedUser.id, newPassword, true);
       toast.success('Nova lozinka je poslana na email korisnika');
+      setResetPasswordDialogOpen(false);
     } catch (error: any) {
       toast.error(error.message || 'Greška pri resetovanju lozinke');
+    } finally {
+      setSelectedUser(null);
     }
   };
 
@@ -182,14 +208,14 @@ const UsersPage = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleResetPassword(user.id, user.username)}
+                            onClick={() => openResetPasswordDialog(user.id, user.username)}
                           >
                             <Key className="w-4 h-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => openDeleteDialog(user.id, user.username)}
                             disabled={deletingId === user.id}
                             className="text-red-600 hover:text-red-700"
                           >
@@ -205,6 +231,53 @@ const UsersPage = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Brisanje korisnika</AlertDialogTitle>
+            <AlertDialogDescription>
+              Da li ste sigurni da želite obrisati korisnika <strong>{selectedUser?.username}</strong>?
+              <br />
+              Ova akcija se ne može poništiti.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSelectedUser(null)}>
+              Odustani
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Obriši
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reset Password Confirmation Dialog */}
+      <AlertDialog open={resetPasswordDialogOpen} onOpenChange={setResetPasswordDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Resetovanje lozinke</AlertDialogTitle>
+            <AlertDialogDescription>
+              Da li ste sigurni da želite resetovati lozinku za korisnika <strong>{selectedUser?.username}</strong>?
+              <br />
+              Nova lozinka će biti generisana i poslata na email korisnika.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSelectedUser(null)}>
+              Odustani
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleResetPassword}>
+              Resetuj lozinku
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

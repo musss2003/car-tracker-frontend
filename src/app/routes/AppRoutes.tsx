@@ -69,6 +69,9 @@ const UsersPage = lazy(
 const CreateUserPage = lazy(
   () => import('../../features/users/pages/CreateUserPage')
 );
+const EditUserPage = lazy(
+  () => import('../../features/users/pages/EditUserPage')
+);
 
 // Dashboard Pages - Feature-based imports
 const DashboardPage = lazy(
@@ -86,6 +89,7 @@ const ShadcnExamplesPage = lazy(
 );
 
 import ProtectedRoute from './ProtectedRoute';
+import AdminRoute from './AdminRoute';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import LoadingSpinner from '../../shared/components/feedback/LoadingSpinner/LoadingSpinner';
 
@@ -126,14 +130,19 @@ export function AppRoutes() {
           <Route path="/customers/:id/edit" element={<EditCustomerPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           {/* <Route path="/notifications" element={<NotificationsPage />} /> */}
-          <Route path="/audit-logs" element={<AuditLogsPage />} />
-          <Route path="/audit-logs/:id" element={<AuditLogDetailsPage />} />
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/users/create" element={<CreateUserPage />} />
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />
           {user && (
             <Route path="/profile" element={<UserProfile id={user.id} />} />
           )}
+        </Route>
+        
+        {/* Admin-only routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/audit-logs" element={<AuditLogsPage />} />
+          <Route path="/audit-logs/:id" element={<AuditLogDetailsPage />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/create" element={<CreateUserPage />} />
+          <Route path="/users/:id/edit" element={<EditUserPage />} />
         </Route>
         <Route
           path="*"

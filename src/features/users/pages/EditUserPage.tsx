@@ -1,65 +1,106 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ArrowLeft, Save, Mail } from 'lucide-react';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import * as userService from '../services/userService';
+import { User } from '../types/user.types';
 
-const CreateUserPage = () => {
+const EditUserPage = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(false);
-  const [sendCredentials, setSendCredentials] = useState(true);
+  const [fetching, setFetching] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
     username: '',
     email: '',
-    password: '',
     role: 'employee' as 'admin' | 'employee' | 'user',
     citizenshipId: '',
   });
 
+  useEffect(() => {
+    if (id) {
+      fetchUser(id);
+    }
+  }, [id]);
+
+  const fetchUser = async (userId: string) => {
+    try {
+      setFetching(true);
+      const data = await userService.getUser(userId);
+      setUser(data);
+      setFormData({
+        name: data.name || '',
+        username: data.username || '',
+        email: data.email || '',
+        role: data.role as 'admin' | 'employee' | 'user',
+        citizenshipId: data.citizenshipId || '',
+      });
+    } catch (error: any) {
+      toast.error(error.message || 'Greška pri učitavanju korisnika');
+      navigate('/users');
+    } finally {
+      setFetching(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.username || !formData.email || !formData.password) {
+    if (!formData.name || !formData.username || !formData.email) {
       toast.error('Molimo popunite sva obavezna polja');
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Lozinka mora imati najmanje 6 karaktera');
+    if (!id) {
+      toast.error('ID korisnika nije pronađen');
       return;
     }
 
     try {
       setLoading(true);
-      await userService.createUser({
-        ...formData,
-        sendCredentials,
-      });
+      await userService.updateUser(id, formData);
       
-      toast.success(
-        sendCredentials
-          ? 'Korisnik je kreiran i kredencijali su poslati na email'
-          : 'Korisnik je uspješno kreiran'
-      );
+      toast.success('Korisnik je uspješno ažuriran');
       navigate('/users');
     } catch (error: any) {
-      toast.error(error.message || 'Greška pri kreiranju korisnika');
+      toast.error(error.message || 'Greška pri ažuriranju korisnika');
     } finally {
       setLoading(false);
     }
   };
 
-  const generatePassword = () => {
-    const password = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-4).toUpperCase();
-    setFormData({ ...formData, password });
-  };
+  if (fetching) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardContent className="py-8 text-center">
+            <p className="text-muted-foreground">Korisnik nije pronađen</p>
+            <Button onClick={() => navigate('/users')} className="mt-4">
+              Nazad na listu
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -70,9 +111,9 @@ const CreateUserPage = () => {
           Nazad
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Novi korisnik</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Uredi korisnika</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Kreirajte novi korisnički nalog
+            Ažurirajte informacije o korisniku
           </p>
         </div>
       </div>
@@ -82,7 +123,7 @@ const CreateUserPage = () => {
           <CardHeader>
             <CardTitle>Informacije o korisniku</CardTitle>
             <CardDescription>
-              Unesite podatke o novom korisniku
+              Izmjenite podatke o korisniku (lozinka se ne mijenja)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -129,29 +170,6 @@ const CreateUserPage = () => {
               />
             </div>
 
-            {/* Password */}
-            <div className="space-y-2">
-              <Label htmlFor="password">
-                Lozinka <span className="text-red-500">*</span>
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="password"
-                  type="text"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Unesite lozinku"
-                  required
-                />
-                <Button type="button" variant="outline" onClick={generatePassword}>
-                  Generiši
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Minimum 6 karaktera. Kliknite "Generiši" za automatsku lozinku.
-              </p>
-            </div>
-
             {/* Role */}
             <div className="space-y-2">
               <Label htmlFor="role">
@@ -186,19 +204,36 @@ const CreateUserPage = () => {
               />
             </div>
 
-            {/* Send Credentials Checkbox */}
-            <div className="flex items-center space-x-2 pt-4 border-t">
-              <input
-                type="checkbox"
-                id="sendCredentials"
-                checked={sendCredentials}
-                onChange={(e) => setSendCredentials(e.target.checked)}
-                className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary"
-              />
-              <Label htmlFor="sendCredentials" className="flex items-center gap-2 cursor-pointer">
-                <Mail className="w-4 h-4" />
-                Pošalji kredencijale na email
-              </Label>
+            {/* Info about password */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <strong>Napomena:</strong> Lozinka se ne mijenja prilikom uređivanja korisnika. 
+                Za resetovanje lozinke koristite opciju "Resetuj lozinku" na listi korisnika.
+              </p>
+            </div>
+
+            {/* User metadata */}
+            <div className="pt-4 border-t space-y-2">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Kreiran:</span>
+                  <p className="font-medium">
+                    {user.createdAt ? new Date(user.createdAt).toLocaleString('bs-BA') : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Posljednja izmjena:</span>
+                  <p className="font-medium">
+                    {user.updatedAt ? new Date(user.updatedAt).toLocaleString('bs-BA') : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Posljednja prijava:</span>
+                  <p className="font-medium">
+                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString('bs-BA') : 'Nikada'}
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -210,7 +245,7 @@ const CreateUserPage = () => {
           </Button>
           <Button type="submit" disabled={loading}>
             <Save className="w-4 h-4 mr-2" />
-            {loading ? 'Kreiranje...' : 'Kreiraj korisnika'}
+            {loading ? 'Čuvanje...' : 'Sačuvaj izmjene'}
           </Button>
         </div>
       </form>
@@ -218,4 +253,4 @@ const CreateUserPage = () => {
   );
 };
 
-export default CreateUserPage;
+export default EditUserPage;
