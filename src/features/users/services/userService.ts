@@ -21,6 +21,9 @@ export interface UpdateUserData {
   email?: string;
   role?: 'admin' | 'employee' | 'user';
   citizenshipId?: string;
+  profilePhotoUrl?: string;
+  phone?: string;
+  address?: string;
 }
 
 /**
@@ -114,11 +117,12 @@ export const changePassword = async (
 /**
  * Upload user profile photo
  */
-export const uploadProfilePhoto = async (userId: string, photoFile: File) => {
+export const uploadProfilePhoto = async (userId: string, photoFile: File): Promise<User> => {
   const formData = new FormData();
-  formData.append('photo', photoFile);
+  formData.append('document', photoFile);
 
-  const response = await fetch(`${API_URL}users/${userId}/photo`, {
+  // First upload the file
+  const uploadResponse = await fetch(`${API_URL}upload/upload`, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -127,9 +131,17 @@ export const uploadProfilePhoto = async (userId: string, photoFile: File) => {
     body: formData,
   });
 
-  if (!response.ok) {
+  if (!uploadResponse.ok) {
     throw new Error('Failed to upload profile photo');
   }
 
-  return response.json();
+  const uploadResult = await uploadResponse.json();
+  const filename = uploadResult.filename;
+
+  // Then update the user with the photo URL
+  const updatedUser = await updateUser(userId, {
+    profilePhotoUrl: filename,
+  });
+
+  return updatedUser;
 };
