@@ -17,8 +17,8 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
           variant === 'destructive'
             ? 'border-destructive bg-destructive text-destructive-foreground'
             : variant === 'warning'
-            ? 'border-amber-500 bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-100'
-            : 'border bg-background text-foreground',
+              ? 'border-amber-500 bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-100'
+              : 'border bg-background text-foreground',
           className
         )}
         {...props}

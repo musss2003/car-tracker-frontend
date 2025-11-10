@@ -28,7 +28,7 @@ vi.stubGlobal(
   'fetch',
   vi.fn((url: string | URL | Request, options?: RequestInit) => {
     const urlString = typeof url === 'string' ? url : url.toString();
-    
+
     // Mock auth session check to always return authenticated immediately
     if (urlString.includes('/api/auth/session-check')) {
       return Promise.resolve({

@@ -127,14 +127,14 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
 
     const allCars = currentCar
       ? [currentCar, ...(cars || []).filter((car) => car.id !== currentCar.id)]
-      : (cars || []);
+      : cars || [];
 
     const selectedCar = allCars.find((car) => car.id === value);
 
     if (selectedCar) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      
+
       // Only calculate if end date is not before start date
       if (end >= start) {
         // For same-day rentals, count as 1 day minimum
@@ -151,7 +151,7 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
 
   const allCars = currentCar
     ? [currentCar, ...(cars || []).filter((car) => car.id !== currentCar.id)]
-    : (cars || []);
+    : cars || [];
 
   const selectedCar = allCars.find((car) => car.id === value);
 
@@ -164,7 +164,9 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
         : undefined;
 
   return (
-    <div className={cn('bg-background border rounded-lg p-6 space-y-4', className)}>
+    <div
+      className={cn('bg-background border rounded-lg p-6 space-y-4', className)}
+    >
       <FormField
         label="Vehicle"
         id="carId"
@@ -228,7 +230,9 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
         new Date(endDate) >= new Date(startDate) && (
           <div className="p-4 bg-muted rounded-lg space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Dnevna cijena:</span>
+              <span className="text-sm text-muted-foreground">
+                Dnevna cijena:
+              </span>
               <span className="font-medium">
                 {formatCurrency(selectedCar.pricePerDay)}
               </span>

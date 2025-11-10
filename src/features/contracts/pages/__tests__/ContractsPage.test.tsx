@@ -77,15 +77,16 @@ describe('ContractsPage', () => {
     // correctly in production, but in tests the auth loading screen interferes.
     // This is a known limitation of the current test setup.
     vi.mocked(contractService.getContracts).mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve(mockContracts), 100))
+      () =>
+        new Promise((resolve) => setTimeout(() => resolve(mockContracts), 100))
     );
 
     renderWithProviders(<ContractsPage />);
-    
+
     // Check for skeleton loaders immediately after render
     const skeletons = screen.getAllByTestId('skeleton');
     expect(skeletons.length).toBeGreaterThan(0);
-    
+
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -144,9 +145,7 @@ describe('ContractsPage', () => {
     renderWithProviders(<ContractsPage />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/failed to load contracts/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/failed to load contracts/i)).toBeInTheDocument();
     });
   });
 
@@ -185,18 +184,26 @@ describe('ContractsPage', () => {
         id: '1',
         startDate: yesterday,
         endDate: nextWeek,
-        customer: { ...mockContracts[0].customer, name: 'Active Contract' } as any,
+        customer: {
+          ...mockContracts[0].customer,
+          name: 'Active Contract',
+        } as any,
       },
       {
         ...mockContracts[1],
         id: '2',
         startDate: tomorrow,
         endDate: nextWeek,
-        customer: { ...mockContracts[1].customer, name: 'Confirmed Contract' } as any,
+        customer: {
+          ...mockContracts[1].customer,
+          name: 'Confirmed Contract',
+        } as any,
       },
     ];
 
-    vi.mocked(contractService.getContracts).mockResolvedValue(testContracts as any);
+    vi.mocked(contractService.getContracts).mockResolvedValue(
+      testContracts as any
+    );
 
     renderWithProviders(<ContractsPage />);
 
@@ -305,7 +312,9 @@ describe('ContractsPage', () => {
     await waitFor(() => {
       // Check that deleteContract was called (the actual ID depends on table sort order)
       expect(contractService.deleteContract).toHaveBeenCalledTimes(1);
-      expect(contractService.deleteContract).toHaveBeenCalledWith(expect.any(String));
+      expect(contractService.deleteContract).toHaveBeenCalledWith(
+        expect.any(String)
+      );
     });
   });
 

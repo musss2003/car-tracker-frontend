@@ -336,7 +336,12 @@ export default function EditContractPage() {
             </Button>
             <Button
               type="submit"
-              disabled={submitting || !isUpdated || hasDateConflict || hasInvalidDateRange}
+              disabled={
+                submitting ||
+                !isUpdated ||
+                hasDateConflict ||
+                hasInvalidDateRange
+              }
               form="edit-contract-form"
             >
               {submitting ? (
@@ -405,16 +410,21 @@ export default function EditContractPage() {
                   }
                 }}
               />
-              
+
               {/* Invalid Date Range Warning */}
-              {hasInvalidDateRange && formData.startDate && formData.endDate && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Datum završetka ne može biti prije datuma početka. Molimo odaberite ispravne datume kako biste mogli sačuvati promjene. (Napomena: Iznajmljivanje u trajanju jednog dana je dozvoljeno)
-                  </AlertDescription>
-                </Alert>
-              )}
+              {hasInvalidDateRange &&
+                formData.startDate &&
+                formData.endDate && (
+                  <Alert variant="destructive" className="mt-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Datum završetka ne može biti prije datuma početka. Molimo
+                      odaberite ispravne datume kako biste mogli sačuvati
+                      promjene. (Napomena: Iznajmljivanje u trajanju jednog dana
+                      je dozvoljeno)
+                    </AlertDescription>
+                  </Alert>
+                )}
             </div>
 
             <div className="w-full">
@@ -439,10 +449,7 @@ export default function EditContractPage() {
                   title="Dodatne informacije"
                   icon={<FileText className="w-5 h-5" />}
                 >
-                  <FormField
-                    label="Dodatne napomene"
-                    id="additionalNotes"
-                  >
+                  <FormField label="Dodatne napomene" id="additionalNotes">
                     <Textarea
                       id="additionalNotes"
                       placeholder="Unesite dodatne napomene..."
