@@ -5,7 +5,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Separator } from '@/shared/components/ui/separator';
 import { Shield, Key, Loader2, Eye, EyeOff } from 'lucide-react';
-import { User } from '../../types/user.types';
+import { User } from '../types/user.types';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 

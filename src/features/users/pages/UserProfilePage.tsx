@@ -6,10 +6,11 @@ import { User, Settings, Shield, Bell } from 'lucide-react';
 import { getUser } from '../services/userService';
 import { User as UserType } from '../types/user.types';
 import { toast } from 'react-toastify';
-import PersonalInfoTab from '../components/UserProfile/PersonalInfoTab';
-import SecurityTab from '../components/UserProfile/SecurityTab';
-import SettingsTab from '../components/UserProfile/SettingsTab';
-import NotificationsTab from '../components/UserProfile/NotificationsTab';
+import PersonalInfoTab from '../components/PersonalInfoTab';
+import SecurityTab from '../components/SecurityTab';
+import SettingsTab from '../components/SettingsTab';
+import NotificationsTab from '../components/NotificationsTab';
+
 
 const UserProfilePage = () => {
   const { user: authUser } = useAuth();

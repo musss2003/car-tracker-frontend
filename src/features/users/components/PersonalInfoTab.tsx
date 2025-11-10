@@ -7,8 +7,8 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Separator } from '@/shared/components/ui/separator';
 import { Camera, Loader2, Save } from 'lucide-react';
-import { User } from '../../types/user.types';
-import { updateUser, uploadProfilePhoto } from '../../services/userService';
+import { User } from '../types/user.types';
+import { updateUser, uploadProfilePhoto } from '../services/userService';
 import { toast } from 'react-toastify';
 
 interface PersonalInfoTabProps {

@@ -3,7 +3,7 @@ import { Label } from '@/shared/components/ui/label';
 import { Switch } from '@/shared/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Settings as SettingsIcon } from 'lucide-react';
-import { User } from '../../types/user.types';
+import { User } from '../types/user.types';
 import { useState, useEffect } from 'react';
 
 interface SettingsTabProps {
