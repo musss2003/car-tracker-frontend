@@ -101,30 +101,30 @@ const ContractDetailsPage = () => {
       setPhoto: React.Dispatch<React.SetStateAction<string | null>>,
       setLoadingPhoto: React.Dispatch<React.SetStateAction<boolean>>
     ) => {
-    try {
-      setLoadingPhoto(true);
+      try {
+        setLoadingPhoto(true);
 
-      // Check if it's a placeholder/invalid URL
-      if (
-        !photoUrl ||
-        photoUrl.startsWith('http://example.com') ||
-        photoUrl.startsWith('https://example.com')
-      ) {
+        // Check if it's a placeholder/invalid URL
+        if (
+          !photoUrl ||
+          photoUrl.startsWith('http://example.com') ||
+          photoUrl.startsWith('https://example.com')
+        ) {
+          setPhoto(null);
+          setLoadingPhoto(false);
+          return;
+        }
+
+        const photoBlob = await downloadDocument(photoUrl);
+        const photoUrlObject = URL.createObjectURL(photoBlob);
+        setPhoto(photoUrlObject);
+      } catch (error) {
+        console.error('Error loading photo:', error);
+        toast.error('Učitavanje fotografije nije uspjelo');
         setPhoto(null);
+      } finally {
         setLoadingPhoto(false);
-        return;
       }
-
-      const photoBlob = await downloadDocument(photoUrl);
-      const photoUrlObject = URL.createObjectURL(photoBlob);
-      setPhoto(photoUrlObject);
-    } catch (error) {
-      console.error('Error loading photo:', error);
-      toast.error('Učitavanje fotografije nije uspjelo');
-      setPhoto(null);
-    } finally {
-      setLoadingPhoto(false);
-    }
     },
     []
   );
@@ -220,14 +220,11 @@ const ContractDetailsPage = () => {
     []
   );
 
-  const formatCurrency = useCallback(
-    (amount: number | null | undefined) => {
-      if (amount === undefined || amount === null || isNaN(Number(amount)))
-        return 'N/A';
-      return `${Number(amount).toFixed(2)} KM`;
-    },
-    []
-  );
+  const formatCurrency = useCallback((amount: number | null | undefined) => {
+    if (amount === undefined || amount === null || isNaN(Number(amount)))
+      return 'N/A';
+    return `${Number(amount).toFixed(2)} KM`;
+  }, []);
 
   const getValue = useCallback(
     (value: unknown, defaultValue: string = 'N/A') => {
