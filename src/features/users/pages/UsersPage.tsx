@@ -21,6 +21,7 @@ import { User } from '../types/user.types';
 import * as userService from '../services/userService';
 import { OnlineStatus } from '../components/OnlineStatus';
 import { getUsersWithStatus, UserWithStatus } from '../services/activityService';
+import { socketService } from '@/shared/services/socketService';
 
 const UsersPage = () => {
   const navigate = useNavigate();
@@ -36,13 +37,23 @@ const UsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
-    
-    // Refresh user status every 30 seconds
-    const interval = setInterval(() => {
-      fetchUsers();
-    }, 30 * 1000);
 
-    return () => clearInterval(interval);
+    // Listen for real-time user status changes via WebSocket
+    socketService.onUserStatusChange((data) => {
+      console.log('User status changed:', data);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === data.userId
+            ? { ...user, isOnline: data.isOnline, lastActiveAt: new Date().toISOString() }
+            : user
+        )
+      );
+    });
+
+    // Cleanup
+    return () => {
+      socketService.offUserStatusChange();
+    };
   }, []);
 
   const fetchUsers = async () => {

@@ -12,7 +12,7 @@ export interface UserWithStatus {
   isOnline: boolean;
 }
 
-// Send heartbeat to update user activity
+// Send heartbeat to update user activity (fallback for non-WebSocket clients)
 export const sendHeartbeat = async (): Promise<void> => {
   try {
     await apiClient.post('/api/activity/heartbeat');
@@ -22,7 +22,7 @@ export const sendHeartbeat = async (): Promise<void> => {
   }
 };
 
-// Get all users with their online status
+// Get all users with their online status (uses real-time WebSocket data)
 export const getUsersWithStatus = async (): Promise<UserWithStatus[]> => {
   try {
     const response = await apiClient.get<{ success: boolean; users: UserWithStatus[] }>('/api/activity/users-status');
@@ -30,5 +30,16 @@ export const getUsersWithStatus = async (): Promise<UserWithStatus[]> => {
   } catch (error) {
     console.error('Error fetching users with status:', error);
     throw error;
+  }
+};
+
+// Get list of currently online user IDs
+export const getOnlineUsers = async (): Promise<string[]> => {
+  try {
+    const response = await apiClient.get<{ success: boolean; onlineUsers: string[] }>('/api/activity/online');
+    return response.data.onlineUsers || [];
+  } catch (error) {
+    console.error('Error fetching online users:', error);
+    return [];
   }
 };
