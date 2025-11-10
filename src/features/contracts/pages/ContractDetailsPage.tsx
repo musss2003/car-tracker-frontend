@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -69,17 +69,19 @@ const ContractDetailsPage = () => {
     title: string;
   } | null>(null);
 
-  // Open modal with photo
-  const openPhotoModal = (src: string, title: string) => {
+  // Open modal with photo - memoized to prevent recreation
+  const openPhotoModal = useCallback((src: string, title: string) => {
     setModalPhoto({ src, title });
     setModalOpen(true);
-  };
+  }, []);
 
-  // Close modal
-  const closePhotoModal = () => {
+  // Close modal with proper cleanup - memoized
+  const closePhotoModal = useCallback(() => {
     setModalOpen(false);
-    setTimeout(() => setModalPhoto(null), 300);
-  };
+    const timer = setTimeout(() => setModalPhoto(null), 300);
+    // Store timer for potential cleanup
+    return () => clearTimeout(timer);
+  }, []);
 
   // Close modal on Escape key
   useEffect(() => {
@@ -92,12 +94,13 @@ const ContractDetailsPage = () => {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [modalOpen]);
 
-  // Load photos
-  const loadPhoto = async (
-    photoUrl: string,
-    setPhoto: React.Dispatch<React.SetStateAction<string | null>>,
-    setLoadingPhoto: React.Dispatch<React.SetStateAction<boolean>>
-  ) => {
+  // Load photos - memoized to prevent recreation
+  const loadPhoto = useCallback(
+    async (
+      photoUrl: string,
+      setPhoto: React.Dispatch<React.SetStateAction<string | null>>,
+      setLoadingPhoto: React.Dispatch<React.SetStateAction<boolean>>
+    ) => {
     try {
       setLoadingPhoto(true);
 
@@ -117,11 +120,14 @@ const ContractDetailsPage = () => {
       setPhoto(photoUrlObject);
     } catch (error) {
       console.error('Error loading photo:', error);
+      toast.error('Učitavanje fotografije nije uspjelo');
       setPhoto(null);
     } finally {
       setLoadingPhoto(false);
     }
-  };
+    },
+    []
+  );
 
   useEffect(() => {
     const fetchContract = async () => {
@@ -194,41 +200,52 @@ const ContractDetailsPage = () => {
   }, [drivingLicensePhoto, passportPhoto, contractPhoto]);
 
   // Helper functions
-  const formatDate = (dateInput: string | Date | null | undefined): string => {
-    if (!dateInput) return 'N/A';
-    try {
-      const date =
-        typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-      if (isNaN(date.getTime())) return 'N/A';
-      return date.toLocaleDateString('bs-BA', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch (error) {
-      return 'N/A';
-    }
-  };
+  // Memoized helper functions
+  const formatDate = useCallback(
+    (dateInput: string | Date | null | undefined): string => {
+      if (!dateInput) return 'N/A';
+      try {
+        const date =
+          typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+        if (isNaN(date.getTime())) return 'N/A';
+        return date.toLocaleDateString('bs-BA', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      } catch (error) {
+        return 'N/A';
+      }
+    },
+    []
+  );
 
-  const formatCurrency = (amount: number | null | undefined) => {
-    if (amount === undefined || amount === null || isNaN(Number(amount)))
-      return 'N/A';
-    return `${Number(amount).toFixed(2)} KM`;
-  };
+  const formatCurrency = useCallback(
+    (amount: number | null | undefined) => {
+      if (amount === undefined || amount === null || isNaN(Number(amount)))
+        return 'N/A';
+      return `${Number(amount).toFixed(2)} KM`;
+    },
+    []
+  );
 
-  const getValue = (value: unknown, defaultValue: string = 'N/A') => {
-    if (
-      value === undefined ||
-      value === null ||
-      value === '' ||
-      (typeof value === 'object' && Object.keys(value).length === 0)
-    ) {
-      return defaultValue;
-    }
-    return String(value);
-  };
+  const getValue = useCallback(
+    (value: unknown, defaultValue: string = 'N/A') => {
+      if (
+        value === undefined ||
+        value === null ||
+        value === '' ||
+        (typeof value === 'object' && Object.keys(value).length === 0)
+      ) {
+        return defaultValue;
+      }
+      return String(value);
+    },
+    []
+  );
 
-  const getContractStatus = () => {
+  // Memoize contract status to avoid recalculation on every render
+  const contractStatus = useMemo(() => {
     if (!contract?.startDate || !contract?.endDate) {
       return {
         status: 'Nepoznato',
@@ -260,10 +277,10 @@ const ContractDetailsPage = () => {
         icon: <CheckCircleIcon className="w-4 h-4" />,
       };
     }
-  };
+  }, [contract?.startDate, contract?.endDate]);
 
-  // Handle delete
-  const handleDelete = async () => {
+  // Handle delete - memoized to prevent recreation
+  const handleDelete = useCallback(async () => {
     if (!contract) return;
 
     try {
@@ -278,7 +295,7 @@ const ContractDetailsPage = () => {
       setDeleting(false);
       setShowDeleteDialog(false);
     }
-  };
+  }, [contract, navigate]);
 
   if (loading) {
     return <LoadingSpinner />;
@@ -305,7 +322,7 @@ const ContractDetailsPage = () => {
     );
   }
 
-  const { status, className, icon } = getContractStatus();
+  const { status, className, icon } = contractStatus;
 
   return (
     <div className="h-full w-full flex flex-col bg-gradient-to-br from-background via-background to-muted/20">

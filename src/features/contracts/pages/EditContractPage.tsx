@@ -54,11 +54,25 @@ export default function EditContractPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [currentCar, setCurrentCar] = useState<Car | null>(null);
   const [isUpdated, setIsUpdated] = useState(false);
-  const [carBookings, setCarBookings] = useState<any[]>([]);
+  const [carBookings, setCarBookings] = useState<
+    Array<{
+      start: string;
+      end: string;
+      contractId?: string;
+    }>
+  >([]);
   const [hasDateConflict, setHasDateConflict] = useState(false);
   const [hasInvalidDateRange, setHasInvalidDateRange] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Auto-dismiss toast with cleanup
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => setShowToast(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
 
   // Use the custom hook
   const {
@@ -133,7 +147,19 @@ export default function EditContractPage() {
         const car = await getCar(formData.carId);
         if (car?.licensePlate) {
           const bookings = await getCarAvailability(car.licensePlate);
-          setCarBookings(bookings);
+          // Convert BookingEvent to our local type
+          const convertedBookings = bookings.map((booking) => ({
+            start:
+              booking.start instanceof Date
+                ? booking.start.toISOString()
+                : booking.start,
+            end:
+              booking.end instanceof Date
+                ? booking.end.toISOString()
+                : booking.end,
+            contractId: booking.contractId,
+          }));
+          setCarBookings(convertedBookings);
         }
       } catch (error) {
         console.error('Error fetching car bookings:', error);
@@ -239,7 +265,6 @@ export default function EditContractPage() {
         'Ne možete sačuvati promjene - odabrani datumi se preklapaju sa postojećim rezervacijama za ovaj automobil'
       );
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 5000);
       newErrors.dates =
         'Odabrani datumi se sukobljavaju sa postojećim rezervacijama';
     }

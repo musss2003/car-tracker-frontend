@@ -104,11 +104,13 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
           startDate,
           endDate
         );
-        setCars(availableCars);
-        onCarsLoaded?.(availableCars);
+        setCars(availableCars || []);
+        onCarsLoaded?.(availableCars || []);
       } catch (err) {
         console.error('Error fetching available cars:', err);
-        setFetchError('Failed to load available cars');
+        setFetchError(
+          'Učitavanje automobila nije uspjelo. Molimo pokušajte ponovo.'
+        );
         setCars([]);
         onCarsLoaded?.([]);
       } finally {
@@ -156,11 +158,11 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
   const selectedCar = allCars.find((car) => car.id === value);
 
   const helperText = loading
-    ? 'Loading available cars...'
+    ? 'Učitavanje dostupnih automobila...'
     : !startDate || !endDate
-      ? 'Please select dates first'
+      ? 'Prvo odaberite datume'
       : (cars || []).length === 0 && !loading
-        ? 'No cars available for selected dates'
+        ? 'Nema dostupnih automobila za odabrane datume'
         : undefined;
 
   return (
@@ -168,7 +170,7 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
       className={cn('bg-background border rounded-lg p-6 space-y-4', className)}
     >
       <FormField
-        label="Vehicle"
+        label="Automobil"
         id="carId"
         error={error}
         required={required}
@@ -182,7 +184,7 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
           >
             <SelectTrigger id="carId" className={cn(loading && 'cursor-wait')}>
               <SelectValue
-                placeholder={loading ? 'Loading...' : 'Select a vehicle'}
+                placeholder={loading ? 'Učitavanje...' : 'Odaberite automobil'}
               />
             </SelectTrigger>
             <SelectContent>
@@ -217,7 +219,9 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
       {fetchError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{fetchError}</AlertDescription>
+          <AlertDescription>
+            Učitavanje automobila nije uspjelo. Molimo pokušajte ponovo.
+          </AlertDescription>
         </Alert>
       )}
 
@@ -248,7 +252,16 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
                       (1000 * 60 * 60 * 24)
                   )
                 )}{' '}
-                day(s)
+                {Math.max(
+                  1,
+                  Math.ceil(
+                    (new Date(endDate).getTime() -
+                      new Date(startDate).getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )
+                ) === 1
+                  ? 'dan'
+                  : 'dana'}
               </span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border">

@@ -48,6 +48,7 @@ const CreateContractPage = ({}) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [hasInvalidDateRange, setHasInvalidDateRange] = useState(false);
 
   // Use the custom hooks
   const {
@@ -64,11 +65,23 @@ const CreateContractPage = ({}) => {
         setCustomers(data);
       } catch (error) {
         console.error('Error fetching customers:', error);
+        toast.error('Učitavanje kupaca nije uspjelo');
       }
     };
 
     fetchCustomers();
-  }, [formData.startDate, formData.endDate, formData.carId]);
+  }, []); // Remove unnecessary dependencies
+
+  // Validate date range (start date must not be after end date, but can be same day)
+  useEffect(() => {
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
+      setHasInvalidDateRange(end < start);
+    } else {
+      setHasInvalidDateRange(false);
+    }
+  }, [formData.startDate, formData.endDate]);
 
   const handleChange = (field: keyof ContractFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -81,22 +94,6 @@ const CreateContractPage = ({}) => {
   };
 
   const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
-    const newFormData = { ...formData, [field]: value };
-
-    // Validate dates
-    if (newFormData.startDate && newFormData.endDate) {
-      const start = new Date(newFormData.startDate);
-      const end = new Date(newFormData.endDate);
-
-      if (end < start) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: 'Datum završetka mora biti nakon datuma početka',
-        }));
-        return;
-      }
-    }
-
     handleChange(field, value);
   };
 
@@ -241,7 +238,12 @@ const CreateContractPage = ({}) => {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.customerId || !formData.carId}
+              disabled={
+                isSubmitting ||
+                !formData.customerId ||
+                !formData.carId ||
+                hasInvalidDateRange
+              }
               form="contract-form"
             >
               {isSubmitting ? (

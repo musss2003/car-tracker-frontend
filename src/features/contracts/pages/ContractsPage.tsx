@@ -161,18 +161,33 @@ const ContractsPage = () => {
           const [obj, prop] = sortConfig.key.split('.');
 
           if (obj === 'customer' && a.customer && b.customer) {
-            aValue = (a.customer as any)[prop] ?? '';
-            bValue = (b.customer as any)[prop] ?? '';
+            aValue = a.customer[prop as keyof typeof a.customer] ?? '';
+            bValue = b.customer[prop as keyof typeof b.customer] ?? '';
           } else if (obj === 'car' && a.car && b.car) {
-            aValue = (a.car as any)[prop] ?? '';
-            bValue = (b.car as any)[prop] ?? '';
+            aValue = a.car[prop as keyof typeof a.car] ?? '';
+            bValue = b.car[prop as keyof typeof b.car] ?? '';
           } else if (prop === 'startDate' || prop === 'endDate') {
-            aValue = new Date((a as any)[prop]);
-            bValue = new Date((b as any)[prop]);
+            const aDate = a[prop];
+            const bDate = b[prop];
+            aValue = new Date(aDate instanceof Date ? aDate : aDate || '');
+            bValue = new Date(bDate instanceof Date ? bDate : bDate || '');
           }
         } else {
-          aValue = (a as any)[sortConfig.key] ?? '';
-          bValue = (b as any)[sortConfig.key] ?? '';
+          const key = sortConfig.key as keyof Contract;
+          const aVal = a[key];
+          const bVal = b[key];
+          aValue =
+            typeof aVal === 'string' ||
+            typeof aVal === 'number' ||
+            aVal instanceof Date
+              ? aVal
+              : '';
+          bValue =
+            typeof bVal === 'string' ||
+            typeof bVal === 'number' ||
+            bVal instanceof Date
+              ? bVal
+              : '';
         }
 
         if (typeof aValue === 'string' && typeof bValue === 'string') {
@@ -219,15 +234,15 @@ const ContractsPage = () => {
       if (contract.id) {
         await deleteContract(contract.id);
         await fetchContracts();
-        toast.success('Contract deleted successfully');
+        toast.success('Ugovor uspješno obrisan');
         setShowDeleteDialog(false);
         setContractToDelete(null);
       } else {
-        toast.error('No contract selected or contract ID is missing.');
+        toast.error('ID ugovora nije pronađen.');
       }
     } catch (error) {
       console.error('Error deleting contract:', error);
-      toast.error('Failed to delete contract');
+      toast.error('Brisanje ugovora nije uspjelo');
     } finally {
       setLoading(false);
     }
@@ -262,13 +277,13 @@ const ContractsPage = () => {
     try {
       if (contract.id) {
         await downloadContract(contract.id);
-        toast.success('Contract download initiated');
+        toast.success('Preuzimanje ugovora započeto');
       } else {
-        toast.error('No contract selected or contract ID is missing.');
+        toast.error('ID ugovora nije pronađen.');
       }
     } catch (error) {
       console.error('Error downloading contract:', error);
-      toast.error('Failed to download contract');
+      toast.error('Preuzimanje ugovora nije uspjelo');
     }
   };
 
@@ -316,11 +331,11 @@ const ContractsPage = () => {
         headStyles: { fillColor: [66, 135, 245] },
       });
 
-      doc.save('contracts.pdf');
-      toast.success('PDF exported successfully');
+      doc.save('ugovori.pdf');
+      toast.success('PDF uspješno izvezen');
     } catch (error) {
       console.error('Error exporting to PDF:', error);
-      toast.error('Failed to export PDF');
+      toast.error('Izvoz PDF-a nije uspio');
     }
   };
 
@@ -351,39 +366,42 @@ const ContractsPage = () => {
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Contracts');
-      XLSX.writeFile(workbook, 'contracts.xlsx');
-      toast.success('Excel exported successfully');
+      XLSX.writeFile(workbook, 'ugovori.xlsx');
+      toast.success('Excel uspješno izvezen');
     } catch (error) {
       console.error('Error exporting to Excel:', error);
-      toast.error('Failed to export Excel');
+      toast.error('Izvoz Excel-a nije uspio');
     }
   };
 
-  // Helper function to determine contract status
-  const getContractStatus = (contract: Contract) => {
-    const now = new Date();
-    const startDate = new Date(contract.startDate);
-    const endDate = new Date(contract.endDate);
+  // Helper function to determine contract status - memoized to avoid recalculation
+  const getContractStatus = useMemo(
+    () => (contract: Contract) => {
+      const now = new Date();
+      const startDate = new Date(contract.startDate);
+      const endDate = new Date(contract.endDate);
 
-    if (now < startDate)
-      return {
-        status: 'confirmed',
-        label: 'Potvrđen',
-        variant: 'secondary' as const,
-      };
-    else if (now >= startDate && now <= endDate)
-      return {
-        status: 'active',
-        label: 'Aktivan',
-        variant: 'default' as const,
-      };
-    else
-      return {
-        status: 'completed',
-        label: 'Završen',
-        variant: 'outline' as const,
-      };
-  };
+      if (now < startDate)
+        return {
+          status: 'confirmed',
+          label: 'Potvrđen',
+          variant: 'secondary' as const,
+        };
+      else if (now >= startDate && now <= endDate)
+        return {
+          status: 'active',
+          label: 'Aktivan',
+          variant: 'default' as const,
+        };
+      else
+        return {
+          status: 'completed',
+          label: 'Završen',
+          variant: 'outline' as const,
+        };
+    },
+    []
+  );
 
   const renderTableHeader = (label: string, key: string) => {
     const isSorted = sortConfig.key === key;
