@@ -7,7 +7,7 @@ import { Separator } from '@/shared/components/ui/separator';
 import { Shield, Key, Loader2, Eye, EyeOff } from 'lucide-react';
 import { User } from '../types/user.types';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import { changePassword } from '../services/userService';
 
 interface SecurityTabProps {
   user: User;
@@ -75,17 +75,11 @@ const SecurityTab = ({ user }: SecurityTabProps) => {
 
     try {
       setIsSaving(true);
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
       
-      await axios.put(
-        `${API_BASE_URL}/api/users/${user.id}/password`,
-        {
-          currentPassword: passwords.currentPassword,
-          newPassword: passwords.newPassword,
-        },
-        {
-          withCredentials: true,
-        }
+      await changePassword(
+        user.id,
+        passwords.currentPassword,
+        passwords.newPassword
       );
 
       toast.success('Lozinka je uspješno promijenjena');
