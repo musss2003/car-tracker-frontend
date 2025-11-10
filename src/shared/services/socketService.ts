@@ -18,10 +18,12 @@ class SocketService {
     this.userId = userId;
     
     this.socket = io(SOCKET_URL, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
+      timeout: 20000, // Increase timeout for slow connections
+      withCredentials: true, // Enable cookies for HTTPS
     });
 
     this.socket.on('connect', () => {
