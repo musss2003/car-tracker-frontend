@@ -63,9 +63,7 @@ const AuditLogDetailsPage = lazy(
 );
 
 // Users Management Pages - Feature-based imports
-const UsersPage = lazy(
-  () => import('../../features/users/pages/UsersPage')
-);
+const UsersPage = lazy(() => import('../../features/users/pages/UsersPage'));
 const CreateUserPage = lazy(
   () => import('../../features/users/pages/CreateUserPage')
 );
@@ -135,7 +133,7 @@ export function AppRoutes() {
             <Route path="/profile" element={<UserProfile id={user.id} />} />
           )}
         </Route>
-        
+
         {/* Admin-only routes */}
         <Route element={<AdminRoute />}>
           <Route path="/audit-logs" element={<AuditLogsPage />} />

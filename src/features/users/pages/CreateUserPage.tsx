@@ -5,15 +5,27 @@ import { ArrowLeft, Save, Mail } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/shared/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select';
 import * as userService from '../services/userService';
 
 const CreateUserPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [sendCredentials, setSendCredentials] = useState(true);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -26,7 +38,12 @@ const CreateUserPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.username || !formData.email || !formData.password) {
+    if (
+      !formData.name ||
+      !formData.username ||
+      !formData.email ||
+      !formData.password
+    ) {
       toast.error('Molimo popunite sva obavezna polja');
       return;
     }
@@ -42,7 +59,7 @@ const CreateUserPage = () => {
         ...formData,
         sendCredentials,
       });
-      
+
       toast.success(
         sendCredentials
           ? 'Korisnik je kreiran i kredencijali su poslati na email'
@@ -57,7 +74,9 @@ const CreateUserPage = () => {
   };
 
   const generatePassword = () => {
-    const password = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-4).toUpperCase();
+    const password =
+      Math.random().toString(36).slice(-12) +
+      Math.random().toString(36).slice(-4).toUpperCase();
     setFormData({ ...formData, password });
   };
 
@@ -81,9 +100,7 @@ const CreateUserPage = () => {
         <Card>
           <CardHeader>
             <CardTitle>Informacije o korisniku</CardTitle>
-            <CardDescription>
-              Unesite podatke o novom korisniku
-            </CardDescription>
+            <CardDescription>Unesite podatke o novom korisniku</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Name */}
@@ -94,7 +111,9 @@ const CreateUserPage = () => {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Ime Prezime"
                 required
               />
@@ -108,7 +127,9 @@ const CreateUserPage = () => {
               <Input
                 id="username"
                 value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, username: e.target.value })
+                }
                 placeholder="korisnicko.ime"
                 required
               />
@@ -123,7 +144,9 @@ const CreateUserPage = () => {
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 placeholder="korisnik@example.com"
                 required
               />
@@ -139,11 +162,17 @@ const CreateUserPage = () => {
                   id="password"
                   type="text"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   placeholder="Unesite lozinku"
                   required
                 />
-                <Button type="button" variant="outline" onClick={generatePassword}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={generatePassword}
+                >
                   Generiši
                 </Button>
               </div>
@@ -157,7 +186,12 @@ const CreateUserPage = () => {
               <Label htmlFor="role">
                 Uloga <span className="text-red-500">*</span>
               </Label>
-              <Select value={formData.role} onValueChange={(value: 'admin' | 'employee' | 'user') => setFormData({ ...formData, role: value })}>
+              <Select
+                value={formData.role}
+                onValueChange={(value: 'admin' | 'employee' | 'user') =>
+                  setFormData({ ...formData, role: value })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Izaberite ulogu" />
                 </SelectTrigger>
@@ -168,9 +202,13 @@ const CreateUserPage = () => {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                <strong>Zaposleni:</strong> Interni korisnici sistema (preporučeno)<br/>
-                <strong>Administrator:</strong> Pun pristup svim funkcijama<br/>
-                <strong>Korisnik:</strong> Eksterni korisnici (za buduću upotrebu)
+                <strong>Zaposleni:</strong> Interni korisnici sistema
+                (preporučeno)
+                <br />
+                <strong>Administrator:</strong> Pun pristup svim funkcijama
+                <br />
+                <strong>Korisnik:</strong> Eksterni korisnici (za buduću
+                upotrebu)
               </p>
             </div>
 
@@ -180,7 +218,9 @@ const CreateUserPage = () => {
               <Input
                 id="citizenshipId"
                 value={formData.citizenshipId}
-                onChange={(e) => setFormData({ ...formData, citizenshipId: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, citizenshipId: e.target.value })
+                }
                 placeholder="1234567890123"
                 maxLength={13}
               />
@@ -195,7 +235,10 @@ const CreateUserPage = () => {
                 onChange={(e) => setSendCredentials(e.target.checked)}
                 className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary"
               />
-              <Label htmlFor="sendCredentials" className="flex items-center gap-2 cursor-pointer">
+              <Label
+                htmlFor="sendCredentials"
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <Mail className="w-4 h-4" />
                 Pošalji kredencijale na email
               </Label>
@@ -205,7 +248,12 @@ const CreateUserPage = () => {
 
         {/* Actions */}
         <div className="flex justify-end gap-3 mt-6">
-          <Button type="button" variant="outline" onClick={() => navigate('/users')} disabled={loading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate('/users')}
+            disabled={loading}
+          >
             Odustani
           </Button>
           <Button type="submit" disabled={loading}>

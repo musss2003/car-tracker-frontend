@@ -1,4 +1,8 @@
-import { AuditAction, AuditResource, AuditStatus } from '../types/auditLog.types';
+import {
+  AuditAction,
+  AuditResource,
+  AuditStatus,
+} from '../types/auditLog.types';
 
 /**
  * Get user-friendly label for audit action
@@ -40,16 +44,26 @@ export const getResourceLabel = (resource: AuditResource): string => {
  */
 export const getActionColor = (action: AuditAction): string => {
   const colors: Record<AuditAction, string> = {
-    [AuditAction.CREATE]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    [AuditAction.READ]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-    [AuditAction.UPDATE]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-    [AuditAction.DELETE]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-    [AuditAction.LOGIN]: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-    [AuditAction.LOGOUT]: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-    [AuditAction.LOGIN_FAILED]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-    [AuditAction.EXPORT]: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
-    [AuditAction.UPLOAD]: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200',
-    [AuditAction.DOWNLOAD]: 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200',
+    [AuditAction.CREATE]:
+      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    [AuditAction.READ]:
+      'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    [AuditAction.UPDATE]:
+      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    [AuditAction.DELETE]:
+      'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    [AuditAction.LOGIN]:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    [AuditAction.LOGOUT]:
+      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
+    [AuditAction.LOGIN_FAILED]:
+      'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    [AuditAction.EXPORT]:
+      'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+    [AuditAction.UPLOAD]:
+      'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200',
+    [AuditAction.DOWNLOAD]:
+      'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200',
   };
   return colors[action] || 'bg-gray-100 text-gray-800';
 };
@@ -94,7 +108,7 @@ export const getActionIcon = (action: AuditAction): string => {
  */
 export const formatDuration = (ms?: number): string => {
   if (!ms) return 'N/A';
-  
+
   if (ms < 1000) return `${ms}ms`;
   if (ms < 60000) return `${(ms / 1000).toFixed(2)}s`;
   return `${(ms / 60000).toFixed(2)}min`;
@@ -105,13 +119,13 @@ export const formatDuration = (ms?: number): string => {
  */
 export const formatIpAddress = (ip?: string): string => {
   if (!ip) return 'N/A';
-  
+
   // Hide last octet: 192.168.1.100 -> 192.168.1.xxx
   const parts = ip.split('.');
   if (parts.length === 4) {
     return `${parts[0]}.${parts[1]}.${parts[2]}.xxx`;
   }
-  
+
   return ip;
 };
 
@@ -120,14 +134,16 @@ export const formatIpAddress = (ip?: string): string => {
  */
 export const formatUserAgent = (userAgent?: string): string => {
   if (!userAgent) return 'N/A';
-  
+
   // Extract browser and OS
-  const browserMatch = userAgent.match(/(Chrome|Firefox|Safari|Edge|Opera)\/[\d.]+/);
+  const browserMatch = userAgent.match(
+    /(Chrome|Firefox|Safari|Edge|Opera)\/[\d.]+/
+  );
   const osMatch = userAgent.match(/(Windows|Mac OS|Linux|Android|iOS)[\s\w.]*/);
-  
+
   const browser = browserMatch ? browserMatch[0] : '';
   const os = osMatch ? osMatch[0] : '';
-  
+
   return `${browser} on ${os}` || userAgent.substring(0, 50) + '...';
 };
 
@@ -147,7 +163,7 @@ export const getRelativeTime = (date: string): string => {
   if (diffMinutes < 60) return `Prije ${diffMinutes} min`;
   if (diffHours < 24) return `Prije ${diffHours} sati`;
   if (diffDays < 7) return `Prije ${diffDays} dana`;
-  
+
   return new Date(date).toLocaleDateString('bs-BA', {
     year: 'numeric',
     month: 'long',

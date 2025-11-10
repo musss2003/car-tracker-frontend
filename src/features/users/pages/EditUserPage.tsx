@@ -5,8 +5,20 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/shared/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select';
 import * as userService from '../services/userService';
 import { User } from '../types/user.types';
 
@@ -16,7 +28,7 @@ const EditUserPage = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -67,7 +79,7 @@ const EditUserPage = () => {
     try {
       setLoading(true);
       await userService.updateUser(id, formData);
-      
+
       toast.success('Korisnik je uspješno ažuriran');
       navigate('/users');
     } catch (error: any) {
@@ -135,7 +147,9 @@ const EditUserPage = () => {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Ime Prezime"
                 required
               />
@@ -149,7 +163,9 @@ const EditUserPage = () => {
               <Input
                 id="username"
                 value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, username: e.target.value })
+                }
                 placeholder="korisnicko.ime"
                 required
               />
@@ -164,7 +180,9 @@ const EditUserPage = () => {
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 placeholder="korisnik@example.com"
                 required
               />
@@ -175,7 +193,12 @@ const EditUserPage = () => {
               <Label htmlFor="role">
                 Uloga <span className="text-red-500">*</span>
               </Label>
-              <Select value={formData.role} onValueChange={(value: 'admin' | 'employee' | 'user') => setFormData({ ...formData, role: value })}>
+              <Select
+                value={formData.role}
+                onValueChange={(value: 'admin' | 'employee' | 'user') =>
+                  setFormData({ ...formData, role: value })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Izaberite ulogu" />
                 </SelectTrigger>
@@ -186,9 +209,13 @@ const EditUserPage = () => {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                <strong>Zaposleni:</strong> Interni korisnici sistema (preporučeno)<br/>
-                <strong>Administrator:</strong> Pun pristup svim funkcijama<br/>
-                <strong>Korisnik:</strong> Eksterni korisnici (za buduću upotrebu)
+                <strong>Zaposleni:</strong> Interni korisnici sistema
+                (preporučeno)
+                <br />
+                <strong>Administrator:</strong> Pun pristup svim funkcijama
+                <br />
+                <strong>Korisnik:</strong> Eksterni korisnici (za buduću
+                upotrebu)
               </p>
             </div>
 
@@ -198,7 +225,9 @@ const EditUserPage = () => {
               <Input
                 id="citizenshipId"
                 value={formData.citizenshipId}
-                onChange={(e) => setFormData({ ...formData, citizenshipId: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, citizenshipId: e.target.value })
+                }
                 placeholder="1234567890123"
                 maxLength={13}
               />
@@ -207,8 +236,9 @@ const EditUserPage = () => {
             {/* Info about password */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800">
-                <strong>Napomena:</strong> Lozinka se ne mijenja prilikom uređivanja korisnika. 
-                Za resetovanje lozinke koristite opciju "Resetuj lozinku" na listi korisnika.
+                <strong>Napomena:</strong> Lozinka se ne mijenja prilikom
+                uređivanja korisnika. Za resetovanje lozinke koristite opciju
+                "Resetuj lozinku" na listi korisnika.
               </p>
             </div>
 
@@ -218,19 +248,29 @@ const EditUserPage = () => {
                 <div>
                   <span className="text-muted-foreground">Kreiran:</span>
                   <p className="font-medium">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleString('bs-BA') : 'N/A'}
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleString('bs-BA')
+                      : 'N/A'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Posljednja izmjena:</span>
+                  <span className="text-muted-foreground">
+                    Posljednja izmjena:
+                  </span>
                   <p className="font-medium">
-                    {user.updatedAt ? new Date(user.updatedAt).toLocaleString('bs-BA') : 'N/A'}
+                    {user.updatedAt
+                      ? new Date(user.updatedAt).toLocaleString('bs-BA')
+                      : 'N/A'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Posljednja prijava:</span>
+                  <span className="text-muted-foreground">
+                    Posljednja prijava:
+                  </span>
                   <p className="font-medium">
-                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString('bs-BA') : 'Nikada'}
+                    {user.lastLogin
+                      ? new Date(user.lastLogin).toLocaleString('bs-BA')
+                      : 'Nikada'}
                   </p>
                 </div>
               </div>
@@ -240,7 +280,12 @@ const EditUserPage = () => {
 
         {/* Actions */}
         <div className="flex justify-end gap-3 mt-6">
-          <Button type="button" variant="outline" onClick={() => navigate('/users')} disabled={loading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate('/users')}
+            disabled={loading}
+          >
             Odustani
           </Button>
           <Button type="submit" disabled={loading}>

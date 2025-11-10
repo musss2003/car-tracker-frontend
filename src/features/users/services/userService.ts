@@ -27,7 +27,9 @@ export interface UpdateUserData {
  * Get all users (admin only)
  */
 export const getUsers = async (): Promise<User[]> => {
-  const response = await apiClient.get<{ success: boolean; data: User[] }>(BASE_URL);
+  const response = await apiClient.get<{ success: boolean; data: User[] }>(
+    BASE_URL
+  );
   return response.data.data;
 };
 
@@ -36,7 +38,9 @@ export const getUsers = async (): Promise<User[]> => {
  * @alias getUserById - For compatibility with UserProfile component
  */
 export const getUser = async (id: string): Promise<User> => {
-  const response = await apiClient.get<{ success: boolean; data: User }>(`${BASE_URL}/${id}`);
+  const response = await apiClient.get<{ success: boolean; data: User }>(
+    `${BASE_URL}/${id}`
+  );
   return response.data.data;
 };
 
@@ -51,15 +55,24 @@ export const getUserById = async (id: string): Promise<User> => {
  * Create new user (admin only)
  */
 export const createUser = async (userData: CreateUserData): Promise<User> => {
-  const response = await apiClient.post<{ success: boolean; data: User }>(BASE_URL, userData);
+  const response = await apiClient.post<{ success: boolean; data: User }>(
+    BASE_URL,
+    userData
+  );
   return response.data.data;
 };
 
 /**
  * Update user (admin only)
  */
-export const updateUser = async (id: string, userData: UpdateUserData): Promise<User> => {
-  const response = await apiClient.put<{ success: boolean; data: User }>(`${BASE_URL}/${id}`, userData);
+export const updateUser = async (
+  id: string,
+  userData: UpdateUserData
+): Promise<User> => {
+  const response = await apiClient.put<{ success: boolean; data: User }>(
+    `${BASE_URL}/${id}`,
+    userData
+  );
   return response.data.data;
 };
 
@@ -73,8 +86,15 @@ export const deleteUser = async (id: string): Promise<void> => {
 /**
  * Reset user password (admin only)
  */
-export const resetUserPassword = async (id: string, newPassword: string, sendEmail: boolean = true): Promise<void> => {
-  await apiClient.post(`${BASE_URL}/${id}/reset-password`, { newPassword, sendEmail });
+export const resetUserPassword = async (
+  id: string,
+  newPassword: string,
+  sendEmail: boolean = true
+): Promise<void> => {
+  await apiClient.post(`${BASE_URL}/${id}/reset-password`, {
+    newPassword,
+    sendEmail,
+  });
 };
 
 /**

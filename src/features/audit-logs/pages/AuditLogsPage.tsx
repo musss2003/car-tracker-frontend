@@ -1,13 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {
-  Clock,
-  Filter,
-  Download,
-  Trash2,
-  Search,
-} from 'lucide-react';
+import { Clock, Filter, Download, Trash2, Search } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import {
@@ -26,7 +20,13 @@ import {
   TableRow,
 } from '@/shared/components/ui/table';
 import { Badge } from '@/shared/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import {
   AuditLog,
   AuditAction,
@@ -56,13 +56,13 @@ const AuditLogsPage = () => {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [cleaning, setCleaning] = useState(false);
-  
+
   // Pagination
   const [page, setPage] = useState(1);
   const [limit] = useState(50);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  
+
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [actionFilter, setActionFilter] = useState<AuditAction | ''>('');
@@ -107,7 +107,7 @@ const AuditLogsPage = () => {
     try {
       setExporting(true);
       const filters: AuditLogFilters = {};
-      
+
       if (actionFilter) filters.action = actionFilter as AuditAction;
       if (resourceFilter) filters.resource = resourceFilter as AuditResource;
       if (statusFilter) filters.status = statusFilter as AuditStatus;
@@ -126,7 +126,11 @@ const AuditLogsPage = () => {
 
   // Cleanup old logs
   const handleCleanup = async () => {
-    if (!confirm('Da li ste sigurni da želite obrisati logove starije od 90 dana?')) {
+    if (
+      !confirm(
+        'Da li ste sigurni da želite obrisati logove starije od 90 dana?'
+      )
+    ) {
       return;
     }
 
@@ -157,7 +161,7 @@ const AuditLogsPage = () => {
   // Filter logs by search term (client-side)
   const filteredLogs = logs.filter((log) => {
     if (!searchTerm) return true;
-    
+
     const term = searchTerm.toLowerCase();
     return (
       log.username?.toLowerCase().includes(term) ||
@@ -232,7 +236,12 @@ const AuditLogsPage = () => {
             </div>
 
             {/* Action Filter */}
-            <Select value={actionFilter || 'all'} onValueChange={(value) => setActionFilter(value === 'all' ? '' : value as AuditAction)}>
+            <Select
+              value={actionFilter || 'all'}
+              onValueChange={(value) =>
+                setActionFilter(value === 'all' ? '' : (value as AuditAction))
+              }
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Sve akcije" />
               </SelectTrigger>
@@ -247,7 +256,14 @@ const AuditLogsPage = () => {
             </Select>
 
             {/* Resource Filter */}
-            <Select value={resourceFilter || 'all'} onValueChange={(value) => setResourceFilter(value === 'all' ? '' : value as AuditResource)}>
+            <Select
+              value={resourceFilter || 'all'}
+              onValueChange={(value) =>
+                setResourceFilter(
+                  value === 'all' ? '' : (value as AuditResource)
+                )
+              }
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Svi resursi" />
               </SelectTrigger>
@@ -262,7 +278,12 @@ const AuditLogsPage = () => {
             </Select>
 
             {/* Status Filter */}
-            <Select value={statusFilter || 'all'} onValueChange={(value) => setStatusFilter(value === 'all' ? '' : value as AuditStatus)}>
+            <Select
+              value={statusFilter || 'all'}
+              onValueChange={(value) =>
+                setStatusFilter(value === 'all' ? '' : (value as AuditStatus))
+              }
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Svi statusi" />
               </SelectTrigger>
@@ -307,7 +328,9 @@ const AuditLogsPage = () => {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="mt-2 text-sm text-muted-foreground">Učitavanje logova...</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Učitavanje logova...
+              </p>
             </div>
           ) : filteredLogs.length === 0 ? (
             <div className="text-center py-12">
@@ -338,14 +361,20 @@ const AuditLogsPage = () => {
                         onClick={() => navigate(`/audit-logs/${log.id}`)}
                       >
                         <TableCell className="whitespace-nowrap">
-                          <div className="text-sm">{getRelativeTime(log.createdAt)}</div>
+                          <div className="text-sm">
+                            {getRelativeTime(log.createdAt)}
+                          </div>
                           <div className="text-xs text-muted-foreground">
                             {new Date(log.createdAt).toLocaleString('bs-BA')}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium">{log.username || 'N/A'}</div>
-                          <div className="text-xs text-muted-foreground">{log.userRole}</div>
+                          <div className="font-medium">
+                            {log.username || 'N/A'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {log.userRole}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge className={getActionColor(log.action)}>
@@ -353,9 +382,13 @@ const AuditLogsPage = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">{getResourceLabel(log.resource)}</Badge>
+                          <Badge variant="outline">
+                            {getResourceLabel(log.resource)}
+                          </Badge>
                         </TableCell>
-                        <TableCell className="max-w-md truncate">{log.description}</TableCell>
+                        <TableCell className="max-w-md truncate">
+                          {log.description}
+                        </TableCell>
                         <TableCell>
                           <Badge className={getStatusColor(log.status)}>
                             {getStatusLabel(log.status)}
@@ -376,7 +409,8 @@ const AuditLogsPage = () => {
               {/* Pagination */}
               <div className="flex items-center justify-between mt-4">
                 <div className="text-sm text-muted-foreground">
-                  Prikazujem {(page - 1) * limit + 1}-{Math.min(page * limit, total)} od {total}
+                  Prikazujem {(page - 1) * limit + 1}-
+                  {Math.min(page * limit, total)} od {total}
                 </div>
 
                 <div className="flex gap-2">

@@ -14,7 +14,7 @@ function App() {
   const { isLoggedIn, user } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const isSmallScreen = useScreenSize('(max-width: 768px)');
-  
+
   // Connect to WebSocket when logged in for real-time presence
   useEffect(() => {
     if (isLoggedIn() && user?.id) {

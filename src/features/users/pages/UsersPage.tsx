@@ -4,8 +4,21 @@ import { toast } from 'react-toastify';
 import { UserCog, Plus, Edit, Trash2, Key, Search } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/shared/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/components/ui/table';
 import { Badge } from '@/shared/components/ui/badge';
 import {
   AlertDialog,
@@ -20,7 +33,10 @@ import {
 import { User } from '../types/user.types';
 import * as userService from '../services/userService';
 import { OnlineStatus } from '../components/OnlineStatus';
-import { getUsersWithStatus, UserWithStatus } from '../services/activityService';
+import {
+  getUsersWithStatus,
+  UserWithStatus,
+} from '../services/activityService';
 import { socketService } from '@/shared/services/socketService';
 
 const UsersPage = () => {
@@ -29,11 +45,14 @@ const UsersPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  
+
   // AlertDialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<{ id: string; username: string } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    username: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -43,7 +62,11 @@ const UsersPage = () => {
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === data.userId
-            ? { ...user, isOnline: data.isOnline, lastActiveAt: new Date().toISOString() }
+            ? {
+                ...user,
+                isOnline: data.isOnline,
+                lastActiveAt: new Date().toISOString(),
+              }
             : user
         )
       );
@@ -124,7 +147,7 @@ const UsersPage = () => {
       user: 'bg-blue-100 text-blue-800 border-blue-200',
       employee: 'bg-green-100 text-green-800 border-green-200',
     };
-    
+
     const labels: Record<string, string> = {
       admin: 'Administrator',
       user: 'Korisnik',
@@ -176,9 +199,7 @@ const UsersPage = () => {
       <Card>
         <CardHeader>
           <CardTitle>Korisnici ({filteredUsers.length})</CardTitle>
-          <CardDescription>
-            Lista svih korisnika u sistemu
-          </CardDescription>
+          <CardDescription>Lista svih korisnika u sistemu</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -208,13 +229,15 @@ const UsersPage = () => {
                   {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
-                        <OnlineStatus 
-                          isOnline={user.isOnline} 
+                        <OnlineStatus
+                          isOnline={user.isOnline}
                           lastActiveAt={user.lastActiveAt}
                           showText
                         />
                       </TableCell>
-                      <TableCell className="font-medium">{user.name || 'N/A'}</TableCell>
+                      <TableCell className="font-medium">
+                        {user.name || 'N/A'}
+                      </TableCell>
                       <TableCell>{user.username}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
@@ -235,14 +258,18 @@ const UsersPage = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => openResetPasswordDialog(user.id, user.username)}
+                            onClick={() =>
+                              openResetPasswordDialog(user.id, user.username)
+                            }
                           >
                             <Key className="w-4 h-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => openDeleteDialog(user.id, user.username)}
+                            onClick={() =>
+                              openDeleteDialog(user.id, user.username)
+                            }
                             disabled={deletingId === user.id}
                             className="text-red-600 hover:text-red-700"
                           >
@@ -265,7 +292,8 @@ const UsersPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Brisanje korisnika</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li ste sigurni da želite obrisati korisnika <strong>{selectedUser?.username}</strong>?
+              Da li ste sigurni da želite obrisati korisnika{' '}
+              <strong>{selectedUser?.username}</strong>?
               <br />
               Ova akcija se ne može poništiti.
             </AlertDialogDescription>
@@ -285,12 +313,16 @@ const UsersPage = () => {
       </AlertDialog>
 
       {/* Reset Password Confirmation Dialog */}
-      <AlertDialog open={resetPasswordDialogOpen} onOpenChange={setResetPasswordDialogOpen}>
+      <AlertDialog
+        open={resetPasswordDialogOpen}
+        onOpenChange={setResetPasswordDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Resetovanje lozinke</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li ste sigurni da želite resetovati lozinku za korisnika <strong>{selectedUser?.username}</strong>?
+              Da li ste sigurni da želite resetovati lozinku za korisnika{' '}
+              <strong>{selectedUser?.username}</strong>?
               <br />
               Nova lozinka će biti generisana i poslata na email korisnika.
             </AlertDialogDescription>

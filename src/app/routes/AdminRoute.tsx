@@ -11,7 +11,9 @@ const AdminRoute = () => {
   }
 
   if (user.role !== 'admin') {
-    toast.error('Nemate pristup ovoj stranici. Samo administratori mogu pristupiti.');
+    toast.error(
+      'Nemate pristup ovoj stranici. Samo administratori mogu pristupiti.'
+    );
     return <Navigate to="/dashboard" />;
   }
 

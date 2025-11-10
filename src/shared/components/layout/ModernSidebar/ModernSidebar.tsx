@@ -127,7 +127,7 @@ const ModernSidebar: React.FC<SidebarProps> = ({
         },
       ],
     },
-  ].filter(group => !group.adminOnly || isAdmin);
+  ].filter((group) => !group.adminOnly || isAdmin);
 
   // Navigation link component
   const NavLink: React.FC<NavItem & { compact?: boolean }> = ({
@@ -259,7 +259,7 @@ const ModernSidebar: React.FC<SidebarProps> = ({
               )}
               <div className="space-y-1">
                 {group.items
-                  .filter(item => !item.adminOnly || isAdmin)
+                  .filter((item) => !item.adminOnly || isAdmin)
                   .map((item, idx) => (
                     <NavLink key={idx} {...item} compact={compact} />
                   ))}

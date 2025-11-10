@@ -15,7 +15,7 @@ class SocketService {
     }
 
     this.userId = userId;
-    
+
     this.socket = io(SOCKET_URL, {
       transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
       reconnection: true,
@@ -29,7 +29,7 @@ class SocketService {
       // Mark user as online
       if (this.userId) {
         this.socket?.emit('user:online', this.userId);
-        
+
         // Also join user's notification room (for backward compatibility)
         this.socket?.emit('join', this.userId);
       }
@@ -66,7 +66,9 @@ class SocketService {
   /**
    * Listen for user status changes (online/offline)
    */
-  onUserStatusChange(callback: (data: { userId: string; isOnline: boolean }) => void) {
+  onUserStatusChange(
+    callback: (data: { userId: string; isOnline: boolean }) => void
+  ) {
     if (!this.socket) {
       console.warn('Socket not connected');
       return;
