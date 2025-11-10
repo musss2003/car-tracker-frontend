@@ -1,4 +1,4 @@
-import { UserRole } from '../types/User';
+import { UserRole } from '@/features/users';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/auth/';
 
@@ -65,7 +65,6 @@ export const registerAPI = async (
   password: string
 ): Promise<RegisterResult> => {
   try {
-    console.log(API_URL + 'register');
     const response = await fetch(API_URL + 'register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

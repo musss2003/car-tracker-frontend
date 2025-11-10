@@ -48,6 +48,7 @@ const CreateContractPage = ({}) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [hasInvalidDateRange, setHasInvalidDateRange] = useState(false);
 
   // Use the custom hooks
   const {
@@ -64,11 +65,23 @@ const CreateContractPage = ({}) => {
         setCustomers(data);
       } catch (error) {
         console.error('Error fetching customers:', error);
+        toast.error('Učitavanje kupaca nije uspjelo');
       }
     };
 
     fetchCustomers();
-  }, [formData.startDate, formData.endDate, formData.carId]);
+  }, []); // Remove unnecessary dependencies
+
+  // Validate date range (start date must not be after end date, but can be same day)
+  useEffect(() => {
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
+      setHasInvalidDateRange(end < start);
+    } else {
+      setHasInvalidDateRange(false);
+    }
+  }, [formData.startDate, formData.endDate]);
 
   const handleChange = (field: keyof ContractFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -81,31 +94,23 @@ const CreateContractPage = ({}) => {
   };
 
   const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
-    const newFormData = { ...formData, [field]: value };
-
-    // Validate dates
-    if (newFormData.startDate && newFormData.endDate) {
-      const start = new Date(newFormData.startDate);
-      const end = new Date(newFormData.endDate);
-
-      if (end < start) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: 'End date must be after start date',
-        }));
-        return;
-      }
-    }
-
     handleChange(field, value);
   };
 
-  const handleCreateContract = async (newContractData: ContractFormData) => {
+  const handleCreateContract = async (
+    newContractData: ContractFormData
+  ): Promise<boolean> => {
     try {
-      await createAndDownloadContract(newContractData);
+      const contract = await createAndDownloadContract(newContractData);
+      if (!contract) {
+        toast.error('Neuspješno kreiranje ugovora');
+        return false;
+      }
+      return true;
     } catch (error) {
       console.error('Error creating contract:', error);
-      toast.error('Failed to create contract');
+      toast.error('Neuspješno kreiranje ugovora');
+      return false;
     }
   };
 
@@ -117,19 +122,19 @@ const CreateContractPage = ({}) => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.customerId) {
-      newErrors.customerId = 'Customer is required';
+      newErrors.customerId = 'Kupac je obavezan';
     }
 
     if (!formData.carId) {
-      newErrors.carId = 'Car is required';
+      newErrors.carId = 'Automobil je obavezan';
     }
 
     if (!formData.startDate) {
-      newErrors.startDate = 'Start date is required';
+      newErrors.startDate = 'Datum početka je obavezan';
     }
 
     if (!formData.endDate) {
-      newErrors.endDate = 'End date is required';
+      newErrors.endDate = 'Datum završetka je obavezan';
     }
 
     if (formData.startDate && formData.endDate) {
@@ -137,7 +142,7 @@ const CreateContractPage = ({}) => {
       const end = new Date(formData.endDate);
 
       if (end < start) {
-        newErrors.endDate = 'End date must be after start date';
+        newErrors.endDate = 'Datum završetka mora biti nakon datuma početka';
       }
     }
 
@@ -163,6 +168,7 @@ const CreateContractPage = ({}) => {
         const uploadedFilename = await uploadPhoto();
         if (!uploadedFilename) {
           // Photo upload failed, don't proceed
+          setIsSubmitting(false);
           return;
         }
         photoFilename = uploadedFilename;
@@ -186,16 +192,21 @@ const CreateContractPage = ({}) => {
         additionalNotes: formData.additionalNotes || '',
       };
 
-      await handleCreateContract(contractData);
+      const result = await handleCreateContract(contractData);
+
+      // Only navigate if contract was created successfully
+      if (result !== false) {
+        toast.success('Ugovor uspješno kreiran');
+        handleClose();
+      }
     } catch (error) {
       console.error('Error creating contract:', error);
       setErrors((prev) => ({
         ...prev,
-        submit: 'Failed to create contract. Please try again.',
+        submit: 'Kreiranje ugovora nije uspjelo. Molimo pokušajte ponovo.',
       }));
     } finally {
       setIsSubmitting(false);
-      handleClose();
     }
   };
 
@@ -211,8 +222,8 @@ const CreateContractPage = ({}) => {
   return (
     <div className="flex flex-col h-full">
       <PageHeader
-        title="Create Contract"
-        subtitle="Fill in the details to create a new rental contract"
+        title="Kreiraj ugovor"
+        subtitle="Popunite detalje kako biste kreirali novi ugovor o iznajmljivanju"
         onBack={handleClose}
         actions={
           <>
@@ -223,22 +234,27 @@ const CreateContractPage = ({}) => {
               disabled={isSubmitting}
             >
               <X className="w-4 h-4 mr-2" />
-              Cancel
+              Otkaži
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.customerId || !formData.carId}
+              disabled={
+                isSubmitting ||
+                !formData.customerId ||
+                !formData.carId ||
+                hasInvalidDateRange
+              }
               form="contract-form"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creating...
+                  Kreiranje...
                 </>
               ) : (
                 <>
                   <PlusCircle className="w-4 h-4 mr-2" />
-                  Create Contract
+                  Kreiraj ugovor
                 </>
               )}
             </Button>
@@ -248,87 +264,99 @@ const CreateContractPage = ({}) => {
 
       {/* Form Section */}
       <div className="flex-1 overflow-auto bg-muted/30">
-        <div className="mx-auto p-4">
+        <div className="w-full p-6">
           <form
             id="contract-form"
             onSubmit={handleSubmit}
             className="space-y-6"
           >
-            <FormSection
-              title="Customer Information"
-              icon={<User className="w-5 h-5" />}
-            >
-              <FormField
-                label="Customer"
-                id="customerId"
-                error={errors.customerId}
-                required
-              >
-                <CustomerSearchSelect
-                  value={formData.customerId}
-                  onChange={(value) => handleChange('customerId', value)}
-                  customers={customers}
-                  disabled={isSubmitting}
-                />
-              </FormField>
-            </FormSection>
-
-            <DateRangeValidator
-              startDate={formData.startDate}
-              endDate={formData.endDate}
-              onStartDateChange={(date) => handleDateChange('startDate', date)}
-              onEndDateChange={(date) => handleDateChange('endDate', date)}
-              startDateError={errors.startDate}
-              endDateError={errors.endDate}
-              disabled={isSubmitting}
-            />
-
-            <CarAvailabilitySelect
-              value={formData.carId}
-              onChange={(carId) => handleChange('carId', carId)}
-              startDate={formData.startDate}
-              endDate={formData.endDate}
-              error={errors.carId}
-              required
-              onPriceCalculated={(dailyRate, totalAmount) => {
-                setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
-              }}
-              showPricingSummary
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="w-full">
               <FormSection
-                title="Additional Information"
-                icon={<FileText className="w-5 h-5" />}
+                title="Informacije o kupcu"
+                icon={<User className="w-5 h-5" />}
               >
                 <FormField
-                  label="Additional Notes"
-                  id="additionalNotes"
-                  helperText="Any additional notes or special conditions"
+                  label="Kupac"
+                  id="customerId"
+                  error={errors.customerId}
+                  required
                 >
-                  <Textarea
-                    id="additionalNotes"
-                    placeholder="Enter any additional notes..."
-                    rows={12}
-                    value={formData.additionalNotes}
-                    onChange={(e) =>
-                      handleChange('additionalNotes', e.target.value)
-                    }
+                  <CustomerSearchSelect
+                    value={formData.customerId}
+                    onChange={(value) => handleChange('customerId', value)}
+                    customers={customers}
+                    disabled={isSubmitting}
                   />
                 </FormField>
               </FormSection>
+            </div>
 
-              <FormSection
-                title="Contract Photo"
-                icon={<Camera className="w-5 h-5" />}
-              >
-                <PhotoUpload
-                  value={photoFile}
-                  onChange={(file) => handlePhotoChange(file)}
-                  error={errors.photoUrl}
-                  disabled={isSubmitting}
-                />
-              </FormSection>
+            <div className="w-full">
+              <DateRangeValidator
+                startDate={formData.startDate}
+                endDate={formData.endDate}
+                onStartDateChange={(date) =>
+                  handleDateChange('startDate', date)
+                }
+                onEndDateChange={(date) => handleDateChange('endDate', date)}
+                startDateError={errors.startDate}
+                endDateError={errors.endDate}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="w-full">
+              <CarAvailabilitySelect
+                value={formData.carId}
+                onChange={(carId) => handleChange('carId', carId)}
+                startDate={formData.startDate}
+                endDate={formData.endDate}
+                error={errors.carId}
+                required
+                onPriceCalculated={(dailyRate, totalAmount) => {
+                  setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
+                }}
+                showPricingSummary
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+              <div className="w-full">
+                <FormSection
+                  title="Dodatne informacije"
+                  icon={<FileText className="w-5 h-5" />}
+                >
+                  <FormField
+                    label="Dodatne napomene"
+                    id="additionalNotes"
+                    helperText="Bilo kakve dodatne napomene ili posebni uslovi"
+                  >
+                    <Textarea
+                      id="additionalNotes"
+                      placeholder="Unesite dodatne napomene..."
+                      rows={12}
+                      value={formData.additionalNotes}
+                      onChange={(e) =>
+                        handleChange('additionalNotes', e.target.value)
+                      }
+                    />
+                  </FormField>
+                </FormSection>
+              </div>
+
+              <div className="w-full">
+                <FormSection
+                  title="Slika ugovora"
+                  icon={<Camera className="w-5 h-5" />}
+                >
+                  <PhotoUpload
+                    value={photoFile}
+                    onChange={(file) => handlePhotoChange(file)}
+                    error={errors.photoUrl}
+                    disabled={isSubmitting}
+                  />
+                </FormSection>
+              </div>
             </div>
 
             {/* Error Alert */}

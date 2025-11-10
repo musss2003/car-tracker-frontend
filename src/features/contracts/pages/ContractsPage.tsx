@@ -161,18 +161,33 @@ const ContractsPage = () => {
           const [obj, prop] = sortConfig.key.split('.');
 
           if (obj === 'customer' && a.customer && b.customer) {
-            aValue = (a.customer as any)[prop] ?? '';
-            bValue = (b.customer as any)[prop] ?? '';
+            aValue = a.customer[prop as keyof typeof a.customer] ?? '';
+            bValue = b.customer[prop as keyof typeof b.customer] ?? '';
           } else if (obj === 'car' && a.car && b.car) {
-            aValue = (a.car as any)[prop] ?? '';
-            bValue = (b.car as any)[prop] ?? '';
+            aValue = a.car[prop as keyof typeof a.car] ?? '';
+            bValue = b.car[prop as keyof typeof b.car] ?? '';
           } else if (prop === 'startDate' || prop === 'endDate') {
-            aValue = new Date((a as any)[prop]);
-            bValue = new Date((b as any)[prop]);
+            const aDate = a[prop];
+            const bDate = b[prop];
+            aValue = new Date(aDate instanceof Date ? aDate : aDate || '');
+            bValue = new Date(bDate instanceof Date ? bDate : bDate || '');
           }
         } else {
-          aValue = (a as any)[sortConfig.key] ?? '';
-          bValue = (b as any)[sortConfig.key] ?? '';
+          const key = sortConfig.key as keyof Contract;
+          const aVal = a[key];
+          const bVal = b[key];
+          aValue =
+            typeof aVal === 'string' ||
+            typeof aVal === 'number' ||
+            aVal instanceof Date
+              ? aVal
+              : '';
+          bValue =
+            typeof bVal === 'string' ||
+            typeof bVal === 'number' ||
+            bVal instanceof Date
+              ? bVal
+              : '';
         }
 
         if (typeof aValue === 'string' && typeof bValue === 'string') {
@@ -219,15 +234,15 @@ const ContractsPage = () => {
       if (contract.id) {
         await deleteContract(contract.id);
         await fetchContracts();
-        toast.success('Contract deleted successfully');
+        toast.success('Ugovor uspješno obrisan');
         setShowDeleteDialog(false);
         setContractToDelete(null);
       } else {
-        toast.error('No contract selected or contract ID is missing.');
+        toast.error('ID ugovora nije pronađen.');
       }
     } catch (error) {
       console.error('Error deleting contract:', error);
-      toast.error('Failed to delete contract');
+      toast.error('Brisanje ugovora nije uspjelo');
     } finally {
       setLoading(false);
     }
@@ -262,13 +277,13 @@ const ContractsPage = () => {
     try {
       if (contract.id) {
         await downloadContract(contract.id);
-        toast.success('Contract download initiated');
+        toast.success('Preuzimanje ugovora započeto');
       } else {
-        toast.error('No contract selected or contract ID is missing.');
+        toast.error('ID ugovora nije pronađen.');
       }
     } catch (error) {
       console.error('Error downloading contract:', error);
-      toast.error('Failed to download contract');
+      toast.error('Preuzimanje ugovora nije uspjelo');
     }
   };
 
@@ -316,11 +331,11 @@ const ContractsPage = () => {
         headStyles: { fillColor: [66, 135, 245] },
       });
 
-      doc.save('contracts.pdf');
-      toast.success('PDF exported successfully');
+      doc.save('ugovori.pdf');
+      toast.success('PDF uspješno izvezen');
     } catch (error) {
       console.error('Error exporting to PDF:', error);
-      toast.error('Failed to export PDF');
+      toast.error('Izvoz PDF-a nije uspio');
     }
   };
 
@@ -351,35 +366,42 @@ const ContractsPage = () => {
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Contracts');
-      XLSX.writeFile(workbook, 'contracts.xlsx');
-      toast.success('Excel exported successfully');
+      XLSX.writeFile(workbook, 'ugovori.xlsx');
+      toast.success('Excel uspješno izvezen');
     } catch (error) {
       console.error('Error exporting to Excel:', error);
-      toast.error('Failed to export Excel');
+      toast.error('Izvoz Excel-a nije uspio');
     }
   };
 
-  // Helper function to determine contract status
-  const getContractStatus = (contract: Contract) => {
-    const now = new Date();
-    const startDate = new Date(contract.startDate);
-    const endDate = new Date(contract.endDate);
+  // Helper function to determine contract status - memoized to avoid recalculation
+  const getContractStatus = useMemo(
+    () => (contract: Contract) => {
+      const now = new Date();
+      const startDate = new Date(contract.startDate);
+      const endDate = new Date(contract.endDate);
 
-    if (now < startDate)
-      return {
-        status: 'confirmed',
-        label: 'Confirmed',
-        variant: 'secondary' as const,
-      };
-    else if (now >= startDate && now <= endDate)
-      return { status: 'active', label: 'Active', variant: 'default' as const };
-    else
-      return {
-        status: 'completed',
-        label: 'Completed',
-        variant: 'outline' as const,
-      };
-  };
+      if (now < startDate)
+        return {
+          status: 'confirmed',
+          label: 'Potvrđen',
+          variant: 'secondary' as const,
+        };
+      else if (now >= startDate && now <= endDate)
+        return {
+          status: 'active',
+          label: 'Aktivan',
+          variant: 'default' as const,
+        };
+      else
+        return {
+          status: 'completed',
+          label: 'Završen',
+          variant: 'outline' as const,
+        };
+    },
+    []
+  );
 
   const renderTableHeader = (label: string, key: string) => {
     const isSorted = sortConfig.key === key;
@@ -440,28 +462,28 @@ const ContractsPage = () => {
         <div className="px-6 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h1 className="text-3xl font-bold tracking-tight">
-              Contracts Management
+              Upravljanje ugovorima
             </h1>
             <div className="flex gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
                     <DocumentDownloadIcon className="w-4 h-4 mr-2" />
-                    Export
+                    Izvoz
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="bg-background-100/80 dark:bg-background-100/80 backdrop-blur-sm rounded-md shadow-md">
                   <DropdownMenuItem onClick={exportToPDF}>
-                    Export as PDF
+                    Izvezi kao PDF
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={exportToExcel}>
-                    Export as Excel
+                    Izvezi kao Excel
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button onClick={handleCreate} disabled={loading}>
                 <PlusIcon className="w-4 h-4 mr-2" />
-                Create Contract
+                Kreiraj ugovor
               </Button>
             </div>
           </div>
@@ -473,7 +495,7 @@ const ContractsPage = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <Input
-              placeholder="Search by customer, passport, or car..."
+              placeholder="Pretraži po imenu kupca, broju pasoša ili vozilu..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full"
@@ -483,13 +505,13 @@ const ContractsPage = () => {
             <FilterIcon className="w-4 h-4 text-muted-foreground" />
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Filtriraj po statusu" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="all">Svi statusi</SelectItem>
+                <SelectItem value="confirmed">Potvrđeni</SelectItem>
+                <SelectItem value="active">Aktivni</SelectItem>
+                <SelectItem value="completed">Završeni</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -516,14 +538,110 @@ const ContractsPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {renderTableHeader('Customer', 'customer.name')}
-                    {renderTableHeader('Passport', 'customer.passportNumber')}
-                    {renderTableHeader('Car', 'car.model')}
-                    {renderTableHeader('License Plate', 'car.licensePlate')}
-                    {renderTableHeader('Start Date', 'startDate')}
-                    {renderTableHeader('End Date', 'endDate')}
-                    {renderTableHeader('Status', 'status')}
-                    <TableHead>Actions</TableHead>
+                    <TableHead
+                      className="hidden min-[1300px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('customer.name')}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>Kupac</span>
+                        {sortConfig.key === 'customer.name' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <ChevronUpIcon className="w-4 h-4" />
+                          ) : (
+                            <ChevronDownIcon className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ChevronUpIcon className="w-4 h-4 opacity-30" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="hidden min-[1050px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('customer.passportNumber')}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>Pasoš</span>
+                        {sortConfig.key === 'customer.passportNumber' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <ChevronUpIcon className="w-4 h-4" />
+                          ) : (
+                            <ChevronDownIcon className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ChevronUpIcon className="w-4 h-4 opacity-30" />
+                        )}
+                      </div>
+                    </TableHead>
+                    {renderTableHeader('Automobil', 'car.model')}
+                    <TableHead
+                      className="max-md:table-cell hidden min-[1400px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('car.licensePlate')}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>Registarska tablica</span>
+                        {sortConfig.key === 'car.licensePlate' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <ChevronUpIcon className="w-4 h-4" />
+                          ) : (
+                            <ChevronDownIcon className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ChevronUpIcon className="w-4 h-4 opacity-30" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort('startDate')}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>Datum početka</span>
+                        {sortConfig.key === 'startDate' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <ChevronUpIcon className="w-4 h-4" />
+                          ) : (
+                            <ChevronDownIcon className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ChevronUpIcon className="w-4 h-4 opacity-30" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="hidden min-[900px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('endDate')}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>Datum završetka</span>
+                        {sortConfig.key === 'endDate' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <ChevronUpIcon className="w-4 h-4" />
+                          ) : (
+                            <ChevronDownIcon className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ChevronUpIcon className="w-4 h-4 opacity-30" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="hidden min-[1150px]:table-cell cursor-pointer select-none"
+                      onClick={() => handleSort('status')}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>Status</span>
+                        {sortConfig.key === 'status' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <ChevronUpIcon className="w-4 h-4" />
+                          ) : (
+                            <ChevronDownIcon className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ChevronUpIcon className="w-4 h-4 opacity-30" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead>Akcije</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -534,7 +652,7 @@ const ContractsPage = () => {
 
                       return (
                         <TableRow key={contract.id || index}>
-                          <TableCell>
+                          <TableCell className="hidden min-[1300px]:table-cell">
                             <div className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
                                 <AvatarFallback>
@@ -546,11 +664,11 @@ const ContractsPage = () => {
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden min-[1050px]:table-cell">
                             {contract.customer?.passportNumber || 'N/A'}
                           </TableCell>
                           <TableCell>{contract.car?.model || 'N/A'}</TableCell>
-                          <TableCell>
+                          <TableCell className="max-md:table-cell hidden min-[1400px]:table-cell">
                             {contract.car?.licensePlate || 'N/A'}
                           </TableCell>
                           <TableCell>
@@ -560,12 +678,12 @@ const ContractsPage = () => {
                                 ).toLocaleDateString()
                               : 'N/A'}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden min-[900px]:table-cell">
                             {contract.endDate
                               ? new Date(contract.endDate).toLocaleDateString()
                               : 'N/A'}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden min-[1150px]:table-cell">
                             {renderStatusBadge(status, label, variant)}
                           </TableCell>
                           <TableCell>
@@ -574,7 +692,7 @@ const ContractsPage = () => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => handleViewDetails(contract)}
-                                title="View Details"
+                                title="Pogledaj detalje"
                               >
                                 <EyeIcon className="w-4 h-4" />
                               </Button>
@@ -584,7 +702,7 @@ const ContractsPage = () => {
                                 onClick={() => {
                                   handleEdit(contract);
                                 }}
-                                title="Edit Contract"
+                                title="Uredi ugovor"
                               >
                                 <PencilIcon className="w-4 h-4" />
                               </Button>
@@ -594,7 +712,7 @@ const ContractsPage = () => {
                                 onClick={() => {
                                   handleDownloadContract(contract);
                                 }}
-                                title="Download Contract"
+                                title="Preuzmi ugovor"
                               >
                                 <DocumentDownloadIcon className="w-4 h-4" />
                               </Button>
@@ -605,7 +723,7 @@ const ContractsPage = () => {
                                   setContractToDelete(contract);
                                   setShowDeleteDialog(true);
                                 }}
-                                title="Delete Contract"
+                                title="Obriši ugovor"
                               >
                                 <TrashIcon className="w-4 h-4 text-destructive" />
                               </Button>
@@ -621,8 +739,8 @@ const ContractsPage = () => {
                         className="text-center py-8 text-muted-foreground"
                       >
                         {searchTerm || filterStatus !== 'all'
-                          ? 'No contracts match your search criteria'
-                          : 'No contracts available'}
+                          ? 'Nema ugovora koji odgovaraju vašim kriterijima pretrage'
+                          : 'Nema dostupnih ugovora'}
                       </TableCell>
                     </TableRow>
                   )}
@@ -633,8 +751,8 @@ const ContractsPage = () => {
             {/* Pagination Section */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-muted-foreground">
-                Showing {paginatedContracts.length} of{' '}
-                {filteredAndSortedContracts.length} contracts
+                Prikazujem {paginatedContracts.length} od{' '}
+                {filteredAndSortedContracts.length} ugovora
               </div>
               <div className="flex items-center gap-2">
                 <Select
@@ -648,10 +766,10 @@ const ContractsPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="5">5 / page</SelectItem>
-                    <SelectItem value="10">10 / page</SelectItem>
-                    <SelectItem value="20">20 / page</SelectItem>
-                    <SelectItem value="50">50 / page</SelectItem>
+                    <SelectItem value="5">5 / stranica</SelectItem>
+                    <SelectItem value="10">10 / stranica</SelectItem>
+                    <SelectItem value="20">20 / stranica</SelectItem>
+                    <SelectItem value="50">50 / stranica</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="flex gap-1">
@@ -663,7 +781,7 @@ const ContractsPage = () => {
                     }
                     disabled={currentPage === 1}
                   >
-                    Previous
+                    Prethodna
                   </Button>
                   <Button
                     variant="outline"
@@ -673,11 +791,11 @@ const ContractsPage = () => {
                     }
                     disabled={currentPage === totalPages}
                   >
-                    Next
+                    Sljedeća
                   </Button>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  Page {currentPage} of {totalPages}
+                  Stranica {currentPage} od {totalPages}
                 </span>
               </div>
             </div>
@@ -689,17 +807,16 @@ const ContractsPage = () => {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Da li ste sigurni?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              contract
+              Ova akcija se ne može poništiti. Ovo će trajno obrisati ugovor
               {contractToDelete && (
                 <span className="font-medium">
                   {' '}
-                  for {contractToDelete.customer?.name} that rented (
+                  za {contractToDelete.customer?.name} koji je iznajmio (
                   {contractToDelete.car?.manufacturer}) (
-                  {contractToDelete.car?.model}) in the period from{' '}
-                  {new Date(contractToDelete.startDate).toLocaleDateString()} to{' '}
+                  {contractToDelete.car?.model}) u periodu od{' '}
+                  {new Date(contractToDelete.startDate).toLocaleDateString()} do{' '}
                   {new Date(contractToDelete.endDate).toLocaleDateString()}
                 </span>
               )}
@@ -712,7 +829,7 @@ const ContractsPage = () => {
                 setContractToDelete(null);
               }}
             >
-              Cancel
+              Otkaži
             </AlertDialogCancel>
             <Button
               variant="destructive"
@@ -724,7 +841,7 @@ const ContractsPage = () => {
               }}
               disabled={!contractToDelete}
             >
-              Delete
+              Obriši
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

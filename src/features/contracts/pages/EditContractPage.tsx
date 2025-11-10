@@ -54,10 +54,25 @@ export default function EditContractPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [currentCar, setCurrentCar] = useState<Car | null>(null);
   const [isUpdated, setIsUpdated] = useState(false);
-  const [carBookings, setCarBookings] = useState<any[]>([]);
+  const [carBookings, setCarBookings] = useState<
+    Array<{
+      start: string;
+      end: string;
+      contractId?: string;
+    }>
+  >([]);
   const [hasDateConflict, setHasDateConflict] = useState(false);
+  const [hasInvalidDateRange, setHasInvalidDateRange] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Auto-dismiss toast with cleanup
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => setShowToast(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
 
   // Use the custom hook
   const {
@@ -95,7 +110,7 @@ export default function EditContractPage() {
         }
       } catch (err) {
         console.error('Error fetching contract:', err);
-        setError('Failed to load contract. Please try again.');
+        setError('Učitavanje ugovora nije uspjelo. Molimo pokušajte ponovo.');
       } finally {
         setLoading(false);
       }
@@ -132,7 +147,19 @@ export default function EditContractPage() {
         const car = await getCar(formData.carId);
         if (car?.licensePlate) {
           const bookings = await getCarAvailability(car.licensePlate);
-          setCarBookings(bookings);
+          // Convert BookingEvent to our local type
+          const convertedBookings = bookings.map((booking) => ({
+            start:
+              booking.start instanceof Date
+                ? booking.start.toISOString()
+                : booking.start,
+            end:
+              booking.end instanceof Date
+                ? booking.end.toISOString()
+                : booking.end,
+            contractId: booking.contractId,
+          }));
+          setCarBookings(convertedBookings);
         }
       } catch (error) {
         console.error('Error fetching car bookings:', error);
@@ -141,6 +168,17 @@ export default function EditContractPage() {
 
     fetchCarBookings();
   }, [formData.carId]);
+
+  // Validate date range (start date must not be after end date, but can be same day)
+  useEffect(() => {
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
+      setHasInvalidDateRange(end < start);
+    } else {
+      setHasInvalidDateRange(false);
+    }
+  }, [formData.startDate, formData.endDate]);
 
   // Validate dates against car bookings
   useEffect(() => {
@@ -158,6 +196,7 @@ export default function EditContractPage() {
     const selectedEnd = new Date(formData.endDate);
 
     // Check for conflicts with existing bookings (excluding current contract)
+    // Allow contracts to share the same date (end of one = start of another)
     const hasConflict = carBookings.some((booking) => {
       // Skip the current contract being edited
       if (booking.contractId === contractId) {
@@ -167,10 +206,11 @@ export default function EditContractPage() {
       const bookingStart = new Date(booking.start);
       const bookingEnd = new Date(booking.end);
 
-      // Check if dates overlap
+      // Check if dates overlap (excluding boundaries - allow same-day end/start)
+      // Conflict exists only if there's actual overlap, not just touching dates
       return (
-        (selectedStart >= bookingStart && selectedStart < bookingEnd) ||
-        (selectedEnd > bookingStart && selectedEnd <= bookingEnd) ||
+        (selectedStart > bookingStart && selectedStart < bookingEnd) ||
+        (selectedEnd > bookingStart && selectedEnd < bookingEnd) ||
         (selectedStart <= bookingStart && selectedEnd >= bookingEnd)
       );
     });
@@ -198,50 +238,6 @@ export default function EditContractPage() {
   };
 
   const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
-    const newFormData = { ...formData, [field]: value };
-
-    if (newFormData.startDate && newFormData.endDate) {
-      const start = new Date(newFormData.startDate);
-      const end = new Date(newFormData.endDate);
-
-      if (end <= start) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: 'End date must be after start date',
-        }));
-        return;
-      }
-
-      // Check if the new date range conflicts with existing bookings
-      if (formData.carId && carBookings.length > 0) {
-        const selectedStart = start;
-        const selectedEnd = end;
-
-        const wouldConflict = carBookings.some((booking) => {
-          if (booking.contractId === contractId) {
-            return false;
-          }
-
-          const bookingStart = new Date(booking.start);
-          const bookingEnd = new Date(booking.end);
-
-          return (
-            (selectedStart >= bookingStart && selectedStart < bookingEnd) ||
-            (selectedEnd > bookingStart && selectedEnd <= bookingEnd) ||
-            (selectedStart <= bookingStart && selectedEnd >= bookingEnd)
-          );
-        });
-
-        if (wouldConflict) {
-          // Don't update the date if it would cause a conflict
-          setToastMessage('Cannot select these dates - car is already booked');
-          setShowToast(true);
-          setTimeout(() => setShowToast(false), 3000);
-          return;
-        }
-      }
-    }
-
     handleChange(field, value);
   };
 
@@ -258,14 +254,19 @@ export default function EditContractPage() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.customerId) newErrors.customerId = 'Customer is required';
-    if (!formData.carId) newErrors.carId = 'Car is required';
-    if (!formData.startDate) newErrors.startDate = 'Start date is required';
-    if (!formData.endDate) newErrors.endDate = 'End date is required';
+    if (!formData.customerId) newErrors.customerId = 'Kupac je obavezan';
+    if (!formData.carId) newErrors.carId = 'Automobil je obavezan';
+    if (!formData.startDate) newErrors.startDate = 'Datum početka je obavezan';
+    if (!formData.endDate) newErrors.endDate = 'Datum završetka je obavezan';
 
-    // Check for date conflicts
+    // Check for date conflicts - show toast warning
     if (hasDateConflict) {
-      newErrors.dates = 'The selected dates conflict with existing bookings';
+      setToastMessage(
+        'Ne možete sačuvati promjene - odabrani datumi se preklapaju sa postojećim rezervacijama za ovaj automobil'
+      );
+      setShowToast(true);
+      newErrors.dates =
+        'Odabrani datumi se sukobljavaju sa postojećim rezervacijama';
     }
 
     setErrors(newErrors);
@@ -308,21 +309,21 @@ export default function EditContractPage() {
       navigate('/contracts');
     } catch (err) {
       console.error('Error updating contract:', err);
-      setError('Failed to update contract. Please try again.');
+      setError('Ažuriranje ugovora nije uspjelo. Molimo pokušajte ponovo.');
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <LoadingState text="Loading contract..." />;
+    return <LoadingState text="Učitavanje ugovora..." />;
   }
 
   if (error && !loading) {
     return (
       <div className="flex flex-col h-full">
         <div className="border-b bg-background px-6 py-4">
-          <h1 className="text-2xl font-semibold">Error</h1>
+          <h1 className="text-2xl font-semibold">Greška</h1>
         </div>
         <div className="flex-1 overflow-auto bg-muted/30 p-6">
           <div className="max-w-4xl mx-auto">
@@ -332,7 +333,7 @@ export default function EditContractPage() {
             </Alert>
             <div className="mt-4">
               <Button variant="outline" onClick={() => navigate('/contracts')}>
-                Back to Contracts
+                Nazad na ugovore
               </Button>
             </div>
           </div>
@@ -344,8 +345,8 @@ export default function EditContractPage() {
   return (
     <div className="flex flex-col h-full">
       <PageHeader
-        title="Edit Contract"
-        subtitle="Update the contract details"
+        title="Uredi ugovor"
+        subtitle="Ažurirajte detalje ugovora"
         onBack={() => navigate('/contracts')}
         actions={
           <>
@@ -356,22 +357,27 @@ export default function EditContractPage() {
               disabled={submitting}
             >
               <X className="w-4 h-4 mr-2" />
-              Cancel
+              Otkaži
             </Button>
             <Button
               type="submit"
-              disabled={submitting || !isUpdated || hasDateConflict}
+              disabled={
+                submitting ||
+                !isUpdated ||
+                hasDateConflict ||
+                hasInvalidDateRange
+              }
               form="edit-contract-form"
             >
               {submitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
+                  Čuvanje...
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4 mr-2" />
-                  Save Changes
+                  Sačuvaj promjene
                 </>
               )}
             </Button>
@@ -380,99 +386,122 @@ export default function EditContractPage() {
       />
 
       <div className="flex-1 overflow-auto bg-muted/30">
-        <div className="mx-auto p-6">
+        <div className="w-full p-6">
           <form
             id="edit-contract-form"
             onSubmit={handleSubmit}
             className="space-y-6"
           >
-            <FormSection
-              title="Customer Information"
-              icon={<User className="w-5 h-5" />}
-            >
-              <FormField
-                label="Customer"
-                id="customerId"
-                error={errors.customerId}
-                required
-              >
-                <CustomerSearchSelect
-                  value={formData.customerId}
-                  onChange={(value) => handleChange('customerId', value)}
-                  customers={customers}
-                  disabled={submitting}
-                />
-              </FormField>
-            </FormSection>
-
-            <DateRangeValidator
-              startDate={formData.startDate}
-              endDate={formData.endDate}
-              onStartDateChange={(date) => handleDateChange('startDate', date)}
-              onEndDateChange={(date) => handleDateChange('endDate', date)}
-              startDateError={errors.startDate}
-              endDateError={errors.endDate}
-              disabled={submitting}
-              checkConflicts
-              existingBookings={carBookings}
-              currentBookingId={contractId}
-              onConflictDetected={(hasConflict, message) => {
-                setHasDateConflict(hasConflict);
-                if (hasConflict && message) {
-                  setToastMessage(message);
-                  setShowToast(true);
-                }
-              }}
-            />
-
-            <CarAvailabilitySelect
-              value={formData.carId}
-              onChange={(carId) => handleChange('carId', carId)}
-              startDate={formData.startDate}
-              endDate={formData.endDate}
-              currentCar={currentCar}
-              error={errors.carId}
-              required
-              onPriceCalculated={(dailyRate, totalAmount) => {
-                setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
-              }}
-              showPricingSummary
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="w-full">
               <FormSection
-                title="Additional Information"
-                icon={<FileText className="w-5 h-5" />}
+                title="Informacije o kupcu"
+                icon={<User className="w-5 h-5" />}
               >
                 <FormField
-                  label="Additional Notes"
-                  id="additionalNotes"
-                  helperText="Any additional notes or special conditions"
+                  label="Kupac"
+                  id="customerId"
+                  error={errors.customerId}
+                  required
                 >
-                  <Textarea
-                    id="additionalNotes"
-                    placeholder="Enter any additional notes..."
-                    rows={4}
-                    value={formData.additionalNotes}
-                    onChange={(e) =>
-                      handleChange('additionalNotes', e.target.value)
-                    }
+                  <CustomerSearchSelect
+                    value={formData.customerId}
+                    onChange={(value) => handleChange('customerId', value)}
+                    customers={customers}
+                    disabled={submitting}
                   />
                 </FormField>
               </FormSection>
+            </div>
 
-              <FormSection
-                title="Contract Photo"
-                icon={<Camera className="w-5 h-5" />}
-              >
-                <PhotoUpload
-                  value={photoFile}
-                  onChange={handlePhotoChange}
-                  error={errors.photoUrl}
-                  disabled={submitting}
-                  existingPhotoUrl={formData.photoUrl}
-                />
-              </FormSection>
+            <div className="w-full">
+              <DateRangeValidator
+                startDate={formData.startDate}
+                endDate={formData.endDate}
+                onStartDateChange={(date) =>
+                  handleDateChange('startDate', date)
+                }
+                onEndDateChange={(date) => handleDateChange('endDate', date)}
+                startDateError={errors.startDate}
+                endDateError={errors.endDate}
+                disabled={submitting}
+                checkConflicts
+                existingBookings={carBookings}
+                currentBookingId={contractId}
+                onConflictDetected={(hasConflict, message) => {
+                  setHasDateConflict(hasConflict);
+                  if (hasConflict && message) {
+                    setToastMessage(message);
+                    setShowToast(true);
+                  }
+                }}
+              />
+
+              {/* Invalid Date Range Warning */}
+              {hasInvalidDateRange &&
+                formData.startDate &&
+                formData.endDate && (
+                  <Alert variant="destructive" className="mt-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Datum završetka ne može biti prije datuma početka. Molimo
+                      odaberite ispravne datume kako biste mogli sačuvati
+                      promjene. (Napomena: Iznajmljivanje u trajanju jednog dana
+                      je dozvoljeno)
+                    </AlertDescription>
+                  </Alert>
+                )}
+            </div>
+
+            <div className="w-full">
+              <CarAvailabilitySelect
+                value={formData.carId}
+                onChange={(carId) => handleChange('carId', carId)}
+                startDate={formData.startDate}
+                endDate={formData.endDate}
+                currentCar={currentCar}
+                error={errors.carId}
+                required
+                onPriceCalculated={(dailyRate, totalAmount) => {
+                  setFormData((prev) => ({ ...prev, dailyRate, totalAmount }));
+                }}
+                showPricingSummary
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+              <div className="w-full">
+                <FormSection
+                  title="Dodatne informacije"
+                  icon={<FileText className="w-5 h-5" />}
+                >
+                  <FormField label="Dodatne napomene" id="additionalNotes">
+                    <Textarea
+                      id="additionalNotes"
+                      placeholder="Unesite dodatne napomene..."
+                      rows={4}
+                      value={formData.additionalNotes}
+                      onChange={(e) =>
+                        handleChange('additionalNotes', e.target.value)
+                      }
+                    />
+                  </FormField>
+                </FormSection>
+              </div>
+
+              <div className="w-full">
+                <FormSection
+                  title="Slika ugovora"
+                  icon={<Camera className="w-5 h-5" />}
+                >
+                  <PhotoUpload
+                    value={photoFile}
+                    onChange={handlePhotoChange}
+                    error={errors.photoUrl}
+                    disabled={submitting}
+                    existingPhotoUrl={formData.photoUrl}
+                  />
+                </FormSection>
+              </div>
             </div>
 
             {/* Error Alert */}
@@ -488,7 +517,7 @@ export default function EditContractPage() {
 
       {/* Toast Notification */}
       {showToast && (
-        <Toast variant="destructive" onClose={() => setShowToast(false)}>
+        <Toast variant="warning" onClose={() => setShowToast(false)}>
           {toastMessage}
         </Toast>
       )}

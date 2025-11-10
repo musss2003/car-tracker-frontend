@@ -3,11 +3,13 @@
 ## Quick Guide to Enable HTTPS on Your Backend
 
 ### Step 1: SSH into EC2
+
 ```bash
 ssh -i ~/Desktop/car-tracker/sarajevo-mus-len.pem ubuntu@54.221.162.139
 ```
 
 ### Step 2: Install NGINX
+
 ```bash
 sudo apt update
 sudo apt install nginx -y
@@ -22,6 +24,7 @@ ls -la /etc/nginx/
 ### Step 3: Configure NGINX Reverse Proxy
 
 **First, check your NGINX structure:**
+
 ```bash
 # Check if sites-available exists
 if [ -d "/etc/nginx/sites-available" ]; then
@@ -34,6 +37,7 @@ fi
 ```
 
 **Or manually create the config file:**
+
 ```bash
 # For Ubuntu/Debian (sites-available)
 sudo nano /etc/nginx/sites-available/car-tracker
@@ -43,6 +47,7 @@ sudo nano /etc/nginx/conf.d/car-tracker.conf
 ```
 
 **Add this configuration:**
+
 ```nginx
 server {
     listen 80;
@@ -68,6 +73,7 @@ server {
 ### Step 4: Enable Site
 
 **For Ubuntu/Debian (sites-available):**
+
 ```bash
 sudo ln -s /etc/nginx/sites-available/car-tracker /etc/nginx/sites-enabled/
 sudo nginx -t
@@ -75,6 +81,7 @@ sudo systemctl restart nginx
 ```
 
 **For CentOS/Amazon Linux (conf.d):**
+
 ```bash
 # Config is already in conf.d, just test and restart
 sudo nginx -t
@@ -82,6 +89,7 @@ sudo systemctl restart nginx
 ```
 
 **If nginx -t fails, check the error:**
+
 ```bash
 sudo nginx -t
 # Fix any syntax errors in your config file
@@ -95,19 +103,21 @@ Edit your backend to allow Vercel domain:
 // In your Express app.ts or server.js
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://car-tracker-frontend-lime.vercel.app'
+  'https://car-tracker-frontend-lime.vercel.app',
 ];
 
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
 ```
 
 ### Step 6: For HTTPS with Self-Signed Certificate (Development)
@@ -123,6 +133,7 @@ sudo nano /etc/nginx/sites-available/car-tracker
 ```
 
 **Add HTTPS configuration:**
+
 ```nginx
 server {
     listen 443 ssl;
@@ -162,6 +173,7 @@ sudo systemctl restart nginx
 ### Step 7: Update Frontend Environment Variable
 
 In Vercel Dashboard:
+
 1. Go to **Settings** → **Environment Variables**
 2. Update `VITE_API_BASE_URL` to `https://54.221.162.139`
 3. Redeploy
@@ -196,6 +208,7 @@ MODE=production
 ### Step 10: Verify Setup
 
 **On your EC2 instance, run:**
+
 ```bash
 # Check NGINX is listening on 443
 sudo netstat -tlnp | grep :443
@@ -211,6 +224,7 @@ sudo tail -20 /var/log/nginx/error.log
 ```
 
 **From your local machine:**
+
 ```bash
 # Test if port 443 is accessible
 curl -k https://54.221.162.139/api/auth/session-check
@@ -223,6 +237,7 @@ curl -k https://54.221.162.139/api/auth/session-check
 **Problem: CORS errors, request doesn't reach backend**
 
 ✅ **Solution:**
+
 1. Verify port 443 is open in AWS Security Group (Step 9)
 2. Verify NGINX is running: `sudo systemctl status nginx`
 3. Check NGINX is listening: `sudo netstat -tlnp | grep :443`
@@ -254,6 +269,7 @@ sudo ufw allow 80/tcp
 ```
 
 ### Notes:
+
 - Self-signed certificates will show browser warnings
 - For production, use Let's Encrypt (requires domain name)
 - Make sure your backend is rupm2nning on port 5001
@@ -261,6 +277,7 @@ sudo ufw allow 80/tcp
 ### Alternative: Use a Domain with Let's Encrypt (Recommended for Production)
 
 If you have a domain:
+
 ```bash
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d yourdomain.com

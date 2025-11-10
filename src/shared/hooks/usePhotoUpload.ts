@@ -47,6 +47,16 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
       return null;
     }
 
+    // Validate file size (10MB limit)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (photoFile.size > maxSize) {
+      const sizeInMB = (photoFile.size / (1024 * 1024)).toFixed(2);
+      const errorMsg = `Fajl je prevelik (${sizeInMB}MB). Maksimalna veličina je 10MB.`;
+      setError(errorMsg);
+      console.error('File too large:', photoFile.size, 'bytes');
+      return null;
+    }
+
     try {
       setUploading(true);
       setError(null);
@@ -61,7 +71,9 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
       throw new Error('Upload failed - no filename returned');
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to upload photo';
+        err instanceof Error
+          ? err.message
+          : 'Neuspješno postavljanje fotografije';
       setError(errorMessage);
       console.error('Error uploading photo:', err);
       return null;

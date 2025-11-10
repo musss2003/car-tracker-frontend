@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Search, Check, ChevronsUpDown } from 'lucide-react';
-import type { Customer } from '@/types/Customer';
+import { Customer } from '@/features/customers';
 
 interface CustomerSearchSelectProps {
   value: string;
@@ -62,7 +62,7 @@ export function CustomerSearchSelect({
 
       {isOpen && (
         <div
-          className="absolute z-50 mt-1 w-full rounded-md border-2 border-border shadow-2xl"
+          className="absolute z-50 mt-1 w-full rounded-lg overflow-hidden bg-white shadow-2xl"
           style={{ backgroundColor: 'hsl(var(--card))', opacity: 1 }}
         >
           <div
@@ -70,7 +70,7 @@ export function CustomerSearchSelect({
             style={{ backgroundColor: 'hsl(var(--card))' }}
           >
             <div
-              className="flex items-center gap-2 px-3 py-2 border-2 border-border rounded-md"
+              className="flex items-center gap-2 px-3 py-2 border-2 border-border rounded-lg"
               style={{ backgroundColor: 'hsl(var(--muted))' }}
             >
               <Search className="h-4 w-4 text-muted-foreground" />
@@ -94,7 +94,7 @@ export function CustomerSearchSelect({
                 key={customer.id}
                 type="button"
                 onClick={() => handleSelect(customer.id)}
-                className="w-full flex items-center justify-between px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer"
+                className="w-full flex items-center justify-between px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg cursor-pointer"
               >
                 <span>{customer.name}</span>
                 {value === customer.id && <Check className="h-4 w-4" />}
