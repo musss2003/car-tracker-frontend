@@ -75,7 +75,9 @@ export const getAuditStatistics = async (
 /**
  * Export audit logs as CSV
  */
-export const exportAuditLogs = async (filters: AuditLogFilters = {}): Promise<void> => {
+export const exportAuditLogs = async (
+  filters: AuditLogFilters = {}
+): Promise<void> => {
   const params = new URLSearchParams();
 
   if (filters.userId) params.append('userId', filters.userId);
@@ -115,7 +117,9 @@ export const exportAuditLogs = async (filters: AuditLogFilters = {}): Promise<vo
 /**
  * Delete old audit logs (admin only)
  */
-export const cleanupOldLogs = async (daysToKeep: number = 90): Promise<number> => {
+export const cleanupOldLogs = async (
+  daysToKeep: number = 90
+): Promise<number> => {
   const token = localStorage.getItem('accessToken');
   const response = await fetch(
     `${import.meta.env.VITE_API_BASE_URL}${BASE_URL}/cleanup`,
