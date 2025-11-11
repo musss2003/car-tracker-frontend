@@ -4,7 +4,6 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { PhotoUpload } from '@/shared/components/ui/photo-upload';
 import { Separator } from '@/shared/components/ui/separator';
 import { Loader2, Save, Upload } from 'lucide-react';
 import { User } from '../types/user.types';
