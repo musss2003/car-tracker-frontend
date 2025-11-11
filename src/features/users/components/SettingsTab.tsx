@@ -19,17 +19,16 @@ const SettingsTab = ({ user, onUpdate }: SettingsTabProps) => {
     // Load theme from localStorage
     const savedTheme = localStorage.getItem('theme') || 'system';
     setTheme(savedTheme);
+    
+    // Apply the saved theme immediately
+    applyTheme(savedTheme);
 
     // Load language from localStorage
     const savedLanguage = localStorage.getItem('language') || 'bs';
     setLanguage(savedLanguage);
   }, []);
 
-  const handleThemeChange = (value: string) => {
-    setTheme(value);
-    localStorage.setItem('theme', value);
-
-    // Apply theme
+  const applyTheme = (value: string) => {
     const root = document.documentElement;
     if (value === 'dark') {
       root.classList.add('dark');
@@ -43,6 +42,12 @@ const SettingsTab = ({ user, onUpdate }: SettingsTabProps) => {
         root.classList.remove('dark');
       }
     }
+  };
+
+  const handleThemeChange = (value: string) => {
+    setTheme(value);
+    localStorage.setItem('theme', value);
+    applyTheme(value);
   };
 
   const handleLanguageChange = (value: string) => {
