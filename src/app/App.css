@@ -1,6 +1,3 @@
-/* Import theme variables */
-@import '../styles/theme.css';
-
 .app-container {
   display: flex;
   min-height: 100vh;

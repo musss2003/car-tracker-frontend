@@ -21,6 +21,9 @@ export interface UpdateUserData {
   email?: string;
   role?: 'admin' | 'employee' | 'user';
   citizenshipId?: string;
+  profilePhotoUrl?: string;
+  phone?: string;
+  address?: string;
 }
 
 /**
@@ -98,24 +101,56 @@ export const resetUserPassword = async (
 };
 
 /**
+ * Change user password (requires current password verification)
+ */
+export const changePassword = async (
+  userId: string,
+  currentPassword: string,
+  newPassword: string
+): Promise<void> => {
+  await apiClient.put(`${BASE_URL}/${userId}/password`, {
+    currentPassword,
+    newPassword,
+  });
+};
+
+/**
  * Upload user profile photo
  */
-export const uploadProfilePhoto = async (userId: string, photoFile: File) => {
+export const uploadProfilePhoto = async (
+  userId: string,
+  photoFile: File
+): Promise<User> => {
   const formData = new FormData();
-  formData.append('photo', photoFile);
+  formData.append('document', photoFile);
 
-  const response = await fetch(`${API_URL}users/${userId}/photo`, {
+  // Get auth headers but remove Content-Type for FormData
+  const authHeaders = getAuthHeaders();
+  const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders;
+
+  // First upload the file
+  const uploadResponse = await fetch(`${API_URL}upload/upload`, {
     method: 'POST',
     credentials: 'include',
-    headers: {
-      ...getAuthHeaders(),
-    },
+    headers: headersWithoutContentType, // Don't set Content-Type - let browser set it with boundary
     body: formData,
   });
 
-  if (!response.ok) {
-    throw new Error('Failed to upload profile photo');
+  if (!uploadResponse.ok) {
+    const errorData = await uploadResponse
+      .json()
+      .catch(() => ({ message: 'Unknown error' }));
+    console.error('Upload failed:', errorData);
+    throw new Error(errorData.message || 'Failed to upload profile photo');
   }
 
-  return response.json();
+  const uploadResult = await uploadResponse.json();
+  const filename = uploadResult.filename;
+
+  // Then update the user with the photo URL
+  const updatedUser = await updateUser(userId, {
+    profilePhotoUrl: filename,
+  });
+
+  return updatedUser;
 };

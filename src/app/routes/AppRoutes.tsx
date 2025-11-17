@@ -77,8 +77,8 @@ const DashboardPage = lazy(
 );
 
 // User Components - Feature-based imports
-const UserProfile = lazy(
-  () => import('../../features/users/components/UserProfile/UserProfile')
+const UserProfilePage = lazy(
+  () => import('../../features/users/pages/UserProfilePage')
 );
 
 // Shared Pages
@@ -129,9 +129,7 @@ export function AppRoutes() {
           <Route path="/customers" element={<CustomersPage />} />
           {/* <Route path="/notifications" element={<NotificationsPage />} /> */}
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />
-          {user && (
-            <Route path="/profile" element={<UserProfile id={user.id} />} />
-          )}
+          {user && <Route path="/profile" element={<UserProfilePage />} />}
         </Route>
 
         {/* Admin-only routes */}
