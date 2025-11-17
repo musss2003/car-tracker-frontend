@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -8,7 +14,10 @@ import { Separator } from '@/shared/components/ui/separator';
 import { Loader2, Save, Upload } from 'lucide-react';
 import { User } from '../types/user.types';
 import { updateUser } from '../services/userService';
-import { uploadDocument, downloadDocument } from '@/shared/services/uploadService';
+import {
+  uploadDocument,
+  downloadDocument,
+} from '@/shared/services/uploadService';
 import { toast } from 'react-toastify';
 
 interface PersonalInfoTabProps {
@@ -68,7 +77,7 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
 
   const uploadPhoto = async (): Promise<string | null> => {
     if (!photoFile) return user.profilePhotoUrl || null;
-    
+
     try {
       const filename = await uploadDocument(photoFile);
       return filename;
@@ -91,7 +100,7 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      
+
       // Upload photo first if a new one was selected
       let photoFilename = user.profilePhotoUrl;
       if (photoFile) {
@@ -102,13 +111,13 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
         }
         photoFilename = uploadedFilename;
       }
-      
+
       // Update user with new data including photo
       const updatedData = {
         ...formData,
         profilePhotoUrl: photoFilename,
       };
-      
+
       const updatedUser = await updateUser(user.id, updatedData);
       onUpdate(updatedUser);
       setPhotoFile(null); // Clear the selected photo after successful save
@@ -166,7 +175,9 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
                   if (file) {
                     // Validate file size (5MB)
                     if (file.size > 5 * 1024 * 1024) {
-                      toast.error('Slika je prevelika. Maksimalna veličina je 5MB.');
+                      toast.error(
+                        'Slika je prevelika. Maksimalna veličina je 5MB.'
+                      );
                       return;
                     }
                     handlePhotoChange(file);
@@ -212,7 +223,9 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
 
             {/* User Info */}
             <div className="flex-1">
-              <h3 className="text-lg font-semibold">{user.name || user.username}</h3>
+              <h3 className="text-lg font-semibold">
+                {user.name || user.username}
+              </h3>
               <p className="text-sm text-muted-foreground">{user.email}</p>
               <p className="text-sm text-muted-foreground mt-1">
                 {user.role === 'admin' ? 'Administrator' : 'Zaposlenik'}
@@ -325,7 +338,11 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
             <>
               <Separator />
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={isSaving}
+                >
                   Otkaži
                 </Button>
                 <Button onClick={handleSave} disabled={isSaving}>

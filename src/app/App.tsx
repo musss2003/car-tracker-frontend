@@ -7,7 +7,6 @@ import { ToastContainer } from 'react-toastify';
 import ModernSidebar from '../shared/components/layout/ModernSidebar/ModernSidebar';
 import { AppRoutes } from './routes/AppRoutes';
 import { socketService } from '../shared/services/socketService';
-import '../shared/utils/themeManager'; // Initialize theme manager
 import './App.css';
 
 function App() {

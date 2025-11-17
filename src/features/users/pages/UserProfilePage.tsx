@@ -1,7 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/components/ui/tabs';
 import { User, Settings, Shield, Bell } from 'lucide-react';
 import { getUser } from '../services/userService';
 import { User as UserType } from '../types/user.types';
@@ -10,7 +21,6 @@ import PersonalInfoTab from '../components/PersonalInfoTab';
 import SecurityTab from '../components/SecurityTab';
 import SettingsTab from '../components/SettingsTab';
 import NotificationsTab from '../components/NotificationsTab';
-
 
 const UserProfilePage = () => {
   const { user: authUser } = useAuth();
@@ -79,7 +89,10 @@ const UserProfilePage = () => {
             <Settings className="h-4 w-4" />
             <span className="hidden sm:inline">Postavke</span>
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
+          <TabsTrigger
+            value="notifications"
+            className="flex items-center gap-2"
+          >
             <Bell className="h-4 w-4" />
             <span className="hidden sm:inline">Notifikacije</span>
           </TabsTrigger>
