@@ -117,7 +117,10 @@ export const changePassword = async (
 /**
  * Upload user profile photo
  */
-export const uploadProfilePhoto = async (userId: string, photoFile: File): Promise<User> => {
+export const uploadProfilePhoto = async (
+  userId: string,
+  photoFile: File
+): Promise<User> => {
   const formData = new FormData();
   formData.append('document', photoFile);
 
@@ -134,7 +137,9 @@ export const uploadProfilePhoto = async (userId: string, photoFile: File): Promi
   });
 
   if (!uploadResponse.ok) {
-    const errorData = await uploadResponse.json().catch(() => ({ message: 'Unknown error' }));
+    const errorData = await uploadResponse
+      .json()
+      .catch(() => ({ message: 'Unknown error' }));
     console.error('Upload failed:', errorData);
     throw new Error(errorData.message || 'Failed to upload profile photo');
   }

@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -75,7 +81,7 @@ const SecurityTab = ({ user }: SecurityTabProps) => {
 
     try {
       setIsSaving(true);
-      
+
       await changePassword(
         user.id,
         passwords.currentPassword,
@@ -91,7 +97,8 @@ const SecurityTab = ({ user }: SecurityTabProps) => {
       setIsChangingPassword(false);
     } catch (error: any) {
       console.error('Failed to change password:', error);
-      const errorMessage = error.response?.data?.message || 'Greška pri promjeni lozinke';
+      const errorMessage =
+        error.response?.data?.message || 'Greška pri promjeni lozinke';
       toast.error(errorMessage);
     } finally {
       setIsSaving(false);
@@ -128,10 +135,16 @@ const SecurityTab = ({ user }: SecurityTabProps) => {
               <div>
                 <p className="font-medium">Lozinka</p>
                 <p className="text-sm text-muted-foreground">
-                  Zadnja promjena: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString('bs-BA') : 'Nepoznato'}
+                  Zadnja promjena:{' '}
+                  {user.updatedAt
+                    ? new Date(user.updatedAt).toLocaleDateString('bs-BA')
+                    : 'Nepoznato'}
                 </p>
               </div>
-              <Button onClick={() => setIsChangingPassword(true)} variant="outline">
+              <Button
+                onClick={() => setIsChangingPassword(true)}
+                variant="outline"
+              >
                 Promijeni lozinku
               </Button>
             </div>
@@ -218,7 +231,11 @@ const SecurityTab = ({ user }: SecurityTabProps) => {
               <Separator />
 
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={isSaving}
+                >
                   Otkaži
                 </Button>
                 <Button onClick={handleChangePassword} disabled={isSaving}>
@@ -255,7 +272,9 @@ const SecurityTab = ({ user }: SecurityTabProps) => {
             <div>
               <p className="font-medium">Zadnja prijava</p>
               <p className="text-sm text-muted-foreground">
-                {user.lastLogin ? new Date(user.lastLogin).toLocaleString('bs-BA') : 'Nepoznato'}
+                {user.lastLogin
+                  ? new Date(user.lastLogin).toLocaleString('bs-BA')
+                  : 'Nepoznato'}
               </p>
             </div>
           </div>
@@ -264,7 +283,9 @@ const SecurityTab = ({ user }: SecurityTabProps) => {
             <div>
               <p className="font-medium">Nalog kreiran</p>
               <p className="text-sm text-muted-foreground">
-                {user.createdAt ? new Date(user.createdAt).toLocaleDateString('bs-BA') : 'Nepoznato'}
+                {user.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString('bs-BA')
+                  : 'Nepoznato'}
               </p>
             </div>
           </div>

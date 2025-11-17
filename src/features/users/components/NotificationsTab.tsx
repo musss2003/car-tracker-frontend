@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import { Bell, Mail, Info } from 'lucide-react';
 import { User } from '../types/user.types';
 
@@ -29,7 +35,8 @@ const NotificationsTab = ({ user, onUpdate }: NotificationsTabProps) => {
             <div className="space-y-1">
               <p className="text-sm font-medium">Aktivna obavještenja</p>
               <p className="text-sm text-muted-foreground">
-                Primajte obavještenja o novim ugovorima, isteku ugovora i važnim događajima u sistemu.
+                Primajte obavještenja o novim ugovorima, isteku ugovora i važnim
+                događajima u sistemu.
               </p>
             </div>
           </div>
@@ -42,7 +49,9 @@ const NotificationsTab = ({ user, onUpdate }: NotificationsTabProps) => {
                 </div>
                 <div>
                   <p className="font-medium">Ugovori</p>
-                  <p className="text-sm text-muted-foreground">Novi i ističući ugovori</p>
+                  <p className="text-sm text-muted-foreground">
+                    Novi i ističući ugovori
+                  </p>
                 </div>
               </div>
               <span className="text-xs font-medium text-primary">Aktivno</span>
@@ -55,7 +64,9 @@ const NotificationsTab = ({ user, onUpdate }: NotificationsTabProps) => {
                 </div>
                 <div>
                   <p className="font-medium">Email obavještenja</p>
-                  <p className="text-sm text-muted-foreground">Automatska email obavještenja</p>
+                  <p className="text-sm text-muted-foreground">
+                    Automatska email obavještenja
+                  </p>
                 </div>
               </div>
               <span className="text-xs font-medium text-primary">Aktivno</span>

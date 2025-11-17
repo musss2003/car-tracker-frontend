@@ -129,9 +129,7 @@ export function AppRoutes() {
           <Route path="/customers" element={<CustomersPage />} />
           {/* <Route path="/notifications" element={<NotificationsPage />} /> */}
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />
-          {user && (
-            <Route path="/profile" element={<UserProfilePage />} />
-          )}
+          {user && <Route path="/profile" element={<UserProfilePage />} />}
         </Route>
 
         {/* Admin-only routes */}
