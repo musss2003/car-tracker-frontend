@@ -14,7 +14,8 @@
 GitGuardian flagged the following line as containing a "Generic Password":
 
 ```typescript
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 ```
 
 ### Why This is a False Positive
@@ -28,9 +29,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001
 
 ✅ The hardcoded URL has been **removed** in the latest commit  
 ✅ All API calls now use environment variables via centralized services  
-✅ No hardcoded URLs exist in the current source code  
+✅ No hardcoded URLs exist in the current source code
 
 **Current Implementation** (commit `1714241`):
+
 - Uses `changePassword()` service function from `userService.ts`
 - Service uses `import.meta.env.VITE_API_BASE_URL` (environment variable)
 - No hardcoded fallback URLs
@@ -42,6 +44,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001
 **Action Taken**: ✅ Code has been refactored to remove hardcoded values
 
 **Current Security Posture**:
+
 - ✅ All API URLs from environment variables (`.env` file)
 - ✅ `.env` file in `.gitignore` (not committed to repo)
 - ✅ Centralized API configuration in service layer
@@ -64,6 +67,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001
 ## Conclusion
 
 This GitGuardian alert is a **false positive**. The detected "secret" is a localhost development URL that:
+
 - Is not sensitive
 - Has been removed from current code
 - Was never a real security concern
