@@ -99,6 +99,19 @@ class SocketService {
   }
 
   /**
+   * Stop listening for notifications
+   */
+  offNotification(callback?: (notification: any) => void) {
+    if (this.socket) {
+      if (callback) {
+        this.socket.off('receiveNotification', callback);
+      } else {
+        this.socket.off('receiveNotification');
+      }
+    }
+  }
+
+  /**
    * Send notification (existing functionality)
    */
   sendNotification(data: {

@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useUnreadCount } from '@/features/notifications/hooks/useUnreadCount';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -58,6 +59,7 @@ const ModernSidebar: React.FC<SidebarProps> = ({
   const location = useLocation();
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
+  const { unreadCount } = useUnreadCount();
 
   // Navigation structure with updated icons and Bosnian labels
   const navGroups: NavGroup[] = [
@@ -117,8 +119,8 @@ const ModernSidebar: React.FC<SidebarProps> = ({
           to: '/notifications',
           icon: Bell,
           label: 'Notifikacije',
-          badge: '3',
-          isNew: true,
+          badge: unreadCount > 0 ? unreadCount.toString() : undefined,
+          isNew: unreadCount > 0,
         },
         {
           to: '/profile',

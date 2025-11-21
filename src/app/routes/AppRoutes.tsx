@@ -52,7 +52,7 @@ const CustomerDetailsPage = lazy(
 );
 
 // Notifications Pages - Feature-based imports
-// const NotificationsPage = lazy(() => import('../../features/notifications/pages/NotificationsPage'));
+const NotificationsPage = lazy(() => import('../../features/notifications/pages/NotificationsPage'));
 
 // Audit Logs Pages - Feature-based imports
 const AuditLogsPage = lazy(
@@ -127,7 +127,7 @@ export function AppRoutes() {
           <Route path="/customers/:id" element={<CustomerDetailsPage />} />
           <Route path="/customers/:id/edit" element={<EditCustomerPage />} />
           <Route path="/customers" element={<CustomersPage />} />
-          {/* <Route path="/notifications" element={<NotificationsPage />} /> */}
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />
           {user && <Route path="/profile" element={<UserProfilePage />} />}
         </Route>
