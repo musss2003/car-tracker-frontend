@@ -52,7 +52,26 @@ const CustomerDetailsPage = lazy(
 );
 
 // Notifications Pages - Feature-based imports
-// const NotificationsPage = lazy(() => import('../../features/notifications/pages/NotificationsPage'));
+const NotificationsPage = lazy(
+  () => import('../../features/notifications/pages/NotificationsPage')
+);
+
+// Audit Logs Pages - Feature-based imports
+const AuditLogsPage = lazy(
+  () => import('../../features/audit-logs/pages/AuditLogsPage')
+);
+const AuditLogDetailsPage = lazy(
+  () => import('../../features/audit-logs/pages/AuditLogDetailsPage')
+);
+
+// Users Management Pages - Feature-based imports
+const UsersPage = lazy(() => import('../../features/users/pages/UsersPage'));
+const CreateUserPage = lazy(
+  () => import('../../features/users/pages/CreateUserPage')
+);
+const EditUserPage = lazy(
+  () => import('../../features/users/pages/EditUserPage')
+);
 
 // Dashboard Pages - Feature-based imports
 const DashboardPage = lazy(
@@ -60,8 +79,8 @@ const DashboardPage = lazy(
 );
 
 // User Components - Feature-based imports
-const UserProfile = lazy(
-  () => import('../../features/users/components/UserProfile/UserProfile')
+const UserProfilePage = lazy(
+  () => import('../../features/users/pages/UserProfilePage')
 );
 
 // Shared Pages
@@ -70,6 +89,7 @@ const ShadcnExamplesPage = lazy(
 );
 
 import ProtectedRoute from './ProtectedRoute';
+import AdminRoute from './AdminRoute';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import LoadingSpinner from '../../shared/components/feedback/LoadingSpinner/LoadingSpinner';
 
@@ -109,11 +129,18 @@ export function AppRoutes() {
           <Route path="/customers/:id" element={<CustomerDetailsPage />} />
           <Route path="/customers/:id/edit" element={<EditCustomerPage />} />
           <Route path="/customers" element={<CustomersPage />} />
-          {/* <Route path="/notifications" element={<NotificationsPage />} /> */}
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/shadcn-examples" element={<ShadcnExamplesPage />} />
-          {user && (
-            <Route path="/profile" element={<UserProfile id={user.id} />} />
-          )}
+          {user && <Route path="/profile" element={<UserProfilePage />} />}
+        </Route>
+
+        {/* Admin-only routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/audit-logs" element={<AuditLogsPage />} />
+          <Route path="/audit-logs/:id" element={<AuditLogDetailsPage />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/create" element={<CreateUserPage />} />
+          <Route path="/users/:id/edit" element={<EditUserPage />} />
         </Route>
         <Route
           path="*"

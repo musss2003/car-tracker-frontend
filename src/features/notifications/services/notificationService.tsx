@@ -1,4 +1,4 @@
-import { getAuthHeaders } from '../utils/getAuthHeaders';
+import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/notifications/';
 

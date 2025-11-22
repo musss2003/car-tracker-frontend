@@ -6,6 +6,7 @@ export { default as NotificationsPage } from './pages/NotificationsPage';
 
 // Hooks
 export { useNotifications } from './hooks/useNotification';
+export { useUnreadCount } from './hooks/useUnreadCount';
 
 // Services
 export * from './services/notificationService';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import useScreenSize from '../shared/hooks/useScreenSize';
 import ErrorBoundary from '../shared/components/feedback/ErrorBoundary/ErrorBoundary';
@@ -6,13 +6,31 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import ModernSidebar from '../shared/components/layout/ModernSidebar/ModernSidebar';
 import { AppRoutes } from './routes/AppRoutes';
-import '../shared/utils/themeManager'; // Initialize theme manager
+import { socketService } from '../shared/services/socketService';
 import './App.css';
 
 function App() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const isSmallScreen = useScreenSize('(max-width: 768px)');
+
+  // Connect to WebSocket when logged in for real-time presence
+  useEffect(() => {
+    if (isLoggedIn() && user?.id) {
+      // Connect to Socket.IO and mark user as online
+      socketService.connect(user.id);
+    } else {
+      // Disconnect when logged out
+      socketService.disconnect();
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (!isLoggedIn()) {
+        socketService.disconnect();
+      }
+    };
+  }, [isLoggedIn, user?.id]);
 
   React.useEffect(() => {
     setSidebarOpen(!isSmallScreen);
