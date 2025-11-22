@@ -21,7 +21,9 @@ interface NotificationsTabProps {
 
 const NotificationsTab = ({ user, onUpdate }: NotificationsTabProps) => {
   const navigate = useNavigate();
-  const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
+  const [recentNotifications, setRecentNotifications] = useState<
+    Notification[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +43,9 @@ const NotificationsTab = ({ user, onUpdate }: NotificationsTabProps) => {
     fetchRecentNotifications();
   }, []);
 
-  const unreadCount = recentNotifications.filter((n) => n.status === 'new').length;
+  const unreadCount = recentNotifications.filter(
+    (n) => n.status === 'new'
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -54,7 +58,7 @@ const NotificationsTab = ({ user, onUpdate }: NotificationsTabProps) => {
               <div>
                 <CardTitle>Nedavna obavještenja</CardTitle>
                 <CardDescription>
-                  {unreadCount > 0 
+                  {unreadCount > 0
                     ? `Imate ${unreadCount} nepročitano obavještenje${unreadCount > 1 ? 'a' : ''}`
                     : 'Sve je pročitano'}
                 </CardDescription>
@@ -89,20 +93,28 @@ const NotificationsTab = ({ user, onUpdate }: NotificationsTabProps) => {
                 <div
                   key={notification.id}
                   className={`p-3 rounded-lg border transition-colors cursor-pointer hover:bg-muted/50 ${
-                    notification.status === 'new' ? 'bg-blue-50/50 border-blue-200' : ''
+                    notification.status === 'new'
+                      ? 'bg-blue-50/50 border-blue-200'
+                      : ''
                   }`}
                   onClick={() => navigate('/notifications')}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 rounded-full mt-2 bg-primary" 
-                         style={{ opacity: notification.status === 'new' ? 1 : 0 }} />
+                    <div
+                      className="flex-shrink-0 w-2 h-2 rounded-full mt-2 bg-primary"
+                      style={{ opacity: notification.status === 'new' ? 1 : 0 }}
+                    />
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm ${notification.status === 'new' ? 'font-medium' : ''}`}>
+                      <p
+                        className={`text-sm ${notification.status === 'new' ? 'font-medium' : ''}`}
+                      >
                         {notification.message}
                       </p>
                       <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
-                        {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(notification.createdAt), {
+                          addSuffix: true,
+                        })}
                       </div>
                     </div>
                   </div>

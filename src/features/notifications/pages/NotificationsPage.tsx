@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, CheckCheck, Trash2, Filter, Clock, FileText, User, Settings, Car } from 'lucide-react';
+import {
+  Bell,
+  Check,
+  CheckCheck,
+  Trash2,
+  Filter,
+  Clock,
+  FileText,
+  User,
+  Settings,
+  Car,
+} from 'lucide-react';
 import {
   getNotifications,
   markAsSeen,
@@ -237,8 +248,8 @@ const NotificationsPage: React.FC = () => {
               {filter === 'unread'
                 ? "You don't have any unread notifications"
                 : filter === 'read'
-                ? "You don't have any read notifications"
-                : "You don't have any notifications yet"}
+                  ? "You don't have any read notifications"
+                  : "You don't have any notifications yet"}
             </p>
           </div>
         ) : (
@@ -283,7 +294,9 @@ const NotificationsPage: React.FC = () => {
                                 ? 'font-semibold text-gray-900'
                                 : 'text-gray-700'
                             }`}
-                            onClick={() => handleNotificationClick(notification)}
+                            onClick={() =>
+                              handleNotificationClick(notification)
+                            }
                           >
                             {notification.message}
                           </p>
@@ -291,9 +304,12 @@ const NotificationsPage: React.FC = () => {
                           {/* Time */}
                           <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
                             <Clock className="w-3 h-3" />
-                            {formatDistanceToNow(new Date(notification.createdAt), {
-                              addSuffix: true,
-                            })}
+                            {formatDistanceToNow(
+                              new Date(notification.createdAt),
+                              {
+                                addSuffix: true,
+                              }
+                            )}
                           </div>
                         </div>
 

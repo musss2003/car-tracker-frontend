@@ -52,7 +52,9 @@ const CustomerDetailsPage = lazy(
 );
 
 // Notifications Pages - Feature-based imports
-const NotificationsPage = lazy(() => import('../../features/notifications/pages/NotificationsPage'));
+const NotificationsPage = lazy(
+  () => import('../../features/notifications/pages/NotificationsPage')
+);
 
 // Audit Logs Pages - Feature-based imports
 const AuditLogsPage = lazy(
