@@ -33,6 +33,11 @@ export interface Car {
   updatedAt: Date;
 }
 
+export interface CarWithStatus extends Car {
+  isBusy: boolean
+}
+
+
 export interface RenderFieldOptions {
   placeholder?: string;
   min?: number;
