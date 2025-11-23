@@ -1,11 +1,11 @@
-import React from 'react';
-import { cn } from '@/shared/lib/utils';
+import type React from "react"
+import { cn } from "@/shared/lib/utils"
 
 interface FormSectionProps {
-  title: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
+  title: string
+  icon?: React.ReactNode
+  children: React.ReactNode
+  className?: string
 }
 
 /**
@@ -21,21 +21,14 @@ interface FormSectionProps {
  *   </FormField>
  * </FormSection>
  */
-export const FormSection: React.FC<FormSectionProps> = ({
-  title,
-  icon,
-  children,
-  className,
-}) => {
+export const FormSection: React.FC<FormSectionProps> = ({ title, icon, children, className }) => {
   return (
-    <div
-      className={cn('bg-background border rounded-lg p-6 space-y-4', className)}
-    >
+    <div className={cn("bg-background border rounded-lg p-6 space-y-4", className)}>
       <h2 className="text-lg font-semibold flex items-center gap-2">
         {icon}
         {title}
       </h2>
       {children}
     </div>
-  );
-};
+  )
+}
