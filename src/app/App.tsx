@@ -8,6 +8,7 @@ import ModernSidebar from '../shared/components/layout/ModernSidebar/ModernSideb
 import { AppRoutes } from './routes/AppRoutes';
 import { socketService } from '../shared/services/socketService';
 import './App.css';
+import { Toaster } from '@/shared/components/ui/sonner';
 
 function App() {
   const { isLoggedIn, user } = useAuth();
@@ -43,8 +44,7 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="app-container">
-        <ToastContainer position="bottom-right" />
-
+        <Toaster />
         {isLoggedIn() && (
           <ModernSidebar
             isOpen={isSidebarOpen}

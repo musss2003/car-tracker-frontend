@@ -72,6 +72,11 @@ export interface CarFormErrors {
   photoUrl?: string;
 }
 
+export interface CarBrand {
+  name: string;
+  popular: boolean;
+}
+
 export interface BookingEvent {
   title: string;
   start: Date;

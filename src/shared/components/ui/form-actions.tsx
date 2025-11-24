@@ -1,3 +1,5 @@
+"use client"
+
 import type React from "react"
 
 import { Save, X } from "lucide-react"
@@ -39,7 +41,7 @@ export function FormActions({
           {additionalActions}
         </div>
         {showSave && (
-          <Button type="submit" onClick={onSave} disabled={isSubmitting} className="gap-2">
+          <Button type="submit" form="edit-car-form" onClick={onSave} disabled={isSubmitting} className="gap-2">
             {isSubmitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

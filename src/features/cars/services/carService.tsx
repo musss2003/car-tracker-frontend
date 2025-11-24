@@ -1,5 +1,5 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
-import { BookingEvent, Car } from '../types/car.types';
+import { BookingEvent, Car, CarBrand } from '../types/car.types';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
@@ -108,3 +108,9 @@ export const getCarAvailability = async (
 
   return await response.json();
 };
+
+export async function fetchCarBrands(): Promise<CarBrand[]> {
+  const res = await fetch("/assets/car_brands.json");
+  if (!res.ok) throw new Error("Failed to fetch car brands");
+  return res.json();
+}

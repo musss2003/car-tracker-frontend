@@ -215,7 +215,7 @@ const CarsPage = () => {
       const doc = new jsPDF()
       doc.text("Cars List", 20, 10)
 
-      const tableColumn = ["Proizvođač", "Model", "Godina", "Registarska oznaka", "Cijena po danu", "Status"]
+      const tableColumn = ["Proizvođač", "Model", "Godina", "Registarska oznaka", "Kilometraža", "Cijena po danu", "Status"]
       const tableRows = filteredAndSortedCars.map((car) => [
         car.manufacturer || "N/A",
         car.model || "N/A",
@@ -249,6 +249,7 @@ const CarsPage = () => {
         Model: car.model || "N/A",
         Godina: car.year?.toString() || "N/A",
         "Registarska oznaka": car.licensePlate || "N/A",
+        "Kilometraža": car.mileage ? `${car.mileage} km` : "N/A",
         "Cijena po danu": car.pricePerDay ? `${car.pricePerDay} BAM` : "N/A",
         Status: car.isBusy ? "Zauzeto" : "Dostupno",
       }))
@@ -410,6 +411,7 @@ const CarsPage = () => {
                       </div>
                     </TableHead>
                     {renderTableHeader("Registarska oznaka", "licensePlate")}
+                    <TableHead className="hidden min-[800px]:table-cell">Kilometraža</TableHead>
                     <TableHead
                       className="hidden min-[1300px]:table-cell cursor-pointer select-none"
                       onClick={() => handleSort("pricePerDay")}
@@ -450,6 +452,9 @@ const CarsPage = () => {
                         <TableCell className="hidden min-[900px]:table-cell">{car.model || "N/A"}</TableCell>
                         <TableCell className="hidden min-[1100px]:table-cell">{car.year || "N/A"}</TableCell>
                         <TableCell>{car.licensePlate || "N/A"}</TableCell>
+                        <TableCell className="hidden min-[1300px]:table-cell">
+                          {car.mileage ? `${car.mileage}km` : "N/A"}
+                        </TableCell>
                         <TableCell className="hidden min-[1300px]:table-cell">
                           {car.pricePerDay ? `${car.pricePerDay} BAM` : "N/A"}
                         </TableCell>
