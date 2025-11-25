@@ -110,7 +110,7 @@ export const getCarAvailability = async (
 };
 
 export async function fetchCarBrands(): Promise<CarBrand[]> {
-  const res = await fetch("/assets/car_brands.json");
+  const res = await fetch("/car_brands.json");
   if (!res.ok) throw new Error("Failed to fetch car brands");
   return res.json();
 }
