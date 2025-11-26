@@ -1,13 +1,13 @@
-import { XIcon } from "@heroicons/react/solid"
+import { XIcon } from '@heroicons/react/solid';
 
 interface PhotoModalProps {
-  isOpen: boolean
-  photo: { src: string; title: string } | null
-  onClose: () => void
+  isOpen: boolean;
+  photo: { src: string; title: string } | null;
+  onClose: () => void;
 }
 
 export function PhotoModal({ isOpen, photo, onClose }: PhotoModalProps) {
-  if (!isOpen || !photo) return null
+  if (!isOpen || !photo) return null;
 
   return (
     <div
@@ -22,9 +22,11 @@ export function PhotoModal({ isOpen, photo, onClose }: PhotoModalProps) {
           <XIcon className="w-6 h-6 text-white" />
         </button>
         <div className="text-center">
-          <h3 className="text-white text-xl font-semibold mb-4">{photo.title}</h3>
+          <h3 className="text-white text-xl font-semibold mb-4">
+            {photo.title}
+          </h3>
           <img
-            src={photo.src || "/placeholder.svg"}
+            src={photo.src || '/placeholder.svg'}
             alt={photo.title}
             className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
             onClick={(e) => e.stopPropagation()}
@@ -32,5 +34,5 @@ export function PhotoModal({ isOpen, photo, onClose }: PhotoModalProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -2,8 +2,16 @@ import type React from 'react';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Car, CarBrand, CarCategory, CarFormErrors, CarStatus, FuelType, TransmissionType } from '../types/car.types';
-import { deleteCar, fetchCarBrands, getCar, updateCar } from '../services/carService';
+import {
+  Car,
+  CarBrand,
+  CarCategory,
+  CarFormErrors,
+  CarStatus,
+  FuelType,
+  TransmissionType,
+} from '../types/car.types';
+
 import { uploadDocument } from '@/shared/services/uploadService';
 import { LoadingState } from '@/shared/components/ui/loading-state';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
@@ -40,6 +48,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
+import { deleteCar, fetchCarBrands, getCar, updateCar } from '../services/carService';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
@@ -98,10 +107,8 @@ export default function EditCarPage() {
   const [carBrands, setCarBrands] = useState<CarBrand[]>([]);
 
   useEffect(() => {
-  fetchCarBrands()
-    .then(setCarBrands)
-    .catch(console.error);
-}, []);
+    fetchCarBrands().then(setCarBrands).catch(console.error);
+  }, []);
 
   // Car brands from JSON file
   const popularBrands = carBrands
@@ -257,7 +264,7 @@ export default function EditCarPage() {
         photoUrl: photoUrl,
         updatedAt: new Date(),
         createdAt: new Date(),
-        id
+        id,
       };
 
       await updateCar(formData.licensePlate, carData);

@@ -1,16 +1,16 @@
-import type React from "react"
-import { Label } from "@/shared/components/ui/label"
-import { AlertCircle } from "lucide-react"
-import { cn } from "@/shared/lib/utils"
+import type React from 'react';
+import { Label } from '@/shared/components/ui/label';
+import { AlertCircle } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
 
 interface FormFieldProps {
-  label: string
-  id: string
-  error?: string
-  required?: boolean
-  children: React.ReactNode
-  className?: string
-  helperText?: string
+  label: string;
+  id: string;
+  error?: string;
+  required?: boolean;
+  children: React.ReactNode;
+  className?: string;
+  helperText?: string;
 }
 
 /**
@@ -48,13 +48,15 @@ export const FormField: React.FC<FormFieldProps> = ({
   helperText,
 }) => {
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn('space-y-2', className)}>
       <Label htmlFor={id}>
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>
       {children}
-      {helperText && !error && <p className="text-sm text-muted-foreground">{helperText}</p>}
+      {helperText && !error && (
+        <p className="text-sm text-muted-foreground">{helperText}</p>
+      )}
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
           <AlertCircle className="w-3 h-3" />
@@ -62,5 +64,5 @@ export const FormField: React.FC<FormFieldProps> = ({
         </p>
       )}
     </div>
-  )
-}
+  );
+};

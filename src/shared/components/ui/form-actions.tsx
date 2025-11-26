@@ -1,25 +1,25 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { Save, X } from "lucide-react"
-import { Button } from "./button"
+import { Save, X } from 'lucide-react';
+import { Button } from './button';
 
 interface FormActionsProps {
-  onCancel: () => void
-  onSave?: () => void
-  saveLabel?: string
-  cancelLabel?: string
-  isSubmitting?: boolean
-  showSave?: boolean
-  additionalActions?: React.ReactNode
+  onCancel: () => void;
+  onSave?: () => void;
+  saveLabel?: string;
+  cancelLabel?: string;
+  isSubmitting?: boolean;
+  showSave?: boolean;
+  additionalActions?: React.ReactNode;
 }
 
 export function FormActions({
   onCancel,
   onSave,
-  saveLabel = "Sačuvaj",
-  cancelLabel = "Otkaži",
+  saveLabel = 'Sačuvaj',
+  cancelLabel = 'Otkaži',
   isSubmitting = false,
   showSave = true,
   additionalActions,
@@ -41,7 +41,13 @@ export function FormActions({
           {additionalActions}
         </div>
         {showSave && (
-          <Button type="submit" form="edit-car-form" onClick={onSave} disabled={isSubmitting} className="gap-2">
+          <Button
+            type="submit"
+            form="edit-car-form"
+            onClick={onSave}
+            disabled={isSubmitting}
+            className="gap-2"
+          >
             {isSubmitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -57,5 +63,5 @@ export function FormActions({
         )}
       </div>
     </div>
-  )
+  );
 }

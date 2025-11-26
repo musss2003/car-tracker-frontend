@@ -34,9 +34,43 @@ export interface Car {
 }
 
 export interface CarWithStatus extends Car {
-  isBusy: boolean
+  isBusy: boolean;
 }
 
+export interface CarServiceHistory {
+  id: string;
+  carId: string;
+  car?: any; // optional if you don't always load relation
+  serviceDate: string; // dates come as ISO strings from backend
+  mileage?: number;
+  serviceType: string;
+  description?: string;
+  nextServiceKm?: number;
+  nextServiceDate?: string;
+  cost?: number;
+  createdAt: string;
+}
+
+export interface CarRegistration {
+  id: string;
+  carId: string;
+  car?: any;
+  registrationExpiry: string;
+  renewalDate: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface CarInsurance {
+  id: string;
+  carId: string;
+  car?: any;
+  policyNumber?: string;
+  provider?: string;
+  insuranceExpiry: string;
+  price?: number;
+  createdAt: string;
+}
 
 export interface RenderFieldOptions {
   placeholder?: string;

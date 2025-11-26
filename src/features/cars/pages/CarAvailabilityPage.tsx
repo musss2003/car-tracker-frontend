@@ -49,7 +49,6 @@ import { getCar, getCarAvailability } from '../services/carService';
 // Setup the localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
 
-
 export default function CarAvailabilityPage() {
   const navigate = useNavigate();
   const params = useParams();

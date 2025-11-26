@@ -13,16 +13,29 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { uploadDocument } from '@/shared/services/uploadService';
 import { toast } from 'sonner';
-import { addCar, fetchCarBrands } from '../services/carService';
-import { Car, CarBrand, CarCategory, FuelType, TransmissionType } from '../types/car.types';
+
+import {
+  Car,
+  CarBrand,
+  CarCategory,
+  FuelType,
+  TransmissionType,
+} from '../types/car.types';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { Button } from '@/shared/components/ui/button';
 import { FormSection } from '@/shared/components/ui/form-section';
 import { FormField } from '@/shared/components/ui/form-field';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select';
 import { Input } from '@/shared/components/ui/input';
 import { PhotoUpload } from '@/shared/components/ui/photo-upload';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { addCar, fetchCarBrands } from '../services/carService';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);

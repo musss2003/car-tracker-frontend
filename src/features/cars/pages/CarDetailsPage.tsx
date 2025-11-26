@@ -40,6 +40,7 @@ import {
 import { downloadDocument } from '@/shared/services/uploadService';
 import { deleteCar, getCar } from '../services/carService';
 
+
 export default function CarDetailsPage() {
   const navigate = useNavigate();
   const params = useParams();
@@ -281,6 +282,32 @@ export default function CarDetailsPage() {
             >
               <CalendarIcon className="w-4 h-4" />
               Kalendar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/cars/${car.id}/service-history`)}
+              className="gap-2"
+            >
+              <CogIcon className="w-4 h-4" />
+              Servis
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/cars/${car.id}/registration`)}
+              className="gap-2"
+            >
+              <TagIcon className="w-4 h-4" />
+              Registracija
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/cars/${car.id}/insurance`)}
+              className="gap-2"
+            >
+              Osiguranje
             </Button>
             <Button
               variant="destructive"

@@ -54,9 +54,10 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 
 import { useNavigate } from 'react-router-dom';
-import { deleteCar, getCars } from '../services/carService';
+
 import { getActiveContracts } from '@/features/contracts';
 import type { CarWithStatus } from '../types/car.types';
+import { deleteCar, getCars } from '../services/carService';
 
 declare module 'jspdf' {
   interface jsPDF {
