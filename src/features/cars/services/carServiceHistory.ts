@@ -1,9 +1,9 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import { CarServiceHistory } from '../types/car.types';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
+const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/cars/';
 
-const BASE_URL = `${API_URL}car-service-history/`;
+const BASE_URL = `${API_URL}service-history/`;
 
 // Get all service entries for a car
 export const getCarServiceHistory = async (
