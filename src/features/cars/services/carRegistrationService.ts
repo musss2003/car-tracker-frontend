@@ -24,7 +24,7 @@ export const getCarRegistrationById = async (
 export const getCarRegistrations = async (
   carId: string
 ): Promise<CarRegistration[]> => {
-  const res = await fetch(`${BASE_URL}$car/{carId}`, {
+  const res = await fetch(`${BASE_URL}car/${carId}`, {
     method: 'GET',
     headers: getAuthHeaders(),
     credentials: 'include',
@@ -38,7 +38,7 @@ export const getCarRegistrations = async (
 export const getLatestCarRegistration = async (
   carId: string
 ): Promise<CarRegistration> => {
-  const res = await fetch(`${BASE_URL}$car/{carId}/latest`, {
+  const res = await fetch(`${BASE_URL}car/${carId}/latest`, {
     method: 'GET',
     headers: getAuthHeaders(),
     credentials: 'include',
