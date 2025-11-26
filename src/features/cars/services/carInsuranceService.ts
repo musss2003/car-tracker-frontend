@@ -1,15 +1,29 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import { CarInsurance } from '../types/car.types';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/cars/';
+const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
-const BASE_URL = `${API_URL}insurance/`;
+const BASE_URL = `${API_URL}car-insurance/`;
 
 // Get all insurance records for a car
 export const getCarInsuranceHistory = async (
   carId: string
 ): Promise<CarInsurance[]> => {
   const res = await fetch(`${BASE_URL}${carId}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch insurance records');
+  return res.json();
+};
+
+// Get the lates insurance record for a car
+export const getLatestCarInsuranceRecord = async (
+  carId: string
+): Promise<CarInsurance> => {
+  const res = await fetch(`${BASE_URL}${carId}/latest`, {
     method: 'GET',
     headers: getAuthHeaders(),
     credentials: 'include',
@@ -39,7 +53,7 @@ export const updateCarInsurance = async (
   id: string,
   data: Partial<CarInsurance>
 ): Promise<CarInsurance> => {
-  const res = await fetch(`${BASE_URL}record/${id}`, {
+  const res = await fetch(`${BASE_URL}${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     credentials: 'include',

@@ -1,15 +1,44 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import { CarRegistration } from '../types/car.types';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/cars/';
+const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
-const BASE_URL = `${API_URL}registration/`;
+const BASE_URL = `${API_URL}car-registration/`;
+
+
+// Get all registration records for a car
+export const getCarRegistrationById = async (
+  carId: string
+): Promise<CarRegistration[]> => {
+  const res = await fetch(`${BASE_URL}${carId}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch registration history');
+  return res.json();
+};
 
 // Get all registration records for a car
 export const getCarRegistrations = async (
   carId: string
 ): Promise<CarRegistration[]> => {
-  const res = await fetch(`${BASE_URL}${carId}`, {
+  const res = await fetch(`${BASE_URL}$car/{carId}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch registration history');
+  return res.json();
+};
+
+// Get all registration records for a car
+export const getLatestCarRegistration = async (
+  carId: string
+): Promise<CarRegistration> => {
+  const res = await fetch(`${BASE_URL}$car/{carId}/latest`, {
     method: 'GET',
     headers: getAuthHeaders(),
     credentials: 'include',

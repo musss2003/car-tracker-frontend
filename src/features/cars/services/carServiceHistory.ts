@@ -1,15 +1,29 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import { CarServiceHistory } from '../types/car.types';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/cars/';
+const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
-const BASE_URL = `${API_URL}service-history/`;
+const BASE_URL = `${API_URL}car-service-history/`;
 
 // Get all service entries for a car
 export const getCarServiceHistory = async (
   carId: string
 ): Promise<CarServiceHistory[]> => {
   const res = await fetch(`${BASE_URL}${carId}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+  });
+
+  if (!res.ok) throw new Error('Failed to load service history');
+  return res.json();
+};
+
+// Get all service entries for a car
+export const getLatestServiceRecord = async (
+  carId: string
+): Promise<CarServiceHistory> => {
+  const res = await fetch(`${BASE_URL}${carId}/latest`, {
     method: 'GET',
     headers: getAuthHeaders(),
     credentials: 'include',
