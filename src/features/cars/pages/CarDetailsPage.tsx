@@ -40,7 +40,6 @@ import {
 import { downloadDocument } from '@/shared/services/uploadService';
 import { deleteCar, getCar } from '../services/carService';
 
-
 export default function CarDetailsPage() {
   const navigate = useNavigate();
   const params = useParams();

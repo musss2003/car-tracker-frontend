@@ -48,7 +48,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
-import { deleteCar, fetchCarBrands, getCar, updateCar } from '../services/carService';
+import {
+  deleteCar,
+  fetchCarBrands,
+  getCar,
+  updateCar,
+} from '../services/carService';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);

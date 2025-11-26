@@ -34,6 +34,21 @@ export const addCarInsurance = async (
   return res.json();
 };
 
+// PUT update insurance record (route PUT /record/:id)
+export const updateCarInsurance = async (
+  id: string,
+  data: Partial<CarInsurance>
+): Promise<CarInsurance> => {
+  const res = await fetch(`${BASE_URL}record/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update insurance record');
+  return res.json();
+};
+
 // Delete insurance policy
 export const deleteCarInsurance = async (id: string): Promise<void> => {
   const res = await fetch(`${BASE_URL}${id}`, {

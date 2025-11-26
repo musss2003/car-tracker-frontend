@@ -20,7 +20,10 @@ export const getCarRegistrations = async (
 };
 
 // PUT update existing registration by id
-export const updateCarRegistration = async (id: string, data: Partial<CarRegistration>): Promise<CarRegistration> => {
+export const updateCarRegistration = async (
+  id: string,
+  data: Partial<CarRegistration>
+): Promise<CarRegistration> => {
   const res = await fetch(`${BASE_URL}${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),

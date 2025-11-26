@@ -32,9 +32,13 @@ import {
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
 
-import { addCarServiceRecord, deleteCarServiceRecord, getCarServiceHistory, updateServiceRecord } from '../services/carServiceHistory';
+import {
+  addCarServiceRecord,
+  deleteCarServiceRecord,
+  getCarServiceHistory,
+  updateServiceRecord,
+} from '../services/carServiceHistory';
 import { getCar } from '../services/carService';
-
 
 export default function CarServiceHistoryPage() {
   const navigate = useNavigate();

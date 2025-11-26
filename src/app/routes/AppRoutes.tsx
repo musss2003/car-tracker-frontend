@@ -31,6 +31,10 @@ const CarRegistrationPage = lazy(
   () => import('../../features/cars/pages/CarRegistrationPage')
 );
 
+const CarInsurancePage = lazy(
+  () => import('../../features/cars/pages/CarInsurancePage')
+);
+
 // Contracts Pages - Feature-based imports
 const ContractsPage = lazy(
   () => import('../../features/contracts/pages/ContractsPage')
@@ -136,6 +140,7 @@ export function AppRoutes() {
             path="/cars/:id/registration"
             element={<CarRegistrationPage />}
           />
+          <Route path="/cars/:id/insurance" element={<CarInsurancePage />} />
           <Route path="/contracts/new" element={<CreateContractPage />} />
           <Route path="/contracts/:id" element={<ContractDetailsPage />} />
           <Route path="/contracts/:id/edit" element={<EditContractPage />} />
