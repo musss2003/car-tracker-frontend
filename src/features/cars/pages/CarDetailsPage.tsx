@@ -9,6 +9,16 @@ import {
   Shield,
   CheckCircle,
   XCircle,
+  Gauge,
+  Droplet,
+  Settings,
+  Car,
+  AlertTriangle,
+  CalendarCheck,
+  Tag,
+  DollarSign,
+  MapPin,
+  ClipboardList,
 } from 'lucide-react';
 import { CarWithStatus } from '../types/car.types';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -29,6 +39,59 @@ import {
 } from '@/shared/components/ui/alert-dialog';
 import { downloadDocument } from '@/shared/services/uploadService';
 import { deleteCar, getCar } from '../services/carService';
+import { KPIGauge } from '../components/kpi-gauge';
+
+function SpecItem({
+  label,
+  value,
+  className,
+  icon: Icon,
+}: {
+  label: string;
+  value?: string | number | null;
+  className?: string;
+  icon?: React.ElementType;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-1.5">
+      <div className="flex items-center gap-2">
+        {Icon && <Icon className="w-4 h-4 text-primary" />}
+        <span className="text-sm text-muted-foreground">{label}</span>
+      </div>
+      <span className={`text-sm font-semibold text-right ${className || ''}`}>
+        {value || 'N/A'}
+      </span>
+    </div>
+  );
+}
+
+function NavTile({
+  title,
+  Icon,
+  onClick,
+}: {
+  title: string;
+  Icon: React.ElementType;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={onClick}
+      className="h-auto py-4 px-6 flex-1 min-w-[200px] flex flex-col items-center justify-center gap-3 bg-background hover:bg-muted/50 border-2 transition-all duration-200 hover:border-primary/50 hover:shadow-md"
+    >
+      <Icon className="w-6 h-6 text-primary" />
+      <span className="font-medium text-center text-sm">{title}</span>
+    </Button>
+  );
+}
+
+const MOCK_SERVICE_KM_REMAINING = 456;
+const MOCK_SERVICE_INTERVAL = 15000;
+const MOCK_REGISTRATION_DAYS_REMAINING = 134;
+const MOCK_REGISTRATION_INTERVAL_DAYS = 365;
+const MOCK_ISSUES_COUNT = 1;
 
 export default function CarDetailsPage() {
   const navigate = useNavigate();
@@ -43,53 +106,42 @@ export default function CarDetailsPage() {
   const [carPhoto, setCarPhoto] = useState<string | null>(null);
   const [loadingPhoto, setLoadingPhoto] = useState(false);
 
-  // Load photo
-  const loadPhoto = useCallback(
-    async (photoUrl: string) => {
-      try {
-        setLoadingPhoto(true);
-
-        if (
-          !photoUrl ||
-          photoUrl.startsWith('http://example.com') ||
-          photoUrl.startsWith('https://example.com')
-        ) {
-          setCarPhoto(null);
-          setLoadingPhoto(false);
-          return;
-        }
-
-        const photoBlob = await downloadDocument(photoUrl);
-        const photoUrlObject = URL.createObjectURL(photoBlob);
-        setCarPhoto(photoUrlObject);
-      } catch (error) {
-        console.error('Error loading photo:', error);
-        toast.error('Učitavanje fotografije nije uspjelo');
+  const loadPhoto = useCallback(async (photoUrl: string) => {
+    try {
+      setLoadingPhoto(true);
+      if (
+        !photoUrl ||
+        photoUrl.startsWith('http://example.com') ||
+        photoUrl.startsWith('https://example.com')
+      ) {
         setCarPhoto(null);
-      } finally {
         setLoadingPhoto(false);
+        return;
       }
-    },
-    [toast]
-  );
+      const photoBlob = await downloadDocument(photoUrl);
+      const photoUrlObject = URL.createObjectURL(photoBlob);
+      setCarPhoto(photoUrlObject);
+    } catch (error) {
+      console.error('Error loading photo:', error);
+      toast.error('Učitavanje fotografije nije uspjelo');
+      setCarPhoto(null);
+    } finally {
+      setLoadingPhoto(false);
+    }
+  }, []);
 
-  // Fetch car data
   useEffect(() => {
     const fetchCar = async () => {
       try {
         setLoading(true);
         const fetchedCar = await getCar(id);
-
         if (!fetchedCar) {
           setError('Vozilo nije pronađeno');
           toast.error('Vozilo nije pronađeno');
           navigate('/cars');
           return;
         }
-
         setCar({ ...fetchedCar, isBusy: false });
-
-        // Load car photo if available
         if (fetchedCar.photoUrl && fetchedCar.photoUrl.trim() !== '') {
           loadPhoto(fetchedCar.photoUrl);
         }
@@ -101,23 +153,19 @@ export default function CarDetailsPage() {
         setLoading(false);
       }
     };
-
     if (id) {
       fetchCar();
     }
-  }, [id, navigate, loadPhoto, toast]);
+  }, [id, navigate, loadPhoto]);
 
-  // Cleanup photo URL
   useEffect(() => {
     return () => {
       if (carPhoto) URL.revokeObjectURL(carPhoto);
     };
   }, [carPhoto]);
 
-  // Handle delete
   const handleDelete = useCallback(async () => {
     if (!car) return;
-
     try {
       setDeleting(true);
       await deleteCar(car.id.toString());
@@ -130,7 +178,7 @@ export default function CarDetailsPage() {
       setDeleting(false);
       setShowDeleteDialog(false);
     }
-  }, [car, navigate, toast]);
+  }, [car, navigate]);
 
   if (loading) {
     return <LoadingState />;
@@ -155,24 +203,25 @@ export default function CarDetailsPage() {
 
   return (
     <div className="h-full w-full flex flex-col bg-background">
-      <div className="flex-none px-6 py-4 bg-gradient-to-r from-background via-muted/20 to-background border-b sticky top-0 z-10 backdrop-blur-sm">
-        <div className="mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      {/* Header */}
+      <div className="flex-none px-4 sm:px-6 py-4 sticky top-0 z-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/cars')}
-              className="gap-2"
+              className="gap-1.5 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4" />
               Nazad
             </Button>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-6 w-px bg-border" />
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">
+              <h1 className="text-xl font-bold tracking-tight">
                 {car.manufacturer} {car.model}
               </h1>
-              <p className="text-sm text-muted-foreground font-mono">
+              <p className="text-xs text-muted-foreground font-mono">
                 {car.licensePlate}
               </p>
             </div>
@@ -181,7 +230,7 @@ export default function CarDetailsPage() {
           <div className="flex items-center gap-3">
             <Badge
               variant={car.isBusy ? 'destructive' : 'default'}
-              className={`gap-2 px-3 py-1 ${car.isBusy ? '' : 'bg-green-600 hover:bg-green-700'}`}
+              className={`gap-2 px-3 py-1.5 ${car.isBusy ? '' : 'bg-green-600 hover:bg-green-700'}`}
             >
               {car.isBusy ? (
                 <>
@@ -218,245 +267,298 @@ export default function CarDetailsPage() {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl">
-          {/* Hero Section with Car Image */}
-          <div className="relative bg-[hsl(var(--accent-foreground))] from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
-            <div className="absolute inset-0 bg-background-white/[0.02]" />
-
-            <div className="relative px-6 py-16 lg:py-24">
-              <div className="flex flex-col lg:flex-row items-center gap-12">
-                {/* Car Image */}
-                <div className="flex-1 w-full flex justify-center">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 space-y-8">
+          
+          {/* Hero Section */}
+          <Card className="overflow-hidden">
+            <div className="flex flex-col lg:flex-row gap-0">
+              {/* Left: Image - Narrower */}
+              <div className="bg-muted/30 p-6 flex items-center justify-center lg:w-[350px] flex-shrink-0">
+                <div className="w-full aspect-[4/3] bg-background rounded-lg overflow-hidden flex items-center justify-center border-2 border-border shadow-lg">
                   {loadingPhoto ? (
-                    <div className="w-full max-w-2xl aspect-video flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-                    </div>
+                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                   ) : carPhoto ? (
-                    <div className="w-full max-w-2xl">
-                      <img
-                        src={carPhoto || '/placeholder.svg'}
-                        alt={`${car.manufacturer} ${car.model}`}
-                        className="w-full h-auto object-contain drop-shadow-2xl"
-                      />
-                    </div>
+                    <img
+                      src={carPhoto}
+                      alt={`${car.manufacturer} ${car.model}`}
+                      className="w-full h-full object-contain p-3"
+                    />
                   ) : (
-                    <div className="w-full max-w-2xl aspect-video flex items-center justify-center bg-slate-800/50 rounded-lg border border-slate-700">
-                      <div className="text-center space-y-2">
-                        <div className="w-16 h-16 mx-auto bg-slate-700 rounded-full flex items-center justify-center">
-                          <svg
-                            className="w-8 h-8 text-slate-500"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-slate-400 text-sm">
-                          Nema fotografije
-                        </p>
-                      </div>
+                    <div className="text-center space-y-2 p-4">
+                      <Car className="w-12 h-12 text-muted-foreground mx-auto" />
+                      <p className="text-muted-foreground text-xs">
+                        Nema fotografije
+                      </p>
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Car Info Highlight */}
-                <div className="flex-1 w-full space-y-6 text-white">
-                  <div className="space-y-2">
-                    <h2 className="text-5xl lg:text-6xl font-bold tracking-tight">
-                      {car.manufacturer}
-                    </h2>
-                    <p className="text-3xl lg:text-4xl text-slate-300 font-light">
-                      {car.model}
+              {/* Right: Info & Price - Takes remaining space */}
+              <div className="p-6 lg:p-8 flex-1 flex flex-col justify-between">
+                {/* Title & Basic Info */}
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">
+                      {car.year || 'N/A'}
                     </p>
+                    <h2 className="text-3xl lg:text-4xl font-bold tracking-tight">
+                      {car.manufacturer} {car.model}
+                    </h2>
                   </div>
 
+                  {/* Quick Specs Grid - More columns to use space */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 pt-2">
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground">Godina</p>
+                        <p className="font-semibold text-sm truncate">{car.year}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <Droplet className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground">Gorivo</p>
+                        <p className="font-semibold text-sm truncate">{car.fuelType || 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <Settings className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground">Transmisija</p>
+                        <p className="font-semibold text-sm truncate">{car.transmission || 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <Gauge className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground">Kilometraža</p>
+                        <p className="font-semibold text-sm truncate">{car.mileage ? `${car.mileage} km` : 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <Tag className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground">Kategorija</p>
+                        <p className="font-semibold text-sm truncate">{car.category || 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <Droplet className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground">Boja</p>
+                        <p className="font-semibold text-sm truncate">{car.color || 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <Settings className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground">Broj vrata</p>
+                        <p className="font-semibold text-sm truncate">{car.doors || 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground">Lokacija</p>
+                        <p className="font-semibold text-sm truncate">{car.currentLocation || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price - Bottom */}
+                <div className="pt-6 border-t mt-6">
+                  <p className="text-sm text-muted-foreground mb-2">Dnevna cijena iznajmljivanja</p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-bold">
-                      {car.pricePerDay
-                        ? `${Number(car.pricePerDay).toFixed(0)}`
-                        : 'N/A'}
+                    <span className="text-4xl lg:text-5xl font-extrabold text-foreground">
+                      {car.pricePerDay ? `${Number(car.pricePerDay).toFixed(0)}` : 'N/A'}
                     </span>
-                    <span className="text-2xl text-slate-400">BAM / dan</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 pt-4">
-                    <div className="space-y-1">
-                      <p className="text-sm text-slate-400 uppercase tracking-wide">
-                        Godina
-                      </p>
-                      <p className="text-2xl font-semibold">
-                        {car.year || 'N/A'}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm text-slate-400 uppercase tracking-wide">
-                        Gorivo
-                      </p>
-                      <p className="text-2xl font-semibold">
-                        {car.fuelType || 'N/A'}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm text-slate-400 uppercase tracking-wide">
-                        Transmisija
-                      </p>
-                      <p className="text-2xl font-semibold">
-                        {car.transmission || 'N/A'}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm text-slate-400 uppercase tracking-wide">
-                        Kilometraža
-                      </p>
-                      <p className="text-2xl font-semibold">
-                        {car.mileage ? `${car.mileage} km` : 'N/A'}
-                      </p>
-                    </div>
+                    <span className="text-xl lg:text-2xl font-bold text-primary">BAM</span>
+                    <span className="text-base lg:text-lg text-muted-foreground">/ dan</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="px-6 py-8 bg-muted/30">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate(`/cars/${car.id}/availability`)}
-                className="h-auto py-6 flex-col gap-2 bg-background hover:bg-muted"
-              >
-                <Calendar className="w-8 h-8" />
-                <span className="font-semibold">Kalendar dostupnosti</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate(`/cars/${car.id}/service-history`)}
-                className="h-auto py-6 flex-col gap-2 bg-background hover:bg-muted"
-              >
-                <Wrench className="w-8 h-8" />
-                <span className="font-semibold">Servisna istorija</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate(`/cars/${car.id}/registration`)}
-                className="h-auto py-6 flex-col gap-2 bg-background hover:bg-muted"
-              >
-                <FileText className="w-8 h-8" />
-                <span className="font-semibold">Registracija</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate(`/cars/${car.id}/insurance`)}
-                className="h-auto py-6 flex-col gap-2 bg-background hover:bg-muted"
-              >
-                <Shield className="w-8 h-8" />
-                <span className="font-semibold">Osiguranje</span>
-              </Button>
+          {/* Maintenance Status Cards */}
+          <div>
+            <h3 className="text-2xl font-bold mb-4">Status održavanja</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Service Gauge */}
+              <Card className="p-6">
+                <KPIGauge
+                  title="Sljedeći servis"
+                  remainingValue={MOCK_SERVICE_KM_REMAINING}
+                  totalValue={MOCK_SERVICE_INTERVAL}
+                  unitLabel="km preostalo"
+                  Icon={Wrench}
+                />
+              </Card>
+
+              {/* Registration Gauge */}
+              <Card className="p-6">
+                <KPIGauge
+                  title="Registracija ističe"
+                  remainingValue={MOCK_REGISTRATION_DAYS_REMAINING}
+                  totalValue={MOCK_REGISTRATION_INTERVAL_DAYS}
+                  unitLabel="dana preostalo"
+                  Icon={CalendarCheck}
+                />
+              </Card>
+
+              {/* Issues Alert */}
+              <Card className="p-6 flex items-center justify-center">
+                {MOCK_ISSUES_COUNT > 0 ? (
+                  <div className="text-center space-y-3">
+                    <AlertTriangle className="w-12 h-12 text-destructive mx-auto" />
+                    <div>
+                      <p className="font-bold text-lg text-destructive">
+                        {MOCK_ISSUES_COUNT} Aktivna greška
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Provjerite servisnu istoriju
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center space-y-3">
+                    <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
+                    <div>
+                      <p className="font-bold text-lg text-green-600">
+                        Nema aktivnih grešaka
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Vozilo je u dobrom stanju
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </Card>
             </div>
           </div>
 
-          <div className="px-6 py-8 space-y-6">
-            <h3 className="text-2xl font-bold">Specifikacije</h3>
+          {/* Quick Actions */}
+          <div>
+            <h3 className="text-2xl font-bold mb-4">Brze akcije</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <NavTile
+                title="Kalendar dostupnosti"
+                Icon={Calendar}
+                onClick={() => navigate(`/cars/${car.id}/availability`)}
+              />
+              <NavTile
+                title="Servisna istorija"
+                Icon={Wrench}
+                onClick={() => navigate(`/cars/${car.id}/service-history`)}
+              />
+              <NavTile
+                title="Detalji registracije"
+                Icon={FileText}
+                onClick={() => navigate(`/cars/${car.id}/registration`)}
+              />
+              <NavTile
+                title="Polisa osiguranja"
+                Icon={Shield}
+                onClick={() => navigate(`/cars/${car.id}/insurance`)}
+              />
+            </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Basic Info */}
-              <Card className="p-6 space-y-4">
-                <h4 className="font-semibold text-lg border-b pb-2">
+          {/* Detailed Specifications */}
+          <div>
+            <h3 className="text-2xl font-bold mb-4">Detaljne specifikacije</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* 1. Basic Info */}
+              <Card className="p-6">
+                <h4 className="font-bold text-lg border-b pb-3 mb-4 text-primary">
                   Osnovne informacije
                 </h4>
                 <div className="space-y-3">
-                  <SpecItem
-                    label="Registarska oznaka"
-                    value={car.licensePlate}
-                  />
-                  <SpecItem label="Kategorija" value={car.category} />
-                  <SpecItem label="Boja" value={car.color} />
-                  <SpecItem label="Broj vrata" value={car.doors} />
-                  <SpecItem label="Status" value={car.status} />
+                  <SpecItem label="Registarska oznaka" value={car.licensePlate} icon={Tag} />
+                  <SpecItem label="Kategorija" value={car.category} icon={Tag} />
+                  <SpecItem label="Boja" value={car.color} icon={Droplet} />
+                  <SpecItem label="Broj vrata" value={car.doors} icon={Settings} />
+                  <SpecItem label="Status vozila" value={car.status} icon={CheckCircle} />
+                  <SpecItem label="Trenutna lokacija" value={car.currentLocation} icon={MapPin} />
                 </div>
               </Card>
 
-              {/* Technical Info */}
-              <Card className="p-6 space-y-4">
-                <h4 className="font-semibold text-lg border-b pb-2">
+              {/* 2. Technical Info */}
+              <Card className="p-6">
+                <h4 className="font-bold text-lg border-b pb-3 mb-4 text-primary">
                   Tehnički podaci
                 </h4>
                 <div className="space-y-3">
-                  <SpecItem
-                    label="Broj šasije"
-                    value={car.chassisNumber}
-                    className="break-all"
+                  <SpecItem 
+                    label="Snaga motora" 
+                    value={car.enginePower ? `${car.enginePower} KS` : undefined} 
+                    icon={Wrench} 
                   />
-                  <SpecItem
-                    label="Snaga motora"
-                    value={
-                      car.enginePower ? `${car.enginePower} KS` : undefined
-                    }
+                  <SpecItem label="Tip goriva" value={car.fuelType} icon={Droplet} />
+                  <SpecItem label="Transmisija" value={car.transmission} icon={Settings} />
+                  <SpecItem label="Godina proizvodnje" value={car.year} icon={Calendar} />
+                </div>
+              </Card>
+
+              {/* 3. Pricing & Costs */}
+              <Card className="p-6">
+                <h4 className="font-bold text-lg border-b pb-3 mb-4 text-primary">
+                  Cijena i kalkulacije
+                </h4>
+                <div className="space-y-3">
+                  <SpecItem 
+                    label="Dnevna cijena" 
+                    value={car.pricePerDay ? `${Number(car.pricePerDay).toFixed(2)} BAM` : undefined}
+                    icon={DollarSign} 
                   />
-                  <SpecItem
-                    label="Trenutna lokacija"
-                    value={car.currentLocation}
+                  <SpecItem 
+                    label="Sedmična (7 dana)" 
+                    value={car.pricePerDay ? `${(Number(car.pricePerDay) * 7).toFixed(2)} BAM` : undefined}
+                    icon={DollarSign} 
+                  />
+                  <SpecItem 
+                    label="Mjesečna (30 dana)" 
+                    value={car.pricePerDay ? `${(Number(car.pricePerDay) * 30).toFixed(2)} BAM` : undefined}
+                    icon={DollarSign} 
                   />
                 </div>
               </Card>
 
-              {/* Pricing */}
-              <Card className="p-6 space-y-4">
-                <h4 className="font-semibold text-lg border-b pb-2">
-                  Cijena i troškovi
+              {/* 4. Key Features & Notes */}
+              <Card className="p-6">
+                <h4 className="font-bold text-lg border-b pb-3 mb-4 text-primary">
+                  Dodatne informacije
                 </h4>
                 <div className="space-y-3">
-                  <SpecItem
-                    label="Dnevna cijena"
-                    value={
-                      car.pricePerDay
-                        ? `${Number(car.pricePerDay).toFixed(2)} BAM`
-                        : undefined
-                    }
+                  <SpecItem 
+                    label="Broj šasije (VIN)" 
+                    value={car.chassisNumber} 
+                    icon={FileText} 
+                    className="break-all" 
                   />
-                  <SpecItem
-                    label="Sedmična (7 dana)"
-                    value={
-                      car.pricePerDay
-                        ? `${(Number(car.pricePerDay) * 7).toFixed(2)} BAM`
-                        : undefined
-                    }
-                  />
-                  <SpecItem
-                    label="Mjesečna (30 dana)"
-                    value={
-                      car.pricePerDay
-                        ? `${(Number(car.pricePerDay) * 30).toFixed(2)} BAM`
-                        : undefined
-                    }
-                  />
+                  <SpecItem label="Klima uređaj" value="Automatski" icon={ClipboardList} />
+                  <SpecItem label="Navigacija" value="Da" icon={ClipboardList} />
+                  <SpecItem label="Max putnika" value="5" icon={ClipboardList} />
                 </div>
               </Card>
             </div>
           </div>
+
         </div>
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Obrisati vozilo?</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li ste sigurni da želite obrisati ovo vozilo? Ova akcija se ne
-              može poništiti.
+              Da li ste sigurni da želite obrisati ovo vozilo? Ova akcija se ne može poništiti.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -467,25 +569,6 @@ export default function CarDetailsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
-}
-
-function SpecItem({
-  label,
-  value,
-  className,
-}: {
-  label: string;
-  value?: string | number | null;
-  className?: string;
-}) {
-  return (
-    <div className="flex justify-between items-start gap-4">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className={`text-sm font-medium text-right ${className || ''}`}>
-        {value || 'N/A'}
-      </span>
     </div>
   );
 }

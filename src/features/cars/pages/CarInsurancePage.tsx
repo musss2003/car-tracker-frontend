@@ -71,7 +71,7 @@ export default function CarInsurancePage() {
 
         if (!carData) {
           toast.error('Vozilo nije pronađeno');
-          navigate('/cars');
+          navigate('/cars/');
           return;
         }
 

@@ -279,7 +279,7 @@ export default function CarAvailabilityPage() {
       <PageHeader
         title={`${car.manufacturer} ${car.model}`}
         subtitle={`Kalendar dostupnosti - ${car.licensePlate}`}
-        onBack={() => navigate('/cars')}
+        onBack={() => navigate(`/cars/${id}`)}
         actions={
           <Button
             onClick={() => fetchCarAndBookings(true)}

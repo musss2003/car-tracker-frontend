@@ -46,12 +46,12 @@ export const theme = {
         foreground: '#f9fafb',
       },
       sidebar: {
-        background: '#1f2937',           // dark gray
-        foreground: '#f9fafb',           // text color
-        accent: '#3b82f6',               // hover/active bg
-        'accent-foreground': '#ffffff',  // text on hover/active
-        border: '#374151',               // border color
-        ring: '#2563eb',                 // focus ring
+        background: '#1f2937', // dark gray
+        foreground: '#f9fafb', // text color
+        accent: '#3b82f6', // hover/active bg
+        'accent-foreground': '#ffffff', // text on hover/active
+        border: '#374151', // border color
+        ring: '#2563eb', // focus ring
       },
     },
     borderRadius: {
