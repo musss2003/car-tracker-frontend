@@ -5,6 +5,7 @@ import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
 import UserProvider from '../features/auth/hooks/useAuth';
 import { ThemeProvider } from '@/shared/providers/ThemeProvider';
+import { SidebarProvider } from '@/shared/components/ui/sidebar';
 
 const rootElement = document.getElementById('root');
 
@@ -15,11 +16,13 @@ if (!rootElement) {
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <Router>
-      <UserProvider>
-        <ThemeProvider>
-          <App />
-        </ThemeProvider>
-      </UserProvider>
+      <ThemeProvider>
+        <UserProvider>
+          <SidebarProvider>
+            <App />
+          </SidebarProvider>
+        </UserProvider>
+      </ThemeProvider>
     </Router>
   </React.StrictMode>
 );

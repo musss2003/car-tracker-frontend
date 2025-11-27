@@ -4,11 +4,11 @@ import useScreenSize from '../shared/hooks/useScreenSize';
 import ErrorBoundary from '../shared/components/feedback/ErrorBoundary/ErrorBoundary';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import ModernSidebar from '../shared/components/layout/ModernSidebar/ModernSidebar';
 import { AppRoutes } from './routes/AppRoutes';
 import { socketService } from '../shared/services/socketService';
 import './App.css';
 import { Toaster } from '@/shared/components/ui/sonner';
+import { AppSidebar } from '@/shared/components/layout';
 
 function App() {
   const { isLoggedIn, user } = useAuth();
@@ -33,24 +33,12 @@ function App() {
     };
   }, [isLoggedIn, user?.id]);
 
-  React.useEffect(() => {
-    setSidebarOpen(!isSmallScreen);
-  }, [isSmallScreen]);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!isSidebarOpen);
-  };
-
   return (
     <ErrorBoundary>
       <div className="app-container">
         <Toaster />
         {isLoggedIn() && (
-          <ModernSidebar
-            isOpen={isSidebarOpen}
-            isSmallScreen={isSmallScreen}
-            toggleSidebar={toggleSidebar}
-          />
+          <AppSidebar />
         )}
 
         {/* Main Content Area */}

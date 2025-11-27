@@ -1,12 +1,19 @@
 @import 'tailwindcss';
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
+  /* Background / Foreground */
+  --background: 0 0% 100%;          /* white */
+  --foreground: 222.2 84% 4.9%;    /* almost black */
+
+  /* Cards and Popovers */
+  --card: 0 0% 100%;                /* white card background */
   --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
+  --popover: 0 0% 100%; /* this is fine */
   --popover-foreground: 222.2 84% 4.9%;
+  /* Make sure to add alpha for safety */
+  --popover-alpha: 1;
+
+  /* Primary / Accent / Muted / etc */
   --primary: 221.2 83.2% 53.3%;
   --primary-foreground: 210 40% 98%;
   --secondary: 210 40% 96.1%;
@@ -17,12 +24,15 @@
   --accent-foreground: 222.2 47.4% 11.2%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
+
+  /* Border / Input / Ring / Radius */
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 221.2 83.2% 53.3%;
   --radius: 0.5rem;
 }
 
+/* Base styles */
 * {
   border-color: hsl(var(--border));
 }
@@ -30,21 +40,17 @@
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-}
-
-body {
   margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
 
 /* Custom Toggle Switch */
 .toggle-checkbox {

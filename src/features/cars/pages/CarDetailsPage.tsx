@@ -1,32 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
-
-import { toast } from 'react-toastify';
 import {
-  ArrowLeftIcon,
-  PencilIcon,
-  TrashIcon,
-  TagIcon,
-  CogIcon,
-  CurrencyDollarIcon,
-  CalendarIcon,
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  PhotographIcon,
-} from '@heroicons/react/solid';
+  ArrowLeft,
+  Edit,
+  Trash2,
+  Calendar,
+  Wrench,
+  FileText,
+  Shield,
+  CheckCircle,
+  XCircle,
+} from 'lucide-react';
 import { CarWithStatus } from '../types/car.types';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import { LoadingState } from '@/shared/components/ui/loading-state';
 import { Button } from '@/shared/components/ui/button';
-import { Badge } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
-import { PhotoCard } from '@/shared/components/ui/photo-card';
-import { DetailCard } from '@/shared/components/ui/detail-card';
-import { DetailField } from '@/shared/components/ui/detail-field';
-import { PhotoModal } from '@/shared/components/ui/photo-modal';
+import { Badge } from '@/shared/components/ui/badge';
+import { Card } from '@/shared/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,68 +40,38 @@ export default function CarDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  // Photo states
   const [carPhoto, setCarPhoto] = useState<string | null>(null);
   const [loadingPhoto, setLoadingPhoto] = useState(false);
 
-  // Modal state
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalPhoto, setModalPhoto] = useState<{
-    src: string;
-    title: string;
-  } | null>(null);
-
-  // Open photo modal
-  const openPhotoModal = useCallback((src: string, title: string) => {
-    setModalPhoto({ src, title });
-    setModalOpen(true);
-  }, []);
-
-  // Close photo modal
-  const closePhotoModal = useCallback(() => {
-    setModalOpen(false);
-    const timer = setTimeout(() => setModalPhoto(null), 300);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Close modal on Escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && modalOpen) {
-        closePhotoModal();
-      }
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [modalOpen, closePhotoModal]);
-
   // Load photo
-  const loadPhoto = useCallback(async (photoUrl: string) => {
-    try {
-      setLoadingPhoto(true);
+  const loadPhoto = useCallback(
+    async (photoUrl: string) => {
+      try {
+        setLoadingPhoto(true);
 
-      if (
-        !photoUrl ||
-        photoUrl.startsWith('http://example.com') ||
-        photoUrl.startsWith('https://example.com')
-      ) {
+        if (
+          !photoUrl ||
+          photoUrl.startsWith('http://example.com') ||
+          photoUrl.startsWith('https://example.com')
+        ) {
+          setCarPhoto(null);
+          setLoadingPhoto(false);
+          return;
+        }
+
+        const photoBlob = await downloadDocument(photoUrl);
+        const photoUrlObject = URL.createObjectURL(photoBlob);
+        setCarPhoto(photoUrlObject);
+      } catch (error) {
+        console.error('Error loading photo:', error);
+        toast.error('Učitavanje fotografije nije uspjelo');
         setCarPhoto(null);
+      } finally {
         setLoadingPhoto(false);
-        return;
       }
-
-      const photoBlob = await downloadDocument(photoUrl);
-      const photoUrlObject = URL.createObjectURL(photoBlob);
-      setCarPhoto(photoUrlObject);
-    } catch (error) {
-      console.error('Error loading photo:', error);
-      toast.error('Učitavanje fotografije nije uspjelo');
-      setCarPhoto(null);
-    } finally {
-      setLoadingPhoto(false);
-    }
-  }, []);
+    },
+    [toast]
+  );
 
   // Fetch car data
   useEffect(() => {
@@ -145,7 +105,7 @@ export default function CarDetailsPage() {
     if (id) {
       fetchCar();
     }
-  }, [id, navigate, loadPhoto]);
+  }, [id, navigate, loadPhoto, toast]);
 
   // Cleanup photo URL
   useEffect(() => {
@@ -154,32 +114,13 @@ export default function CarDetailsPage() {
     };
   }, [carPhoto]);
 
-  // Helper functions
-  const getValue = useCallback((value: unknown, defaultValue = 'N/A') => {
-    if (
-      value === undefined ||
-      value === null ||
-      value === '' ||
-      (typeof value === 'object' && Object.keys(value).length === 0)
-    ) {
-      return defaultValue;
-    }
-    return String(value);
-  }, []);
-
-  const formatCurrency = useCallback((amount: number | null | undefined) => {
-    if (amount === undefined || amount === null || isNaN(Number(amount)))
-      return 'N/A';
-    return `${Number(amount).toFixed(2)} BAM`;
-  }, []);
-
   // Handle delete
   const handleDelete = useCallback(async () => {
     if (!car) return;
 
     try {
       setDeleting(true);
-      await deleteCar(car.id);
+      await deleteCar(car.id.toString());
       toast.success('Vozilo je uspješno obrisano');
       navigate('/cars');
     } catch (error) {
@@ -189,33 +130,24 @@ export default function CarDetailsPage() {
       setDeleting(false);
       setShowDeleteDialog(false);
     }
-  }, [car, navigate]);
+  }, [car, navigate, toast]);
 
   if (loading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="flex items-center gap-2">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-          <span>Učitavanje...</span>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error || !car) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="max-w-md">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <ExclamationCircleIcon className="w-16 h-16 text-destructive" />
-            <p className="text-lg font-medium">
-              {error || 'Vozilo nije pronađeno'}
-            </p>
-            <Button onClick={() => navigate('/cars')}>
-              <ArrowLeftIcon className="w-4 h-4 mr-2" />
-              Nazad na vozila
-            </Button>
-          </div>
+        <div className="max-w-md text-center space-y-4">
+          <XCircle className="w-16 h-16 text-destructive mx-auto" />
+          <p className="text-lg font-medium">
+            {error || 'Vozilo nije pronađeno'}
+          </p>
+          <Button onClick={() => navigate('/cars')}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Nazad na vozila
+          </Button>
         </div>
       </div>
     );
@@ -223,8 +155,7 @@ export default function CarDetailsPage() {
 
   return (
     <div className="h-full w-full flex flex-col bg-background">
-      {/* Header */}
-      <div className="flex-none px-6 py-4 bg-card border-b sticky top-0 z-10 shadow-sm">
+      <div className="flex-none px-6 py-4 bg-gradient-to-r from-background via-muted/20 to-background border-b sticky top-0 z-10 backdrop-blur-sm">
         <div className="mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
@@ -233,16 +164,15 @@ export default function CarDetailsPage() {
               onClick={() => navigate('/cars')}
               className="gap-2"
             >
-              <ArrowLeftIcon className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" />
               Nazad
             </Button>
             <div className="h-8 w-px bg-border" />
             <div>
-              <h1 className="text-2xl font-semibold flex items-center gap-2">
-                <TagIcon className="w-6 h-6 text-primary" />
+              <h1 className="text-2xl font-bold tracking-tight">
                 {car.manufacturer} {car.model}
               </h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground font-mono">
                 {car.licensePlate}
               </p>
             </div>
@@ -250,16 +180,17 @@ export default function CarDetailsPage() {
 
           <div className="flex items-center gap-3">
             <Badge
-              className={`${car.isBusy ? 'bg-red-500' : 'bg-green-500'} text-white gap-2 px-3 py-1`}
+              variant={car.isBusy ? 'destructive' : 'default'}
+              className={`gap-2 px-3 py-1 ${car.isBusy ? '' : 'bg-green-600 hover:bg-green-700'}`}
             >
               {car.isBusy ? (
                 <>
-                  <ExclamationCircleIcon className="w-4 h-4" />
+                  <XCircle className="w-4 h-4" />
                   Zauzeto
                 </>
               ) : (
                 <>
-                  <CheckCircleIcon className="w-4 h-4" />
+                  <CheckCircle className="w-4 h-4" />
                   Dostupno
                 </>
               )}
@@ -270,43 +201,8 @@ export default function CarDetailsPage() {
               onClick={() => navigate(`/cars/${car.id}/edit`)}
               className="gap-2"
             >
-              <PencilIcon className="w-4 h-4" />
+              <Edit className="w-4 h-4" />
               Uredi
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/cars/${car.id}/availability`)}
-              className="gap-2"
-            >
-              <CalendarIcon className="w-4 h-4" />
-              Kalendar
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/cars/${car.id}/service-history`)}
-              className="gap-2"
-            >
-              <CogIcon className="w-4 h-4" />
-              Servis
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/cars/${car.id}/registration`)}
-              className="gap-2"
-            >
-              <TagIcon className="w-4 h-4" />
-              Registracija
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/cars/${car.id}/insurance`)}
-              className="gap-2"
-            >
-              Osiguranje
             </Button>
             <Button
               variant="destructive"
@@ -315,185 +211,243 @@ export default function CarDetailsPage() {
               disabled={deleting}
               className="gap-2"
             >
-              <TrashIcon className="w-4 h-4" />
+              <Trash2 className="w-4 h-4" />
               Obriši
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto bg-muted/30">
-        <div className="mx-auto p-6">
-          <div className="space-y-6">
-            {/* Car Photo - Full Width at Top */}
-            {carPhoto && (
-              <div className="w-full">
-                <Card className="overflow-hidden">
-                  <div className="h-1 w-full bg-purple-500" />
-                  <CardHeader className="bg-gradient-to-r from-purple-500/10 to-transparent pb-3">
-                    <CardTitle className="flex items-center gap-2 text-base text-purple-700 dark:text-purple-400">
-                      <PhotographIcon className="w-5 h-5" />
-                      Fotografija vozila
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-4">
-                    <div className="flex justify-center">
-                      <div className="w-full max-w-3xl">
-                        <PhotoCard
-                          src={carPhoto}
-                          alt={`${car.manufacturer} ${car.model}`}
-                          label="Slika vozila"
-                          loading={loadingPhoto}
-                          onZoom={() =>
-                            openPhotoModal(
-                              carPhoto,
-                              `${car.manufacturer} ${car.model}`
-                            )
-                          }
-                          className="h-[400px]"
-                        />
-                      </div>
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-7xl">
+          {/* Hero Section with Car Image */}
+          <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-background-white/[0.02]" />
+
+            <div className="relative px-6 py-16 lg:py-24">
+              <div className="flex flex-col lg:flex-row items-center gap-12">
+                {/* Car Image */}
+                <div className="flex-1 w-full flex justify-center">
+                  {loadingPhoto ? (
+                    <div className="w-full max-w-2xl aspect-video flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Information Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Basic Information */}
-              <DetailCard
-                title="Osnovne informacije"
-                icon={<TagIcon className="w-5 h-5" />}
-                borderColor="border-l-green-500"
-                gradientColor="from-green-500/10"
-                textColor="text-green-700 dark:text-green-400"
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <DetailField
-                    label="Proizvođač"
-                    value={getValue(car.manufacturer)}
-                  />
-                  <DetailField label="Model" value={getValue(car.model)} />
-                  <DetailField label="Godina" value={getValue(car.year)} />
-                  <DetailField
-                    label="Registarska oznaka"
-                    value={getValue(car.licensePlate)}
-                    valueClassName="font-medium text-sm font-mono"
-                  />
-                  <DetailField
-                    label="Boja"
-                    value={
-                      <div className="flex items-center gap-2">
-                        {car.color && (
-                          <div
-                            className="w-3 h-3 rounded-full border border-gray-300"
-                            style={{ backgroundColor: car.color }}
-                          />
-                        )}
-                        <span className="font-medium text-sm">
-                          {car.color || 'Nedefinirano'}
-                        </span>
+                  ) : carPhoto ? (
+                    <div className="w-full max-w-2xl">
+                      <img
+                        src={carPhoto || '/placeholder.svg'}
+                        alt={`${car.manufacturer} ${car.model}`}
+                        className="w-full h-auto object-contain drop-shadow-2xl"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full max-w-2xl aspect-video flex items-center justify-center bg-slate-800/50 rounded-lg border border-slate-700">
+                      <div className="text-center space-y-2">
+                        <div className="w-16 h-16 mx-auto bg-slate-700 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-8 h-8 text-slate-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-slate-400 text-sm">
+                          Nema fotografije
+                        </p>
                       </div>
-                    }
-                  />
-                  <DetailField
-                    label="Kategorija"
-                    value={getValue(car.category, 'Nedefinirano')}
-                  />
-                </div>
-              </DetailCard>
-
-              {/* Technical Details */}
-              <DetailCard
-                title="Tehnički podaci"
-                icon={<CogIcon className="w-5 h-5" />}
-                borderColor="border-l-blue-500"
-                gradientColor="from-blue-500/10"
-                textColor="text-blue-700 dark:text-blue-400"
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <DetailField
-                    label="Broj šasije"
-                    value={getValue(car.chassisNumber, 'Nedefinirano')}
-                    valueClassName="font-medium text-sm break-all"
-                  />
-                  <DetailField
-                    label="Gorivo"
-                    value={getValue(car.fuelType, 'Nedefinirano')}
-                  />
-                  <DetailField
-                    label="Transmisija"
-                    value={getValue(car.transmission, 'Nedefinirano')}
-                  />
-                  <DetailField
-                    label="Broj vrata"
-                    value={getValue(car.doors, 'Nedefinirano')}
-                  />
-                  <DetailField
-                    label="Kilometraža"
-                    value={car.mileage ? `${car.mileage} km` : 'Nedefinirano'}
-                  />
-                  <DetailField
-                    label="Snaga motora"
-                    value={
-                      car.enginePower ? `${car.enginePower} KS` : 'Nedefinirano'
-                    }
-                  />
-                  <DetailField
-                    label="Status"
-                    value={getValue(car.status, 'Nedefinirano')}
-                  />
-                  <DetailField
-                    label="Trenutna lokacija"
-                    value={getValue(car.currentLocation, 'Nedefinirano')}
-                  />
-                </div>
-              </DetailCard>
-
-              {/* Pricing Information */}
-              <DetailCard
-                title="Cijena"
-                icon={<CurrencyDollarIcon className="w-5 h-5" />}
-                borderColor="border-l-orange-500"
-                gradientColor="from-orange-500/10"
-                textColor="text-orange-700 dark:text-orange-400"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">
-                      Cijena po danu
-                    </p>
-                    <p className="text-xl font-bold">
-                      {formatCurrency(car.pricePerDay)}
-                    </p>
-                  </div>
-                  {car.pricePerDay && (
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground">
-                        Mjesečno (30 dana)
-                      </p>
-                      <p className="text-lg font-semibold text-muted-foreground">
-                        {formatCurrency(
-                          Number.parseFloat(String(car.pricePerDay)) * 30
-                        )}
-                      </p>
                     </div>
                   )}
                 </div>
-              </DetailCard>
+
+                {/* Car Info Highlight */}
+                <div className="flex-1 w-full space-y-6 text-white">
+                  <div className="space-y-2">
+                    <h2 className="text-5xl lg:text-6xl font-bold tracking-tight">
+                      {car.manufacturer}
+                    </h2>
+                    <p className="text-3xl lg:text-4xl text-slate-300 font-light">
+                      {car.model}
+                    </p>
+                  </div>
+
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold">
+                      {car.pricePerDay
+                        ? `${Number(car.pricePerDay).toFixed(0)}`
+                        : 'N/A'}
+                    </span>
+                    <span className="text-2xl text-slate-400">BAM / dan</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 pt-4">
+                    <div className="space-y-1">
+                      <p className="text-sm text-slate-400 uppercase tracking-wide">
+                        Godina
+                      </p>
+                      <p className="text-2xl font-semibold">
+                        {car.year || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-slate-400 uppercase tracking-wide">
+                        Gorivo
+                      </p>
+                      <p className="text-2xl font-semibold">
+                        {car.fuelType || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-slate-400 uppercase tracking-wide">
+                        Transmisija
+                      </p>
+                      <p className="text-2xl font-semibold">
+                        {car.transmission || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-slate-400 uppercase tracking-wide">
+                        Kilometraža
+                      </p>
+                      <p className="text-2xl font-semibold">
+                        {car.mileage ? `${car.mileage} km` : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="px-6 py-8 bg-muted/30">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate(`/cars/${car.id}/availability`)}
+                className="h-auto py-6 flex-col gap-2 bg-background hover:bg-muted"
+              >
+                <Calendar className="w-8 h-8" />
+                <span className="font-semibold">Kalendar dostupnosti</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate(`/cars/${car.id}/service-history`)}
+                className="h-auto py-6 flex-col gap-2 bg-background hover:bg-muted"
+              >
+                <Wrench className="w-8 h-8" />
+                <span className="font-semibold">Servisna istorija</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate(`/cars/${car.id}/registration`)}
+                className="h-auto py-6 flex-col gap-2 bg-background hover:bg-muted"
+              >
+                <FileText className="w-8 h-8" />
+                <span className="font-semibold">Registracija</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate(`/cars/${car.id}/insurance`)}
+                className="h-auto py-6 flex-col gap-2 bg-background hover:bg-muted"
+              >
+                <Shield className="w-8 h-8" />
+                <span className="font-semibold">Osiguranje</span>
+              </Button>
+            </div>
+          </div>
+
+          <div className="px-6 py-8 space-y-6">
+            <h3 className="text-2xl font-bold">Specifikacije</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Basic Info */}
+              <Card className="p-6 space-y-4">
+                <h4 className="font-semibold text-lg border-b pb-2">
+                  Osnovne informacije
+                </h4>
+                <div className="space-y-3">
+                  <SpecItem
+                    label="Registarska oznaka"
+                    value={car.licensePlate}
+                  />
+                  <SpecItem label="Kategorija" value={car.category} />
+                  <SpecItem label="Boja" value={car.color} />
+                  <SpecItem label="Broj vrata" value={car.doors} />
+                  <SpecItem label="Status" value={car.status} />
+                </div>
+              </Card>
+
+              {/* Technical Info */}
+              <Card className="p-6 space-y-4">
+                <h4 className="font-semibold text-lg border-b pb-2">
+                  Tehnički podaci
+                </h4>
+                <div className="space-y-3">
+                  <SpecItem
+                    label="Broj šasije"
+                    value={car.chassisNumber}
+                    className="break-all"
+                  />
+                  <SpecItem
+                    label="Snaga motora"
+                    value={
+                      car.enginePower ? `${car.enginePower} KS` : undefined
+                    }
+                  />
+                  <SpecItem
+                    label="Trenutna lokacija"
+                    value={car.currentLocation}
+                  />
+                </div>
+              </Card>
+
+              {/* Pricing */}
+              <Card className="p-6 space-y-4">
+                <h4 className="font-semibold text-lg border-b pb-2">
+                  Cijena i troškovi
+                </h4>
+                <div className="space-y-3">
+                  <SpecItem
+                    label="Dnevna cijena"
+                    value={
+                      car.pricePerDay
+                        ? `${Number(car.pricePerDay).toFixed(2)} BAM`
+                        : undefined
+                    }
+                  />
+                  <SpecItem
+                    label="Sedmična (7 dana)"
+                    value={
+                      car.pricePerDay
+                        ? `${(Number(car.pricePerDay) * 7).toFixed(2)} BAM`
+                        : undefined
+                    }
+                  />
+                  <SpecItem
+                    label="Mjesečna (30 dana)"
+                    value={
+                      car.pricePerDay
+                        ? `${(Number(car.pricePerDay) * 30).toFixed(2)} BAM`
+                        : undefined
+                    }
+                  />
+                </div>
+              </Card>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Photo Modal */}
-      <PhotoModal
-        isOpen={modalOpen}
-        photo={modalPhoto}
-        onClose={closePhotoModal}
-      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -513,6 +467,25 @@ export default function CarDetailsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+function SpecItem({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value?: string | number | null;
+  className?: string;
+}) {
+  return (
+    <div className="flex justify-between items-start gap-4">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className={`text-sm font-medium text-right ${className || ''}`}>
+        {value || 'N/A'}
+      </span>
     </div>
   );
 }

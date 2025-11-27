@@ -335,7 +335,7 @@ export default function EditCarPage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/cars')}
+              onClick={() => navigate(`/cars/${id}`)}
               disabled={submitting}
             >
               <X className="w-4 h-4 mr-2" />
