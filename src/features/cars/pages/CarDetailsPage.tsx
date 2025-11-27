@@ -221,7 +221,7 @@ export default function CarDetailsPage() {
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-7xl">
           {/* Hero Section with Car Image */}
-          <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+          <div className="relative bg-[hsl(var(--accent-foreground))] from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
             <div className="absolute inset-0 bg-background-white/[0.02]" />
 

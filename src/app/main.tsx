@@ -1,11 +1,10 @@
+import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
-import UserProvider from '../features/auth/hooks/useAuth';
-import { ThemeProvider } from '@/shared/providers/ThemeProvider';
-import { SidebarProvider } from '@/shared/components/ui/sidebar';
+import { AppProviders } from './AppProviders';
+
+const App = React.lazy(() => import('./App'));
 
 const rootElement = document.getElementById('root');
 
@@ -14,15 +13,11 @@ if (!rootElement) {
 }
 
 ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <Router>
-      <ThemeProvider>
-        <UserProvider>
-          <SidebarProvider>
-            <App />
-          </SidebarProvider>
-        </UserProvider>
-      </ThemeProvider>
-    </Router>
-  </React.StrictMode>
+  <Router>
+    <React.StrictMode>
+      <AppProviders>
+        <App />
+      </AppProviders>
+    </React.StrictMode>
+  </Router>
 );

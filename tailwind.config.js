@@ -12,44 +12,52 @@ export const content = [
 export const theme = {
   extend: {
     colors: {
-      border: 'hsl(var(--border))',
-      input: 'hsl(var(--input))',
-      ring: 'hsl(var(--ring))',
-      background: 'hsl(var(--background))',
-      foreground: 'hsl(var(--foreground))',
+      border: '#374151', // gray-700
+      input: '#1f2937', // gray-800
+      ring: '#2563eb', // blue-600
+      background: '#111827', // gray-900
+      foreground: '#f9fafb', // gray-50
       primary: {
-        DEFAULT: 'hsl(var(--primary))',
-        foreground: 'hsl(var(--primary-foreground))',
+        DEFAULT: '#3b82f6', // blue-500
+        foreground: '#ffffff',
       },
       secondary: {
-        DEFAULT: 'hsl(var(--secondary))',
-        foreground: 'hsl(var(--secondary-foreground))',
+        DEFAULT: '#6b7280', // gray-500
+        foreground: '#ffffff',
       },
       destructive: {
-        DEFAULT: 'hsl(var(--destructive))',
-        foreground: 'hsl(var(--destructive-foreground))',
+        DEFAULT: '#ef4444', // red-500
+        foreground: '#ffffff',
       },
       muted: {
-        DEFAULT: 'hsl(var(--muted))',
-        foreground: 'hsl(var(--muted-foreground))',
+        DEFAULT: '#9ca3af', // gray-400
+        foreground: '#111827', // dark background
       },
       accent: {
-        DEFAULT: 'hsl(var(--accent))',
-        foreground: 'hsl(var(--accent-foreground))',
+        DEFAULT: '#10b981', // emerald-500
+        foreground: '#ffffff',
       },
       popover: {
-        DEFAULT: 'hsl(var(--popover))',
-        foreground: 'hsl(var(--popover-foreground))',
+        DEFAULT: '#1f2937', // gray-800
+        foreground: '#f9fafb',
       },
       card: {
-        DEFAULT: 'hsl(var(--card))',
-        foreground: 'hsl(var(--card-foreground))',
+        DEFAULT: '#1f2937', // gray-800
+        foreground: '#f9fafb',
+      },
+      sidebar: {
+        background: '#1f2937',           // dark gray
+        foreground: '#f9fafb',           // text color
+        accent: '#3b82f6',               // hover/active bg
+        'accent-foreground': '#ffffff',  // text on hover/active
+        border: '#374151',               // border color
+        ring: '#2563eb',                 // focus ring
       },
     },
     borderRadius: {
-      lg: 'var(--radius)',
-      md: 'calc(var(--radius) - 2px)',
-      sm: 'calc(var(--radius) - 4px)',
+      lg: '0.5rem',
+      md: '0.375rem',
+      sm: '0.25rem',
     },
     keyframes: {
       pulse: {
@@ -79,6 +87,14 @@ export const theme = {
       'slide-out-to-left': 'slide-out-to-left 0.3s ease-out',
       'fade-in': 'fade-in 0.3s ease-out',
       'fade-out': 'fade-out 0.3s ease-out',
+    },
+    spacing: {
+      sidebar: '16rem',
+      'sidebar-icon': '3rem',
+      'sidebar-mobile': '18rem',
+    },
+    minHeight: {
+      svh: '100svh',
     },
   },
 };
