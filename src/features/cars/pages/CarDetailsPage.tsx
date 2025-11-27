@@ -40,6 +40,8 @@ import {
 import { downloadDocument } from '@/shared/services/uploadService';
 import { deleteCar, getCar } from '../services/carService';
 import { KPIGauge } from '../components/kpi-gauge';
+import { getRegistrationDaysRemaining } from '../services/carRegistrationService';
+import { getServiceRemainingKm } from '../services/carServiceHistory';
 
 function SpecItem({
   label,
@@ -87,10 +89,9 @@ function NavTile({
   );
 }
 
-const MOCK_SERVICE_KM_REMAINING = 456;
-const MOCK_SERVICE_INTERVAL = 15000;
-const MOCK_REGISTRATION_DAYS_REMAINING = 134;
-const MOCK_REGISTRATION_INTERVAL_DAYS = 365;
+
+const SERVICE_INTERVAL = 10000;
+const REGISTRATION_INTERVAL_DAYS = 365;
 const MOCK_ISSUES_COUNT = 1;
 
 export default function CarDetailsPage() {
@@ -105,6 +106,12 @@ export default function CarDetailsPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [carPhoto, setCarPhoto] = useState<string | null>(null);
   const [loadingPhoto, setLoadingPhoto] = useState(false);
+  const [registrationDaysRemaining, setRegistrationDaysRemaining] = useState<
+    number | null
+  >(null);
+  const [serviceKilometersRemaining, setServiceKilometersRemaining] = useState<
+    number | null
+  >(null);
 
   const loadPhoto = useCallback(async (photoUrl: string) => {
     try {
@@ -131,6 +138,29 @@ export default function CarDetailsPage() {
   }, []);
 
   useEffect(() => {
+    const fetchServiceKmRemaining = async (carId: string) => {
+      try {
+        const data = await getServiceRemainingKm(carId);
+
+        setServiceKilometersRemaining(data);
+      } catch (error) {
+        console.error('Error fetching registration days remaining:', error);
+        setServiceKilometersRemaining(null);
+      }
+    };
+
+    const fetchRegistrationDaysRemaining = async (carId: string) => {
+      try {
+        // getRegistrationDaysRemaining returns a Promise<number> (or an object), so await it directly.
+        const data = await getRegistrationDaysRemaining(carId);
+
+        setRegistrationDaysRemaining(data);
+      } catch (error) {
+        console.error('Error fetching registration days remaining:', error);
+        setRegistrationDaysRemaining(null);
+      }
+    };
+
     const fetchCar = async () => {
       try {
         setLoading(true);
@@ -155,6 +185,8 @@ export default function CarDetailsPage() {
     };
     if (id) {
       fetchCar();
+      fetchRegistrationDaysRemaining(id);
+      fetchServiceKmRemaining(id);
     }
   }, [id, navigate, loadPhoto]);
 
@@ -270,7 +302,6 @@ export default function CarDetailsPage() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 space-y-8">
-          
           {/* Hero Section */}
           <Card className="overflow-hidden">
             <div className="flex flex-col lg:flex-row gap-0">
@@ -315,56 +346,82 @@ export default function CarDetailsPage() {
                       <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
                       <div className="min-w-0">
                         <p className="text-xs text-muted-foreground">Godina</p>
-                        <p className="font-semibold text-sm truncate">{car.year}</p>
+                        <p className="font-semibold text-sm truncate">
+                          {car.year}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <Droplet className="w-4 h-4 text-primary flex-shrink-0" />
                       <div className="min-w-0">
                         <p className="text-xs text-muted-foreground">Gorivo</p>
-                        <p className="font-semibold text-sm truncate">{car.fuelType || 'N/A'}</p>
+                        <p className="font-semibold text-sm truncate">
+                          {car.fuelType || 'N/A'}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <Settings className="w-4 h-4 text-primary flex-shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">Transmisija</p>
-                        <p className="font-semibold text-sm truncate">{car.transmission || 'N/A'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Transmisija
+                        </p>
+                        <p className="font-semibold text-sm truncate">
+                          {car.transmission || 'N/A'}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <Gauge className="w-4 h-4 text-primary flex-shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">Kilometraža</p>
-                        <p className="font-semibold text-sm truncate">{car.mileage ? `${car.mileage} km` : 'N/A'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Kilometraža
+                        </p>
+                        <p className="font-semibold text-sm truncate">
+                          {car.mileage ? `${car.mileage} km` : 'N/A'}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <Tag className="w-4 h-4 text-primary flex-shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">Kategorija</p>
-                        <p className="font-semibold text-sm truncate">{car.category || 'N/A'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Kategorija
+                        </p>
+                        <p className="font-semibold text-sm truncate">
+                          {car.category || 'N/A'}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <Droplet className="w-4 h-4 text-primary flex-shrink-0" />
                       <div className="min-w-0">
                         <p className="text-xs text-muted-foreground">Boja</p>
-                        <p className="font-semibold text-sm truncate">{car.color || 'N/A'}</p>
+                        <p className="font-semibold text-sm truncate">
+                          {car.color || 'N/A'}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <Settings className="w-4 h-4 text-primary flex-shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">Broj vrata</p>
-                        <p className="font-semibold text-sm truncate">{car.doors || 'N/A'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Broj vrata
+                        </p>
+                        <p className="font-semibold text-sm truncate">
+                          {car.doors || 'N/A'}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">Lokacija</p>
-                        <p className="font-semibold text-sm truncate">{car.currentLocation || 'N/A'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Lokacija
+                        </p>
+                        <p className="font-semibold text-sm truncate">
+                          {car.currentLocation || 'N/A'}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -372,13 +429,21 @@ export default function CarDetailsPage() {
 
                 {/* Price - Bottom */}
                 <div className="pt-6 border-t mt-6">
-                  <p className="text-sm text-muted-foreground mb-2">Dnevna cijena iznajmljivanja</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Dnevna cijena iznajmljivanja
+                  </p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl lg:text-5xl font-extrabold text-foreground">
-                      {car.pricePerDay ? `${Number(car.pricePerDay).toFixed(0)}` : 'N/A'}
+                      {car.pricePerDay
+                        ? `${Number(car.pricePerDay).toFixed(0)}`
+                        : 'N/A'}
                     </span>
-                    <span className="text-xl lg:text-2xl font-bold text-primary">BAM</span>
-                    <span className="text-base lg:text-lg text-muted-foreground">/ dan</span>
+                    <span className="text-xl lg:text-2xl font-bold text-primary">
+                      BAM
+                    </span>
+                    <span className="text-base lg:text-lg text-muted-foreground">
+                      / dan
+                    </span>
                   </div>
                 </div>
               </div>
@@ -393,8 +458,8 @@ export default function CarDetailsPage() {
               <Card className="p-6">
                 <KPIGauge
                   title="Sljedeći servis"
-                  remainingValue={MOCK_SERVICE_KM_REMAINING}
-                  totalValue={MOCK_SERVICE_INTERVAL}
+                  remainingValue={serviceKilometersRemaining ?? 0}
+                  totalValue={SERVICE_INTERVAL}
                   unitLabel="km preostalo"
                   Icon={Wrench}
                 />
@@ -404,8 +469,8 @@ export default function CarDetailsPage() {
               <Card className="p-6">
                 <KPIGauge
                   title="Registracija ističe"
-                  remainingValue={MOCK_REGISTRATION_DAYS_REMAINING}
-                  totalValue={MOCK_REGISTRATION_INTERVAL_DAYS}
+                  remainingValue={registrationDaysRemaining ?? 0}
+                  totalValue={REGISTRATION_INTERVAL_DAYS}
                   unitLabel="dana preostalo"
                   Icon={CalendarCheck}
                 />
@@ -479,12 +544,32 @@ export default function CarDetailsPage() {
                   Osnovne informacije
                 </h4>
                 <div className="space-y-3">
-                  <SpecItem label="Registarska oznaka" value={car.licensePlate} icon={Tag} />
-                  <SpecItem label="Kategorija" value={car.category} icon={Tag} />
+                  <SpecItem
+                    label="Registarska oznaka"
+                    value={car.licensePlate}
+                    icon={Tag}
+                  />
+                  <SpecItem
+                    label="Kategorija"
+                    value={car.category}
+                    icon={Tag}
+                  />
                   <SpecItem label="Boja" value={car.color} icon={Droplet} />
-                  <SpecItem label="Broj vrata" value={car.doors} icon={Settings} />
-                  <SpecItem label="Status vozila" value={car.status} icon={CheckCircle} />
-                  <SpecItem label="Trenutna lokacija" value={car.currentLocation} icon={MapPin} />
+                  <SpecItem
+                    label="Broj vrata"
+                    value={car.doors}
+                    icon={Settings}
+                  />
+                  <SpecItem
+                    label="Status vozila"
+                    value={car.status}
+                    icon={CheckCircle}
+                  />
+                  <SpecItem
+                    label="Trenutna lokacija"
+                    value={car.currentLocation}
+                    icon={MapPin}
+                  />
                 </div>
               </Card>
 
@@ -494,14 +579,28 @@ export default function CarDetailsPage() {
                   Tehnički podaci
                 </h4>
                 <div className="space-y-3">
-                  <SpecItem 
-                    label="Snaga motora" 
-                    value={car.enginePower ? `${car.enginePower} KS` : undefined} 
-                    icon={Wrench} 
+                  <SpecItem
+                    label="Snaga motora"
+                    value={
+                      car.enginePower ? `${car.enginePower} KS` : undefined
+                    }
+                    icon={Wrench}
                   />
-                  <SpecItem label="Tip goriva" value={car.fuelType} icon={Droplet} />
-                  <SpecItem label="Transmisija" value={car.transmission} icon={Settings} />
-                  <SpecItem label="Godina proizvodnje" value={car.year} icon={Calendar} />
+                  <SpecItem
+                    label="Tip goriva"
+                    value={car.fuelType}
+                    icon={Droplet}
+                  />
+                  <SpecItem
+                    label="Transmisija"
+                    value={car.transmission}
+                    icon={Settings}
+                  />
+                  <SpecItem
+                    label="Godina proizvodnje"
+                    value={car.year}
+                    icon={Calendar}
+                  />
                 </div>
               </Card>
 
@@ -511,20 +610,32 @@ export default function CarDetailsPage() {
                   Cijena i kalkulacije
                 </h4>
                 <div className="space-y-3">
-                  <SpecItem 
-                    label="Dnevna cijena" 
-                    value={car.pricePerDay ? `${Number(car.pricePerDay).toFixed(2)} BAM` : undefined}
-                    icon={DollarSign} 
+                  <SpecItem
+                    label="Dnevna cijena"
+                    value={
+                      car.pricePerDay
+                        ? `${Number(car.pricePerDay).toFixed(2)} BAM`
+                        : undefined
+                    }
+                    icon={DollarSign}
                   />
-                  <SpecItem 
-                    label="Sedmična (7 dana)" 
-                    value={car.pricePerDay ? `${(Number(car.pricePerDay) * 7).toFixed(2)} BAM` : undefined}
-                    icon={DollarSign} 
+                  <SpecItem
+                    label="Sedmična (7 dana)"
+                    value={
+                      car.pricePerDay
+                        ? `${(Number(car.pricePerDay) * 7).toFixed(2)} BAM`
+                        : undefined
+                    }
+                    icon={DollarSign}
                   />
-                  <SpecItem 
-                    label="Mjesečna (30 dana)" 
-                    value={car.pricePerDay ? `${(Number(car.pricePerDay) * 30).toFixed(2)} BAM` : undefined}
-                    icon={DollarSign} 
+                  <SpecItem
+                    label="Mjesečna (30 dana)"
+                    value={
+                      car.pricePerDay
+                        ? `${(Number(car.pricePerDay) * 30).toFixed(2)} BAM`
+                        : undefined
+                    }
+                    icon={DollarSign}
                   />
                 </div>
               </Card>
@@ -535,20 +646,31 @@ export default function CarDetailsPage() {
                   Dodatne informacije
                 </h4>
                 <div className="space-y-3">
-                  <SpecItem 
-                    label="Broj šasije (VIN)" 
-                    value={car.chassisNumber} 
-                    icon={FileText} 
-                    className="break-all" 
+                  <SpecItem
+                    label="Broj šasije (VIN)"
+                    value={car.chassisNumber}
+                    icon={FileText}
+                    className="break-all"
                   />
-                  <SpecItem label="Klima uređaj" value="Automatski" icon={ClipboardList} />
-                  <SpecItem label="Navigacija" value="Da" icon={ClipboardList} />
-                  <SpecItem label="Max putnika" value="5" icon={ClipboardList} />
+                  <SpecItem
+                    label="Klima uređaj"
+                    value="Automatski"
+                    icon={ClipboardList}
+                  />
+                  <SpecItem
+                    label="Navigacija"
+                    value="Da"
+                    icon={ClipboardList}
+                  />
+                  <SpecItem
+                    label="Max putnika"
+                    value="5"
+                    icon={ClipboardList}
+                  />
                 </div>
               </Card>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -558,7 +680,8 @@ export default function CarDetailsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Obrisati vozilo?</AlertDialogTitle>
             <AlertDialogDescription>
-              Da li ste sigurni da želite obrisati ovo vozilo? Ova akcija se ne može poništiti.
+              Da li ste sigurni da želite obrisati ovo vozilo? Ova akcija se ne
+              može poništiti.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

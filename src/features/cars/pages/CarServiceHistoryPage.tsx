@@ -274,7 +274,7 @@ export default function CarServiceHistoryPage() {
                     {record.cost && (
                       <DetailField
                         label="Cijena"
-                        value={`${record.cost.toFixed(2)} BAM`}
+                        value={`${Number(record.cost).toFixed(2)} BAM`}
                       />
                     )}
 

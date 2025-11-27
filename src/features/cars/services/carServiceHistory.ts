@@ -33,11 +33,35 @@ export const getLatestServiceRecord = async (
   return res.json();
 };
 
+// Get all service entries for a car
+export const getServiceRemainingKm = async (carId: string): Promise<number> => {
+  const res = await fetch(`${BASE_URL}${carId}/remaining-km`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+  });
+
+  const data = await res.json();
+
+  if (typeof data === 'number') return data;
+  if (
+    data &&
+    typeof data === 'object' &&
+    'remainingKm' in data &&
+    typeof (data as any).remainingKm === 'number'
+  ) {
+    return (data as any).remainingKm;
+  }
+
+  if (!res.ok) throw new Error('Failed to load service history');
+  return res.json();
+};
+
 // Add service record
 export const addCarServiceRecord = async (
   data: Partial<CarServiceHistory>
 ): Promise<CarServiceHistory> => {
-  const res = await fetch(BASE_URL, {
+  const res = await fetch(BASE_URL + `/${data.carId}`, {
     method: 'POST',
     headers: getAuthHeaders(),
     credentials: 'include',

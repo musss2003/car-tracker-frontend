@@ -48,6 +48,25 @@ export const getLatestCarRegistration = async (
   return res.json();
 };
 
+export const getRegistrationDaysRemaining = async (carId: string): Promise<number> => {
+  const res = await fetch(`${BASE_URL}car/${carId}/registration-days-remaining`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch registration days remaining');
+
+  const data = await res.json();
+
+  if (typeof data === 'number') return data;
+  if (data && typeof data === 'object' && 'daysRemaining' in data && typeof (data as any).daysRemaining === 'number') {
+    return (data as any).daysRemaining;
+  }
+
+  throw new Error('Unexpected response format for registration days remaining');
+};
+
 // PUT update existing registration by id
 export const updateCarRegistration = async (
   id: string,
