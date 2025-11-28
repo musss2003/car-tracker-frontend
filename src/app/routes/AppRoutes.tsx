@@ -104,6 +104,7 @@ import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import LoadingSpinner from '../../shared/components/feedback/LoadingSpinner/LoadingSpinner';
+import CarIssuesPage from '@/features/cars/pages/CarIssueReportPage';
 
 export function AppRoutes() {
   const { isLoggedIn, user } = useAuth();
@@ -139,6 +140,10 @@ export function AppRoutes() {
           <Route
             path="/cars/:id/registration"
             element={<CarRegistrationPage />}
+          />
+          <Route
+            path="/cars/:id/issues"
+            element={<CarIssuesPage />}
           />
           <Route path="/cars/:id/insurance" element={<CarInsurancePage />} />
           <Route path="/contracts/new" element={<CreateContractPage />} />

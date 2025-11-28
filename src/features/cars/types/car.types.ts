@@ -72,6 +72,45 @@ export interface CarInsurance {
   createdAt: string;
 }
 
+// Types
+export interface CarIssueReport {
+  id: string;
+  carId: string;
+  description: string;
+  diagnosticPdfUrl?: string;
+  severity?: 'low' | 'medium' | 'high';
+  status: 'open' | 'in_progress' | 'resolved';
+  reportedBy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  reportedById?: string;
+  resolvedBy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  resolvedById?: string;
+  resolvedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCarIssueReportPayload {
+    carId: string;
+    description?: string;
+    severity?: 'low' | 'medium' | 'high';
+    diagnosticPdfUrl?: string;
+}
+
+export interface UpdateCarIssueReportPayload {
+    status?: 'open' | 'in_progress' | 'resolved' | 'closed';
+    severity?: 'low' | 'medium' | 'high';
+    description?: string;
+    diagnosticPdfUrl?: string;
+}
+
 export interface RenderFieldOptions {
   placeholder?: string;
   min?: number;

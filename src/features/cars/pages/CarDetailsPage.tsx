@@ -42,6 +42,7 @@ import { deleteCar, getCar } from '../services/carService';
 import { KPIGauge } from '../components/kpi-gauge';
 import { getRegistrationDaysRemaining } from '../services/carRegistrationService';
 import { getServiceRemainingKm } from '../services/carServiceHistory';
+import { PageHeader } from '@/shared/components/ui/page-header';
 
 function SpecItem({
   label,
@@ -88,7 +89,6 @@ function NavTile({
     </Button>
   );
 }
-
 
 const SERVICE_INTERVAL = 10000;
 const REGISTRATION_INTERVAL_DAYS = 365;
@@ -236,33 +236,15 @@ export default function CarDetailsPage() {
   return (
     <div className="h-full w-full flex flex-col bg-background">
       {/* Header */}
-      <div className="flex-none px-4 sm:px-6 py-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/cars')}
-              className="gap-1.5 text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Nazad
-            </Button>
-            <div className="h-6 w-px bg-border" />
-            <div>
-              <h1 className="text-xl font-bold tracking-tight">
-                {car.manufacturer} {car.model}
-              </h1>
-              <p className="text-xs text-muted-foreground font-mono">
-                {car.licensePlate}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
+      <PageHeader
+        title={`Detalji o vozilu`}
+        subtitle={`${car.manufacturer} ${car.model} ${car.licensePlate}`}
+        onBack={() => navigate('/cars')}
+        actions={
+          <>
             <Badge
               variant={car.isBusy ? 'destructive' : 'default'}
-              className={`gap-2 px-3 py-1.5 ${car.isBusy ? '' : 'bg-green-600 hover:bg-green-700'}`}
+              className={`gap-2 px-3 py-1 ${car.isBusy ? '' : 'bg-green-600 hover:bg-green-700'}`}
             >
               {car.isBusy ? (
                 <>
@@ -295,9 +277,9 @@ export default function CarDetailsPage() {
               <Trash2 className="w-4 h-4" />
               Obriši
             </Button>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
@@ -517,7 +499,7 @@ export default function CarDetailsPage() {
                 onClick={() => navigate(`/cars/${car.id}/availability`)}
               />
               <NavTile
-                title="Servisna istorija"
+                title="Servisna historija"
                 Icon={Wrench}
                 onClick={() => navigate(`/cars/${car.id}/service-history`)}
               />
@@ -530,6 +512,11 @@ export default function CarDetailsPage() {
                 title="Polisa osiguranja"
                 Icon={Shield}
                 onClick={() => navigate(`/cars/${car.id}/insurance`)}
+              />
+              <NavTile
+                title="Kvarovi na autu"
+                Icon={Shield}
+                onClick={() => navigate(`/cars/${car.id}/issues`)}
               />
             </div>
           </div>
