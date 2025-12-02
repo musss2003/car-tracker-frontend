@@ -1,3 +1,5 @@
+import { User } from "@/features/users";
+
 // Type definitions from backend
 export type FuelType = 'petrol' | 'diesel' | 'hybrid' | 'electric';
 export type TransmissionType = 'manual' | 'automatic';
@@ -80,11 +82,7 @@ export interface CarIssueReport {
   diagnosticPdfUrl?: string;
   severity?: 'low' | 'medium' | 'high';
   status: 'open' | 'in_progress' | 'resolved';
-  reportedBy?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-  };
+  reportedBy?: User;
   reportedById?: string;
   resolvedBy?: {
     id: string;
@@ -93,7 +91,7 @@ export interface CarIssueReport {
   };
   resolvedById?: string;
   resolvedAt?: string;
-  createdAt: string;
+  reportedAt: string;
   updatedAt: string;
 }
 

@@ -22,7 +22,7 @@ export function DetailCard({
 }: DetailCardProps) {
   return (
     <Card
-      className={`group hover:shadow-lg transition-all duration-300 overflow-hidden ${className}`}
+      className={`group hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col ${className}`}
     >
       <div
         className={`h-1 w-full ${borderColor.replace('border-l-', 'bg-')}`}
@@ -35,7 +35,7 @@ export function DetailCard({
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 pt-4">{children}</CardContent>
+      <CardContent className="pt-4 flex-1 flex flex-col">{children}</CardContent>
     </Card>
   );
 }

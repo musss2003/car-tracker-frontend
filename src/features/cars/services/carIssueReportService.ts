@@ -58,7 +58,6 @@ export async function updateCarIssueReportStatus(
     id: string,
     payload: UpdateCarIssueReportPayload,
 ): Promise<CarIssueReport> {
-    console.log("Updating issue report:", id, payload); 
     const res = await fetch(`${BASE_PATH}/${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers: getAuthHeaders(),
@@ -75,7 +74,7 @@ export async function deleteCarIssueReport(id: string): Promise<{ success: boole
     return handleResponse<{ success: boolean; id?: string }>(res);
 }
 
-export async function getNewCarCarIssueReports(): Promise<CarIssueReport[]> {
+export async function getNewIssueReports(): Promise<CarIssueReport[]> {
     const res = await fetch(`${BASE_PATH}/reports/new`, {
         method: 'GET',
         headers: getAuthHeaders(),
@@ -83,10 +82,33 @@ export async function getNewCarCarIssueReports(): Promise<CarIssueReport[]> {
     return handleResponse<CarIssueReport[]>(res);
 }
 
-export async function getNewCarCarIssueReportsByCar(carId: string): Promise<CarIssueReport[]> {
+export async function getNewIssueReportsByCar(carId: string): Promise<CarIssueReport[]> {
     const res = await fetch(`${BASE_PATH}/car/${encodeURIComponent(carId)}/new`, {
         method: 'GET',
         headers: getAuthHeaders(),
     });
     return handleResponse<CarIssueReport[]>(res);
+}
+
+export async function getIssueReportAuditLogs(
+    issueReportId: string,
+    page: number = 1,
+    limit: number = 50
+): Promise<{
+    success: boolean;
+    data: any[];
+    pagination: { page: number; limit: number; total: number; totalPages: number };
+}> {
+    const res = await fetch(
+        `${BASE_PATH}/${encodeURIComponent(issueReportId)}/audit-logs?page=${page}&limit=${limit}`,
+        {
+            method: 'GET',
+            headers: getAuthHeaders(),
+        }
+    );
+    return handleResponse<{
+        success: boolean;
+        data: any[];
+        pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>(res);
 }

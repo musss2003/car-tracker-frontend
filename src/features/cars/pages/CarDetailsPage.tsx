@@ -43,6 +43,7 @@ import { KPIGauge } from '../components/kpi-gauge';
 import { getRegistrationDaysRemaining } from '../services/carRegistrationService';
 import { getServiceRemainingKm } from '../services/carServiceHistory';
 import { PageHeader } from '@/shared/components/ui/page-header';
+import { getNewIssueReportsByCar } from '../services/carIssueReportService';
 
 function SpecItem({
   label,
@@ -112,6 +113,9 @@ export default function CarDetailsPage() {
   const [serviceKilometersRemaining, setServiceKilometersRemaining] = useState<
     number | null
   >(null);
+  const [activeIssueReports, setActiveIssueReports] = useState<number | null>(
+    null
+  );
 
   const loadPhoto = useCallback(async (photoUrl: string) => {
     try {
@@ -138,6 +142,17 @@ export default function CarDetailsPage() {
   }, []);
 
   useEffect(() => {
+    const fetchActiveIssueReports = async (carId: string) => {
+      try {
+        const data = await getNewIssueReportsByCar(carId);
+
+        setActiveIssueReports(data.length);
+      } catch (error) {
+        console.error('Error fetching registration days remaining:', error);
+        setServiceKilometersRemaining(null);
+      }
+    };
+
     const fetchServiceKmRemaining = async (carId: string) => {
       try {
         const data = await getServiceRemainingKm(carId);
@@ -187,6 +202,7 @@ export default function CarDetailsPage() {
       fetchCar();
       fetchRegistrationDaysRemaining(id);
       fetchServiceKmRemaining(id);
+      fetchActiveIssueReports(id);
     }
   }, [id, navigate, loadPhoto]);
 
@@ -460,15 +476,15 @@ export default function CarDetailsPage() {
 
               {/* Issues Alert */}
               <Card className="p-6 flex items-center justify-center">
-                {MOCK_ISSUES_COUNT > 0 ? (
+                {(activeIssueReports ?? 0) > 0 ? (
                   <div className="text-center space-y-3">
                     <AlertTriangle className="w-12 h-12 text-destructive mx-auto" />
                     <div>
                       <p className="font-bold text-lg text-destructive">
-                        {MOCK_ISSUES_COUNT} Aktivna greška
+                        {activeIssueReports ?? 0} Aktivna greška
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Provjerite servisnu istoriju
+                        Provjerite kvarove na autu
                       </p>
                     </div>
                   </div>

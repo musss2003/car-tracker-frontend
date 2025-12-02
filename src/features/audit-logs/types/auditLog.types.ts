@@ -15,6 +15,7 @@ export enum AuditResource {
   CONTRACT = 'contract',
   CUSTOMER = 'customer',
   CAR = 'car',
+  CAR_ISSUE_REPORT = 'car_issue_report',
   USER = 'user',
   AUTH = 'auth',
   NOTIFICATION = 'notification',
