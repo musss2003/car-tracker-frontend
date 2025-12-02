@@ -6,13 +6,9 @@ import {
   Trash2,
   Edit,
   Filter,
-  Download,
   User,
   Calendar,
   AlertCircle,
-  History,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -60,9 +56,9 @@ import {
   updateCarIssueReportStatus,
   getIssueReportAuditLogs,
 } from '../services/carIssueReportService';
-import { AuditLog } from '@/features/audit-logs/types/auditLog.types';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { getCar } from '../services/carService';
+import { AuditLogHistory } from '@/shared/components/audit/AuditLogHistory';
 
 // Utility functions for styling
 const getSeverityColor = (severity?: string) => {
@@ -127,10 +123,7 @@ export default function CarIssuesPage() {
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [car, setCar] = useState<Car | null>(null);
 
-  // Audit logs state
-  const [expandedIssueId, setExpandedIssueId] = useState<string | null>(null);
-  const [auditLogs, setAuditLogs] = useState<Record<string, AuditLog[]>>({});
-  const [loadingAuditLogs, setLoadingAuditLogs] = useState<Record<string, boolean>>({});
+
 
   // Form state
   const [formData, setFormData] = useState<CreateCarIssueReportPayload>({
@@ -276,58 +269,7 @@ export default function CarIssuesPage() {
     setShowEditDialog(true);
   };
 
-  const toggleAuditLogs = async (issueId: string) => {
-    if (expandedIssueId === issueId) {
-      setExpandedIssueId(null);
-      return;
-    }
 
-    setExpandedIssueId(issueId);
-
-    // Fetch audit logs if not already loaded
-    if (!auditLogs[issueId]) {
-      try {
-        setLoadingAuditLogs({ ...loadingAuditLogs, [issueId]: true });
-        const response = await getIssueReportAuditLogs(issueId);
-        setAuditLogs({ ...auditLogs, [issueId]: response.data });
-      } catch (error) {
-        console.error('Error fetching audit logs:', error);
-        toast.error('Greška pri učitavanju historije');
-      } finally {
-        setLoadingAuditLogs({ ...loadingAuditLogs, [issueId]: false });
-      }
-    }
-  };
-
-  const getActionLabel = (action: string) => {
-    switch (action) {
-      case 'CREATE':
-        return 'Kreiran';
-      case 'UPDATE':
-        return 'Ažuriran';
-      case 'DELETE':
-        return 'Obrisan';
-      case 'READ':
-        return 'Pročitan';
-      default:
-        return action;
-    }
-  };
-
-  const getActionColor = (action: string) => {
-    switch (action) {
-      case 'CREATE':
-        return 'text-green-600';
-      case 'UPDATE':
-        return 'text-blue-600';
-      case 'DELETE':
-        return 'text-red-600';
-      case 'READ':
-        return 'text-gray-600';
-      default:
-        return 'text-gray-600';
-    }
-  };
 
   if (loading) {
     return <LoadingState />;
@@ -529,164 +471,12 @@ export default function CarIssuesPage() {
                     </div>
                   </div>
 
-                  {/* Audit Log Toggle Button */}
-                  <div className="mt-4 pt-4 border-t">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleAuditLogs(issue.id)}
-                      className="w-full gap-2 text-muted-foreground hover:text-foreground"
-                    >
-                      <History className="w-4 h-4" />
-                      <span>Historija izmjena</span>
-                      {expandedIssueId === issue.id ? (
-                        <ChevronUp className="w-4 h-4 ml-auto" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 ml-auto" />
-                      )}
-                    </Button>
-                  </div>
-
-                  {/* Audit Logs Section */}
-                  {expandedIssueId === issue.id && (
-                    <div className="mt-4 pt-4 border-t space-y-3">
-                      {loadingAuditLogs[issue.id] ? (
-                        <div className="text-center py-4 text-muted-foreground">
-                          Učitavanje historije...
-                        </div>
-                      ) : auditLogs[issue.id]?.length > 0 ? (
-                        <div className="space-y-2">
-                          <h4 className="text-sm font-semibold text-foreground mb-3">
-                            Historija izmjena
-                          </h4>
-                          {auditLogs[issue.id].map((log) => (
-                            <div
-                              key={log.id}
-                              className="flex gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                            >
-                              <div className="flex-shrink-0 mt-0.5">
-                                <div
-                                  className={`w-2 h-2 rounded-full ${
-                                    log.action === 'CREATE'
-                                      ? 'bg-green-500'
-                                      : log.action === 'UPDATE'
-                                        ? 'bg-blue-500'
-                                        : log.action === 'DELETE'
-                                          ? 'bg-red-500'
-                                          : 'bg-gray-500'
-                                  }`}
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2 flex-wrap">
-                                  <div className="flex items-center gap-2">
-                                    <Badge
-                                      variant="outline"
-                                      className={getActionColor(log.action)}
-                                    >
-                                      {getActionLabel(log.action)}
-                                    </Badge>
-                                    {log.username && (
-                                      <span className="text-sm font-medium">
-                                        {log.username}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <span className="text-xs text-muted-foreground">
-                                    {new Date(log.createdAt).toLocaleString(
-                                      'bs-BA',
-                                      {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                      }
-                                    )}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-foreground mt-1">
-                                  {log.description}
-                                </p>
-                                {log.changes && (log.changes.before || log.changes.after) && (
-                                  <div className="mt-3 space-y-2">
-                                    {log.changes.before && log.changes.after && (
-                                      <div className="grid grid-cols-2 gap-3 text-xs">
-                                        <div className="space-y-1 p-2 rounded bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
-                                          <span className="font-semibold text-red-700 dark:text-red-400 block mb-1">
-                                            Prije:
-                                          </span>
-                                          {Object.entries(log.changes.before).map(([key, value]) => (
-                                            <div key={key} className="text-muted-foreground">
-                                              <span className="font-medium">{key}:</span>{' '}
-                                              <span className="font-mono text-xs">
-                                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                                              </span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                        <div className="space-y-1 p-2 rounded bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
-                                          <span className="font-semibold text-green-700 dark:text-green-400 block mb-1">
-                                            Poslije:
-                                          </span>
-                                          {Object.entries(log.changes.after).map(([key, value]) => (
-                                            <div key={key} className="text-muted-foreground">
-                                              <span className="font-medium">{key}:</span>{' '}
-                                              <span className="font-mono text-xs">
-                                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                                              </span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                    {log.changes.after && !log.changes.before && (
-                                      <div className="p-2 rounded bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 text-xs">
-                                        <span className="font-semibold text-green-700 dark:text-green-400 block mb-1">
-                                          Kreirano:
-                                        </span>
-                                        <div className="space-y-1">
-                                          {Object.entries(log.changes.after).map(([key, value]) => (
-                                            <div key={key} className="text-muted-foreground">
-                                              <span className="font-medium">{key}:</span>{' '}
-                                              <span className="font-mono text-xs">
-                                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                                              </span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                    {log.changes.before && !log.changes.after && (
-                                      <div className="p-2 rounded bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 text-xs">
-                                        <span className="font-semibold text-red-700 dark:text-red-400 block mb-1">
-                                          Obrisano:
-                                        </span>
-                                        <div className="space-y-1">
-                                          {Object.entries(log.changes.before).map(([key, value]) => (
-                                            <div key={key} className="text-muted-foreground">
-                                              <span className="font-medium">{key}:</span>{' '}
-                                              <span className="font-mono text-xs">
-                                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                                              </span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-4 text-muted-foreground text-sm">
-                          Nema zabilježenih izmjena
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {/* Audit Log History */}
+                  <AuditLogHistory
+                    resourceId={issue.id}
+                    fetchAuditLogs={getIssueReportAuditLogs}
+                    title="Historija izmjena"
+                  />
                 </Card>
               );
             })}
