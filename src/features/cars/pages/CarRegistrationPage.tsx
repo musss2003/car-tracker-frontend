@@ -37,7 +37,9 @@ import {
   deleteCarRegistration,
   getCarRegistrations,
   updateCarRegistration,
+  getRegistrationAuditLogs,
 } from '../services/carRegistrationService';
+import { AuditLogHistory } from '@/shared/components/audit/AuditLogHistory';
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
@@ -276,6 +278,13 @@ export default function RegistrationPage() {
                         value={registration.notes}
                       />
                     )}
+
+                    <AuditLogHistory
+                      resourceId={registration.id}
+                      fetchAuditLogs={getRegistrationAuditLogs}
+                      title="Historija izmjena"
+                      className="mt-3"
+                    />
 
                     <div className="flex gap-2 pt-2 border-t">
                       <Button

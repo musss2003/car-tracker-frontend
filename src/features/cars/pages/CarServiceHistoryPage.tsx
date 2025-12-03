@@ -37,8 +37,10 @@ import {
   deleteCarServiceRecord,
   getCarServiceHistory,
   updateServiceRecord,
+  getServiceHistoryAuditLogs,
 } from '../services/carServiceHistory';
 import { getCar } from '../services/carService';
+import { AuditLogHistory } from '@/shared/components/audit/AuditLogHistory';
 
 export default function CarServiceHistoryPage() {
   const navigate = useNavigate();
@@ -319,6 +321,13 @@ export default function CarServiceHistoryPage() {
                             />
                           )}
                         </div>
+
+                        <AuditLogHistory
+                          resourceId={record.id}
+                          fetchAuditLogs={getServiceHistoryAuditLogs}
+                          title="Historija izmjena"
+                          className="mt-4"
+                        />
 
                         <div className="flex gap-2 pt-4 mt-4 border-t">
                           <Button

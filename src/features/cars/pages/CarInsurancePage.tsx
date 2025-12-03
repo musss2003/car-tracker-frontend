@@ -8,7 +8,9 @@ import {
   deleteCarInsurance,
   getCarInsuranceHistory,
   updateCarInsurance,
+  getInsuranceAuditLogs,
 } from '../services/carInsuranceService';
+import { AuditLogHistory } from '@/shared/components/audit/AuditLogHistory';
 import { LoadingState } from '@/shared/components/ui/loading-state';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { Button } from '@/shared/components/ui/button';
@@ -282,6 +284,13 @@ export default function CarInsurancePage() {
                         value={`${insurance.price.toFixed(2)} BAM`}
                       />
                     )}
+
+                    <AuditLogHistory
+                      resourceId={insurance.id}
+                      fetchAuditLogs={getInsuranceAuditLogs}
+                      title="Historija izmjena"
+                      className="mt-3"
+                    />
 
                     <div className="flex gap-2 pt-2 border-t">
                       <Button

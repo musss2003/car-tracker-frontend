@@ -97,3 +97,26 @@ export const deleteCarServiceRecord = async (id: string): Promise<void> => {
 
   if (!res.ok) throw new Error('Failed to delete service record');
 };
+
+// Get audit logs for a specific service record
+export async function getServiceHistoryAuditLogs(
+  serviceId: string,
+  page: number = 1,
+  limit: number = 50
+): Promise<{
+  success: boolean;
+  data: any[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}> {
+  const res = await fetch(
+    `${BASE_URL}record/${encodeURIComponent(serviceId)}/audit-logs?page=${page}&limit=${limit}`,
+    {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    }
+  );
+
+  if (!res.ok) throw new Error('Failed to fetch audit logs');
+  return res.json();
+}
