@@ -86,7 +86,12 @@ export async function getInsuranceAuditLogs(
 ): Promise<{
   success: boolean;
   data: any[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }> {
   const res = await fetch(
     `${BASE_URL}record/${encodeURIComponent(insuranceId)}/audit-logs?page=${page}&limit=${limit}`,
@@ -98,5 +103,12 @@ export async function getInsuranceAuditLogs(
   );
 
   if (!res.ok) throw new Error('Failed to fetch audit logs');
-  return res.json();
+  const result = await res.json();
+  // Backend returns { success, data: { logs, pagination } }
+  // Transform to { success, data: logs, pagination }
+  return {
+    success: result.success,
+    data: result.data?.logs || [],
+    pagination: result.data?.pagination,
+  };
 }

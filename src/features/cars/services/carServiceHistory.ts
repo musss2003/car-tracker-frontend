@@ -35,25 +35,18 @@ export const getLatestServiceRecord = async (
   return result.data || result;
 };
 
-// Get all service entries for a car
+// Get remaining km until next service
 export const getServiceRemainingKm = async (carId: string): Promise<number> => {
-  const res = await fetch(`${BASE_URL}${carId}/remaining-km`, {
+  const res = await fetch(`${BASE_URL}${carId}/km-remaining`, {
     method: 'GET',
     headers: getAuthHeaders(),
     credentials: 'include',
   });
 
   if (!res.ok) throw new Error('Failed to load remaining km');
-  
-  const data = await res.json();
 
-  // Backend returns { success, data: { remainingKm: number }, timestamp }
-  if (data?.data?.remainingKm !== undefined) return data.data.remainingKm;
-  // Fallback for direct number or object with remainingKm
-  if (typeof data === 'number') return data;
-  if (data?.remainingKm !== undefined) return data.remainingKm;
-  
-  throw new Error('Unexpected response format for remaining km');
+  const result = await res.json();
+  return result.data?.kmRemaining ?? 0;
 };
 
 // Add service record
@@ -107,7 +100,12 @@ export async function getServiceHistoryAuditLogs(
 ): Promise<{
   success: boolean;
   data: any[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }> {
   const res = await fetch(
     `${BASE_URL}record/${encodeURIComponent(serviceId)}/audit-logs?page=${page}&limit=${limit}`,
@@ -119,5 +117,12 @@ export async function getServiceHistoryAuditLogs(
   );
 
   if (!res.ok) throw new Error('Failed to fetch audit logs');
-  return res.json();
+  const result = await res.json();
+  // Backend returns { success, data: { logs, pagination } }
+  // Transform to { success, data: logs, pagination }
+  return {
+    success: result.success,
+    data: result.data?.logs || [],
+    pagination: result.data?.pagination,
+  };
 }

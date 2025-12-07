@@ -43,7 +43,7 @@ import { KPIGauge } from '../components/kpi-gauge';
 import { getRegistrationDaysRemaining } from '../services/carRegistrationService';
 import { getServiceRemainingKm } from '../services/carServiceHistory';
 import { PageHeader } from '@/shared/components/ui/page-header';
-import { getNewIssueReportsByCar } from '../services/carIssueReportService';
+import { getActiveIssueReportsCount } from '../services/carIssueReportService';
 
 function SpecItem({
   label,
@@ -144,22 +144,20 @@ export default function CarDetailsPage() {
   useEffect(() => {
     const fetchActiveIssueReports = async (carId: string) => {
       try {
-        const data = await getNewIssueReportsByCar(carId);
-
-        setActiveIssueReports(data.length);
+        const count = await getActiveIssueReportsCount(carId);
+        setActiveIssueReports(count);
       } catch (error) {
-        console.error('Error fetching registration days remaining:', error);
-        setServiceKilometersRemaining(null);
+        console.error('Error fetching active issue reports:', error);
+        setActiveIssueReports(null);
       }
     };
 
     const fetchServiceKmRemaining = async (carId: string) => {
       try {
         const data = await getServiceRemainingKm(carId);
-
         setServiceKilometersRemaining(data);
       } catch (error) {
-        console.error('Error fetching registration days remaining:', error);
+        console.error('Error fetching service km remaining:', error);
         setServiceKilometersRemaining(null);
       }
     };
@@ -176,7 +174,9 @@ export default function CarDetailsPage() {
       }
     };
 
-    const fetchCar = async () => {
+    const fetchCarAndRelatedData = async () => {
+      if (!id) return;
+
       try {
         setLoading(true);
         const fetchedCar = await getCar(id);
@@ -187,9 +187,16 @@ export default function CarDetailsPage() {
           return;
         }
         setCar({ ...fetchedCar, isBusy: false });
+        setError(null);
+
         if (fetchedCar.photoUrl && fetchedCar.photoUrl.trim() !== '') {
           loadPhoto(fetchedCar.photoUrl);
         }
+
+        // Fetch related data
+        fetchRegistrationDaysRemaining(id);
+        fetchServiceKmRemaining(id);
+        fetchActiveIssueReports(id);
       } catch (error) {
         console.error('Error fetching car:', error);
         setError('Greška pri učitavanju vozila');
@@ -198,11 +205,9 @@ export default function CarDetailsPage() {
         setLoading(false);
       }
     };
+
     if (id) {
-      fetchCar();
-      fetchRegistrationDaysRemaining(id);
-      fetchServiceKmRemaining(id);
-      fetchActiveIssueReports(id);
+      fetchCarAndRelatedData();
     }
   }, [id, navigate, loadPhoto]);
 

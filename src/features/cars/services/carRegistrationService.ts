@@ -5,7 +5,6 @@ const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
 const BASE_URL = `${API_URL}car-registration/`;
 
-
 // Get all registration records for a car
 export const getCarRegistrationById = async (
   carId: string
@@ -51,8 +50,10 @@ export const getLatestCarRegistration = async (
   return result.data || result;
 };
 
-export const getRegistrationDaysRemaining = async (carId: string): Promise<number> => {
-  const res = await fetch(`${BASE_URL}car/${carId}/registration-days-remaining`, {
+export const getRegistrationDaysRemaining = async (
+  carId: string
+): Promise<number> => {
+  const res = await fetch(`${BASE_URL}car/${carId}/days-remaining`, {
     method: 'GET',
     headers: getAuthHeaders(),
     credentials: 'include',
@@ -60,14 +61,8 @@ export const getRegistrationDaysRemaining = async (carId: string): Promise<numbe
 
   if (!res.ok) throw new Error('Failed to fetch registration days remaining');
 
-  const data = await res.json();
-
-  if (typeof data === 'number') return data;
-  if (data && typeof data === 'object' && 'daysRemaining' in data && typeof (data as any).daysRemaining === 'number') {
-    return (data as any).daysRemaining;
-  }
-
-  throw new Error('Unexpected response format for registration days remaining');
+  const result = await res.json();
+  return result.data?.daysRemaining ?? 0;
 };
 
 // PUT update existing registration by id
@@ -121,7 +116,12 @@ export async function getRegistrationAuditLogs(
 ): Promise<{
   success: boolean;
   data: any[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }> {
   const res = await fetch(
     `${BASE_URL}${encodeURIComponent(registrationId)}/audit-logs?page=${page}&limit=${limit}`,
@@ -133,5 +133,12 @@ export async function getRegistrationAuditLogs(
   );
 
   if (!res.ok) throw new Error('Failed to fetch audit logs');
-  return res.json();
+  const result = await res.json();
+  // Backend returns { success, data: { logs, pagination } }
+  // Transform to { success, data: logs, pagination }
+  return {
+    success: result.success,
+    data: result.data?.logs || [],
+    pagination: result.data?.pagination,
+  };
 }

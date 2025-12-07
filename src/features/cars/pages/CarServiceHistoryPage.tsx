@@ -172,7 +172,10 @@ export default function CarServiceHistoryPage() {
       };
 
       if (selectedRecord) {
-        const updatedRecord = await updateServiceRecord(selectedRecord.id, data);
+        const updatedRecord = await updateServiceRecord(
+          selectedRecord.id,
+          data
+        );
         setServiceHistory((prev) =>
           prev
             .map((record) =>

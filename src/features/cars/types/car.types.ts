@@ -1,4 +1,4 @@
-import { User } from "@/features/users";
+import { User } from '@/features/users';
 
 // Type definitions from backend
 export type FuelType = 'petrol' | 'diesel' | 'hybrid' | 'electric';
@@ -96,17 +96,17 @@ export interface CarIssueReport {
 }
 
 export interface CreateCarIssueReportPayload {
-    carId: string;
-    description?: string;
-    severity?: 'low' | 'medium' | 'high';
-    diagnosticPdfUrl?: string;
+  carId: string;
+  description?: string;
+  severity?: 'low' | 'medium' | 'high';
+  diagnosticPdfUrl?: string;
 }
 
 export interface UpdateCarIssueReportPayload {
-    status?: 'open' | 'in_progress' | 'resolved' | 'closed';
-    severity?: 'low' | 'medium' | 'high';
-    description?: string;
-    diagnosticPdfUrl?: string;
+  status?: 'open' | 'in_progress' | 'resolved' | 'closed';
+  severity?: 'low' | 'medium' | 'high';
+  description?: string;
+  diagnosticPdfUrl?: string;
 }
 
 export interface RenderFieldOptions {

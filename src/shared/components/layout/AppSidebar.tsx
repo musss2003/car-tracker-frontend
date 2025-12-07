@@ -10,11 +10,11 @@ import {
   SidebarMenuBadge,
   SidebarContent,
   SidebarRail,
-} from "@/shared/components/ui/sidebar";
+} from '@/shared/components/ui/sidebar';
 
-import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useUnreadCount } from "@/features/notifications/hooks/useUnreadCount";
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useUnreadCount } from '@/features/notifications/hooks/useUnreadCount';
 
 import {
   BarChart3,
@@ -27,47 +27,62 @@ import {
   Settings,
   ClipboardList,
   UserCog,
-} from "lucide-react";
+} from 'lucide-react';
 
 export function AppSidebar() {
   const location = useLocation();
   const { user } = useAuth();
   const { unreadCount } = useUnreadCount();
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === 'admin';
 
   const navGroups = [
     {
-      title: "Pregled",
-      items: [
-        { to: "/dashboard", icon: BarChart3, label: "Komandna tabela", badge: "" },
-        { to: "/cars", icon: Car, label: "Vozila", badge: "" },
-      ],
-    },
-    {
-      title: "Upravljanje",
-      items: [
-        { to: "/contracts", icon: FileText, label: "Ugovori", badge: "" },
-        { to: "/customers", icon: Users, label: "Kupci", badge: "" },
-      ],
-    },
-    {
-      title: "Administracija",
-      adminOnly: true,
-      items: [
-        { to: "/users", icon: UserCog, label: "Upravljanje korisnicima", badge: "" },
-        { to: "/audit-logs", icon: ClipboardList, label: "Audit logovi", badge: "" },
-      ],
-    },
-    {
-      title: "Račun",
+      title: 'Pregled',
       items: [
         {
-          to: "/notifications",
+          to: '/dashboard',
+          icon: BarChart3,
+          label: 'Komandna tabela',
+          badge: '',
+        },
+        { to: '/cars', icon: Car, label: 'Vozila', badge: '' },
+      ],
+    },
+    {
+      title: 'Upravljanje',
+      items: [
+        { to: '/contracts', icon: FileText, label: 'Ugovori', badge: '' },
+        { to: '/customers', icon: Users, label: 'Kupci', badge: '' },
+      ],
+    },
+    {
+      title: 'Administracija',
+      adminOnly: true,
+      items: [
+        {
+          to: '/users',
+          icon: UserCog,
+          label: 'Upravljanje korisnicima',
+          badge: '',
+        },
+        {
+          to: '/audit-logs',
+          icon: ClipboardList,
+          label: 'Audit logovi',
+          badge: '',
+        },
+      ],
+    },
+    {
+      title: 'Račun',
+      items: [
+        {
+          to: '/notifications',
           icon: Bell,
-          label: "Notifikacije",
+          label: 'Notifikacije',
           badge: unreadCount > 0 ? unreadCount.toString() : undefined,
         },
-        { to: "/profile", icon: User, label: "Profil" },
+        { to: '/profile', icon: User, label: 'Profil' },
       ],
     },
   ].filter((g) => !g.adminOnly || isAdmin);

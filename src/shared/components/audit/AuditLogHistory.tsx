@@ -164,109 +164,137 @@ export function AuditLogHistory({
                         })}
                       </span>
                     </div>
-                    <p className="text-sm text-foreground mt-1">
-                      {log.description}
-                    </p>
-                    {log.changes && (log.changes.before || log.changes.after) && (
-                      <div className="mt-3 space-y-2">
-                        {log.changes.before && log.changes.after && (
-                          <div className="grid grid-cols-2 gap-3 text-xs">
-                            <div className="space-y-1 p-2 rounded bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
-                              <span className="font-semibold text-red-700 dark:text-red-400 block mb-1">
-                                Prije:
-                              </span>
-                              {Object.entries(log.changes.before)
-                                .filter(([key]) => {
-                                  // Only show fields that changed
-                                  if (!log.changes?.after || !log.changes?.before) return true;
-                                  const afterValue = (log.changes.after as any)?.[key];
-                                  const beforeValue = (log.changes.before as any)?.[key];
-                                  return JSON.stringify(afterValue) !== JSON.stringify(beforeValue);
-                                })
-                                .map(([key, value]) => (
-                                  <div
-                                    key={key}
-                                    className="text-muted-foreground"
-                                  >
-                                    <span className="font-medium">{key}:</span>{' '}
-                                    <span className="font-mono text-xs">
-                                      {formatValue(value)}
-                                    </span>
-                                  </div>
-                                ))}
+                    {log.changes &&
+                      (log.changes.before || log.changes.after) && (
+                        <div className="mt-3 space-y-2">
+                          {log.changes.before && log.changes.after && (
+                            <div className="grid grid-cols-2 gap-3 text-xs">
+                              <div className="space-y-1 p-2 rounded bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
+                                <span className="font-semibold text-red-700 dark:text-red-400 block mb-1">
+                                  Prije:
+                                </span>
+                                {Object.entries(log.changes.before)
+                                  .filter(([key]) => {
+                                    // Only show fields that changed
+                                    if (
+                                      !log.changes?.after ||
+                                      !log.changes?.before
+                                    )
+                                      return true;
+                                    const afterValue = (
+                                      log.changes.after as any
+                                    )?.[key];
+                                    const beforeValue = (
+                                      log.changes.before as any
+                                    )?.[key];
+                                    return (
+                                      JSON.stringify(afterValue) !==
+                                      JSON.stringify(beforeValue)
+                                    );
+                                  })
+                                  .map(([key, value]) => (
+                                    <div
+                                      key={key}
+                                      className="text-muted-foreground"
+                                    >
+                                      <span className="font-medium">
+                                        {key}:
+                                      </span>{' '}
+                                      <span className="font-mono text-xs">
+                                        {formatValue(value)}
+                                      </span>
+                                    </div>
+                                  ))}
+                              </div>
+                              <div className="space-y-1 p-2 rounded bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
+                                <span className="font-semibold text-green-700 dark:text-green-400 block mb-1">
+                                  Poslije:
+                                </span>
+                                {Object.entries(log.changes.after)
+                                  .filter(([key]) => {
+                                    // Only show fields that changed
+                                    if (
+                                      !log.changes?.after ||
+                                      !log.changes?.before
+                                    )
+                                      return true;
+                                    const afterValue = (
+                                      log.changes.after as any
+                                    )?.[key];
+                                    const beforeValue = (
+                                      log.changes.before as any
+                                    )?.[key];
+                                    return (
+                                      JSON.stringify(afterValue) !==
+                                      JSON.stringify(beforeValue)
+                                    );
+                                  })
+                                  .map(([key, value]) => (
+                                    <div
+                                      key={key}
+                                      className="text-muted-foreground"
+                                    >
+                                      <span className="font-medium">
+                                        {key}:
+                                      </span>{' '}
+                                      <span className="font-mono text-xs">
+                                        {formatValue(value)}
+                                      </span>
+                                    </div>
+                                  ))}
+                              </div>
                             </div>
-                            <div className="space-y-1 p-2 rounded bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
+                          )}
+                          {log.changes.after && !log.changes.before && (
+                            <div className="p-2 rounded bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 text-xs">
                               <span className="font-semibold text-green-700 dark:text-green-400 block mb-1">
-                                Poslije:
+                                Kreirano:
                               </span>
-                              {Object.entries(log.changes.after)
-                                .filter(([key]) => {
-                                  // Only show fields that changed
-                                  if (!log.changes?.after || !log.changes?.before) return true;
-                                  const afterValue = (log.changes.after as any)?.[key];
-                                  const beforeValue = (log.changes.before as any)?.[key];
-                                  return JSON.stringify(afterValue) !== JSON.stringify(beforeValue);
-                                })
-                                .map(([key, value]) => (
-                                  <div
-                                    key={key}
-                                    className="text-muted-foreground"
-                                  >
-                                    <span className="font-medium">{key}:</span>{' '}
-                                    <span className="font-mono text-xs">
-                                      {formatValue(value)}
-                                    </span>
-                                  </div>
-                                ))}
+                              <div className="space-y-1">
+                                {Object.entries(log.changes.after).map(
+                                  ([key, value]) => (
+                                    <div
+                                      key={key}
+                                      className="text-muted-foreground"
+                                    >
+                                      <span className="font-medium">
+                                        {key}:
+                                      </span>{' '}
+                                      <span className="font-mono text-xs">
+                                        {formatValue(value)}
+                                      </span>
+                                    </div>
+                                  )
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        {log.changes.after && !log.changes.before && (
-                          <div className="p-2 rounded bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 text-xs">
-                            <span className="font-semibold text-green-700 dark:text-green-400 block mb-1">
-                              Kreirano:
-                            </span>
-                            <div className="space-y-1">
-                              {Object.entries(log.changes.after).map(
-                                ([key, value]) => (
-                                  <div
-                                    key={key}
-                                    className="text-muted-foreground"
-                                  >
-                                    <span className="font-medium">{key}:</span>{' '}
-                                    <span className="font-mono text-xs">
-                                      {formatValue(value)}
-                                    </span>
-                                  </div>
-                                )
-                              )}
+                          )}
+                          {log.changes.before && !log.changes.after && (
+                            <div className="p-2 rounded bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 text-xs">
+                              <span className="font-semibold text-red-700 dark:text-red-400 block mb-1">
+                                Obrisano:
+                              </span>
+                              <div className="space-y-1">
+                                {Object.entries(log.changes.before).map(
+                                  ([key, value]) => (
+                                    <div
+                                      key={key}
+                                      className="text-muted-foreground"
+                                    >
+                                      <span className="font-medium">
+                                        {key}:
+                                      </span>{' '}
+                                      <span className="font-mono text-xs">
+                                        {formatValue(value)}
+                                      </span>
+                                    </div>
+                                  )
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        {log.changes.before && !log.changes.after && (
-                          <div className="p-2 rounded bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 text-xs">
-                            <span className="font-semibold text-red-700 dark:text-red-400 block mb-1">
-                              Obrisano:
-                            </span>
-                            <div className="space-y-1">
-                              {Object.entries(log.changes.before).map(
-                                ([key, value]) => (
-                                  <div
-                                    key={key}
-                                    className="text-muted-foreground"
-                                  >
-                                    <span className="font-medium">{key}:</span>{' '}
-                                    <span className="font-mono text-xs">
-                                      {formatValue(value)}
-                                    </span>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                          )}
+                        </div>
+                      )}
                   </div>
                 </div>
               ))}

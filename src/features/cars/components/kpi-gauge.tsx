@@ -114,7 +114,7 @@ export function KPIGauge({
       <p className="text-sm mt-2 font-semibold text-muted-foreground">
         <span className="font-extrabold">
           {Math.max(0, remainingValue).toLocaleString()} {unitLabel}
-        </span> 
+        </span>
       </p>
     </Card>
   );

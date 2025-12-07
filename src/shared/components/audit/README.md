@@ -23,7 +23,7 @@ function MyComponent() {
   return (
     <div>
       {/* Your component content */}
-      
+
       <AuditLogHistory
         resourceId={issue.id}
         fetchAuditLogs={getIssueReportAuditLogs}
@@ -36,26 +36,28 @@ function MyComponent() {
 
 ## Props
 
-| Prop | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| `resourceId` | `string` | Yes | - | The ID of the resource to fetch audit logs for |
-| `fetchAuditLogs` | `(resourceId: string) => Promise<{success: boolean, data: AuditLog[]}>` | Yes | - | Function that fetches audit logs for the resource |
-| `title` | `string` | No | `"Historija izmjena"` | Title displayed in the toggle button and expanded section |
-| `className` | `string` | No | `""` | Additional CSS classes |
+| Prop             | Type                                                                    | Required | Default               | Description                                               |
+| ---------------- | ----------------------------------------------------------------------- | -------- | --------------------- | --------------------------------------------------------- |
+| `resourceId`     | `string`                                                                | Yes      | -                     | The ID of the resource to fetch audit logs for            |
+| `fetchAuditLogs` | `(resourceId: string) => Promise<{success: boolean, data: AuditLog[]}>` | Yes      | -                     | Function that fetches audit logs for the resource         |
+| `title`          | `string`                                                                | No       | `"Historija izmjena"` | Title displayed in the toggle button and expanded section |
+| `className`      | `string`                                                                | No       | `""`                  | Additional CSS classes                                    |
 
 ## Example Service Functions
 
 ### Car Issue Report
+
 ```tsx
 import { getIssueReportAuditLogs } from '../services/carIssueReportService';
 
 <AuditLogHistory
   resourceId={issueId}
   fetchAuditLogs={getIssueReportAuditLogs}
-/>
+/>;
 ```
 
 ### Contract
+
 ```tsx
 import { getContractAuditLogs } from '../services/contractService';
 
@@ -63,10 +65,11 @@ import { getContractAuditLogs } from '../services/contractService';
   resourceId={contractId}
   fetchAuditLogs={getContractAuditLogs}
   title="Historija ugovora"
-/>
+/>;
 ```
 
 ### Customer
+
 ```tsx
 import { getCustomerAuditLogs } from '../services/customerService';
 
@@ -74,7 +77,7 @@ import { getCustomerAuditLogs } from '../services/customerService';
   resourceId={customerId}
   fetchAuditLogs={getCustomerAuditLogs}
   title="Historija klijenta"
-/>
+/>;
 ```
 
 ## Creating Service Functions
@@ -90,7 +93,12 @@ export async function getContractAuditLogs(
 ): Promise<{
   success: boolean;
   data: AuditLog[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }> {
   const res = await fetch(
     `${BASE_PATH}/${encodeURIComponent(contractId)}/audit-logs?page=${page}&limit=${limit}`,
@@ -102,7 +110,12 @@ export async function getContractAuditLogs(
   return handleResponse<{
     success: boolean;
     data: AuditLog[];
-    pagination: { page: number; limit: number; total: number; totalPages: number };
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
   }>(res);
 }
 ```
@@ -155,10 +168,13 @@ The component uses Tailwind CSS and supports both light and dark modes. Color co
 ## Change Display Formats
 
 ### Create (only "after" exists)
+
 Shows new values in green box with "Kreirano:" label.
 
 ### Update (both "before" and "after" exist)
+
 Shows side-by-side comparison with before (red) and after (green) values.
 
 ### Delete (only "before" exists)
+
 Shows deleted values in red box with "Obrisano:" label.

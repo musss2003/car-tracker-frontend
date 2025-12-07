@@ -35,7 +35,9 @@ export function DetailCard({
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1 flex flex-col">{children}</CardContent>
+      <CardContent className="pt-4 flex-1 flex flex-col">
+        {children}
+      </CardContent>
     </Card>
   );
 }

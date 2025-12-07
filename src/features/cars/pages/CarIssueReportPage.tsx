@@ -123,8 +123,6 @@ export default function CarIssuesPage() {
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [car, setCar] = useState<Car | null>(null);
 
-
-
   // Form state
   const [formData, setFormData] = useState<CreateCarIssueReportPayload>({
     carId: id || '',
@@ -269,8 +267,6 @@ export default function CarIssuesPage() {
     setShowEditDialog(true);
   };
 
-
-
   if (loading) {
     return <LoadingState />;
   }
@@ -383,9 +379,7 @@ export default function CarIssuesPage() {
                         {issue.reportedBy && (
                           <div className="flex items-center gap-1.5">
                             <User className="w-4 h-4" />
-                            <span>
-                              Prijavio: {issue.reportedBy.name}
-                            </span>
+                            <span>Prijavio: {issue.reportedBy.name}</span>
                           </div>
                         )}
                         <div className="flex items-center gap-1.5">

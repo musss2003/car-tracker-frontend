@@ -17,7 +17,12 @@ export const getTotalRevenue = async (): Promise<number> => {
   const data = await response.json();
 
   // Backend returns { success: true, data: { totalRevenue: number }, timestamp }
-  if (data && data.success && data.data && typeof data.data.totalRevenue === 'number') {
+  if (
+    data &&
+    data.success &&
+    data.data &&
+    typeof data.data.totalRevenue === 'number'
+  ) {
     return data.data.totalRevenue;
   }
 
