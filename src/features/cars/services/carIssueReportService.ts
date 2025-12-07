@@ -16,7 +16,8 @@ async function handleResponse<T>(res: Response): Promise<T> {
         const msg = data?.message || data?.error || res.statusText || 'Request failed';
         throw new Error(msg);
     }
-    return data as T;
+    // Extract data from backend response format { success, data, message, timestamp }
+    return (data?.data !== undefined ? data.data : data) as T;
 }
 
 export async function createCarIssueReport(

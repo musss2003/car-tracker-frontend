@@ -16,7 +16,8 @@ export const getCarInsuranceHistory = async (
   });
 
   if (!res.ok) throw new Error('Failed to fetch insurance records');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Get the lates insurance record for a car
@@ -30,7 +31,8 @@ export const getLatestCarInsuranceRecord = async (
   });
 
   if (!res.ok) throw new Error('Failed to fetch insurance records');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Add insurance policy
@@ -45,7 +47,8 @@ export const addCarInsurance = async (
   });
 
   if (!res.ok) throw new Error('Failed to add insurance record');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // PUT update insurance record (route PUT /record/:id)
@@ -60,7 +63,8 @@ export const updateCarInsurance = async (
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('Failed to update insurance record');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Delete insurance policy

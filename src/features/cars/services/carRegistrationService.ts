@@ -17,7 +17,8 @@ export const getCarRegistrationById = async (
   });
 
   if (!res.ok) throw new Error('Failed to fetch registration history');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Get all registration records for a car
@@ -31,7 +32,8 @@ export const getCarRegistrations = async (
   });
 
   if (!res.ok) throw new Error('Failed to fetch registration history');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Get all registration records for a car
@@ -45,7 +47,8 @@ export const getLatestCarRegistration = async (
   });
 
   if (!res.ok) throw new Error('Failed to fetch registration history');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 export const getRegistrationDaysRemaining = async (carId: string): Promise<number> => {
@@ -79,7 +82,8 @@ export const updateCarRegistration = async (
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('Failed to update registration');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Add registration record
@@ -94,7 +98,8 @@ export const addCarRegistration = async (
   });
 
   if (!res.ok) throw new Error('Failed to add registration');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Delete registration record

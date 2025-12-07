@@ -25,13 +25,14 @@ export const getTotalRevenue = async (): Promise<number> => {
 };
 
 export const getContracts = async (): Promise<Contract[]> => {
-  const res = await fetch(`${API_URL}all`, {
+  const res = await fetch(`${API_URL}`, {
     method: 'GET',
     headers: getAuthHeaders(),
   });
 
   if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  return res.json();
+  const response = await res.json();
+  return response.data || response;
 };
 
 export const getContract = async (id: string): Promise<Contract> => {
@@ -41,7 +42,8 @@ export const getContract = async (id: string): Promise<Contract> => {
   });
 
   if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  return res.json();
+  const response = await res.json();
+  return response.data || response;
 };
 
 export const getContractTemplate = async (): Promise<Response> => {
@@ -61,7 +63,8 @@ export const getActiveContracts = async (): Promise<Contract[]> => {
   });
 
   if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  return res.json();
+  const response = await res.json();
+  return response.data || response;
 };
 
 export const updateContract = async (
@@ -78,7 +81,8 @@ export const updateContract = async (
 
   if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
   toast.success('Contract updated successfully!');
-  return res.json();
+  const response = await res.json();
+  return response.data || response;
 };
 
 export const deleteContract = async (contractId: string): Promise<void> => {

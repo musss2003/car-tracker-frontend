@@ -15,7 +15,8 @@ export const getCustomer = async (customerId: string): Promise<Customer> => {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result.data || result;
   } catch (error) {
     console.error('Error fetching customer:', error);
     throw error;
@@ -34,7 +35,8 @@ export const getCustomers = async (): Promise<Customer[]> => {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result.data || result;
   } catch (error) {
     console.error('Error fetching all customers:', error);
     throw error;
@@ -58,7 +60,8 @@ export const searchCustomersByName = async (
       throw new Error('Error searching for customers');
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result.data || result;
   } catch (error) {
     console.error('Error fetching customers:', error);
     throw error;
@@ -84,7 +87,8 @@ export const updateCustomer = async (
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result.data || result;
   } catch (error) {
     console.error('Error updating customer:', error);
     throw error;
@@ -128,7 +132,8 @@ export const addCustomer = async (
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result.data || result;
   } catch (error) {
     console.error('Error adding customer:', error);
     throw error;
@@ -182,9 +187,8 @@ export const getCountries = async (): Promise<CountryOption[]> => {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const countries = await response.json();
-
-    return countries;
+    const result = await response.json();
+    return result.data || result;
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';

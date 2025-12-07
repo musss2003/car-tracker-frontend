@@ -12,7 +12,8 @@ export const getCar = async (carId: string): Promise<Car> => {
 
   if (!response.ok)
     throw new Error(`Error getting car: ${response.statusText}`);
-  return await response.json();
+  const result = await response.json();
+  return result.data || result;
 };
 
 export const getCars = async (): Promise<Car[]> => {
@@ -25,7 +26,8 @@ export const getCars = async (): Promise<Car[]> => {
 
   if (!response.ok)
     throw new Error(`Error getting all cars: ${response.statusText}`);
-  return await response.json();
+  const result = await response.json();
+  return result.data || result;
 };
 
 export const updateCar = async (
@@ -44,7 +46,8 @@ export const updateCar = async (
 
   if (!response.ok)
     throw new Error(`Error updating car: ${response.statusText}`);
-  return await response.json();
+  const result = await response.json();
+  return result.data || result;
 };
 
 export const deleteCar = async (
@@ -58,7 +61,8 @@ export const deleteCar = async (
 
   if (!response.ok)
     throw new Error(`Error deleting car: ${response.statusText}`);
-  return await response.json();
+  const result = await response.json();
+  return result.data || result;
 };
 
 export const addCar = async (car: Car): Promise<Car> => {
@@ -73,7 +77,8 @@ export const addCar = async (car: Car): Promise<Car> => {
   });
 
   if (!response.ok) throw new Error(`Error adding car: ${response.statusText}`);
-  return await response.json();
+  const result = await response.json();
+  return result.data || result;
 };
 
 export const getAvailableCarsForPeriod = async (
@@ -92,7 +97,8 @@ export const getAvailableCarsForPeriod = async (
 
   if (!response.ok)
     throw new Error(`Error fetching available cars: ${response.statusText}`);
-  return await response.json();
+  const result = await response.json();
+  return result.data || result;
 };
 
 export const getCarAvailability = async (
@@ -107,7 +113,8 @@ export const getCarAvailability = async (
   if (!response.ok)
     throw new Error(`Error fetching car availability: ${response.statusText}`);
 
-  return await response.json();
+  const result = await response.json();
+  return result.data || result;
 };
 
 export async function fetchCarBrands(): Promise<CarBrand[]> {
