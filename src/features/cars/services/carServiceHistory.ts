@@ -16,7 +16,8 @@ export const getCarServiceHistory = async (
   });
 
   if (!res.ok) throw new Error('Failed to load service history');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Get all service entries for a car
@@ -30,7 +31,8 @@ export const getLatestServiceRecord = async (
   });
 
   if (!res.ok) throw new Error('Failed to load service history');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Get all service entries for a car
@@ -41,20 +43,17 @@ export const getServiceRemainingKm = async (carId: string): Promise<number> => {
     credentials: 'include',
   });
 
+  if (!res.ok) throw new Error('Failed to load remaining km');
+  
   const data = await res.json();
 
+  // Backend returns { success, data: { remainingKm: number }, timestamp }
+  if (data?.data?.remainingKm !== undefined) return data.data.remainingKm;
+  // Fallback for direct number or object with remainingKm
   if (typeof data === 'number') return data;
-  if (
-    data &&
-    typeof data === 'object' &&
-    'remainingKm' in data &&
-    typeof (data as any).remainingKm === 'number'
-  ) {
-    return (data as any).remainingKm;
-  }
-
-  if (!res.ok) throw new Error('Failed to load service history');
-  return res.json();
+  if (data?.remainingKm !== undefined) return data.remainingKm;
+  
+  throw new Error('Unexpected response format for remaining km');
 };
 
 // Add service record
@@ -69,7 +68,8 @@ export const addCarServiceRecord = async (
   });
 
   if (!res.ok) throw new Error('Failed to add service record');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // PUT update a service record (route: PUT /record/:id)
@@ -84,7 +84,8 @@ export const updateServiceRecord = async (
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('Failed to update service record');
-  return res.json();
+  const result = await res.json();
+  return result.data || result;
 };
 
 // Delete service record
