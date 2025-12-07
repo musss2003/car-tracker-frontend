@@ -5,7 +5,7 @@ import { Contract, ContractFormData } from '../types/contract.types';
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/contracts/';
 
 export const getTotalRevenue = async (): Promise<number> => {
-  const response = await fetch(`${API_URL}revenue`, {
+  const response = await fetch(`${API_URL}revenue/total`, {
     method: 'GET',
     headers: getAuthHeaders(),
   });
@@ -16,10 +16,10 @@ export const getTotalRevenue = async (): Promise<number> => {
 
   const data = await response.json();
 
-  // Support APIs that return either a plain number or an object like { totalRevenue: number }
-  if (typeof data === 'number') return data;
-  if (data && typeof data === 'object' && 'totalRevenue' in data)
-    return Number((data as any).totalRevenue);
+  // Backend returns { success: true, data: { totalRevenue: number }, timestamp }
+  if (data && data.success && data.data && typeof data.data.totalRevenue === 'number') {
+    return data.data.totalRevenue;
+  }
 
   throw new Error('Unexpected revenue response format');
 };

@@ -14,7 +14,7 @@ export const getNotifications = async () => {
     }
 
     const data = await response.json();
-    return data;
+    return data.data; // Backend returns { success, data, timestamp }
   } catch (err) {
     console.error((err as Error).message || 'Something went wrong');
     throw err;
@@ -69,7 +69,7 @@ export const getUnreadNotifications = async () => {
     }
 
     const data = await response.json();
-    return data.notifications;
+    return data.data; // Backend returns { success, data, timestamp }
   } catch (err) {
     console.error((err as Error).message || 'Something went wrong');
     throw err;

@@ -16,6 +16,7 @@ export const getCar = async (carId: string): Promise<Car> => {
 };
 
 export const getCars = async (): Promise<Car[]> => {
+  console.log('Fetching all cars from API');
   const response = await fetch(`${API_URL}cars`, {
     method: 'GET',
     headers: getAuthHeaders(),
