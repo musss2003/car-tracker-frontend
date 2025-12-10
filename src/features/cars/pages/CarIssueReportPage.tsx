@@ -486,7 +486,6 @@ export default function CarIssuesPage() {
                       key={`${issue.id}-${issue.updatedAt || Date.now()}`}
                       resourceId={issue.id}
                       fetchAuditLogs={getIssueReportAuditLogs}
-                      title="Historija izmjena"
                       className="mt-4"
                     />
                   </div>

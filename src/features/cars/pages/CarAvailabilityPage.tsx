@@ -364,51 +364,67 @@ export default function CarAvailabilityPage() {
                 ) : (
                   bookings
                     .sort((a, b) => a.start.getTime() - b.start.getTime())
-                    .map((event, index) => (
-                      <Card
-                        key={index}
-                        className="hover:shadow-md transition-shadow"
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="space-y-2 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <User className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                                <span className="font-medium">
+                    .map((event, index) => {
+                      const statusColorMap = {
+                        confirmed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+                        active: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+                        completed: 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400',
+                      };
+                      const statusColor = statusColorMap[event.status] || statusColorMap.completed;
+
+                      return (
+                        <div
+                          key={index}
+                          className="flex gap-4 p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
+                        >
+                          <div className="flex-shrink-0">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${statusColor}`}>
+                              <User className="w-6 h-6" />
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-3 mb-2">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-lg mb-1">
                                   {event.customerName}
-                                </span>
-                                <Badge
-                                  variant={getStatusBadgeVariant(event.status)}
-                                >
-                                  {getStatusLabel(event.status)}
-                                </Badge>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {moment(event.start).format(
-                                    'DD.MM.YYYY'
-                                  )} - {moment(event.end).format('DD.MM.YYYY')}
-                                </div>
-                                {event.totalAmount && (
-                                  <div className="flex items-center gap-1">
-                                    <DollarSign className="w-3 h-3" />
-                                    {event.totalAmount} BAM
-                                  </div>
+                                </h4>
+                                {event.customerPassportNumber && (
+                                  <p className="text-sm text-muted-foreground">
+                                    Pasoš: {event.customerPassportNumber}
+                                  </p>
                                 )}
                               </div>
+                              <div className="flex gap-2 items-center flex-shrink-0">
+                                <Badge variant={getStatusBadgeVariant(event.status)}>
+                                  {getStatusLabel(event.status)}
+                                </Badge>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedEvent(event)}
+                                >
+                                  Detalji
+                                </Button>
+                              </div>
                             </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setSelectedEvent(event)}
-                            >
-                              Detalji
-                            </Button>
+                            
+                            <div className="flex items-center flex-wrap gap-3 mt-3 text-sm border-t pt-3">
+                              <span className="flex items-center gap-1.5 text-muted-foreground">
+                                <Clock className="w-4 h-4" />
+                                <span className="font-medium">
+                                  {moment(event.start).format('DD.MM.YYYY')} - {moment(event.end).format('DD.MM.YYYY')}
+                                </span>
+                              </span>
+                              {event.totalAmount && (
+                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">
+                                  {event.totalAmount.toFixed(2)} BAM
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))
+                        </div>
+                      );
+                    })
                 )}
               </CardContent>
             </Card>

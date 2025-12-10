@@ -213,7 +213,7 @@ export default function RegistrationPage() {
       />
 
       <div className="flex-1 overflow-y-auto bg-muted/30">
-        <div className="mx-auto p-6 max-w-7xl">
+        <div className="mx-auto p-6">
           {registrations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <FileText className="w-16 h-16 text-muted-foreground mb-4" />
@@ -229,89 +229,105 @@ export default function RegistrationPage() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {registrations.map((registration) => (
-                <DetailCard
-                  key={registration.id}
-                  title="Registracija"
-                  icon={<FileText className="w-5 h-5" />}
-                  borderColor="border-l-green-500"
-                  gradientColor="from-green-500/10"
-                  textColor="text-green-700 dark:text-green-400"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <DetailField
-                        label="Istek registracije"
-                        value={new Date(
-                          registration.registrationExpiry
-                        ).toLocaleDateString('hr-HR')}
-                      />
-                      {isExpired(registration.registrationExpiry) && (
-                        <Badge variant="destructive" className="gap-1">
-                          <AlertTriangle className="w-3 h-3" />
-                          Isteklo
-                        </Badge>
-                      )}
-                      {isExpiringSoon(registration.registrationExpiry) &&
-                        !isExpired(registration.registrationExpiry) && (
-                          <Badge
-                            variant="outline"
-                            className="gap-1 border-yellow-500 text-yellow-600"
-                          >
-                            <AlertTriangle className="w-3 h-3" />
-                            Uskoro
-                          </Badge>
-                        )}
+            <div className="space-y-4">
+              {registrations.map((registration) => {
+                const formatDate = (dateString: string) => {
+                  return new Date(dateString).toLocaleDateString('bs-BA', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  });
+                };
+                
+                const truncateText = (text: string, maxLength: number = 120) => {
+                  if (!text) return '';
+                  if (text.length <= maxLength) return text;
+                  return text.substring(0, maxLength) + '...';
+                };
+
+                return (
+                  <div
+                    key={registration.id}
+                    className="flex gap-4 p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center">
+                        <FileText className="w-6 h-6" />
+                      </div>
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-lg mb-1">
+                            Registracija vozila
+                          </h4>
+                          {registration.notes && (
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {truncateText(registration.notes, 120)}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 items-center flex-shrink-0">
+                          {isExpired(registration.registrationExpiry) && (
+                            <Badge variant="destructive" className="gap-1">
+                              <AlertTriangle className="w-3 h-3" />
+                              Isteklo
+                            </Badge>
+                          )}
+                          {isExpiringSoon(registration.registrationExpiry) &&
+                            !isExpired(registration.registrationExpiry) && (
+                              <Badge
+                                variant="outline"
+                                className="gap-1 border-yellow-500 text-yellow-600"
+                              >
+                                <AlertTriangle className="w-3 h-3" />
+                                Uskoro
+                              </Badge>
+                            )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenDialog(registration)}
+                            className="gap-2"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedRegistration(registration);
+                              setDeleteDialogOpen(true);
+                            }}
+                            className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
 
-                    <DetailField
-                      label="Datum obnove"
-                      value={new Date(
-                        registration.renewalDate
-                      ).toLocaleDateString('hr-HR')}
-                    />
+                      <div className="flex items-center flex-wrap gap-3 mt-3 text-sm border-t pt-3">
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <FileText className="w-4 h-4" />
+                          <span className="font-medium">
+                            Ističe: {formatDate(registration.registrationExpiry)}
+                          </span>
+                        </span>
+                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-medium">
+                          Obnovljeno: {formatDate(registration.renewalDate)}
+                        </span>
+                      </div>
 
-                    {registration.notes && (
-                      <DetailField
-                        label="Napomene"
-                        value={registration.notes}
+                      <AuditLogHistory
+                        key={`${registration.id}-${Date.now()}`}
+                        resourceId={registration.id}
+                        fetchAuditLogs={getRegistrationAuditLogs}
+                        className="mt-4"
                       />
-                    )}
-
-                    <AuditLogHistory
-                      resourceId={registration.id}
-                      fetchAuditLogs={getRegistrationAuditLogs}
-                      title="Historija izmjena"
-                      className="mt-3"
-                    />
-
-                    <div className="flex gap-2 pt-2 border-t">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleOpenDialog(registration)}
-                        className="gap-2"
-                      >
-                        <Edit className="w-3 h-3" />
-                        Uredi
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedRegistration(registration);
-                          setDeleteDialogOpen(true);
-                        }}
-                        className="gap-2 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                        Obriši
-                      </Button>
                     </div>
                   </div>
-                </DetailCard>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

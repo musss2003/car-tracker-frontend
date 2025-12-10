@@ -365,7 +365,6 @@ export default function CarServiceHistoryPage() {
                       <AuditLogHistory
                         resourceId={record.id}
                         fetchAuditLogs={getServiceHistoryAuditLogs}
-                        title="Historija izmjena"
                         className="mt-4"
                       />
                     </div>

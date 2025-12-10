@@ -317,7 +317,6 @@ export default function CarInsurancePage() {
                       <AuditLogHistory
                         resourceId={insurance.id}
                         fetchAuditLogs={getInsuranceAuditLogs}
-                        title="Historija izmjena"
                         className="mt-4"
                       />
                     </div>

@@ -685,6 +685,11 @@ export default function CarDetailsPage() {
                 onClick={() => navigate(`/cars/${car.id}/maintenance`)}
               />
               <NavTile
+                title="Analitika troškova"
+                Icon={DollarSign}
+                onClick={() => navigate(`/cars/${car.id}/cost-analytics`)}
+              />
+              <NavTile
                 title="Kalendar dostupnosti"
                 Icon={Calendar}
                 onClick={() => navigate(`/cars/${car.id}/availability`)}

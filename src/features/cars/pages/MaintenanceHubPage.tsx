@@ -377,15 +377,26 @@ export default function MaintenanceHubPage() {
         subtitle={`${car.manufacturer} ${car.model} • ${car.licensePlate}`}
         onBack={() => navigate(`/cars/${id}`)}
         actions={
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={exportToCSV}
-            className="gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Izvezi CSV
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/cars/${id}/cost-analytics`)}
+              className="gap-2"
+            >
+              <DollarSign className="w-4 h-4" />
+              Analitika troškova
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportToCSV}
+              className="gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Izvezi CSV
+            </Button>
+          </div>
         }
       />
 
