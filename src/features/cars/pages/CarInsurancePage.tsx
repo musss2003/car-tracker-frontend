@@ -229,95 +229,101 @@ export default function CarInsurancePage() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {insurances.map((insurance) => (
-                <DetailCard
-                  key={insurance.id}
-                  title={insurance.provider || 'Osiguranje'}
-                  icon={<Shield className="w-5 h-5" />}
-                  borderColor="border-l-purple-500"
-                  gradientColor="from-purple-500/10"
-                  textColor="text-purple-700 dark:text-purple-400"
-                >
-                  <div className="space-y-3">
-                    {insurance.policyNumber && (
-                      <DetailField
-                        label="Broj polise"
-                        value={insurance.policyNumber}
-                      />
-                    )}
-                    {insurance.provider && (
-                      <DetailField
-                        label="Provajder"
-                        value={insurance.provider}
-                      />
-                    )}
+            <div className="space-y-4">
+              {insurances.map((insurance) => {
+                const formatDate = (dateString: string) => {
+                  return new Date(dateString).toLocaleDateString('bs-BA', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  });
+                };
 
-                    <div className="flex items-center justify-between">
-                      <DetailField
-                        label="Istek osiguranja"
-                        value={new Date(
-                          insurance.insuranceExpiry
-                        ).toLocaleDateString('hr-HR')}
-                      />
-                      {isExpired(insurance.insuranceExpiry) && (
-                        <Badge variant="destructive" className="gap-1">
-                          <AlertTriangle className="w-3 h-3" />
-                          Isteklo
-                        </Badge>
-                      )}
-                      {isExpiringSoon(insurance.insuranceExpiry) &&
-                        !isExpired(insurance.insuranceExpiry) && (
-                          <Badge
-                            variant="outline"
-                            className="gap-1 border-yellow-500 text-yellow-600"
-                          >
-                            <AlertTriangle className="w-3 h-3" />
-                            Uskoro
-                          </Badge>
-                        )}
+                return (
+                  <div
+                    key={insurance.id}
+                    className="flex gap-4 p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 flex items-center justify-center">
+                        <Shield className="w-6 h-6" />
+                      </div>
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-lg mb-1">
+                            {insurance.provider || 'Osiguranje vozila'}
+                          </h4>
+                          {insurance.policyNumber && (
+                            <p className="text-sm text-muted-foreground">
+                              Polisa: {insurance.policyNumber}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 items-center flex-shrink-0">
+                          {isExpired(insurance.insuranceExpiry) && (
+                            <Badge variant="destructive" className="gap-1">
+                              <AlertTriangle className="w-3 h-3" />
+                              Isteklo
+                            </Badge>
+                          )}
+                          {isExpiringSoon(insurance.insuranceExpiry) &&
+                            !isExpired(insurance.insuranceExpiry) && (
+                              <Badge
+                                variant="outline"
+                                className="gap-1 border-yellow-500 text-yellow-600"
+                              >
+                                <AlertTriangle className="w-3 h-3" />
+                                Uskoro
+                              </Badge>
+                            )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenDialog(insurance)}
+                            className="gap-2"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedInsurance(insurance);
+                              setDeleteDialogOpen(true);
+                            }}
+                            className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
 
-                    {insurance.price && (
-                      <DetailField
-                        label="Cijena"
-                        value={`${insurance.price.toFixed(2)} BAM`}
+                      <div className="flex items-center flex-wrap gap-3 mt-3 text-sm">
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <Shield className="w-4 h-4" />
+                          <span className="font-medium">
+                            Ističe: {formatDate(insurance.insuranceExpiry)}
+                          </span>
+                        </span>
+                        {insurance.price && (
+                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">
+                            {Number(insurance.price).toFixed(2)} BAM
+                          </span>
+                        )}
+                      </div>
+
+                      <AuditLogHistory
+                        resourceId={insurance.id}
+                        fetchAuditLogs={getInsuranceAuditLogs}
+                        title="Historija izmjena"
+                        className="mt-4"
                       />
-                    )}
-
-                    <AuditLogHistory
-                      resourceId={insurance.id}
-                      fetchAuditLogs={getInsuranceAuditLogs}
-                      title="Historija izmjena"
-                      className="mt-3"
-                    />
-
-                    <div className="flex gap-2 pt-2 border-t">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleOpenDialog(insurance)}
-                        className="gap-2"
-                      >
-                        <Edit className="w-3 h-3" />
-                        Uredi
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedInsurance(insurance);
-                          setDeleteDialogOpen(true);
-                        }}
-                        className="gap-2 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                        Obriši
-                      </Button>
                     </div>
                   </div>
-                </DetailCard>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

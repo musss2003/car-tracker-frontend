@@ -343,36 +343,47 @@ export default function CarIssuesPage() {
           <div className="mx-auto space-y-4">
             {filteredIssues.map((issue) => {
               const SeverityIcon = getSeverityIcon(issue.severity);
+              const iconColorMap = {
+                critical: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+                high: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+                medium: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+                low: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+              };
+              const iconColor = iconColorMap[issue.severity as keyof typeof iconColorMap] || iconColorMap.medium;
+              const truncatedDescription = issue.description.length > 200 
+                ? issue.description.substring(0, 200) + '...' 
+                : issue.description;
+
               return (
-                <Card
+                <div
                   key={issue.id}
-                  className="p-6 hover:shadow-lg transition-shadow"
+                  className="flex gap-4 p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
                 >
-                  <div className="flex flex-col lg:flex-row gap-6">
-                    {/* Left: Main Info */}
-                    <div className="flex-1 space-y-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-3 flex-1">
-                          <SeverityIcon className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap mb-2">
-                              <Badge
-                                className={getSeverityColor(issue.severity)}
-                              >
-                                {issue.severity?.toUpperCase() || 'N/A'}
-                              </Badge>
-                              <Badge className={getStatusColor(issue.status)}>
-                                {issue.status === 'open' && 'Otvoreno'}
-                                {issue.status === 'in_progress' && 'U toku'}
-                                {issue.status === 'resolved' && 'Riješeno'}
-                              </Badge>
-                            </div>
-                            <p className="text-base leading-relaxed text-foreground">
-                              {issue.description}
-                            </p>
-                          </div>
+                  <div className="flex-shrink-0">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconColor}`}>
+                      <SeverityIcon className="w-6 h-6" />
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-2">
+                          <Badge
+                            className={getSeverityColor(issue.severity)}
+                          >
+                            {issue.severity?.toUpperCase() || 'N/A'}
+                          </Badge>
+                          <Badge className={getStatusColor(issue.status)}>
+                            {issue.status === 'open' && 'Otvoreno'}
+                            {issue.status === 'in_progress' && 'U toku'}
+                            {issue.status === 'resolved' && 'Riješeno'}
+                          </Badge>
                         </div>
+                        <p className="text-base leading-relaxed text-foreground">
+                          {truncatedDescription}
+                        </p>
                       </div>
+                    </div>
 
                       {/* Metadata */}
                       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -406,72 +417,80 @@ export default function CarIssuesPage() {
                             </span>
                           </div>
                         )}
-                      </div>
                     </div>
 
-                    {/* Right: Actions */}
-                    <div className="flex lg:flex-col items-center lg:items-end gap-3 lg:min-w-[200px]">
-                      {/* {issue.diagnosticPdfUrl && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="gap-2"
-                          onClick={() =>
-                            window.open(issue.diagnosticPdfUrl, '_blank')
+                    <div className="flex items-center flex-wrap gap-3 mt-3 text-sm border-t pt-3">
+                      {issue.reportedBy && (
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <User className="w-4 h-4" />
+                          <span className="font-medium">{issue.reportedBy.name}</span>
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5 text-muted-foreground">
+                        <Calendar className="w-4 h-4" />
+                        <span className="font-medium">
+                          {new Date(issue.reportedAt).toLocaleDateString(
+                            'bs-BA',
+                            {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            }
+                          )}
+                        </span>
+                      </span>
+                      {issue.resolvedAt && issue.resolvedBy && (
+                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium">
+                          <CheckCircle className="w-4 h-4" />
+                          Riješio: {issue.resolvedBy.firstName}
+                        </span>
+                      )}
+                      <div className="ml-auto flex gap-2">
+                        <Select
+                          value={issue.status}
+                          onValueChange={(value) =>
+                            handleStatusChange(issue.id, value)
                           }
                         >
-                          <Download className="w-4 h-4" />
-                          Dijagnostika
-                        </Button>
-                      )} */}
-                      <Select
-                        value={issue.status}
-                        onValueChange={(value) =>
-                          handleStatusChange(issue.id, value)
-                        }
-                      >
-                        <SelectTrigger className="w-full lg:w-[180px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="open">Otvoreno</SelectItem>
-                          <SelectItem value="in_progress">U toku</SelectItem>
-                          <SelectItem value="resolved">Riješeno</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="flex gap-2">
+                          <SelectTrigger className="w-[140px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="open">Otvoreno</SelectItem>
+                            <SelectItem value="in_progress">U toku</SelectItem>
+                            <SelectItem value="resolved">Riješeno</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => openEditDialog(issue)}
-                          className="gap-2"
                         >
                           <Edit className="w-4 h-4" />
-                          Uredi
                         </Button>
                         <Button
-                          variant="destructive"
+                          variant="outline"
                           size="sm"
                           onClick={() => {
                             setIssueToDelete(issue.id);
                             setShowDeleteDialog(true);
                           }}
-                          className="gap-2"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         >
                           <Trash2 className="w-4 h-4" />
-                          Obriši
                         </Button>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Audit Log History */}
-                  <AuditLogHistory
-                    resourceId={issue.id}
-                    fetchAuditLogs={getIssueReportAuditLogs}
-                    title="Historija izmjena"
-                  />
-                </Card>
+                    <AuditLogHistory
+                      key={`${issue.id}-${issue.updatedAt || Date.now()}`}
+                      resourceId={issue.id}
+                      fetchAuditLogs={getIssueReportAuditLogs}
+                      title="Historija izmjena"
+                      className="mt-4"
+                    />
+                  </div>
+                </div>
               );
             })}
           </div>

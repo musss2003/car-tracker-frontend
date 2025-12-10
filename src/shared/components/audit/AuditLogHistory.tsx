@@ -12,7 +12,6 @@ interface AuditLogHistoryProps {
     data: AuditLog[];
     pagination?: any;
   }>;
-  title?: string;
   className?: string;
 }
 
@@ -56,7 +55,6 @@ const formatValue = (value: any): string => {
 export function AuditLogHistory({
   resourceId,
   fetchAuditLogs,
-  title = 'Historija izmjena',
   className = '',
 }: AuditLogHistoryProps) {
   const [expanded, setExpanded] = useState(false);
@@ -100,7 +98,7 @@ export function AuditLogHistory({
           className="w-full gap-2 text-muted-foreground hover:text-foreground"
         >
           <History className="w-4 h-4" />
-          <span>{title}</span>
+          <span>Historija izmjena</span>
           {expanded ? (
             <ChevronUp className="w-4 h-4 ml-auto" />
           ) : (
@@ -118,9 +116,6 @@ export function AuditLogHistory({
             </div>
           ) : auditLogs.length > 0 ? (
             <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-foreground mb-3">
-                {title}
-              </h4>
               {auditLogs.map((log) => (
                 <div
                   key={log.id}
@@ -200,7 +195,7 @@ export function AuditLogHistory({
                                       <span className="font-medium">
                                         {key}:
                                       </span>{' '}
-                                      <span className="font-mono text-xs">
+                                      <span className="font-mono block text-ellipsis overflow-hidden whitespace-nowrap">
                                         {formatValue(value)}
                                       </span>
                                     </div>
@@ -237,7 +232,7 @@ export function AuditLogHistory({
                                       <span className="font-medium">
                                         {key}:
                                       </span>{' '}
-                                      <span className="font-mono text-xs">
+                                      <span className="font-mono block text-ellipsis overflow-hidden whitespace-nowrap">
                                         {formatValue(value)}
                                       </span>
                                     </div>
@@ -260,7 +255,7 @@ export function AuditLogHistory({
                                       <span className="font-medium">
                                         {key}:
                                       </span>{' '}
-                                      <span className="font-mono text-xs">
+                                      <span className="font-mono text-xs text-ellipsis">
                                         {formatValue(value)}
                                       </span>
                                     </div>

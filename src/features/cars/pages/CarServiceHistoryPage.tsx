@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { LoadingState } from '@/shared/components/ui/loading-state';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { Button } from '@/shared/components/ui/button';
-import { Edit, Plus, Trash2, Wrench } from 'lucide-react';
+import { Calendar, Edit, Plus, Trash2, Wrench } from 'lucide-react';
 import { DetailCard } from '@/shared/components/ui/detail-card';
 import { DetailField } from '@/shared/components/ui/detail-field';
 import {
@@ -260,87 +260,54 @@ export default function CarServiceHistoryPage() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+            <div className="space-y-4">
               {serviceHistory.map((record) => {
                 const formatDate = (dateString: string | Date) => {
                   const date = new Date(dateString);
                   if (isNaN(date.getTime())) return 'N/A';
-                  return date.toLocaleDateString('hr-HR', {
-                    day: '2-digit',
-                    month: '2-digit',
+                  return date.toLocaleDateString('bs-BA', {
+                    day: 'numeric',
+                    month: 'short',
                     year: 'numeric',
                   });
                 };
 
-                const truncateText = (text: string, maxLength: number = 50) => {
+                const truncateText = (text: string, maxLength: number = 120) => {
+                  if (!text) return '';
                   if (text.length <= maxLength) return text;
                   return text.substring(0, maxLength) + '...';
                 };
 
                 return (
-                  <div key={record.id} className="flex">
-                    <DetailCard
-                      title={truncateText(record.serviceType, 40)}
-                      icon={<Wrench className="w-5 h-5" />}
-                      borderColor="border-l-blue-500"
-                      gradientColor="from-blue-500/10"
-                      textColor="text-blue-700 dark:text-blue-400"
-                      className="w-full flex flex-col"
-                    >
-                      <div className="flex flex-col flex-1 min-h-0">
-                        <div className="space-y-3 flex-1">
-                          <DetailField
-                            label="Datum servisa"
-                            value={formatDate(record.serviceDate)}
-                          />
-                          {record.mileage && (
-                            <DetailField
-                              label="Kilometraža"
-                              value={`${record.mileage.toLocaleString('hr-HR')} km`}
-                            />
-                          )}
+                  <div
+                    key={record.id}
+                    className="flex gap-4 p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 flex items-center justify-center">
+                        <Wrench className="w-6 h-6" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-lg mb-1">
+                            {record.serviceType}
+                          </h4>
                           {record.description && (
-                            <DetailField
-                              label="Opis"
-                              value={truncateText(record.description, 50)}
-                            />
-                          )}
-                          {record.nextServiceKm && (
-                            <DetailField
-                              label="Sljedeći servis (km)"
-                              value={`${record.nextServiceKm.toLocaleString('hr-HR')} km`}
-                            />
-                          )}
-                          {record.nextServiceDate && (
-                            <DetailField
-                              label="Sljedeći servis (datum)"
-                              value={formatDate(record.nextServiceDate)}
-                            />
-                          )}
-                          {record.cost && (
-                            <DetailField
-                              label="Cijena"
-                              value={`${Number(record.cost).toFixed(2)} BAM`}
-                            />
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {truncateText(record.description, 120)}
+                            </p>
                           )}
                         </div>
-
-                        <AuditLogHistory
-                          resourceId={record.id}
-                          fetchAuditLogs={getServiceHistoryAuditLogs}
-                          title="Historija izmjena"
-                          className="mt-4"
-                        />
-
-                        <div className="flex gap-2 pt-4 mt-4 border-t">
+                        <div className="flex gap-2 flex-shrink-0">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleOpenDialog(record)}
-                            className="gap-2 flex-1"
+                            className="gap-2"
                           >
-                            <Edit className="w-3 h-3" />
-                            Uredi
+                            <Edit className="w-4 h-4" />
                           </Button>
                           <Button
                             variant="outline"
@@ -349,14 +316,59 @@ export default function CarServiceHistoryPage() {
                               setSelectedRecord(record);
                               setDeleteDialogOpen(true);
                             }}
-                            className="gap-2 flex-1 text-destructive hover:text-destructive"
+                            className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
-                            <Trash2 className="w-3 h-3" />
-                            Obriši
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
-                    </DetailCard>
+
+                      <div className="flex items-center flex-wrap gap-3 mt-3 text-sm">
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <Calendar className="w-4 h-4" />
+                          <span className="font-medium">
+                            {formatDate(record.serviceDate)}
+                          </span>
+                        </span>
+                        {record.mileage && (
+                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-medium">
+                            {record.mileage.toLocaleString('bs-BA')} km
+                          </span>
+                        )}
+                        {record.cost && (
+                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">
+                            {Number(record.cost).toFixed(2)} BAM
+                          </span>
+                        )}
+                      </div>
+
+                      {(record.nextServiceKm || record.nextServiceDate) && (
+                        <div className="mt-3 pt-3 border-t border-dashed">
+                          <p className="text-xs text-muted-foreground font-semibold mb-2">
+                            Sljedeći servis:
+                          </p>
+                          <div className="flex items-center gap-3 text-sm">
+                            {record.nextServiceKm && (
+                              <span className="text-muted-foreground">
+                                {record.nextServiceKm.toLocaleString('bs-BA')} km
+                              </span>
+                            )}
+                            {record.nextServiceDate && (
+                              <span className="text-muted-foreground">
+                                {formatDate(record.nextServiceDate)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <AuditLogHistory
+                        resourceId={record.id}
+                        fetchAuditLogs={getServiceHistoryAuditLogs}
+                        title="Historija izmjena"
+                        className="mt-4"
+                      />
+                    </div>
                   </div>
                 );
               })}
