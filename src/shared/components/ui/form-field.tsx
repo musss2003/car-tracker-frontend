@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Label } from '@/shared/components/ui/label';
 import { AlertCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';

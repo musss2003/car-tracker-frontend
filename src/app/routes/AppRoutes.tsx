@@ -23,6 +23,30 @@ const CarAvailabilityPage = lazy(
   () => import('../../features/cars/pages/CarAvailabilityPage')
 );
 
+const CarServiceHistoryPage = lazy(
+  () => import('../../features/cars/pages/CarServiceHistoryPage')
+);
+
+const CarRegistrationPage = lazy(
+  () => import('../../features/cars/pages/CarRegistrationPage')
+);
+
+const CarInsurancePage = lazy(
+  () => import('../../features/cars/pages/CarInsurancePage')
+);
+
+const MaintenanceHubPage = lazy(
+  () => import('../../features/cars/pages/MaintenanceHubPage')
+);
+
+const CostAnalyticsPage = lazy(
+  () => import('../../features/cars/pages/CostAnalyticsPage')
+);
+
+const TimelinePage = lazy(
+  () => import('../../features/cars/pages/TimelinePage')
+);
+
 // Contracts Pages - Feature-based imports
 const ContractsPage = lazy(
   () => import('../../features/contracts/pages/ContractsPage')
@@ -92,6 +116,7 @@ import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import LoadingSpinner from '../../shared/components/feedback/LoadingSpinner/LoadingSpinner';
+import CarIssuesPage from '@/features/cars/pages/CarIssueReportPage';
 
 export function AppRoutes() {
   const { isLoggedIn, user } = useAuth();
@@ -120,6 +145,25 @@ export function AppRoutes() {
             path="/cars/:id/availability"
             element={<CarAvailabilityPage />}
           />
+          <Route
+            path="/cars/:id/service-history"
+            element={<CarServiceHistoryPage />}
+          />
+          <Route
+            path="/cars/:id/registration"
+            element={<CarRegistrationPage />}
+          />
+          <Route path="/cars/:id/issues" element={<CarIssuesPage />} />
+          <Route path="/cars/:id/insurance" element={<CarInsurancePage />} />
+          <Route
+            path="/cars/:id/maintenance"
+            element={<MaintenanceHubPage />}
+          />
+          <Route
+            path="/cars/:id/cost-analytics"
+            element={<CostAnalyticsPage />}
+          />
+          <Route path="/cars/:id/timeline" element={<TimelinePage />} />
           <Route path="/contracts/new" element={<CreateContractPage />} />
           <Route path="/contracts/:id" element={<ContractDetailsPage />} />
           <Route path="/contracts/:id/edit" element={<EditContractPage />} />

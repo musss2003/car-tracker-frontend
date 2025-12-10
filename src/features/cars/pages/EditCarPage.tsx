@@ -1,12 +1,34 @@
-'use client';
-
+import type React from 'react';
+import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { X, Save, Upload, Image } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Car,
+  CarBrand,
+  CarCategory,
+  CarFormErrors,
+  CarStatus,
+  FuelType,
+  TransmissionType,
+} from '../types/car.types';
+
+import { uploadDocument } from '@/shared/services/uploadService';
+import { LoadingState } from '@/shared/components/ui/loading-state';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import {
+  AlertCircle,
+  CarIcon,
+  FileTextIcon,
+  Loader2,
+  Save,
+  TagIcon,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
+import { PageHeader } from '@/shared/components/ui/page-header';
+import { FormSection } from '@/shared/components/ui/form-section';
+import { FormField } from '@/shared/components/ui/form-field';
 import {
   Select,
   SelectContent,
@@ -14,107 +36,84 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
+import { Input } from '@/shared/components/ui/input';
+import { PhotoUpload } from '@/shared/components/ui/photo-upload';
 import {
-  uploadDocument,
-  downloadDocument,
-} from '@/shared/services/uploadService';
-import carBrands from '@/assets/car_brands.json';
-
-import './EditCarPage.css';
-import LoadingSpinner from '@/shared/components/feedback/LoadingSpinner/LoadingSpinner';
-import { Car, CarFormErrors } from '../types/car.types';
-import { getCar, updateCar } from '../services/carService';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shared/components/ui/alert-dialog';
+import {
+  deleteCar,
+  fetchCarBrands,
+  getCar,
+  updateCar,
+} from '../services/carService';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
 const CHASSIS_NUMBER_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/i;
 
-interface CarTouchedFields {
-  [key: string]: boolean;
+interface CarFormData {
+  manufacturer: string;
+  model: string;
+  year: number;
+  color: string;
+  licensePlate: string;
+  chassisNumber: string;
+  pricePerDay: number;
+  transmission: string;
+  fuelType: string;
+  seats: number;
+  doors: number;
+  mileage: number;
+  enginePower: number;
+  category: string;
+  status: string;
+  photoUrl: string;
 }
 
-const EditCarPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+export default function EditCarPage() {
+  const params = useParams();
+  const id = params?.id as string;
   const navigate = useNavigate();
-  const [car, setCar] = useState<Car | null>(null);
+
+  const [formData, setFormData] = useState<CarFormData>({
+    manufacturer: '',
+    model: '',
+    year: CURRENT_YEAR,
+    color: '#000000',
+    licensePlate: '',
+    chassisNumber: '',
+    pricePerDay: 0,
+    transmission: 'automatic',
+    fuelType: 'petrol',
+    seats: 5,
+    doors: 4,
+    mileage: 0,
+    enginePower: 0,
+    category: 'economy',
+    status: 'available',
+    photoUrl: '',
+  });
+
   const [loading, setLoading] = useState(true);
-
-  // Load car data
-  useEffect(() => {
-    const loadCar = async () => {
-      if (!id) {
-        toast.error('ID vozila je obavezan');
-        navigate('/cars');
-        return;
-      }
-
-      try {
-        const carData = await getCar(id);
-        setCar(carData);
-      } catch (error) {
-        console.error('Error loading car:', error);
-        toast.error('Neuspješno učitavanje podataka o vozilu');
-        navigate('/cars');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCar();
-  }, [id, navigate]);
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!car) {
-    return null;
-  }
-
-  const initialData: Car = {
-    ...car,
-    id: car.id,
-    manufacturer: car.manufacturer || '',
-    model: car.model || '',
-    year: car.year || CURRENT_YEAR,
-    color: car.color || '#000000',
-    licensePlate: car.licensePlate || '',
-    chassisNumber: car.chassisNumber || '',
-    pricePerDay: car.pricePerDay || 0,
-    transmission: car.transmission || 'automatic',
-    fuelType: car.fuelType || 'petrol',
-    seats: car.seats || 5,
-    doors: car.doors || 4,
-    mileage: car.mileage || 0,
-    enginePower: car.enginePower || 0,
-    category: car.category || 'economy',
-    status: car.status, // Keep existing status, will be calculated by backend
-    photoUrl: car.photoUrl || '',
-    createdAt: car.createdAt || new Date(),
-    updatedAt: new Date(),
-  };
-
-  return <EditCarFormContent car={initialData} />;
-};
-
-// Separate component for the form content
-const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
-  const navigate = useNavigate();
-
-  // Form state
-  const [formData, setFormData] = useState<Car>(initialData);
-  const [originalData, setOriginalData] = useState<Car>(initialData);
-
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<CarFormErrors>({});
-  const [touched, setTouched] = useState<CarTouchedFields>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Photo upload state
+  const [isUpdated, setIsUpdated] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-  const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
-  const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
+  const [carBrands, setCarBrands] = useState<CarBrand[]>([]);
+
+  useEffect(() => {
+    fetchCarBrands().then(setCarBrands).catch(console.error);
+  }, []);
 
   // Car brands from JSON file
   const popularBrands = carBrands
@@ -122,111 +121,69 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
     .map((brand) => brand.name);
   const allBrands = carBrands.map((brand) => brand.name);
 
-  // Common car manufacturers for suggestions (popular Bosnian market brands)
-  const commonManufacturers = popularBrands;
-
-  // Load existing photo from backend
-  const loadExistingPhoto = async (photoUrl: string) => {
-    if (!photoUrl) return;
-
-    setIsLoadingPhoto(true);
-    try {
-      const photoBlob = await downloadDocument(photoUrl);
-      const photoObjectUrl = URL.createObjectURL(photoBlob);
-      setExistingPhotoUrl(photoObjectUrl);
-    } catch (error) {
-      console.error('Error loading existing photo:', error);
-      // Show user-friendly error message
-      setErrors((prev) => ({
-        ...prev,
-        photoUrl: `Neuspješno učitavanje postojeće fotografije. Možete unijeti novu.`,
-      }));
-      // Clear the photo URL from form data since it failed to load
-      setFormData((prev) => ({ ...prev, photoUrl: '' }));
-    } finally {
-      setIsLoadingPhoto(false);
-    }
-  };
-
-  // Load existing photo when component mounts
+  // Fetch car data
   useEffect(() => {
-    if (formData.photoUrl) {
-      loadExistingPhoto(formData.photoUrl);
-    }
-  }, [formData.photoUrl]);
+    const fetchCar = async () => {
+      try {
+        setLoading(true);
+        const carData = await getCar(id);
 
-  // Cleanup photo URLs when component unmounts
-  useEffect(() => {
-    return () => {
-      if (existingPhotoUrl) {
-        URL.revokeObjectURL(existingPhotoUrl);
-      }
-      if (photoPreview) {
-        URL.revokeObjectURL(photoPreview);
+        setFormData({
+          manufacturer: carData.manufacturer || '',
+          model: carData.model || '',
+          year: carData.year || CURRENT_YEAR,
+          color: carData.color || '#000000',
+          licensePlate: carData.licensePlate || '',
+          chassisNumber: carData.chassisNumber || '',
+          pricePerDay: carData.pricePerDay || 0,
+          transmission: carData.transmission || 'automatic',
+          fuelType: carData.fuelType || 'petrol',
+          seats: carData.seats || 5,
+          doors: carData.doors || 4,
+          mileage: carData.mileage || 0,
+          enginePower: carData.enginePower || 0,
+          category: carData.category || 'economy',
+          status: carData.status || 'available',
+          photoUrl: carData.photoUrl || '',
+        });
+      } catch (err) {
+        console.error('Error fetching car:', err);
+        setError('Učitavanje vozila nije uspjelo. Molimo pokušajte ponovo.');
+      } finally {
+        setLoading(false);
       }
     };
-  }, [existingPhotoUrl, photoPreview]);
 
-  // Handle form field changes
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value, type } = e.target;
-
-    const newValue =
-      type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
-
-    setFormData((prev) => ({ ...prev, [name]: newValue }));
-
-    if (!touched[name]) {
-      setTouched((prev) => ({ ...prev, [name]: true }));
+    if (id) {
+      fetchCar();
     }
+  }, [id]);
+
+  const handleChange = (field: keyof CarFormData, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setIsUpdated(true);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
   };
 
-  // Handle photo selection
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setErrors((prev) => ({
-          ...prev,
-          photoUrl: 'Molimo odaberite validnu sliku',
-        }));
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors((prev) => ({
-          ...prev,
-          photoUrl: 'Slika mora biti manja od 5MB',
-        }));
-        return;
-      }
-
-      setSelectedPhoto(file);
-      setErrors((prev) => ({ ...prev, photoUrl: undefined }));
-
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPhotoPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handlePhotoChange = (file: File | null) => {
+    setSelectedPhoto(file);
+    setIsUpdated(true);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.photoUrl;
+      return newErrors;
+    });
   };
 
-  // Upload photo to server
   const uploadPhoto = async (): Promise<string | null> => {
     if (!selectedPhoto) return null;
 
-    setIsUploadingPhoto(true);
     try {
       const filename = await uploadDocument(selectedPhoto);
-      // Clear any previous photo upload errors
       setErrors((prev) => ({ ...prev, photoUrl: undefined }));
       return filename;
     } catch (error) {
@@ -236,30 +193,12 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
         photoUrl: 'Neuspješno dodavanje fotografije. Molimo pokušajte ponovo.',
       }));
       return null;
-    } finally {
-      setIsUploadingPhoto(false);
     }
   };
 
-  // Remove selected photo
-  const removePhoto = () => {
-    setSelectedPhoto(null);
-    setPhotoPreview(null);
-    setFormData((prev) => ({ ...prev, photoUrl: '' }));
-    setErrors((prev) => ({ ...prev, photoUrl: undefined }));
+  const validateForm = (): boolean => {
+    const newErrors = {} as CarFormErrors;
 
-    // Clean up existing photo URL
-    if (existingPhotoUrl) {
-      URL.revokeObjectURL(existingPhotoUrl);
-      setExistingPhotoUrl(null);
-    }
-  };
-
-  // Validate the form
-  const validateForm = () => {
-    const newErrors: CarFormErrors = {};
-
-    // Required fields
     if (!formData.manufacturer)
       newErrors.manufacturer = 'Proizvođač je obavezan';
     if (!formData.model) newErrors.model = 'Model je obavezan';
@@ -267,7 +206,6 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
     if (!formData.licensePlate)
       newErrors.licensePlate = 'Registarska oznaka je obavezna';
 
-    // Chassis number format (if provided)
     if (
       formData.chassisNumber &&
       !CHASSIS_NUMBER_REGEX.test(formData.chassisNumber)
@@ -276,612 +214,519 @@ const EditCarFormContent: React.FC<{ car: Car }> = ({ car: initialData }) => {
         'Broj šasije mora imati 17 karaktera (isključuje I, O, Q)';
     }
 
-    // Price validation
-    if (formData.pricePerDay !== undefined) {
-      const price = Number.parseFloat(String(formData.pricePerDay));
-      if (isNaN(price) || price <= 0) {
-        newErrors.pricePerDay = 'Cijena mora biti pozitivan broj';
-      }
-    } else {
-      newErrors.pricePerDay = 'Cijena po danu je obavezna';
+    const price = Number.parseFloat(String(formData.pricePerDay));
+    if (isNaN(price) || price <= 0) {
+      newErrors.pricePerDay = 'Cijena mora biti pozitivan broj';
     }
 
-    // Seats validation
-    if (formData.seats) {
-      const seats = Number.parseInt(formData.seats.toString());
-      if (isNaN(seats) || seats < 1 || seats > 10) {
-        newErrors.seats = 'Broj sjedala mora biti između 1 i 10';
-      }
+    const seats = Number.parseInt(formData.seats.toString());
+    if (isNaN(seats) || seats < 1 || seats > 10) {
+      newErrors.seats = 'Broj sjedala mora biti između 1 i 10';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Check if form has been modified
-  const hasChanges = () => {
-    // Check if form data has changed
-    const formChanged =
-      JSON.stringify(formData) !== JSON.stringify(originalData);
-
-    // Check if a new photo has been selected
-    const photoChanged = selectedPhoto !== null;
-
-    return formChanged || photoChanged;
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setTouched({
-      manufacturer: true,
-      model: true,
-      year: true,
-      color: true,
-      licensePlate: true,
-      chassisNumber: true,
-      pricePerDay: true,
-      seats: true,
-      doors: true,
-      fuelType: true,
-      transmission: true,
-      category: true,
-    });
-
-    if (!validateForm() || !formData) {
+    if (!validateForm()) {
       toast.error('Molimo ispravite greške u formi');
       return;
     }
 
-    try {
-      setIsSubmitting(true);
+    setSubmitting(true);
+    setError(null);
 
-      // Upload photo first if selected
+    try {
       let photoUrl = formData.photoUrl;
+
       if (selectedPhoto) {
         const uploadedFilename = await uploadPhoto();
         if (!uploadedFilename) {
-          // Photo upload failed, don't proceed
           return;
         }
         photoUrl = uploadedFilename;
       }
 
-      // Format the data before saving
-      const carData: Car = {
-        ...formData,
-        photoUrl: photoUrl,
+      const carData: Omit<Car, 'createdAt'> = {
+        licensePlate: formData.licensePlate,
+        manufacturer: formData.manufacturer,
+        model: formData.model,
         year: Number(formData.year),
+        color: formData.color,
+        chassisNumber: formData.chassisNumber,
         pricePerDay: Number(formData.pricePerDay),
+        transmission: formData.transmission as TransmissionType,
+        fuelType: formData.fuelType as FuelType,
         seats: Number(formData.seats),
         doors: Number(formData.doors),
         mileage: Number(formData.mileage),
         enginePower: Number(formData.enginePower),
+        category: formData.category as CarCategory,
+        status: formData.status as CarStatus,
+        photoUrl: photoUrl,
         updatedAt: new Date(),
+        id,
       };
-
-      await updateCar(carData.licensePlate, carData);
+      await updateCar(formData.licensePlate, carData);
       toast.success('Vozilo je uspješno ažurirano');
       navigate('/cars');
-    } catch (error) {
-      console.error('Error updating car:', error);
-      toast.error('Neuspješno ažuriranje vozila');
+    } catch (err) {
+      console.error('Error updating car:', err);
+      setError('Ažuriranje vozila nije uspjelo. Molimo pokušajte ponovo.');
+      toast.error('Ažuriranje vozila nije uspjelo. Molimo pokušajte ponovo.');
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
-  // Handle cancel with unsaved changes
-  const handleCancel = () => {
-    if (hasChanges()) {
-      if (
-        window.confirm(
-          'Imate nesačuvane promjene. Da li ste sigurni da želite otkazati?'
-        )
-      ) {
-        navigate('/cars');
-      }
-    } else {
+  const handleDelete = async () => {
+    try {
+      setSubmitting(true);
+      await deleteCar(id);
+      toast.success('Vozilo je uspješno obrisano');
       navigate('/cars');
+    } catch (error) {
+      console.error('Error deleting car:', error);
+      toast.error('Neuspješno brisanje vozila');
+      setSubmitting(false);
     }
   };
 
-  // Validate on field change
-  useEffect(() => {
-    if (Object.keys(touched).length > 0) {
-      validateForm();
-    }
-  }, [formData, touched]);
+  if (loading) {
+    return <LoadingState text="Učitavanje vozila..." />;
+  }
 
-  return (
-    <div className="edit-car-form-page">
-      {/* Page Header */}
-      <div className="page-header">
-        <div className="header-content">
-          <div className="header-info">
-            <h1 className="page-title">
-              Uredi vozilo: {formData.manufacturer} {formData.model}
-            </h1>
-            <p className="page-description">Ažuriraj detalje vozila</p>
+  if (error && !loading) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="border-b bg-background px-6 py-4">
+          <h1 className="text-2xl font-semibold">Greška</h1>
+        </div>
+        <div className="flex-1 overflow-auto bg-muted/30 p-6">
+          <div className="max-w-4xl mx-auto">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+            <div className="mt-4">
+              <Button variant="outline" onClick={() => navigate('/cars')}>
+                Nazad na vozila
+              </Button>
+            </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCancel}
-            disabled={isSubmitting}
-            className="close-button"
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </div>
       </div>
+    );
+  }
 
-      {/* Page Content */}
-      <div className="page-content">
-        <form onSubmit={handleSubmit} className="car-form">
-          {/* Basic Information Section */}
-          <div className="form-section">
-            <div className="section-header">
-              <h2 className="section-title">Osnovne informacije</h2>
-            </div>
-
-            <div className="form-grid">
-              <div className="form-field">
-                <Label htmlFor="manufacturer">
-                  Proizvođač <span className="required">*</span>
-                </Label>
-                <Select
-                  value={formData.manufacturer || ''}
-                  onValueChange={(value) =>
-                    handleChange({
-                      target: { name: 'manufacturer', value },
-                    } as any)
-                  }
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Odaberite proizvođača" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[200px] overflow-y-auto">
-                    {popularBrands.map((manufacturer) => (
-                      <SelectItem key={manufacturer} value={manufacturer}>
-                        {manufacturer}
-                      </SelectItem>
-                    ))}
-                    {allBrands
-                      .filter((brand) => !popularBrands.includes(brand))
-                      .map((manufacturer) => (
-                        <SelectItem key={manufacturer} value={manufacturer}>
-                          {manufacturer}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                {errors.manufacturer && (
-                  <p className="error-text">{errors.manufacturer}</p>
-                )}
-              </div>
-
-              <div className="form-field">
-                <Label htmlFor="model">
-                  Model <span className="required">*</span>
-                </Label>
-                <Input
-                  id="model"
-                  name="model"
-                  value={formData.model || ''}
-                  onChange={handleChange}
-                  placeholder="npr. Camry"
-                  disabled={isSubmitting}
-                  className={errors.model ? 'error' : ''}
-                />
-                {errors.model && <p className="error-text">{errors.model}</p>}
-              </div>
-            </div>
-
-            <div className="form-grid">
-              <div className="form-field">
-                <Label htmlFor="year">
-                  Godina <span className="required">*</span>
-                </Label>
-                <Select
-                  value={formData.year?.toString()}
-                  onValueChange={(value) =>
-                    handleChange({
-                      target: { name: 'year', value: parseInt(value) },
-                    } as any)
-                  }
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Odaberite godinu" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[200px] overflow-y-auto">
-                    {YEARS.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.year && <p className="error-text">{errors.year}</p>}
-              </div>
-
-              <div className="form-field">
-                <Label htmlFor="color">Boja</Label>
-                <Input
-                  id="color"
-                  name="color"
-                  type="color"
-                  value={formData.color || '#000000'}
-                  onChange={handleChange}
-                  disabled={isSubmitting}
-                  className="color-input"
-                />
-                {errors.color && <p className="error-text">{errors.color}</p>}
-              </div>
-            </div>
-
-            {/* Car Photo - Full width for better presentation */}
-            <div className="form-grid single-column">
-              <div className="form-field">
-                <Label htmlFor="photo">Fotografija vozila</Label>
-                <div className="photo-upload-container">
-                  <div className="upload-wrapper">
-                    <input
-                      id="photo"
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoChange}
-                      disabled={
-                        isSubmitting || isUploadingPhoto || isLoadingPhoto
-                      }
-                      className="hidden-file-input"
-                    />
-                    {isLoadingPhoto ? (
-                      // Show loading state when loading existing photo
-                      <div className="upload-area-loading">
-                        <div className="upload-content">
-                          <div className="progress-spinner large"></div>
-                          <div className="upload-text">
-                            <span className="upload-primary-text">
-                              Učitavanje postojeće fotografije...
-                            </span>
-                            <span className="upload-secondary-text">
-                              Molimo sačekajte
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ) : !photoPreview && !existingPhotoUrl ? (
-                      <label htmlFor="photo" className="upload-area-clickable">
-                        <div className="upload-content">
-                          <Upload className="upload-icon" />
-                          <div className="upload-text">
-                            <span className="upload-primary-text">
-                              Kliknite da biste dodali fotografiju
-                            </span>
-                            <span className="upload-secondary-text">
-                              PNG, JPG, JPEG do 5MB
-                            </span>
-                          </div>
-                        </div>
-                      </label>
-                    ) : (
-                      <div className="photo-preview-container">
-                        <div className="photo-preview-wrapper">
-                          <img
-                            src={photoPreview || existingPhotoUrl || ''}
-                            alt="Car preview"
-                            className="photo-preview-image"
-                          />
-                          <div className="photo-overlay">
-                            <div className="photo-actions">
-                              <label
-                                htmlFor="photo"
-                                className="change-photo-button"
-                              >
-                                <Upload className="h-4 w-4" />
-                                Promijeni
-                              </label>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={removePhoto}
-                                disabled={
-                                  isSubmitting ||
-                                  isUploadingPhoto ||
-                                  isLoadingPhoto
-                                }
-                                className="remove-photo-button"
-                              >
-                                <X className="h-4 w-4" />
-                                Ukloni
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {isUploadingPhoto && (
-                    <div className="upload-progress">
-                      <div className="progress-spinner"></div>
-                      <span className="progress-text">
-                        Dodavanje fotografije...
-                      </span>
-                    </div>
-                  )}
-                </div>
-                {errors.photoUrl && (
-                  <p className="error-text">{errors.photoUrl}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="form-grid">
-              <div className="form-field">
-                <Label htmlFor="transmission">Menjač</Label>
-                <Select
-                  value={formData.transmission}
-                  onValueChange={(value) =>
-                    handleChange({
-                      target: { name: 'transmission', value },
-                    } as any)
-                  }
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Odaberite menjač" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="automatic">Automatski</SelectItem>
-                    <SelectItem value="manual">Ručni</SelectItem>
-                    <SelectItem value="semi-automatic">
-                      Poluautomatski
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.transmission && (
-                  <p className="error-text">{errors.transmission}</p>
-                )}
-              </div>
-
-              <div className="form-field">
-                <Label htmlFor="fuelType">Tip goriva</Label>
-                <Select
-                  value={formData.fuelType}
-                  onValueChange={(value) =>
-                    handleChange({ target: { name: 'fuelType', value } } as any)
-                  }
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Odaberite tip goriva" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="petrol">Benzin</SelectItem>
-                    <SelectItem value="diesel">Dizel</SelectItem>
-                    <SelectItem value="electric">Električni</SelectItem>
-                    <SelectItem value="hybrid">Hibridni</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.fuelType && (
-                  <p className="error-text">{errors.fuelType}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="form-grid">
-              <div className="form-field">
-                <Label htmlFor="seats">Broj sjedala</Label>
-                <Input
-                  id="seats"
-                  name="seats"
-                  type="number"
-                  value={formData.seats || ''}
-                  onChange={handleChange}
-                  min="1"
-                  max="10"
-                  disabled={isSubmitting}
-                  className={errors.seats ? 'error' : ''}
-                />
-                {errors.seats && <p className="error-text">{errors.seats}</p>}
-              </div>
-
-              <div className="form-field">
-                <Label htmlFor="doors">Broj vrata</Label>
-                <Input
-                  id="doors"
-                  name="doors"
-                  type="number"
-                  value={formData.doors || ''}
-                  onChange={handleChange}
-                  min="2"
-                  max="6"
-                  disabled={isSubmitting}
-                  className={errors.doors ? 'error' : ''}
-                />
-                {errors.doors && <p className="error-text">{errors.doors}</p>}
-              </div>
-            </div>
-          </div>
-
-          {/* Registration Details Section */}
-          <div className="form-section">
-            <div className="section-header">
-              <h2 className="section-title">Registarski detalji</h2>
-            </div>
-
-            <div className="form-grid">
-              <div className="form-field">
-                <Label htmlFor="licensePlate">
-                  Registarska oznaka <span className="required">*</span>
-                </Label>
-                <Input
-                  id="licensePlate"
-                  name="licensePlate"
-                  value={formData.licensePlate || ''}
-                  onChange={handleChange}
-                  placeholder="npr. ABC123"
-                  disabled={isSubmitting}
-                  className={errors.licensePlate ? 'error' : ''}
-                />
-                {errors.licensePlate && (
-                  <p className="error-text">{errors.licensePlate}</p>
-                )}
-              </div>
-
-              <div className="form-field">
-                <Label htmlFor="chassisNumber">Broj šasije</Label>
-                <Input
-                  id="chassisNumber"
-                  name="chassisNumber"
-                  value={formData.chassisNumber || ''}
-                  onChange={handleChange}
-                  placeholder="npr. 1HGCM82633A123456"
-                  disabled={isSubmitting}
-                  className={errors.chassisNumber ? 'error' : ''}
-                />
-                {errors.chassisNumber && (
-                  <p className="error-text">{errors.chassisNumber}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Pricing Section */}
-          <div className="form-section">
-            <div className="section-header">
-              <h2 className="section-title">Cijena</h2>
-            </div>
-
-            <div className="form-grid single-column">
-              <div className="form-field">
-                <Label htmlFor="pricePerDay">
-                  Cijena po danu ($) <span className="required">*</span>
-                </Label>
-                <Input
-                  id="pricePerDay"
-                  name="pricePerDay"
-                  type="number"
-                  value={formData.pricePerDay || ''}
-                  onChange={handleChange}
-                  min="0"
-                  step="0.01"
-                  placeholder="npr. 49.99"
-                  disabled={isSubmitting}
-                  className={errors.pricePerDay ? 'error' : ''}
-                />
-                {errors.pricePerDay && (
-                  <p className="error-text">{errors.pricePerDay}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Details Section */}
-          <div className="form-section">
-            <div className="section-header">
-              <h2 className="section-title">Dodatni detalji</h2>
-            </div>
-
-            <div className="form-grid">
-              <div className="form-field">
-                <Label htmlFor="mileage">Kilometraža (km)</Label>
-                <Input
-                  id="mileage"
-                  name="mileage"
-                  type="number"
-                  value={formData.mileage || ''}
-                  onChange={handleChange}
-                  min="0"
-                  disabled={isSubmitting}
-                  className={errors.mileage ? 'error' : ''}
-                />
-                {errors.mileage && (
-                  <p className="error-text">{errors.mileage}</p>
-                )}
-              </div>
-
-              <div className="form-field">
-                <Label htmlFor="enginePower">Snaga motora (KS)</Label>
-                <Input
-                  id="enginePower"
-                  name="enginePower"
-                  type="number"
-                  value={formData.enginePower || ''}
-                  onChange={handleChange}
-                  min="0"
-                  disabled={isSubmitting}
-                  className={errors.enginePower ? 'error' : ''}
-                />
-                {errors.enginePower && (
-                  <p className="error-text">{errors.enginePower}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="form-grid">
-              <div className="form-field">
-                <Label htmlFor="category">Kategorija</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value) =>
-                    handleChange({ target: { name: 'category', value } } as any)
-                  }
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Odaberite kategoriju" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="economy">Ekonomska</SelectItem>
-                    <SelectItem value="luxury">Luksuzna</SelectItem>
-                    <SelectItem value="suv">SUV</SelectItem>
-                    <SelectItem value="van">Kombi</SelectItem>
-                    <SelectItem value="family">Obiteljska</SelectItem>
-                    <SelectItem value="business">Poslovna</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.category && (
-                  <p className="error-text">{errors.category}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Form Actions */}
-          <div className="form-actions">
+  return (
+    <div className="flex flex-col h-full">
+      <PageHeader
+        title="Uredi vozilo"
+        subtitle="Ažurirajte detalje vozila"
+        onBack={() => navigate('/cars')}
+        actions={
+          <>
             <Button
               type="button"
               variant="outline"
-              onClick={handleCancel}
-              disabled={isSubmitting}
+              onClick={() => navigate(`/cars/${id}`)}
+              disabled={submitting}
             >
+              <X className="w-4 h-4 mr-2" />
               Otkaži
             </Button>
-
-            <Button type="submit" disabled={isSubmitting || !hasChanges()}>
-              {isSubmitting ? (
-                <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Snimanje...</span>
-                </div>
+            <Button
+              type="submit"
+              disabled={submitting || !isUpdated}
+              form="edit-car-form"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Čuvanje...
+                </>
               ) : (
-                <div className="flex items-center space-x-2">
-                  <Save className="h-4 w-4" />
-                  <span>Snimi promjene</span>
-                </div>
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Sačuvaj promjene
+                </>
               )}
             </Button>
-          </div>
-        </form>
+          </>
+        }
+      />
+
+      <div className="flex-1 overflow-auto bg-muted/30">
+        <div className="w-full p-6">
+          <form
+            id="edit-car-form"
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            <div className="w-full">
+              <FormSection
+                title="Osnovne informacije"
+                icon={<TagIcon className="w-5 h-5" />}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    label="Proizvođač"
+                    id="manufacturer"
+                    required
+                    error={errors.manufacturer}
+                  >
+                    <Select
+                      value={formData.manufacturer || ''}
+                      onValueChange={(value) =>
+                        handleChange('manufacturer', value)
+                      }
+                      disabled={submitting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Odaberite proizvođača" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px] overflow-y-auto">
+                        {popularBrands.map((manufacturer) => (
+                          <SelectItem key={manufacturer} value={manufacturer}>
+                            {manufacturer}
+                          </SelectItem>
+                        ))}
+                        {allBrands
+                          .filter((brand) => !popularBrands.includes(brand))
+                          .map((manufacturer) => (
+                            <SelectItem key={manufacturer} value={manufacturer}>
+                              {manufacturer}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+
+                  <FormField
+                    label="Model"
+                    id="model"
+                    required
+                    error={errors.model}
+                  >
+                    <Input
+                      id="model"
+                      value={formData.model || ''}
+                      onChange={(e) => handleChange('model', e.target.value)}
+                      placeholder="npr. Camry"
+                      disabled={submitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Godina"
+                    id="year"
+                    required
+                    error={errors.year}
+                  >
+                    <Select
+                      value={formData.year?.toString()}
+                      onValueChange={(value) =>
+                        handleChange('year', Number.parseInt(value))
+                      }
+                      disabled={submitting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Odaberite godinu" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px] overflow-y-auto">
+                        {YEARS.map((year) => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+
+                  <FormField label="Boja" id="color" error={errors.color}>
+                    <Input
+                      id="color"
+                      type="color"
+                      value={formData.color || '#000000'}
+                      onChange={(e) => handleChange('color', e.target.value)}
+                      disabled={submitting}
+                      className="h-10"
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Menjač"
+                    id="transmission"
+                    error={errors.transmission}
+                  >
+                    <Select
+                      value={formData.transmission}
+                      onValueChange={(value) =>
+                        handleChange('transmission', value)
+                      }
+                      disabled={submitting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Odaberite menjač" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="automatic">Automatski</SelectItem>
+                        <SelectItem value="manual">Ručni</SelectItem>
+                        <SelectItem value="semi-automatic">
+                          Poluautomatski
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+
+                  <FormField
+                    label="Tip goriva"
+                    id="fuelType"
+                    error={errors.fuelType}
+                  >
+                    <Select
+                      value={formData.fuelType}
+                      onValueChange={(value) => handleChange('fuelType', value)}
+                      disabled={submitting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Odaberite tip goriva" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="petrol">Benzin</SelectItem>
+                        <SelectItem value="diesel">Dizel</SelectItem>
+                        <SelectItem value="electric">Električni</SelectItem>
+                        <SelectItem value="hybrid">Hibridni</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+
+                  <FormField
+                    label="Broj sjedala"
+                    id="seats"
+                    error={errors.seats}
+                  >
+                    <Input
+                      id="seats"
+                      type="number"
+                      value={formData.seats || ''}
+                      onChange={(e) =>
+                        handleChange('seats', Number.parseInt(e.target.value))
+                      }
+                      min="1"
+                      max="10"
+                      disabled={submitting}
+                    />
+                  </FormField>
+
+                  <FormField label="Broj vrata" id="doors" error={errors.doors}>
+                    <Input
+                      id="doors"
+                      type="number"
+                      value={formData.doors || ''}
+                      onChange={(e) =>
+                        handleChange('doors', Number.parseInt(e.target.value))
+                      }
+                      min="2"
+                      max="6"
+                      disabled={submitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Kategorija"
+                    id="category"
+                    error={errors.category}
+                    className="md:col-span-2"
+                  >
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value) => handleChange('category', value)}
+                      disabled={submitting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Odaberite kategoriju" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="economy">Economy</SelectItem>
+                        <SelectItem value="compact">Compact</SelectItem>
+                        <SelectItem value="suv">SUV</SelectItem>
+                        <SelectItem value="luxury">Luxury</SelectItem>
+                        <SelectItem value="sports">Sports</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+                </div>
+              </FormSection>
+            </div>
+
+            <div className="w-full">
+              <FormSection
+                title="Detalji vozila"
+                icon={<CarIcon className="w-5 h-5" />}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    label="Registarska oznaka"
+                    id="licensePlate"
+                    required
+                    error={errors.licensePlate}
+                  >
+                    <Input
+                      id="licensePlate"
+                      value={formData.licensePlate || ''}
+                      onChange={(e) =>
+                        handleChange('licensePlate', e.target.value)
+                      }
+                      placeholder="npr. ABC-123"
+                      disabled={submitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Broj šasije"
+                    id="chassisNumber"
+                    error={errors.chassisNumber}
+                  >
+                    <Input
+                      id="chassisNumber"
+                      value={formData.chassisNumber || ''}
+                      onChange={(e) =>
+                        handleChange('chassisNumber', e.target.value)
+                      }
+                      placeholder="17 karaktera"
+                      maxLength={17}
+                      disabled={submitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Kilometraža"
+                    id="mileage"
+                    error={errors.mileage}
+                  >
+                    <Input
+                      id="mileage"
+                      type="number"
+                      value={formData.mileage || ''}
+                      onChange={(e) =>
+                        handleChange('mileage', Number.parseInt(e.target.value))
+                      }
+                      placeholder="npr. 50000"
+                      min="0"
+                      disabled={submitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Snaga motora (KS)"
+                    id="enginePower"
+                    error={errors.enginePower}
+                  >
+                    <Input
+                      id="enginePower"
+                      type="number"
+                      value={formData.enginePower || ''}
+                      onChange={(e) =>
+                        handleChange(
+                          'enginePower',
+                          Number.parseInt(e.target.value)
+                        )
+                      }
+                      placeholder="npr. 150"
+                      min="0"
+                      disabled={submitting}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Cijena po danu (BAM)"
+                    id="pricePerDay"
+                    required
+                    error={errors.pricePerDay}
+                    className="md:col-span-2"
+                  >
+                    <Input
+                      id="pricePerDay"
+                      type="number"
+                      step="0.01"
+                      value={formData.pricePerDay || ''}
+                      onChange={(e) =>
+                        handleChange(
+                          'pricePerDay',
+                          Number.parseFloat(e.target.value)
+                        )
+                      }
+                      placeholder="npr. 50.00"
+                      min="0"
+                      disabled={submitting}
+                    />
+                  </FormField>
+                </div>
+              </FormSection>
+            </div>
+
+            <div className="w-full">
+              <FormSection
+                title="Fotografija vozila"
+                icon={<FileTextIcon className="w-5 h-5" />}
+              >
+                <PhotoUpload
+                  value={selectedPhoto}
+                  onChange={handlePhotoChange}
+                  error={errors.photoUrl}
+                  disabled={submitting}
+                  existingPhotoUrl={formData.photoUrl}
+                />
+              </FormSection>
+            </div>
+
+            {(errors as any).submit && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{(errors as any).submit}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex justify-end pt-4">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => setShowDeleteDialog(true)}
+                disabled={submitting}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Obriši vozilo
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Da li ste sigurni?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ova akcija ne može biti poništena. Ovo će trajno obrisati vozilo
+              iz baze podataka.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Otkaži</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Obriši
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
-};
-
-export default EditCarPage;
+}

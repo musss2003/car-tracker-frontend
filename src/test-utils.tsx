@@ -2,6 +2,7 @@ import { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { MemoryRouter, MemoryRouterProps } from 'react-router-dom';
 import UserProvider from './features/auth/hooks/useAuth';
+import { SidebarProvider } from './shared/components/ui/sidebar';
 
 /**
  * Custom render function that wraps components with necessary providers
@@ -34,7 +35,11 @@ export function renderWithProviders(
       children
     );
 
-    return <MemoryRouter {...routerProps}>{content}</MemoryRouter>;
+    return (
+      <MemoryRouter {...routerProps}>
+        <SidebarProvider>{content}</SidebarProvider>
+      </MemoryRouter>
+    );
   }
 
   return render(ui, { wrapper: Wrapper, ...renderOptions });

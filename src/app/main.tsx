@@ -1,9 +1,10 @@
+import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
-import UserProvider from '../features/auth/hooks/useAuth';
+import { AppProviders } from './AppProviders';
+
+const App = React.lazy(() => import('./App'));
 
 const rootElement = document.getElementById('root');
 
@@ -12,11 +13,11 @@ if (!rootElement) {
 }
 
 ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <Router>
-      <UserProvider>
+  <Router>
+    <React.StrictMode>
+      <AppProviders>
         <App />
-      </UserProvider>
-    </Router>
-  </React.StrictMode>
+      </AppProviders>
+    </React.StrictMode>
+  </Router>
 );
