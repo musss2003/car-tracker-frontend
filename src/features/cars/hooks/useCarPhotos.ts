@@ -24,7 +24,7 @@ export const useCarPhotos = (cars: CarWithStatus[]) => {
         loadCarPhoto(car.id, car.photoUrl);
       }
     });
-  }, [cars]);
+  }, [cars, photoUrls]);
 
   // Cleanup blob URLs on unmount
   useEffect(() => {
