@@ -44,6 +44,10 @@ import { getRegistrationDaysRemaining } from '../services/carRegistrationService
 import { getServiceRemainingKm } from '../services/carServiceHistory';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { getActiveIssueReportsCount } from '../services/carIssueReportService';
+import {
+  MaintenanceStatusList,
+  MaintenanceStatus,
+} from '../components/MaintenanceStatusList';
 
 function SpecItem({
   label,
@@ -453,61 +457,87 @@ export default function CarDetailsPage() {
             </div>
           </Card>
 
-          {/* Maintenance Status Cards */}
+          {/* Maintenance Status - Compact View */}
           <div>
             <h3 className="text-2xl font-bold mb-4">Status održavanja</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Service Gauge */}
-              <Card className="p-6">
-                <KPIGauge
-                  title="Sljedeći servis"
-                  remainingValue={serviceKilometersRemaining ?? 0}
-                  totalValue={SERVICE_INTERVAL}
-                  unitLabel="km preostalo"
-                  Icon={Wrench}
-                />
-              </Card>
-
-              {/* Registration Gauge */}
-              <Card className="p-6">
-                <KPIGauge
-                  title="Registracija ističe"
-                  remainingValue={registrationDaysRemaining ?? 0}
-                  totalValue={REGISTRATION_INTERVAL_DAYS}
-                  unitLabel="dana preostalo"
-                  Icon={CalendarCheck}
-                />
-              </Card>
-
-              {/* Issues Alert */}
-              <Card className="p-6 flex items-center justify-center">
-                {(activeIssueReports ?? 0) > 0 ? (
-                  <div className="text-center space-y-3">
-                    <AlertTriangle className="w-12 h-12 text-destructive mx-auto" />
-                    <div>
-                      <p className="font-bold text-lg text-destructive">
-                        {activeIssueReports ?? 0} Aktivna greška
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Provjerite kvarove na autu
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center space-y-3">
-                    <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
-                    <div>
-                      <p className="font-bold text-lg text-green-600">
-                        Nema aktivnih grešaka
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Vozilo je u dobrom stanju
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </Card>
-            </div>
+            <MaintenanceStatusList
+              items={[
+                {
+                  id: 'service',
+                  title: 'Sljedeći servis',
+                  icon: Wrench,
+                  currentValue: serviceKilometersRemaining,
+                  maxValue: SERVICE_INTERVAL,
+                  unit: 'km preostalo',
+                  urgency:
+                    serviceKilometersRemaining === null
+                      ? 'ok'
+                      : serviceKilometersRemaining < 500
+                        ? 'critical'
+                        : serviceKilometersRemaining < 2000
+                          ? 'warning'
+                          : 'ok',
+                  actionLabel:
+                    serviceKilometersRemaining !== null &&
+                    serviceKilometersRemaining < 2000
+                      ? 'Zakaži servis'
+                      : undefined,
+                  onAction:
+                    serviceKilometersRemaining !== null &&
+                    serviceKilometersRemaining < 2000
+                      ? () => navigate(`/cars/${car.id}/service-history`)
+                      : undefined,
+                },
+                {
+                  id: 'registration',
+                  title: 'Registracija ističe',
+                  icon: CalendarCheck,
+                  currentValue: registrationDaysRemaining,
+                  maxValue: REGISTRATION_INTERVAL_DAYS,
+                  unit: 'dana preostalo',
+                  urgency:
+                    registrationDaysRemaining === null
+                      ? 'ok'
+                      : registrationDaysRemaining < 7
+                        ? 'critical'
+                        : registrationDaysRemaining < 30
+                          ? 'warning'
+                          : 'ok',
+                  actionLabel:
+                    registrationDaysRemaining !== null &&
+                    registrationDaysRemaining < 30
+                      ? 'Produlji'
+                      : undefined,
+                  onAction:
+                    registrationDaysRemaining !== null &&
+                    registrationDaysRemaining < 30
+                      ? () => navigate(`/cars/${car.id}/registration`)
+                      : undefined,
+                },
+                {
+                  id: 'issues',
+                  title: 'Aktivni kvarovi',
+                  icon: AlertTriangle,
+                  currentValue: activeIssueReports,
+                  maxValue: MOCK_ISSUES_COUNT,
+                  unit: activeIssueReports === 1 ? 'kvar' : 'kvarova',
+                  urgency:
+                    activeIssueReports === null || activeIssueReports === 0
+                      ? 'ok'
+                      : activeIssueReports >= 3
+                        ? 'critical'
+                        : 'warning',
+                  actionLabel:
+                    activeIssueReports !== null && activeIssueReports > 0
+                      ? 'Prikaži kvarove'
+                      : undefined,
+                  onAction:
+                    activeIssueReports !== null && activeIssueReports > 0
+                      ? () => navigate(`/cars/${car.id}/issues`)
+                      : undefined,
+                },
+              ]}
+            />
           </div>
 
           {/* Quick Actions */}
