@@ -122,7 +122,24 @@ export const getCarAvailability = async (
 };
 
 export async function fetchCarBrands(): Promise<CarBrand[]> {
-  const res = await fetch('/car_brands.json');
+  // Use explicit origin and validate response
+  const res = await fetch(
+    new URL('/car_brands.json', window.location.origin).href
+  );
   if (!res.ok) throw new Error('Failed to fetch car brands');
-  return res.json();
+
+  // Validate Content-Type to prevent data poisoning
+  const contentType = res.headers.get('content-type');
+  if (!contentType?.includes('application/json')) {
+    throw new Error('Invalid content type for car brands data');
+  }
+
+  const data = await res.json();
+
+  // Basic schema validation to ensure data integrity
+  if (!Array.isArray(data)) {
+    throw new Error('Invalid car brands data format');
+  }
+
+  return data as CarBrand[];
 }

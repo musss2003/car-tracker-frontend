@@ -13,7 +13,18 @@ const BASE_PATH = `${API_URL}car-issue-report`;
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+
+  // Safe JSON parsing to prevent exceptions from non-JSON responses
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (error) {
+    // If JSON parsing fails, throw normalized error
+    throw new Error(
+      `Invalid response format: ${res.statusText || 'Request failed'}`
+    );
+  }
+
   if (!res.ok) {
     const msg =
       data?.message || data?.error || res.statusText || 'Request failed';

@@ -13,31 +13,11 @@ export const useIsMobile = (): UseIsMobileReturn => {
 
   useEffect(() => {
     const checkIsMobile = () => {
-      // Check using media query
+      // Only use media query for reliable, secure detection
+      // User-agent detection is unreliable and can be spoofed
       const mediaQuery = window.matchMedia('(max-width: 768px)');
-
-      // Check using user agent (additional detection)
-      const userAgent = navigator.userAgent.toLowerCase();
-      const mobileKeywords = [
-        'android',
-        'webos',
-        'iphone',
-        'ipad',
-        'ipod',
-        'blackberry',
-        'windows phone',
-        'mobile',
-      ];
-
-      const isMobileUA = mobileKeywords.some((keyword) =>
-        userAgent.includes(keyword)
-      );
-
-      // Combine both checks - prioritize media query but consider user agent
-      const isMobileDevice =
-        mediaQuery.matches || (isMobileUA && window.innerWidth <= 768);
-
-      setIsMobile(isMobileDevice);
+      
+      setIsMobile(mediaQuery.matches);
       setIsLoading(false);
     };
 

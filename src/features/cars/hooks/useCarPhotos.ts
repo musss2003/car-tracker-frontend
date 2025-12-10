@@ -10,6 +10,20 @@ export const useCarPhotos = (cars: CarWithStatus[]) => {
 
     try {
       const blob = await downloadDocument(photoFilename);
+
+      // Validate MIME type to prevent content sniffing attacks
+      const validImageTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+      ];
+      if (!validImageTypes.includes(blob.type)) {
+        console.error(`Invalid image type for car ${carId}: ${blob.type}`);
+        return;
+      }
+
       const url = URL.createObjectURL(blob);
       setPhotoUrls((prev) => ({ ...prev, [carId]: url }));
     } catch (error) {
