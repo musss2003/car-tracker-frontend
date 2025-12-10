@@ -1,13 +1,25 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '@/test-utils';
+import {
+  renderWithProviders,
+  mockMatchMedia,
+  mockLocalStorage,
+} from '@/test-utils';
 import ContractsPage from '../ContractsPage';
 import * as contractService from '../../services/contractService';
 import { UserRole } from '@/features/users/types/user.types';
 
 // Mock the contract service
 vi.mock('../../services/contractService');
+
+beforeAll(() => {
+  // Mock matchMedia for tests
+  mockMatchMedia();
+
+  // Mock localStorage
+  mockLocalStorage();
+});
 
 const mockUser = {
   id: 'user-1',
