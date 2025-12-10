@@ -91,36 +91,41 @@ export default function CarAvailabilityPage() {
         const availability = await getCarAvailability(foundCar.licensePlate);
 
         // Transform availability data into calendar events
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Normalize to start of day
+        const now = new Date();
+        const today = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate()
+        ); // Normalize to start of day
 
-      const events: BookingEvent[] = availability.map(
-        (booking): BookingEvent => {
-          const startDate = new Date(booking.start);
-          const endDate = new Date(booking.end);
+        const events: BookingEvent[] = availability.map(
+          (booking): BookingEvent => {
+            const startDate = new Date(booking.start);
+            const endDate = new Date(booking.end);
 
-          let status: 'confirmed' | 'active' | 'completed';
-          if (startDate.getTime() > now.getTime()) {
-            status = 'confirmed';
-          } else if (endDate.getTime() >= today.getTime()) {
-            status = 'active';
-          } else {
-            status = 'completed';
+            let status: 'confirmed' | 'active' | 'completed';
+            if (startDate.getTime() > now.getTime()) {
+              status = 'confirmed';
+            } else if (endDate.getTime() >= today.getTime()) {
+              status = 'active';
+            } else {
+              status = 'completed';
+            }
+
+            return {
+              title: `Rezervacija: ${booking.customerName}`,
+              start: startDate,
+              end: endDate,
+              contractId: booking.contractId,
+              customerName: booking.customerName,
+              customerPassportNumber: booking.customerPassportNumber,
+              totalAmount: booking.totalAmount,
+              status,
+              resource: booking,
+            };
           }
-
-          return {
-            title: `Rezervacija: ${booking.customerName}`,
-            start: startDate,
-            end: endDate,
-            contractId: booking.contractId,
-            customerName: booking.customerName,
-            customerPassportNumber: booking.customerPassportNumber,
-            totalAmount: booking.totalAmount,
-            status,
-            resource: booking,
-          };
-        }
-      );        setBookings(events);
+        );
+        setBookings(events);
         setError(null);
       } catch (error) {
         console.error('Error fetching car availability:', error);
