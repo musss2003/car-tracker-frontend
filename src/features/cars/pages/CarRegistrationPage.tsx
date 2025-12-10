@@ -238,8 +238,11 @@ export default function RegistrationPage() {
                     year: 'numeric',
                   });
                 };
-                
-                const truncateText = (text: string, maxLength: number = 120) => {
+
+                const truncateText = (
+                  text: string,
+                  maxLength: number = 120
+                ) => {
                   if (!text) return '';
                   if (text.length <= maxLength) return text;
                   return text.substring(0, maxLength) + '...';
@@ -310,7 +313,8 @@ export default function RegistrationPage() {
                         <span className="flex items-center gap-1.5 text-muted-foreground">
                           <FileText className="w-4 h-4" />
                           <span className="font-medium">
-                            Ističe: {formatDate(registration.registrationExpiry)}
+                            Ističe:{' '}
+                            {formatDate(registration.registrationExpiry)}
                           </span>
                         </span>
                         <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-medium">

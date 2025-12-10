@@ -16,12 +16,7 @@ interface MetadataRowProps {
 
 export const MetadataRow = ({ items, className }: MetadataRowProps) => {
   return (
-    <div
-      className={cn(
-        'flex items-center flex-wrap gap-3 text-sm',
-        className
-      )}
-    >
+    <div className={cn('flex items-center flex-wrap gap-3 text-sm', className)}>
       {items.map((item, index) => {
         const Icon = item.icon;
 
@@ -31,7 +26,8 @@ export const MetadataRow = ({ items, className }: MetadataRowProps) => {
               key={index}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1 rounded-full',
-                item.color || 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+                item.color ||
+                  'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
                 item.className
               )}
             >

@@ -263,7 +263,10 @@ export default function CarInsurancePage() {
                         </div>
                         <div className="flex gap-2 items-center flex-shrink-0 self-start">
                           {isExpired(insurance.insuranceExpiry) && (
-                            <Badge variant="destructive" className="gap-1 text-xs">
+                            <Badge
+                              variant="destructive"
+                              className="gap-1 text-xs"
+                            >
                               <AlertTriangle className="w-3 h-3" />
                               <span className="hidden sm:inline">Isteklo</span>
                             </Badge>

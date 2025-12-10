@@ -39,7 +39,7 @@ export const getLatestCarInsuranceRecord = async (
 export const addCarInsurance = async (
   data: Partial<CarInsurance>
 ): Promise<CarInsurance> => {
-  const res = await fetch(BASE_URL, {
+  const res = await fetch(`${BASE_URL}${data.carId}`, {
     method: 'POST',
     headers: getAuthHeaders(),
     credentials: 'include',
@@ -56,7 +56,7 @@ export const updateCarInsurance = async (
   id: string,
   data: Partial<CarInsurance>
 ): Promise<CarInsurance> => {
-  const res = await fetch(`${BASE_URL}${id}`, {
+  const res = await fetch(`${BASE_URL}record/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     credentials: 'include',
@@ -69,7 +69,7 @@ export const updateCarInsurance = async (
 
 // Delete insurance policy
 export const deleteCarInsurance = async (id: string): Promise<void> => {
-  const res = await fetch(`${BASE_URL}${id}`, {
+  const res = await fetch(`${BASE_URL}record/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
     credentials: 'include',

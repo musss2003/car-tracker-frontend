@@ -375,9 +375,7 @@ export default function TimelinePage() {
             {/* Group By */}
             <Select
               value={groupBy}
-              onValueChange={(value) =>
-                setGroupBy(value as typeof groupBy)
-              }
+              onValueChange={(value) => setGroupBy(value as typeof groupBy)}
             >
               <SelectTrigger className="w-full lg:w-48">
                 <SelectValue placeholder="Grupiši po" />
@@ -410,9 +408,7 @@ export default function TimelinePage() {
           </div>
 
           {/* Active Filters Display */}
-          {(typeFilter !== 'all' ||
-            statusFilter !== 'all' ||
-            searchTerm) && (
+          {(typeFilter !== 'all' || statusFilter !== 'all' || searchTerm) && (
             <div className="flex items-center gap-2 mt-4">
               <Filter className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">

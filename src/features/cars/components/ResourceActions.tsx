@@ -23,7 +23,7 @@ export const ResourceActions = ({
   return (
     <div className="flex gap-2 items-center flex-shrink-0">
       {additionalActions}
-      
+
       <Button
         variant="outline"
         size={size}

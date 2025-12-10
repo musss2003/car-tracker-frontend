@@ -242,7 +242,9 @@ export default function MaintenanceHubPage() {
         const recentCosts = allEvents
           .filter((e) => e.cost && e.date >= thirtyDaysAgo)
           .map((e) => Number(e.cost) || 0);
-        setMonthlyCost(Number(recentCosts.reduce((sum, cost) => sum + cost, 0)));
+        setMonthlyCost(
+          Number(recentCosts.reduce((sum, cost) => sum + cost, 0))
+        );
 
         // Yearly cost (last 365 days)
         const oneYearAgo = new Date();
@@ -419,7 +421,8 @@ export default function MaintenanceHubPage() {
                     Ukupno potrošeno
                   </p>
                   <p className="text-2xl sm:text-3xl font-bold mt-1 break-words">
-                    {Number(totalCost || 0).toFixed(2)} <span className="text-base sm:text-lg">BAM</span>
+                    {Number(totalCost || 0).toFixed(2)}{' '}
+                    <span className="text-base sm:text-lg">BAM</span>
                   </p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -452,7 +455,8 @@ export default function MaintenanceHubPage() {
                     Godišnje (365 dana)
                   </p>
                   <p className="text-2xl sm:text-3xl font-bold mt-1 break-words">
-                    {Number(yearlyCost || 0).toFixed(2)} <span className="text-base sm:text-lg">BAM</span>
+                    {Number(yearlyCost || 0).toFixed(2)}{' '}
+                    <span className="text-base sm:text-lg">BAM</span>
                   </p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
@@ -469,26 +473,38 @@ export default function MaintenanceHubPage() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                   <div className="overflow-x-auto w-full sm:w-auto">
                     <TabsList className="w-max">
-                      <TabsTrigger value="all" className="text-xs sm:text-sm">Sve ({events.length})</TabsTrigger>
-                      <TabsTrigger value="service" className="text-xs sm:text-sm">
+                      <TabsTrigger value="all" className="text-xs sm:text-sm">
+                        Sve ({events.length})
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="service"
+                        className="text-xs sm:text-sm"
+                      >
                         <Wrench className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Servisi </span>
-                        ({events.filter((e) => e.type === 'service').length})
+                        <span className="hidden sm:inline">Servisi </span>(
+                        {events.filter((e) => e.type === 'service').length})
                       </TabsTrigger>
-                      <TabsTrigger value="registration" className="text-xs sm:text-sm">
+                      <TabsTrigger
+                        value="registration"
+                        className="text-xs sm:text-sm"
+                      >
                         <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Registracije </span>
-                        ({events.filter((e) => e.type === 'registration').length})
+                        <span className="hidden sm:inline">Registracije </span>(
+                        {events.filter((e) => e.type === 'registration').length}
+                        )
                       </TabsTrigger>
-                      <TabsTrigger value="insurance" className="text-xs sm:text-sm">
+                      <TabsTrigger
+                        value="insurance"
+                        className="text-xs sm:text-sm"
+                      >
                         <Shield className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Osiguranja </span>
-                        ({events.filter((e) => e.type === 'insurance').length})
+                        <span className="hidden sm:inline">Osiguranja </span>(
+                        {events.filter((e) => e.type === 'insurance').length})
                       </TabsTrigger>
                       <TabsTrigger value="issue" className="text-xs sm:text-sm">
                         <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">Kvarovi </span>
-                        ({events.filter((e) => e.type === 'issue').length})
+                        <span className="hidden sm:inline">Kvarovi </span>(
+                        {events.filter((e) => e.type === 'issue').length})
                       </TabsTrigger>
                     </TabsList>
                   </div>
@@ -515,21 +531,28 @@ export default function MaintenanceHubPage() {
                       {filteredEvents.map((event) => {
                         const Icon = getEventIcon(event.type);
                         const iconColorMap = {
-                          service: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-                          registration: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-                          insurance: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
-                          issue: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+                          service:
+                            'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+                          registration:
+                            'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+                          insurance:
+                            'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+                          issue:
+                            'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
                         };
-                        const truncatedDescription = event.description.length > 100 
-                          ? event.description.substring(0, 100) + '...' 
-                          : event.description;
+                        const truncatedDescription =
+                          event.description.length > 100
+                            ? event.description.substring(0, 100) + '...'
+                            : event.description;
                         return (
                           <div
                             key={event.id}
                             className="flex gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
                           >
                             <div className="flex-shrink-0">
-                              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${iconColorMap[event.type]}`}>
+                              <div
+                                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${iconColorMap[event.type]}`}
+                              >
                                 <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                               </div>
                             </div>

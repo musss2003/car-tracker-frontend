@@ -272,7 +272,10 @@ export default function CarServiceHistoryPage() {
                   });
                 };
 
-                const truncateText = (text: string, maxLength: number = 120) => {
+                const truncateText = (
+                  text: string,
+                  maxLength: number = 120
+                ) => {
                   if (!text) return '';
                   if (text.length <= maxLength) return text;
                   return text.substring(0, maxLength) + '...';
@@ -350,7 +353,8 @@ export default function CarServiceHistoryPage() {
                           <div className="flex items-center gap-3 text-sm">
                             {record.nextServiceKm && (
                               <span className="text-muted-foreground">
-                                {record.nextServiceKm.toLocaleString('bs-BA')} km
+                                {record.nextServiceKm.toLocaleString('bs-BA')}{' '}
+                                km
                               </span>
                             )}
                             {record.nextServiceDate && (

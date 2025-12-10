@@ -344,12 +344,16 @@ export default function CarIssuesPage() {
             {filteredIssues.map((issue) => {
               const SeverityIcon = getSeverityIcon(issue.severity);
               const iconColorMap = {
-                critical: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+                critical:
+                  'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
                 high: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
-                medium: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+                medium:
+                  'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
                 low: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
               };
-              const iconColor = iconColorMap[issue.severity as keyof typeof iconColorMap] || iconColorMap.medium;
+              const iconColor =
+                iconColorMap[issue.severity as keyof typeof iconColorMap] ||
+                iconColorMap.medium;
 
               return (
                 <div
@@ -357,7 +361,9 @@ export default function CarIssuesPage() {
                   className="flex gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex-shrink-0">
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${iconColor}`}>
+                    <div
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${iconColor}`}
+                    >
                       <SeverityIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                   </div>
@@ -370,7 +376,9 @@ export default function CarIssuesPage() {
                           >
                             {issue.severity?.toUpperCase() || 'N/A'}
                           </Badge>
-                          <Badge className={`${getStatusColor(issue.status)} text-xs`}>
+                          <Badge
+                            className={`${getStatusColor(issue.status)} text-xs`}
+                          >
                             {issue.status === 'open' && 'Otvoreno'}
                             {issue.status === 'in_progress' && 'U toku'}
                             {issue.status === 'resolved' && 'Riješeno'}
@@ -382,45 +390,47 @@ export default function CarIssuesPage() {
                       </div>
                     </div>
 
-                      {/* Metadata */}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                        {issue.reportedBy && (
-                          <div className="flex items-center gap-1.5">
-                            <User className="w-4 h-4" />
-                            <span>Prijavio: {issue.reportedBy.name}</span>
-                          </div>
-                        )}
+                    {/* Metadata */}
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                      {issue.reportedBy && (
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4" />
+                          <User className="w-4 h-4" />
+                          <span>Prijavio: {issue.reportedBy.name}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-4 h-4" />
+                        <span>
+                          {new Date(issue.reportedAt).toLocaleDateString(
+                            'bs-BA',
+                            {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }
+                          )}
+                        </span>
+                      </div>
+                      {issue.resolvedAt && issue.resolvedBy && (
+                        <div className="flex items-center gap-1.5 text-green-600">
+                          <CheckCircle className="w-4 h-4" />
                           <span>
-                            {new Date(issue.reportedAt).toLocaleDateString(
-                              'bs-BA',
-                              {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              }
-                            )}
+                            Riješio: {issue.resolvedBy.firstName}{' '}
+                            {issue.resolvedBy.lastName}
                           </span>
                         </div>
-                        {issue.resolvedAt && issue.resolvedBy && (
-                          <div className="flex items-center gap-1.5 text-green-600">
-                            <CheckCircle className="w-4 h-4" />
-                            <span>
-                              Riješio: {issue.resolvedBy.firstName}{' '}
-                              {issue.resolvedBy.lastName}
-                            </span>
-                          </div>
-                        )}
+                      )}
                     </div>
 
                     <div className="flex items-center flex-wrap gap-2 sm:gap-3 mt-3 text-xs sm:text-sm border-t pt-3">
                       {issue.reportedBy && (
                         <span className="flex items-center gap-1 sm:gap-1.5 text-muted-foreground">
                           <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                          <span className="font-medium truncate max-w-[150px] sm:max-w-none">{issue.reportedBy.name}</span>
+                          <span className="font-medium truncate max-w-[150px] sm:max-w-none">
+                            {issue.reportedBy.name}
+                          </span>
                         </span>
                       )}
                       <span className="flex items-center gap-1 sm:gap-1.5 text-muted-foreground">
@@ -439,7 +449,8 @@ export default function CarIssuesPage() {
                       {issue.resolvedAt && issue.resolvedBy && (
                         <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium whitespace-nowrap">
                           <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                          <span className="hidden sm:inline">Riješio: </span>{issue.resolvedBy.firstName}
+                          <span className="hidden sm:inline">Riješio: </span>
+                          {issue.resolvedBy.firstName}
                         </span>
                       )}
                       <div className="ml-auto flex gap-2">

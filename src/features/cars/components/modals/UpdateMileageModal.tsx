@@ -71,7 +71,7 @@ export function UpdateMileageModal({
       // Fetch current car data and update only mileage
       const { getCar } = await import('../../services/carService');
       const currentCar = await getCar(carId);
-      
+
       await updateCar(carId, {
         ...currentCar,
         mileage: Number(mileage),

@@ -83,7 +83,7 @@ export const updateServiceRecord = async (
 
 // Delete service record
 export const deleteCarServiceRecord = async (id: string): Promise<void> => {
-  const res = await fetch(`${BASE_URL}${id}`, {
+  const res = await fetch(`${BASE_URL}record/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
     credentials: 'include',

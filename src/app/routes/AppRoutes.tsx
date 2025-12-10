@@ -163,10 +163,7 @@ export function AppRoutes() {
             path="/cars/:id/cost-analytics"
             element={<CostAnalyticsPage />}
           />
-          <Route
-            path="/cars/:id/timeline"
-            element={<TimelinePage />}
-          />
+          <Route path="/cars/:id/timeline" element={<TimelinePage />} />
           <Route path="/contracts/new" element={<CreateContractPage />} />
           <Route path="/contracts/:id" element={<ContractDetailsPage />} />
           <Route path="/contracts/:id/edit" element={<EditContractPage />} />

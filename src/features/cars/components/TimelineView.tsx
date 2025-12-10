@@ -120,7 +120,9 @@ export function TimelineView({
             <div className="flex items-center gap-2 sm:gap-3 mb-6">
               <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-muted rounded-full">
                 <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
-                <h3 className="font-bold text-base sm:text-lg truncate">{groupKey}</h3>
+                <h3 className="font-bold text-base sm:text-lg truncate">
+                  {groupKey}
+                </h3>
               </div>
               <div className="flex-1 h-px bg-border" />
               <Badge variant="outline" className="text-xs whitespace-nowrap">

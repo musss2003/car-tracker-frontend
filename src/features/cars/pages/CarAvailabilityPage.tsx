@@ -366,11 +366,16 @@ export default function CarAvailabilityPage() {
                     .sort((a, b) => a.start.getTime() - b.start.getTime())
                     .map((event, index) => {
                       const statusColorMap = {
-                        confirmed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-                        active: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
-                        completed: 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400',
+                        confirmed:
+                          'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+                        active:
+                          'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+                        completed:
+                          'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400',
                       };
-                      const statusColor = statusColorMap[event.status] || statusColorMap.completed;
+                      const statusColor =
+                        statusColorMap[event.status] ||
+                        statusColorMap.completed;
 
                       return (
                         <div
@@ -378,7 +383,9 @@ export default function CarAvailabilityPage() {
                           className="flex gap-4 p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
                         >
                           <div className="flex-shrink-0">
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${statusColor}`}>
+                            <div
+                              className={`w-12 h-12 rounded-xl flex items-center justify-center ${statusColor}`}
+                            >
                               <User className="w-6 h-6" />
                             </div>
                           </div>
@@ -395,7 +402,9 @@ export default function CarAvailabilityPage() {
                                 )}
                               </div>
                               <div className="flex gap-2 items-center flex-shrink-0">
-                                <Badge variant={getStatusBadgeVariant(event.status)}>
+                                <Badge
+                                  variant={getStatusBadgeVariant(event.status)}
+                                >
                                   {getStatusLabel(event.status)}
                                 </Badge>
                                 <Button
@@ -407,12 +416,13 @@ export default function CarAvailabilityPage() {
                                 </Button>
                               </div>
                             </div>
-                            
+
                             <div className="flex items-center flex-wrap gap-3 mt-3 text-sm border-t pt-3">
                               <span className="flex items-center gap-1.5 text-muted-foreground">
                                 <Clock className="w-4 h-4" />
                                 <span className="font-medium">
-                                  {moment(event.start).format('DD.MM.YYYY')} - {moment(event.end).format('DD.MM.YYYY')}
+                                  {moment(event.start).format('DD.MM.YYYY')} -{' '}
+                                  {moment(event.end).format('DD.MM.YYYY')}
                                 </span>
                               </span>
                               {event.totalAmount && (

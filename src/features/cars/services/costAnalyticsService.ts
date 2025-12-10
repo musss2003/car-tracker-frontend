@@ -226,9 +226,7 @@ function generateCategoryBreakdown(totalCosts: {
 /**
  * Generate yearly trends
  */
-function generateYearlyTrends(
-  monthlyCosts: MonthlyBreakdown[]
-): YearlyTrend[] {
+function generateYearlyTrends(monthlyCosts: MonthlyBreakdown[]): YearlyTrend[] {
   const yearlyMap = new Map<number, YearlyTrend>();
 
   monthlyCosts.forEach((month) => {
@@ -370,7 +368,8 @@ export function calculateCostComparison(
   change: number;
   changePercentage: number;
 } {
-  const monthsToCompare = period === 'month' ? 1 : period === 'quarter' ? 3 : 12;
+  const monthsToCompare =
+    period === 'month' ? 1 : period === 'quarter' ? 3 : 12;
 
   const currentPeriod = monthlyCosts.slice(-monthsToCompare);
   const previousPeriod = monthlyCosts.slice(
