@@ -48,6 +48,11 @@ import {
   MaintenanceStatusList,
   MaintenanceStatus,
 } from '../components/MaintenanceStatusList';
+import {
+  LogServiceModal,
+  ReportIssueModal,
+  UpdateMileageModal,
+} from '../components/modals';
 
 function SpecItem({
   label,
@@ -120,6 +125,11 @@ export default function CarDetailsPage() {
   const [activeIssueReports, setActiveIssueReports] = useState<number | null>(
     null
   );
+
+  // Modal states
+  const [showLogServiceModal, setShowLogServiceModal] = useState(false);
+  const [showReportIssueModal, setShowReportIssueModal] = useState(false);
+  const [showUpdateMileageModal, setShowUpdateMileageModal] = useState(false);
 
   const loadPhoto = useCallback(async (photoUrl: string) => {
     try {
@@ -236,6 +246,24 @@ export default function CarDetailsPage() {
       setShowDeleteDialog(false);
     }
   }, [car, navigate]);
+
+  const refreshMaintenanceData = useCallback(async () => {
+    if (!id) return;
+    try {
+      const [carData, regDays, serviceKm, issueCount] = await Promise.all([
+        getCar(id),
+        getRegistrationDaysRemaining(id),
+        getServiceRemainingKm(id),
+        getActiveIssueReportsCount(id),
+      ]);
+      if (carData) setCar({ ...carData, isBusy: false });
+      setRegistrationDaysRemaining(regDays);
+      setServiceKilometersRemaining(serviceKm);
+      setActiveIssueReports(issueCount);
+    } catch (error) {
+      console.error('Error refreshing maintenance data:', error);
+    }
+  }, [id]);
 
   if (loading) {
     return <LoadingState />;
@@ -540,9 +568,62 @@ export default function CarDetailsPage() {
             />
           </div>
 
-          {/* Quick Actions */}
+          {/* Quick Maintenance Actions */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">Brze akcije</h3>
+            <h3 className="text-2xl font-bold mb-4">Brze akcije održavanja</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setShowLogServiceModal(true)}
+                className="h-auto py-6 px-6 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 border-2 transition-all duration-200 hover:border-primary/50 hover:shadow-lg"
+              >
+                <Wrench className="w-8 h-8 text-primary" />
+                <div className="text-center">
+                  <div className="font-semibold text-base">
+                    ⚡ Zabilježi servis
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Brzo dodaj novi servis
+                  </div>
+                </div>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setShowReportIssueModal(true)}
+                className="h-auto py-6 px-6 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/30 hover:from-orange-100 hover:to-orange-200 dark:hover:from-orange-900/30 dark:hover:to-orange-800/40 border-2 transition-all duration-200 hover:border-orange-500/50 hover:shadow-lg"
+              >
+                <AlertTriangle className="w-8 h-8 text-orange-600" />
+                <div className="text-center">
+                  <div className="font-semibold text-base">⚡ Prijavi kvar</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Brzo prijavi problem
+                  </div>
+                </div>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setShowUpdateMileageModal(true)}
+                className="h-auto py-6 px-6 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-900/30 dark:hover:to-blue-800/40 border-2 transition-all duration-200 hover:border-blue-500/50 hover:shadow-lg"
+              >
+                <Gauge className="w-8 h-8 text-blue-600" />
+                <div className="text-center">
+                  <div className="font-semibold text-base">⚡ Ažuriraj km</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Trenutno: {car.mileage?.toLocaleString() || 'N/A'} km
+                  </div>
+                </div>
+              </Button>
+            </div>
+          </div>
+
+          {/* Navigation Tiles */}
+          <div>
+            <h3 className="text-2xl font-bold mb-4">Navigacija</h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <NavTile
                 title="Kalendar dostupnosti"
@@ -566,7 +647,7 @@ export default function CarDetailsPage() {
               />
               <NavTile
                 title="Kvarovi na autu"
-                Icon={Shield}
+                Icon={AlertTriangle}
                 onClick={() => navigate(`/cars/${car.id}/issues`)}
               />
             </div>
@@ -730,6 +811,30 @@ export default function CarDetailsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Quick Action Modals */}
+      <LogServiceModal
+        open={showLogServiceModal}
+        onOpenChange={setShowLogServiceModal}
+        carId={car.id}
+        currentMileage={car.mileage}
+        onSuccess={refreshMaintenanceData}
+      />
+
+      <ReportIssueModal
+        open={showReportIssueModal}
+        onOpenChange={setShowReportIssueModal}
+        carId={car.id}
+        onSuccess={refreshMaintenanceData}
+      />
+
+      <UpdateMileageModal
+        open={showUpdateMileageModal}
+        onOpenChange={setShowUpdateMileageModal}
+        carId={car.id}
+        currentMileage={car.mileage}
+        onSuccess={refreshMaintenanceData}
+      />
     </div>
   );
 }
