@@ -58,6 +58,8 @@ import { useNavigate } from 'react-router-dom';
 import { getActiveContracts } from '@/features/contracts';
 import type { CarWithStatus } from '../types/car.types';
 import { deleteCar, getCars } from '../services/carService';
+import { CarCard, EmptyCarState } from '../components';
+import { useCarPhotos } from '../hooks';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -89,6 +91,9 @@ const CarsPage = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+
+  // Load car photos using custom hook
+  const photoUrls = useCarPhotos(cars);
 
   // Fetch cars data
   const fetchCars = async () => {
@@ -429,7 +434,38 @@ const CarsPage = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="rounded-md border bg-card overflow-hidden">
+            {/* Mobile Card View */}
+            <div className="block md:hidden space-y-4">
+              {paginatedCars.length > 0 ? (
+                paginatedCars.map((car) => (
+                  <CarCard
+                    key={car.id}
+                    car={car}
+                    photoUrl={photoUrls[car.id]}
+                    onViewDetails={handleViewDetails}
+                    onViewAvailability={handleViewAvailability}
+                    onEdit={handleEdit}
+                    onDelete={(car) => {
+                      if (car.isBusy) {
+                        toast.error(
+                          'Nije moguće obrisati vozilo koje je trenutno u upotrebi'
+                        );
+                      } else {
+                        setCarToDelete(car);
+                        setShowDeleteDialog(true);
+                      }
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptyCarState
+                  hasFilters={searchTerm !== '' || filterStatus !== 'all'}
+                />
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block rounded-md border bg-card overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>

@@ -1,0 +1,1 @@
+export { useCarPhotos } from './useCarPhotos';
