@@ -350,37 +350,34 @@ export default function CarIssuesPage() {
                 low: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
               };
               const iconColor = iconColorMap[issue.severity as keyof typeof iconColorMap] || iconColorMap.medium;
-              const truncatedDescription = issue.description.length > 200 
-                ? issue.description.substring(0, 200) + '...' 
-                : issue.description;
 
               return (
                 <div
                   key={issue.id}
-                  className="flex gap-4 p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
+                  className="flex gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex-shrink-0">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconColor}`}>
-                      <SeverityIcon className="w-6 h-6" />
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${iconColor}`}>
+                      <SeverityIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-2">
                           <Badge
-                            className={getSeverityColor(issue.severity)}
+                            className={`${getSeverityColor(issue.severity)} text-xs`}
                           >
                             {issue.severity?.toUpperCase() || 'N/A'}
                           </Badge>
-                          <Badge className={getStatusColor(issue.status)}>
+                          <Badge className={`${getStatusColor(issue.status)} text-xs`}>
                             {issue.status === 'open' && 'Otvoreno'}
                             {issue.status === 'in_progress' && 'U toku'}
                             {issue.status === 'resolved' && 'Riješeno'}
                           </Badge>
                         </div>
-                        <p className="text-base leading-relaxed text-foreground">
-                          {truncatedDescription}
+                        <p className="text-sm sm:text-base leading-relaxed text-foreground line-clamp-3">
+                          {issue.description}
                         </p>
                       </div>
                     </div>
@@ -419,16 +416,16 @@ export default function CarIssuesPage() {
                         )}
                     </div>
 
-                    <div className="flex items-center flex-wrap gap-3 mt-3 text-sm border-t pt-3">
+                    <div className="flex items-center flex-wrap gap-2 sm:gap-3 mt-3 text-xs sm:text-sm border-t pt-3">
                       {issue.reportedBy && (
-                        <span className="flex items-center gap-1.5 text-muted-foreground">
-                          <User className="w-4 h-4" />
-                          <span className="font-medium">{issue.reportedBy.name}</span>
+                        <span className="flex items-center gap-1 sm:gap-1.5 text-muted-foreground">
+                          <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="font-medium truncate max-w-[150px] sm:max-w-none">{issue.reportedBy.name}</span>
                         </span>
                       )}
-                      <span className="flex items-center gap-1.5 text-muted-foreground">
-                        <Calendar className="w-4 h-4" />
-                        <span className="font-medium">
+                      <span className="flex items-center gap-1 sm:gap-1.5 text-muted-foreground">
+                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                        <span className="font-medium whitespace-nowrap">
                           {new Date(issue.reportedAt).toLocaleDateString(
                             'bs-BA',
                             {
@@ -440,9 +437,9 @@ export default function CarIssuesPage() {
                         </span>
                       </span>
                       {issue.resolvedAt && issue.resolvedBy && (
-                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium">
-                          <CheckCircle className="w-4 h-4" />
-                          Riješio: {issue.resolvedBy.firstName}
+                        <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium whitespace-nowrap">
+                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="hidden sm:inline">Riješio: </span>{issue.resolvedBy.firstName}
                         </span>
                       )}
                       <div className="ml-auto flex gap-2">

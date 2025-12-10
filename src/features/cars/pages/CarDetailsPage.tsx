@@ -98,7 +98,7 @@ function NavTile({
       variant="outline"
       size="lg"
       onClick={onClick}
-      className="h-auto py-4 px-6 flex-1 min-w-[200px] flex flex-col items-center justify-center gap-3 bg-background hover:bg-muted/50 border-2 transition-all duration-200 hover:border-primary/50 hover:shadow-md"
+      className="h-auto py-4 px-4 sm:px-6 w-full flex flex-col items-center justify-center gap-3 bg-background hover:bg-muted/50 border-2 transition-all duration-200 hover:border-primary/50 hover:shadow-md"
     >
       <Icon className="w-6 h-6 text-primary" />
       <span className="font-medium text-center text-sm">{title}</span>
@@ -679,7 +679,7 @@ export default function CarDetailsPage() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-2xl font-bold">Navigacija</h3>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <NavTile
                 title="Centar održavanja"
                 Icon={Settings}

@@ -148,7 +148,7 @@ export default function CostAnalyticsPage() {
       />
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-6">
         {/* Total Costs */}
         <Card className="border-l-4 border-l-primary">
           <CardContent className="pt-6">

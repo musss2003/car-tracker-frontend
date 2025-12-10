@@ -242,40 +242,40 @@ export default function CarInsurancePage() {
                 return (
                   <div
                     key={insurance.id}
-                    className="flex gap-4 p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
+                    className="flex gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl border-2 bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200"
                   >
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 flex items-center justify-center">
-                        <Shield className="w-6 h-6" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 flex items-center justify-center">
+                        <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-lg mb-1">
+                      <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3 mb-2">
+                        <div className="flex-1 min-w-0 w-full">
+                          <h4 className="font-bold text-base sm:text-lg mb-1 truncate">
                             {insurance.provider || 'Osiguranje vozila'}
                           </h4>
                           {insurance.policyNumber && (
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs sm:text-sm text-muted-foreground truncate">
                               Polisa: {insurance.policyNumber}
                             </p>
                           )}
                         </div>
-                        <div className="flex gap-2 items-center flex-shrink-0">
+                        <div className="flex gap-2 items-center flex-shrink-0 self-start">
                           {isExpired(insurance.insuranceExpiry) && (
-                            <Badge variant="destructive" className="gap-1">
+                            <Badge variant="destructive" className="gap-1 text-xs">
                               <AlertTriangle className="w-3 h-3" />
-                              Isteklo
+                              <span className="hidden sm:inline">Isteklo</span>
                             </Badge>
                           )}
                           {isExpiringSoon(insurance.insuranceExpiry) &&
                             !isExpired(insurance.insuranceExpiry) && (
                               <Badge
                                 variant="outline"
-                                className="gap-1 border-yellow-500 text-yellow-600"
+                                className="gap-1 border-yellow-500 text-yellow-600 text-xs"
                               >
                                 <AlertTriangle className="w-3 h-3" />
-                                Uskoro
+                                <span className="hidden sm:inline">Uskoro</span>
                               </Badge>
                             )}
                           <Button
@@ -300,15 +300,15 @@ export default function CarInsurancePage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center flex-wrap gap-3 mt-3 text-sm">
-                        <span className="flex items-center gap-1.5 text-muted-foreground">
-                          <Shield className="w-4 h-4" />
-                          <span className="font-medium">
+                      <div className="flex items-center flex-wrap gap-2 sm:gap-3 mt-3 text-xs sm:text-sm">
+                        <span className="flex items-center gap-1 sm:gap-1.5 text-muted-foreground">
+                          <Shield className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="font-medium whitespace-nowrap">
                             Ističe: {formatDate(insurance.insuranceExpiry)}
                           </span>
                         </span>
                         {insurance.price && (
-                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">
+                          <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full bg-primary/10 text-primary font-bold whitespace-nowrap">
                             {Number(insurance.price).toFixed(2)} BAM
                           </span>
                         )}

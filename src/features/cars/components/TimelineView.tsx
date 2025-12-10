@@ -117,23 +117,23 @@ export function TimelineView({
         <div key={groupKey}>
           {/* Group Header */}
           {groupBy !== 'none' && (
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-full">
-                <Clock className="w-4 h-4 text-muted-foreground" />
-                <h3 className="font-bold text-lg">{groupKey}</h3>
+            <div className="flex items-center gap-2 sm:gap-3 mb-6">
+              <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-muted rounded-full">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
+                <h3 className="font-bold text-base sm:text-lg truncate">{groupKey}</h3>
               </div>
               <div className="flex-1 h-px bg-border" />
-              <Badge variant="outline">
-                {groupedEvents[groupKey].length} događaja
+              <Badge variant="outline" className="text-xs whitespace-nowrap">
+                {groupedEvents[groupKey].length}
               </Badge>
             </div>
           )}
 
           {/* Timeline Events */}
-          <div className="relative pl-8">
+          <div className="relative pl-6 sm:pl-8">
             {/* Vertical connector line */}
             {showConnectors && groupedEvents[groupKey].length > 1 && (
-              <div className="absolute left-[19px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent" />
+              <div className="absolute left-[15px] sm:left-[19px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent" />
             )}
 
             <div className="space-y-6">
@@ -184,21 +184,16 @@ function TimelineEventCard({
       'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-300',
   };
 
-  const truncatedDescription =
-    event.description.length > 100
-      ? event.description.substring(0, 100) + '...'
-      : event.description;
-
   return (
     <div className="relative group">
       {/* Timeline dot/icon */}
       <div
         className={cn(
-          'absolute -left-8 top-3 w-10 h-10 rounded-full flex items-center justify-center border-2 shadow-lg z-10 transition-transform group-hover:scale-110',
+          'absolute -left-8 top-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 shadow-lg z-10 transition-transform group-hover:scale-110',
           iconColorMap[event.type]
         )}
       >
-        <Icon className="w-5 h-5" />
+        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
       </div>
 
       {/* Event Card */}
@@ -206,50 +201,59 @@ function TimelineEventCard({
         className={cn(
           'rounded-xl border-2 bg-card transition-all duration-200',
           onClick && 'cursor-pointer hover:border-primary/50 hover:shadow-lg',
-          compact ? 'p-4' : 'p-5'
+          compact ? 'p-3 sm:p-4' : 'p-4 sm:p-5'
         )}
         onClick={() => onClick?.(event)}
       >
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex-1 min-w-0">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3 mb-3">
+          <div className="flex-1 min-w-0 w-full">
             <div className="flex items-center gap-2 mb-1">
               <h4
                 className={cn(
-                  'font-bold',
-                  compact ? 'text-base' : 'text-lg'
+                  'font-bold truncate flex-1',
+                  compact ? 'text-sm sm:text-base' : 'text-base sm:text-lg'
                 )}
               >
                 {event.title}
               </h4>
               {onClick && (
-                <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
               )}
             </div>
             {!compact && (
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {truncatedDescription}
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                {event.description}
               </p>
             )}
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 self-start">
             {getStatusBadge(event.status)}
             {event.urgency && event.urgency !== 'ok' && (
               <Badge
                 variant={
                   event.urgency === 'critical' ? 'destructive' : 'secondary'
                 }
+                className="text-xs"
               >
-                {event.urgency === 'critical' ? '🔴 Hitno' : '🟡 Važno'}
+                {event.urgency === 'critical' ? (
+                  <>
+                    🔴 <span className="hidden sm:inline">Hitno</span>
+                  </>
+                ) : (
+                  <>
+                    🟡 <span className="hidden sm:inline">Važno</span>
+                  </>
+                )}
               </Badge>
             )}
           </div>
         </div>
 
-        <div className="flex items-center flex-wrap gap-3 text-sm">
-          <span className="flex items-center gap-1.5 text-muted-foreground">
-            <Calendar className="w-4 h-4" />
-            <span className="font-medium">
+        <div className="flex items-center flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">
+          <span className="flex items-center gap-1 sm:gap-1.5 text-muted-foreground">
+            <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="font-medium whitespace-nowrap">
               {event.date.toLocaleDateString('bs-BA', {
                 year: 'numeric',
                 month: 'short',
@@ -259,13 +263,13 @@ function TimelineEventCard({
           </span>
 
           {event.cost && (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">
-              <TrendingUp className="w-3.5 h-3.5" />
+            <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full bg-primary/10 text-primary font-bold whitespace-nowrap">
+              <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
               {Number(event.cost).toFixed(2)} BAM
             </span>
           )}
 
-          <Badge variant="outline" className="capitalize">
+          <Badge variant="outline" className="capitalize text-xs">
             {getTypeLabel(event.type)}
           </Badge>
         </div>
