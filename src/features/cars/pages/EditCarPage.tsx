@@ -646,7 +646,7 @@ export default function EditCarPage() {
                   </FormField>
 
                   <FormField
-                    label="Cijena po danu (€)"
+                    label="Cijena po danu (BAM)"
                     id="pricePerDay"
                     required
                     error={errors.pricePerDay}

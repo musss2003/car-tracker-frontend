@@ -280,7 +280,7 @@ export default function CarDetailsPage() {
     if (!car) return;
     try {
       setDeleting(true);
-      await deleteCar(car.id.toString());
+      await deleteCar(car.licensePlate);
       toast.success('Vozilo je uspješno obrisano');
       navigate('/cars');
     } catch (error) {

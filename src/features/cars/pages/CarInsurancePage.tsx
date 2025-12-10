@@ -88,7 +88,7 @@ export default function CarInsurancePage() {
     };
 
     if (carId) fetchData();
-  }, [carId, navigate, toast]);
+  }, [carId, navigate]);
 
   const handleOpenDialog = (insurance?: CarInsurance) => {
     if (insurance) {

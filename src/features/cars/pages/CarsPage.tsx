@@ -268,6 +268,7 @@ const CarsPage = () => {
         car.model || 'N/A',
         car.year?.toString() || 'N/A',
         car.licensePlate || 'N/A',
+        car.mileage ? `${car.mileage} km` : 'N/A',
         car.pricePerDay ? `${car.pricePerDay} BAM` : 'N/A',
         car.isBusy ? 'Zauzeto' : 'Dostupno',
       ]);
