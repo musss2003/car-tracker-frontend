@@ -675,8 +675,15 @@ export default function CarDetailsPage() {
 
           {/* Navigation Tiles */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">Navigacija</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl font-bold">Navigacija</h3>
+            </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <NavTile
+                title="Centar održavanja"
+                Icon={Settings}
+                onClick={() => navigate(`/cars/${car.id}/maintenance`)}
+              />
               <NavTile
                 title="Kalendar dostupnosti"
                 Icon={Calendar}
