@@ -211,9 +211,17 @@ export default function CarIssuesPage() {
     if (!selectedIssue) return;
 
     try {
+      // The payload for update might only need description and severity, not carId.
+      // We create a specific payload to avoid sending unnecessary or incorrect data.
+      const updatePayload = {
+        description: formData.description,
+        severity: formData.severity,
+        diagnosticPdfUrl: formData.diagnosticPdfUrl,
+      };
+
       const response = await updateCarIssueReportStatus(
         selectedIssue.id,
-        formData
+        updatePayload
       );
 
       toast.success('Problem je uspješno ažuriran');

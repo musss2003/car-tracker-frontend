@@ -2,6 +2,8 @@ import { getCarServiceHistory } from './carServiceHistory';
 import { getCarRegistrations } from './carRegistrationService';
 import { getCarInsuranceHistory } from './carInsuranceService';
 import { getCarIssueReportsForCar } from './carIssueReportService';
+import { logError } from '@/shared/utils/errorHandler';
+import { validateId } from '@/shared/utils/inputValidator';
 import {
   CostAnalytics,
   MonthlyBreakdown,
@@ -23,6 +25,9 @@ export async function getCarCostAnalytics(
   carId: string
 ): Promise<CostAnalytics> {
   try {
+    // Input validation
+    validateId(carId, 'car id');
+
     // Fetch all maintenance data with error handling for each source
     const results = await Promise.allSettled([
       getCarServiceHistory(carId),
@@ -76,7 +81,7 @@ export async function getCarCostAnalytics(
 
     // Calculate averages
     const monthsWithData = monthlyCosts.filter((m) => m.total > 0).length || 1;
-    const monthlyAverage = totalCosts.all / Math.max(monthsWithData, 12);
+    const monthlyAverage = totalCosts.all / monthsWithData;
     const serviceAverage =
       serviceCosts / Math.max(serviceHistory.length, 1) || 0;
     const issueAverage = 0; // Placeholder
@@ -126,7 +131,9 @@ export async function getCarCostAnalytics(
       costPerDay,
     };
   } catch (error) {
-    console.error('Error fetching cost analytics:', error);
+    if (error instanceof Error) {
+      logError(error, { operation: 'getCarCostAnalytics', carId });
+    }
     throw error;
   }
 }
@@ -332,7 +339,9 @@ export async function getTopExpenses(
     // Sort by amount descending and take top N
     return expenses.sort((a, b) => b.amount - a.amount).slice(0, limit);
   } catch (error) {
-    console.error('Error fetching top expenses:', error);
+    if (error instanceof Error) {
+      logError(error, { operation: 'getTopExpenses', carId, limit });
+    }
     throw error;
   }
 }
@@ -345,15 +354,20 @@ function getOldestDate(
   registrations: CarRegistration[],
   insuranceHistory: CarInsurance[]
 ): string | null {
-  const dates: string[] = [];
+  const dates: Date[] = [];
 
-  serviceHistory.forEach((s) => dates.push(s.serviceDate));
-  registrations.forEach((r) => dates.push(r.createdAt));
-  insuranceHistory.forEach((i) => dates.push(i.createdAt));
+  serviceHistory.forEach((s) => dates.push(new Date(s.serviceDate)));
+  registrations.forEach((r) => dates.push(new Date(r.createdAt)));
+  insuranceHistory.forEach((i) => dates.push(new Date(i.createdAt)));
 
   if (dates.length === 0) return null;
 
-  return dates.sort()[0];
+  const validDates = dates.filter((d) => !isNaN(d.getTime()));
+  if (validDates.length === 0) return null;
+
+  validDates.sort((a, b) => a.getTime() - b.getTime());
+
+  return validDates[0].toISOString();
 }
 
 /**

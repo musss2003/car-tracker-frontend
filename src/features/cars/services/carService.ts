@@ -1,5 +1,14 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import {
+  handleServiceError,
+  handleNetworkError,
+  logError,
+} from '@/shared/utils/errorHandler';
+import {
+  validateId,
+  validateLicensePlate,
+} from '@/shared/utils/inputValidator';
+import {
   BookingEvent,
   Car,
   CarBrand,
@@ -9,64 +18,148 @@ import {
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
 export const getCar = async (carId: string): Promise<Car> => {
-  const response = await fetch(`${API_URL}cars/${carId}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
+  try {
+    validateId(carId, 'car id');
 
-  if (!response.ok)
-    throw new Error(`Error getting car: ${response.statusText}`);
-  const result = await response.json();
-  return result.data || result;
+    const response = await fetch(`${API_URL}cars/${carId}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      await handleServiceError(response, {
+        operation: 'retrieve',
+        resource: 'car',
+        resourceId: carId,
+      });
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      handleNetworkError(error, {
+        operation: 'retrieve',
+        resource: 'car',
+        resourceId: carId,
+      });
+    }
+    if (error instanceof Error) {
+      logError(error, { operation: 'getCar', carId });
+    }
+    throw error;
+  }
 };
 
 export const getCars = async (): Promise<Car[]> => {
-  const response = await fetch(`${API_URL}cars`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
+  try {
+    const response = await fetch(`${API_URL}cars`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
 
-  if (!response.ok)
-    throw new Error(`Error getting all cars: ${response.statusText}`);
-  const result = await response.json();
-  return result.data || result;
+    if (!response.ok) {
+      await handleServiceError(response, {
+        operation: 'list',
+        resource: 'cars',
+      });
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      handleNetworkError(error, {
+        operation: 'list',
+        resource: 'cars',
+      });
+    }
+    if (error instanceof Error) {
+      logError(error, { operation: 'getCars' });
+    }
+    throw error;
+  }
 };
 
 export const updateCar = async (
   licensePlate: string,
   car: Car
 ): Promise<Car> => {
-  const response = await fetch(`${API_URL}cars/${licensePlate}`, {
-    method: 'PUT',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(car),
-    credentials: 'include',
-  });
+  try {
+    validateLicensePlate(licensePlate);
 
-  if (!response.ok)
-    throw new Error(`Error updating car: ${response.statusText}`);
-  const result = await response.json();
-  return result.data || result;
+    const response = await fetch(`${API_URL}cars/${licensePlate}`, {
+      method: 'PUT',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(car),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      await handleServiceError(response, {
+        operation: 'update',
+        resource: 'car',
+        resourceId: licensePlate,
+      });
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      handleNetworkError(error, {
+        operation: 'update',
+        resource: 'car',
+        resourceId: licensePlate,
+      });
+    }
+    if (error instanceof Error) {
+      logError(error, { operation: 'updateCar', licensePlate });
+    }
+    throw error;
+  }
 };
 
 export const deleteCar = async (
   licensePlate: string
 ): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}cars/${licensePlate}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
+  try {
+    validateLicensePlate(licensePlate);
 
-  if (!response.ok)
-    throw new Error(`Error deleting car: ${response.statusText}`);
-  const result = await response.json();
-  return result.data || result;
+    const response = await fetch(`${API_URL}cars/${licensePlate}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      await handleServiceError(response, {
+        operation: 'delete',
+        resource: 'car',
+        resourceId: licensePlate,
+      });
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      handleNetworkError(error, {
+        operation: 'delete',
+        resource: 'car',
+        resourceId: licensePlate,
+      });
+    }
+    if (error instanceof Error) {
+      logError(error, { operation: 'deleteCar', licensePlate });
+    }
+    throw error;
+  }
 };
 
 export const addCar = async (car: Car): Promise<Car> => {

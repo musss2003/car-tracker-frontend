@@ -2,6 +2,21 @@
 
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import {
+  logAudit,
+  AuditAction,
+  AuditResource,
+} from '@/shared/utils/auditLogger';
+import {
+  handleServiceError,
+  handleNetworkError,
+  logError,
+} from '@/shared/utils/errorHandler';
+import {
+  validateId,
+  validateText,
+  sanitizeObject,
+} from '@/shared/utils/inputValidator';
+import {
   CarIssueReport,
   CreateCarIssueReportPayload,
   UpdateCarIssueReportPayload,
@@ -37,12 +52,57 @@ async function handleResponse<T>(res: Response): Promise<T> {
 export async function createCarIssueReport(
   payload: CreateCarIssueReportPayload
 ): Promise<CarIssueReport> {
-  const res = await fetch(`${BASE_PATH}/`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  });
-  return handleResponse<CarIssueReport>(res);
+  try {
+    // Input validation
+    validateId(payload.carId, 'carId');
+    validateText(payload.description, {
+      fieldName: 'description',
+      minLength: 3,
+      maxLength: 2000,
+    });
+
+    if (payload.reportedBy) {
+      validateId(payload.reportedBy, 'reportedBy');
+    }
+
+    const sanitized = sanitizeObject(payload);
+
+    const res = await fetch(`${BASE_PATH}/`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(sanitized),
+    });
+
+    if (!res.ok) {
+      await handleServiceError(res, {
+        operation: 'create',
+        resource: 'car issue report',
+      });
+    }
+
+    const result = await handleResponse<CarIssueReport>(res);
+
+    // Audit log successful creation
+    logAudit(AuditAction.CREATE, AuditResource.CAR_ISSUE, {
+      resourceId: result.id,
+      success: true,
+      metadata: { carId: payload.carId },
+    });
+
+    return result;
+  } catch (error) {
+    // Audit log failed creation
+    logAudit(AuditAction.CREATE, AuditResource.CAR_ISSUE, {
+      success: false,
+      errorCode: error instanceof Error ? error.message : 'UNKNOWN_ERROR',
+      metadata: { carId: payload.carId },
+    });
+
+    if (error instanceof Error) {
+      logError(error, { operation: 'createCarIssueReport' });
+    }
+    throw error;
+  }
 }
 
 export async function getAllCarIssueReports(): Promise<CarIssueReport[]> {
@@ -77,22 +137,96 @@ export async function updateCarIssueReportStatus(
   id: string,
   payload: UpdateCarIssueReportPayload
 ): Promise<CarIssueReport> {
-  const res = await fetch(`${BASE_PATH}/${encodeURIComponent(id)}`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  });
-  return handleResponse<CarIssueReport>(res);
+  try {
+    // Input validation
+    validateId(id, 'issue report id');
+
+    const sanitized = sanitizeObject(payload);
+
+    const res = await fetch(`${BASE_PATH}/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(sanitized),
+    });
+
+    if (!res.ok) {
+      await handleServiceError(res, {
+        operation: 'update',
+        resource: 'car issue report',
+        resourceId: id,
+      });
+    }
+
+    const result = await handleResponse<CarIssueReport>(res);
+
+    // Audit log successful update
+    logAudit(AuditAction.UPDATE, AuditResource.CAR_ISSUE, {
+      resourceId: id,
+      success: true,
+      metadata: { status: payload.status },
+    });
+
+    return result;
+  } catch (error) {
+    // Audit log failed update
+    logAudit(AuditAction.UPDATE, AuditResource.CAR_ISSUE, {
+      resourceId: id,
+      success: false,
+      errorCode: error instanceof Error ? error.message : 'UNKNOWN_ERROR',
+    });
+
+    if (error instanceof Error) {
+      logError(error, {
+        operation: 'updateCarIssueReportStatus',
+        resourceId: id,
+      });
+    }
+    throw error;
+  }
 }
 
 export async function deleteCarIssueReport(
   id: string
 ): Promise<{ success: boolean; id?: string }> {
-  const res = await fetch(`${BASE_PATH}/${encodeURIComponent(id)}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse<{ success: boolean; id?: string }>(res);
+  try {
+    // Input validation
+    validateId(id, 'issue report id');
+
+    const res = await fetch(`${BASE_PATH}/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      await handleServiceError(res, {
+        operation: 'delete',
+        resource: 'car issue report',
+        resourceId: id,
+      });
+    }
+
+    const result = await handleResponse<{ success: boolean; id?: string }>(res);
+
+    // Audit log successful deletion
+    logAudit(AuditAction.DELETE, AuditResource.CAR_ISSUE, {
+      resourceId: id,
+      success: true,
+    });
+
+    return result;
+  } catch (error) {
+    // Audit log failed deletion
+    logAudit(AuditAction.DELETE, AuditResource.CAR_ISSUE, {
+      resourceId: id,
+      success: false,
+      errorCode: error instanceof Error ? error.message : 'UNKNOWN_ERROR',
+    });
+
+    if (error instanceof Error) {
+      logError(error, { operation: 'deleteCarIssueReport', resourceId: id });
+    }
+    throw error;
+  }
 }
 
 export async function getNewIssueReports(): Promise<CarIssueReport[]> {

@@ -213,34 +213,25 @@ export default function CreateCarPage() {
       }
 
       // Format the data before saving
-      const carData: Partial<Car> = {
-        ...formData,
-        photoUrl: photoFilename,
-        year: formData.year || CURRENT_YEAR,
-        pricePerDay:
-          formData.pricePerDay !== undefined
-            ? Number.parseFloat(String(formData.pricePerDay))
-            : 0,
-        seats:
-          formData.seats !== undefined
-            ? Number.parseInt(String(formData.seats))
-            : 5,
-        doors:
-          formData.doors !== undefined
-            ? Number.parseInt(String(formData.doors))
-            : 4,
-        mileage:
-          formData.mileage !== undefined
-            ? Number.parseInt(String(formData.mileage))
-            : 0,
-        manufacturer: formData.manufacturer || '',
-        model: formData.model || '',
-        licensePlate: formData.licensePlate || '',
-      };
+    const sanitizeNumber = (value: any, defaultValue: number = 0): number => {
+      const num = Number(value);
+      return isNaN(num) ? defaultValue : num;
+    };
 
-      await addCar(carData as Car);
+    const carData: Partial<Car> = {
+      ...formData,
+      photoUrl: photoFilename,
+      year: formData.year || CURRENT_YEAR,
+      pricePerDay: sanitizeNumber(formData.pricePerDay, 0),
+      seats: sanitizeNumber(formData.seats, 5),
+      doors: sanitizeNumber(formData.doors, 4),
+      mileage: sanitizeNumber(formData.mileage, 0),
+      manufacturer: formData.manufacturer || '',
+      model: formData.model || '',
+      licensePlate: formData.licensePlate || '',
+    };
 
-      toast.success('Vozilo je uspješno kreirano');
+    await addCar(carData as Car);      toast.success('Vozilo je uspješno kreirano');
       handleClose();
     } catch (error) {
       console.error('Error creating car:', error);

@@ -250,29 +250,26 @@ export default function EditCarPage() {
         photoUrl = uploadedFilename;
       }
 
-      const carData: Car = {
-        licensePlate: formData.licensePlate,
-        manufacturer: formData.manufacturer,
-        model: formData.model,
-        year: Number(formData.year),
-        color: formData.color,
-        chassisNumber: formData.chassisNumber,
-        pricePerDay: Number(formData.pricePerDay),
-        transmission: formData.transmission as TransmissionType,
-        fuelType: formData.fuelType as FuelType,
-        seats: Number(formData.seats),
-        doors: Number(formData.doors),
-        mileage: Number(formData.mileage),
-        enginePower: Number(formData.enginePower),
-        category: formData.category as CarCategory,
-        status: formData.status as CarStatus,
-        photoUrl: photoUrl,
-        updatedAt: new Date(),
-        createdAt: new Date(),
-        id,
-      };
-
-      await updateCar(formData.licensePlate, carData);
+    const carData: Omit<Car, 'createdAt'> = {
+      licensePlate: formData.licensePlate,
+      manufacturer: formData.manufacturer,
+      model: formData.model,
+      year: Number(formData.year),
+      color: formData.color,
+      chassisNumber: formData.chassisNumber,
+      pricePerDay: Number(formData.pricePerDay),
+      transmission: formData.transmission as TransmissionType,
+      fuelType: formData.fuelType as FuelType,
+      seats: Number(formData.seats),
+      doors: Number(formData.doors),
+      mileage: Number(formData.mileage),
+      enginePower: Number(formData.enginePower),
+      category: formData.category as CarCategory,
+      status: formData.status as CarStatus,
+      photoUrl: photoUrl,
+      updatedAt: new Date(),
+      id,
+    };      await updateCar(formData.licensePlate, carData);
       toast.success('Vozilo je uspješno ažurirano');
       navigate('/cars');
     } catch (err) {
@@ -287,7 +284,7 @@ export default function EditCarPage() {
   const handleDelete = async () => {
     try {
       setSubmitting(true);
-      await deleteCar(formData.licensePlate);
+      await deleteCar(id);
       toast.success('Vozilo je uspješno obrisano');
       navigate('/cars');
     } catch (error) {

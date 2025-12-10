@@ -16,7 +16,7 @@ export const useIsMobile = (): UseIsMobileReturn => {
       // Only use media query for reliable, secure detection
       // User-agent detection is unreliable and can be spoofed
       const mediaQuery = window.matchMedia('(max-width: 768px)');
-      
+
       setIsMobile(mediaQuery.matches);
       setIsLoading(false);
     };
