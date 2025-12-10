@@ -19,6 +19,7 @@ import {
   DollarSign,
   MapPin,
   ClipboardList,
+  Clock,
 } from 'lucide-react';
 import { CarWithStatus } from '../types/car.types';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -683,6 +684,11 @@ export default function CarDetailsPage() {
                 title="Centar održavanja"
                 Icon={Settings}
                 onClick={() => navigate(`/cars/${car.id}/maintenance`)}
+              />
+              <NavTile
+                title="Timeline događaja"
+                Icon={Clock}
+                onClick={() => navigate(`/cars/${car.id}/timeline`)}
               />
               <NavTile
                 title="Analitika troškova"

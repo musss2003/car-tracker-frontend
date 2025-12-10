@@ -43,6 +43,10 @@ const CostAnalyticsPage = lazy(
   () => import('../../features/cars/pages/CostAnalyticsPage')
 );
 
+const TimelinePage = lazy(
+  () => import('../../features/cars/pages/TimelinePage')
+);
+
 // Contracts Pages - Feature-based imports
 const ContractsPage = lazy(
   () => import('../../features/contracts/pages/ContractsPage')
@@ -158,6 +162,10 @@ export function AppRoutes() {
           <Route
             path="/cars/:id/cost-analytics"
             element={<CostAnalyticsPage />}
+          />
+          <Route
+            path="/cars/:id/timeline"
+            element={<TimelinePage />}
           />
           <Route path="/contracts/new" element={<CreateContractPage />} />
           <Route path="/contracts/:id" element={<ContractDetailsPage />} />
