@@ -264,6 +264,7 @@ const CarsPage = () => {
         'Status',
       ];
       const tableRows = filteredAndSortedCars.map((car) => [
+      const tableRows = filteredAndSortedCars.map((car) => [
         car.manufacturer || 'N/A',
         car.model || 'N/A',
         car.year?.toString() || 'N/A',
