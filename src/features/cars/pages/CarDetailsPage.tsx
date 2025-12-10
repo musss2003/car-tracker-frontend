@@ -53,6 +53,11 @@ import {
   ReportIssueModal,
   UpdateMileageModal,
 } from '../components/modals';
+import { MaintenanceAlertBanner } from '../components/MaintenanceAlertBanner';
+import {
+  getMaintenanceAlerts,
+  MaintenanceAlert,
+} from '../services/maintenanceNotificationService';
 
 function SpecItem({
   label,
@@ -130,6 +135,12 @@ export default function CarDetailsPage() {
   const [showLogServiceModal, setShowLogServiceModal] = useState(false);
   const [showReportIssueModal, setShowReportIssueModal] = useState(false);
   const [showUpdateMileageModal, setShowUpdateMileageModal] = useState(false);
+
+  // Alert states
+  const [maintenanceAlerts, setMaintenanceAlerts] = useState<
+    MaintenanceAlert[]
+  >([]);
+  const [alertsDismissed, setAlertsDismissed] = useState(false);
 
   const loadPhoto = useCallback(async (photoUrl: string) => {
     try {
@@ -230,6 +241,39 @@ export default function CarDetailsPage() {
       if (carPhoto) URL.revokeObjectURL(carPhoto);
     };
   }, [carPhoto]);
+
+  // Calculate maintenance alerts when data changes
+  useEffect(() => {
+    if (!id) return;
+
+    const alerts = getMaintenanceAlerts(id, {
+      service: {
+        kmRemaining: serviceKilometersRemaining,
+        serviceInterval: SERVICE_INTERVAL,
+      },
+      registration: {
+        daysRemaining: registrationDaysRemaining,
+        registrationInterval: REGISTRATION_INTERVAL_DAYS,
+      },
+      insurance: {
+        daysRemaining: null, // TODO: Implement insurance tracking
+      },
+      issues: {
+        activeCount: activeIssueReports,
+      },
+    });
+
+    setMaintenanceAlerts(alerts);
+    // Reset dismissed state when alerts change
+    if (alerts.length > 0) {
+      setAlertsDismissed(false);
+    }
+  }, [
+    id,
+    serviceKilometersRemaining,
+    registrationDaysRemaining,
+    activeIssueReports,
+  ]);
 
   const handleDelete = useCallback(async () => {
     if (!car) return;
@@ -337,6 +381,14 @@ export default function CarDetailsPage() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 space-y-8">
+          {/* Maintenance Alerts */}
+          {!alertsDismissed && maintenanceAlerts.length > 0 && (
+            <MaintenanceAlertBanner
+              alerts={maintenanceAlerts}
+              onDismiss={() => setAlertsDismissed(true)}
+            />
+          )}
+
           {/* Hero Section */}
           <Card className="overflow-hidden">
             <div className="flex flex-col lg:flex-row gap-0">
