@@ -7,6 +7,7 @@
 
 # testing
 /coverage
+coverage/
 
 # production
 /build
@@ -24,4 +25,20 @@ dist
 
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*.env
+yarn-error.log*
+
+# SSH keys and certificates
+*.pem
+*.key
+*.pub
+rescue-key
+rescue-key.pub
+car-tracker.pem
+
+# Temporary documentation files
+GIT_HISTORY_CLEANUP.md
+USER_PROFILE_CLEANUP.md
+NOTIFICATIONS_IMPLEMENTATION.md
+NOTIFICATIONS_READY.md
+setup-https-backend.md
+SECURITY.md

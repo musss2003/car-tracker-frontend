@@ -85,7 +85,7 @@ export const getCars = async (): Promise<Car[]> => {
 
 export const updateCar = async (
   licensePlate: string,
-  car: Car
+  car: Omit<Car, 'createdAt'>
 ): Promise<Car> => {
   try {
     validateLicensePlate(licensePlate);
@@ -182,7 +182,7 @@ export const getAvailableCarsForPeriod = async (
   startingDate: string,
   endingDate: string
 ): Promise<Car[]> => {
-  const response = await fetch(`${API_URL}cars/available`, {
+  const response = await fetch(`${API_URL}cars/available-period`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(),
