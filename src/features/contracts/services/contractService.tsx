@@ -41,7 +41,11 @@ export const getContractTemplate = async (): Promise<Response> => {
     headers: getAuthHeaders(),
   });
 
-  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  if (!res.ok) {
+    // Log the actual status for debugging purposes only (server-side or dev console)
+    console.error('Failed to fetch contract template:', res.status);
+    throw new Error('Failed to fetch contract template');
+  }
   return res;
 };
 
@@ -84,8 +88,8 @@ export const createAndDownloadContract = async (
     });
     if (!res.ok) {
       const errorText = await res.text();
-      console.error('Server error:', errorText);
-      throw new Error(`Error creating contract: ${res.statusText}`);
+      console.error('Server error:', errorText, 'Status:', res.status);
+      throw new Error('Failed to create contract');
     }
 
     const text = await res.text();
@@ -109,7 +113,10 @@ export const downloadContract = async (contractId: string): Promise<void> => {
     }
   );
 
-  if (!res.ok) throw new Error(`Error downloading contract: ${res.statusText}`);
+  if (!res.ok) {
+    console.error('Failed to download contract:', res.status);
+    throw new Error('Failed to download contract');
+  }
 
   const { docx } = await res.json();
   const blob = await extractDocxBlobFromResponse(docx);
