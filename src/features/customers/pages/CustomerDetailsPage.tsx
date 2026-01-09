@@ -545,10 +545,12 @@ const CustomerDetailsPage = () => {
 
             {/* Customer Contracts Section */}
             <div className="lg:col-span-2">
-              <CustomerContractsList
-                customerId={customer.id}
-                customerName={customer.name}
-              />
+              {customer && (
+                <CustomerContractsList
+                  customerId={customer.id}
+                  customerName={customer.name}
+                />
+              )}
             </div>
           </div>
         </div>
