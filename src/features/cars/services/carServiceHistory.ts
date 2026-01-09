@@ -1,4 +1,8 @@
-import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
+import {
+  api,
+  encodePathParam,
+  buildQueryString,
+} from '@/shared/utils/apiService';
 import { CarServiceHistory } from '../types/car.types';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
@@ -9,60 +13,43 @@ const BASE_URL = `${API_URL}car-service-history/`;
 export const getCarServiceHistory = async (
   carId: string
 ): Promise<CarServiceHistory[]> => {
-  const res = await fetch(`${BASE_URL}${carId}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  if (!res.ok) throw new Error('Failed to load service history');
-  const result = await res.json();
-  return result.data || result;
+  return api.get<CarServiceHistory[]>(
+    `/car-service-history/${encodePathParam(carId)}`,
+    'car service history',
+    carId
+  );
 };
 
 // Get all service entries for a car
 export const getLatestServiceRecord = async (
   carId: string
 ): Promise<CarServiceHistory> => {
-  const res = await fetch(`${BASE_URL}${carId}/latest`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  if (!res.ok) throw new Error('Failed to load service history');
-  const result = await res.json();
-  return result.data || result;
+  return api.get<CarServiceHistory>(
+    `/car-service-history/${encodePathParam(carId)}/latest`,
+    'car service history',
+    carId
+  );
 };
 
 // Get remaining km until next service
 export const getServiceRemainingKm = async (carId: string): Promise<number> => {
-  const res = await fetch(`${BASE_URL}${carId}/km-remaining`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  if (!res.ok) throw new Error('Failed to load remaining km');
-
-  const result = await res.json();
-  return result.data?.kmRemaining ?? 0;
+  const result = await api.get<{ kmRemaining: number }>(
+    `/car-service-history/${encodePathParam(carId)}/km-remaining`,
+    'service km remaining',
+    carId
+  );
+  return result.kmRemaining ?? 0;
 };
 
 // Add service record
 export const addCarServiceRecord = async (
   data: Partial<CarServiceHistory>
 ): Promise<CarServiceHistory> => {
-  const res = await fetch(BASE_URL + `/${data.carId}`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) throw new Error('Failed to add service record');
-  const result = await res.json();
-  return result.data || result;
+  return api.post<CarServiceHistory>(
+    `/car-service-history/${encodePathParam(data.carId!)}`,
+    data,
+    'car service history'
+  );
 };
 
 // PUT update a service record (route: PUT /record/:id)
@@ -70,26 +57,21 @@ export const updateServiceRecord = async (
   id: string,
   data: Partial<CarServiceHistory>
 ): Promise<CarServiceHistory> => {
-  const res = await fetch(`${BASE_URL}record/${id}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error('Failed to update service record');
-  const result = await res.json();
-  return result.data || result;
+  return api.put<CarServiceHistory>(
+    `/car-service-history/record/${encodePathParam(id)}`,
+    data,
+    'car service history',
+    id
+  );
 };
 
 // Delete service record
 export const deleteCarServiceRecord = async (id: string): Promise<void> => {
-  const res = await fetch(`${BASE_URL}record/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  if (!res.ok) throw new Error('Failed to delete service record');
+  await api.delete<void>(
+    `/car-service-history/record/${encodePathParam(id)}`,
+    'car service history',
+    id
+  );
 };
 
 // Get audit logs for a specific service record
@@ -107,19 +89,16 @@ export async function getServiceHistoryAuditLogs(
     totalPages: number;
   };
 }> {
-  const res = await fetch(
-    `${BASE_URL}record/${encodeURIComponent(serviceId)}/audit-logs?page=${page}&limit=${limit}`,
-    {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      credentials: 'include',
-    }
+  const queryString = buildQueryString({ page, limit });
+  const result = await api.get<{
+    success: boolean;
+    data: { logs: any[]; pagination: any };
+  }>(
+    `/car-service-history/record/${encodePathParam(serviceId)}/audit-logs${queryString}`,
+    'service history audit logs',
+    serviceId
   );
 
-  if (!res.ok) throw new Error('Failed to fetch audit logs');
-  const result = await res.json();
-  // Backend returns { success, data: { logs, pagination } }
-  // Transform to { success, data: logs, pagination }
   return {
     success: result.success,
     data: result.data?.logs || [],
