@@ -1,4 +1,8 @@
-import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
+import {
+  api,
+  encodePathParam,
+  buildQueryString,
+} from '@/shared/utils/apiService';
 import { CarInsurance } from '../types/car.types';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
@@ -9,46 +13,33 @@ const BASE_URL = `${API_URL}car-insurance/`;
 export const getCarInsuranceHistory = async (
   carId: string
 ): Promise<CarInsurance[]> => {
-  const res = await fetch(`${BASE_URL}${carId}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  if (!res.ok) throw new Error('Failed to fetch insurance records');
-  const result = await res.json();
-  return result.data || result;
+  return api.get<CarInsurance[]>(
+    `/car-insurance/${encodePathParam(carId)}`,
+    'car insurance',
+    carId
+  );
 };
 
 // Get the lates insurance record for a car
 export const getLatestCarInsuranceRecord = async (
   carId: string
 ): Promise<CarInsurance> => {
-  const res = await fetch(`${BASE_URL}${carId}/latest`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  if (!res.ok) throw new Error('Failed to fetch insurance records');
-  const result = await res.json();
-  return result.data || result;
+  return api.get<CarInsurance>(
+    `/car-insurance/${encodePathParam(carId)}/latest`,
+    'car insurance',
+    carId
+  );
 };
 
 // Add insurance policy
 export const addCarInsurance = async (
   data: Partial<CarInsurance>
 ): Promise<CarInsurance> => {
-  const res = await fetch(`${BASE_URL}${data.carId}`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) throw new Error('Failed to add insurance record');
-  const result = await res.json();
-  return result.data || result;
+  return api.post<CarInsurance>(
+    `/car-insurance/${encodePathParam(data.carId!)}`,
+    data,
+    'car insurance'
+  );
 };
 
 // PUT update insurance record (route PUT /record/:id)
@@ -56,26 +47,21 @@ export const updateCarInsurance = async (
   id: string,
   data: Partial<CarInsurance>
 ): Promise<CarInsurance> => {
-  const res = await fetch(`${BASE_URL}record/${id}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error('Failed to update insurance record');
-  const result = await res.json();
-  return result.data || result;
+  return api.put<CarInsurance>(
+    `/car-insurance/record/${encodePathParam(id)}`,
+    data,
+    'car insurance',
+    id
+  );
 };
 
 // Delete insurance policy
 export const deleteCarInsurance = async (id: string): Promise<void> => {
-  const res = await fetch(`${BASE_URL}record/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  if (!res.ok) throw new Error('Failed to delete insurance');
+  await api.delete<void>(
+    `/car-insurance/record/${encodePathParam(id)}`,
+    'car insurance',
+    id
+  );
 };
 
 // Get audit logs for a specific insurance record
@@ -93,19 +79,16 @@ export async function getInsuranceAuditLogs(
     totalPages: number;
   };
 }> {
-  const res = await fetch(
-    `${BASE_URL}record/${encodeURIComponent(insuranceId)}/audit-logs?page=${page}&limit=${limit}`,
-    {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      credentials: 'include',
-    }
+  const queryString = buildQueryString({ page, limit });
+  const result = await api.get<{
+    success: boolean;
+    data: { logs: any[]; pagination: any };
+  }>(
+    `/car-insurance/record/${encodePathParam(insuranceId)}/audit-logs${queryString}`,
+    'insurance audit logs',
+    insuranceId
   );
 
-  if (!res.ok) throw new Error('Failed to fetch audit logs');
-  const result = await res.json();
-  // Backend returns { success, data: { logs, pagination } }
-  // Transform to { success, data: logs, pagination }
   return {
     success: result.success,
     data: result.data?.logs || [],

@@ -1,4 +1,5 @@
 import { UserRole } from '@/features/users';
+import { api } from '@/shared/utils/apiService';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/auth/';
 
@@ -31,32 +32,19 @@ export const loginAPI = async (
   username: string,
   password: string
 ): Promise<LoginResult> => {
-  try {
-    const response = await fetch(API_URL + 'login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ username, password }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error logging in: ${response.statusText}`);
-    }
-
-    const data: LoginResponse = await response.json();
-
-    localStorage.setItem('accessToken', data.accessToken);
-
-    return {
-      status: response.status,
-      data,
-    };
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error; // rethrow so the caller can handle it
-  }
+  const data = await api.post<LoginResponse>(
+    '/auth/login',
+    {
+      username,
+      password,
+    },
+    'authentication'
+  );
+  localStorage.setItem('accessToken', data.accessToken);
+  return {
+    status: 200,
+    data,
+  };
 };
 
 export const registerAPI = async (
@@ -64,27 +52,16 @@ export const registerAPI = async (
   username: string,
   password: string
 ): Promise<RegisterResult> => {
-  try {
-    const response = await fetch(API_URL + 'register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, username, password }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error registering: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+  const data = await api.post<RegisterResponse & { accessToken?: string }>(
+    '/auth/register',
+    { email, username, password },
+    'authentication'
+  );
+  if (data.accessToken) {
     localStorage.setItem('accessToken', data.accessToken);
-
-    return {
-      status: response.status,
-      data,
-    };
-  } catch (error) {
-    console.error('Registration error:', error);
-    throw error;
   }
+  return {
+    status: 200,
+    data,
+  };
 };

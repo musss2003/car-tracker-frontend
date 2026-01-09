@@ -1,16 +1,9 @@
-// src/features/cars/services/carCarIssueReportService.ts
-
-import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
+import { api, encodePathParam } from '@/shared/utils/apiService';
 import {
   logAudit,
   AuditAction,
   AuditResource,
 } from '@/shared/utils/auditLogger';
-import {
-  handleServiceError,
-  handleNetworkError,
-  logError,
-} from '@/shared/utils/errorHandler';
 import {
   validateId,
   validateText,
@@ -22,65 +15,26 @@ import {
   UpdateCarIssueReportPayload,
 } from '../types/car.types';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
-
-const BASE_PATH = `${API_URL}car-issue-report`;
-
-async function handleResponse<T>(res: Response): Promise<T> {
-  const text = await res.text();
-
-  // Safe JSON parsing to prevent exceptions from non-JSON responses
-  let data = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch (error) {
-    // If JSON parsing fails, throw normalized error
-    throw new Error(
-      `Invalid response format: ${res.statusText || 'Request failed'}`
-    );
-  }
-
-  if (!res.ok) {
-    const msg =
-      data?.message || data?.error || res.statusText || 'Request failed';
-    throw new Error(msg);
-  }
-  // Extract data from backend response format { success, data, message, timestamp }
-  return (data?.data !== undefined ? data.data : data) as T;
-}
-
 export async function createCarIssueReport(
   payload: CreateCarIssueReportPayload
 ): Promise<CarIssueReport> {
   try {
     // Input validation
     validateId(payload.carId, 'carId');
-    validateText(payload.description, {
-      fieldName: 'description',
-      minLength: 3,
-      maxLength: 2000,
-    });
-
-    if (payload.reportedBy) {
-      validateId(payload.reportedBy, 'reportedBy');
-    }
-
-    const sanitized = sanitizeObject(payload);
-
-    const res = await fetch(`${BASE_PATH}/`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(sanitized),
-    });
-
-    if (!res.ok) {
-      await handleServiceError(res, {
-        operation: 'create',
-        resource: 'car issue report',
+    if (payload.description) {
+      validateText(payload.description, {
+        fieldName: 'description',
+        minLength: 3,
+        maxLength: 2000,
       });
     }
 
-    const result = await handleResponse<CarIssueReport>(res);
+    const sanitized = sanitizeObject(payload as any);
+    const result = await api.post<CarIssueReport>(
+      '/car-issue-report/',
+      sanitized,
+      'car issue report'
+    );
 
     // Audit log successful creation
     logAudit(AuditAction.CREATE, AuditResource.CAR_ISSUE, {
@@ -97,40 +51,32 @@ export async function createCarIssueReport(
       errorCode: error instanceof Error ? error.message : 'UNKNOWN_ERROR',
       metadata: { carId: payload.carId },
     });
-
-    if (error instanceof Error) {
-      logError(error, { operation: 'createCarIssueReport' });
-    }
     throw error;
   }
 }
 
 export async function getAllCarIssueReports(): Promise<CarIssueReport[]> {
-  const res = await fetch(`${BASE_PATH}/`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse<CarIssueReport[]>(res);
+  return api.get<CarIssueReport[]>('/car-issue-report/', 'car issue reports');
 }
 
 export async function getCarIssueReportsForCar(
   carId: string
 ): Promise<CarIssueReport[]> {
-  const res = await fetch(`${BASE_PATH}/car/${encodeURIComponent(carId)}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse<CarIssueReport[]>(res);
+  return api.get<CarIssueReport[]>(
+    `/car-issue-report/car/${encodePathParam(carId)}`,
+    'car issue reports',
+    carId
+  );
 }
 
 export async function getSingleCarIssueReport(
   id: string
 ): Promise<CarIssueReport> {
-  const res = await fetch(`${BASE_PATH}/${encodeURIComponent(id)}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse<CarIssueReport>(res);
+  return api.get<CarIssueReport>(
+    `/car-issue-report/${encodePathParam(id)}`,
+    'car issue report',
+    id
+  );
 }
 
 export async function updateCarIssueReportStatus(
@@ -141,23 +87,13 @@ export async function updateCarIssueReportStatus(
     // Input validation
     validateId(id, 'issue report id');
 
-    const sanitized = sanitizeObject(payload);
-
-    const res = await fetch(`${BASE_PATH}/${encodeURIComponent(id)}`, {
-      method: 'PATCH',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(sanitized),
-    });
-
-    if (!res.ok) {
-      await handleServiceError(res, {
-        operation: 'update',
-        resource: 'car issue report',
-        resourceId: id,
-      });
-    }
-
-    const result = await handleResponse<CarIssueReport>(res);
+    const sanitized = sanitizeObject(payload as any);
+    const result = await api.patch<CarIssueReport>(
+      `/car-issue-report/${encodePathParam(id)}`,
+      sanitized,
+      'car issue report',
+      id
+    );
 
     // Audit log successful update
     logAudit(AuditAction.UPDATE, AuditResource.CAR_ISSUE, {
@@ -174,13 +110,6 @@ export async function updateCarIssueReportStatus(
       success: false,
       errorCode: error instanceof Error ? error.message : 'UNKNOWN_ERROR',
     });
-
-    if (error instanceof Error) {
-      logError(error, {
-        operation: 'updateCarIssueReportStatus',
-        resourceId: id,
-      });
-    }
     throw error;
   }
 }
@@ -192,20 +121,11 @@ export async function deleteCarIssueReport(
     // Input validation
     validateId(id, 'issue report id');
 
-    const res = await fetch(`${BASE_PATH}/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(),
-    });
-
-    if (!res.ok) {
-      await handleServiceError(res, {
-        operation: 'delete',
-        resource: 'car issue report',
-        resourceId: id,
-      });
-    }
-
-    const result = await handleResponse<{ success: boolean; id?: string }>(res);
+    const result = await api.delete<{ success: boolean; id?: string }>(
+      `/car-issue-report/${encodePathParam(id)}`,
+      'car issue report',
+      id
+    );
 
     // Audit log successful deletion
     logAudit(AuditAction.DELETE, AuditResource.CAR_ISSUE, {
@@ -221,44 +141,35 @@ export async function deleteCarIssueReport(
       success: false,
       errorCode: error instanceof Error ? error.message : 'UNKNOWN_ERROR',
     });
-
-    if (error instanceof Error) {
-      logError(error, { operation: 'deleteCarIssueReport', resourceId: id });
-    }
     throw error;
   }
 }
 
 export async function getNewIssueReports(): Promise<CarIssueReport[]> {
-  const res = await fetch(`${BASE_PATH}/reports/new`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse<CarIssueReport[]>(res);
+  return api.get<CarIssueReport[]>(
+    '/car-issue-report/reports/new',
+    'new issue reports'
+  );
 }
 
 export async function getNewIssueReportsByCar(
   carId: string
 ): Promise<CarIssueReport[]> {
-  const res = await fetch(`${BASE_PATH}/car/${encodeURIComponent(carId)}/new`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-  const data = await handleResponse<CarIssueReport[]>(res);
-  return data;
+  return api.get<CarIssueReport[]>(
+    `/car-issue-report/car/${encodePathParam(carId)}/new`,
+    'new issue reports',
+    carId
+  );
 }
 
 export async function getActiveIssueReportsCount(
   carId: string
 ): Promise<number> {
-  const res = await fetch(
-    `${BASE_PATH}/car/${encodeURIComponent(carId)}/active-count`,
-    {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    }
+  const data = await api.get<{ count: number }>(
+    `/car-issue-report/car/${encodePathParam(carId)}/active-count`,
+    'active issue reports count',
+    carId
   );
-  const data = await handleResponse<{ count: number }>(res);
   return data.count;
 }
 
@@ -276,17 +187,15 @@ export async function getIssueReportAuditLogs(
     totalPages: number;
   };
 }> {
-  const res = await fetch(
-    `${BASE_PATH}/${encodeURIComponent(issueReportId)}/audit-logs?page=${page}&limit=${limit}`,
-    {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    }
-  );
-  const result = await handleResponse<{
+  const result = await api.get<{
     success: boolean;
     data: { logs: any[]; pagination: any };
-  }>(res);
+  }>(
+    `/car-issue-report/${encodePathParam(issueReportId)}/audit-logs?page=${page}&limit=${limit}`,
+    'issue report audit logs',
+    issueReportId
+  );
+
   // Backend returns { success, data: { logs, pagination } }
   // Transform to { success, data: logs, pagination }
   return {

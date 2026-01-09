@@ -1,9 +1,4 @@
-import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
-import {
-  handleServiceError,
-  handleNetworkError,
-  logError,
-} from '@/shared/utils/errorHandler';
+import { api, encodePathParam } from '@/shared/utils/apiService';
 import {
   validateId,
   validateLicensePlate,
@@ -18,200 +13,64 @@ import {
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
 export const getCar = async (carId: string): Promise<Car> => {
-  try {
-    validateId(carId, 'car id');
-
-    const response = await fetch(`${API_URL}cars/${carId}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      await handleServiceError(response, {
-        operation: 'retrieve',
-        resource: 'car',
-        resourceId: carId,
-      });
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      handleNetworkError(error, {
-        operation: 'retrieve',
-        resource: 'car',
-        resourceId: carId,
-      });
-    }
-    if (error instanceof Error) {
-      logError(error, { operation: 'getCar', carId });
-    }
-    throw error;
-  }
+  validateId(carId, 'car id');
+  return api.get<Car>(`/cars/${encodePathParam(carId)}`, 'car', carId);
 };
 
 export const getCars = async (): Promise<Car[]> => {
-  try {
-    const response = await fetch(`${API_URL}cars`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      await handleServiceError(response, {
-        operation: 'list',
-        resource: 'cars',
-      });
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      handleNetworkError(error, {
-        operation: 'list',
-        resource: 'cars',
-      });
-    }
-    if (error instanceof Error) {
-      logError(error, { operation: 'getCars' });
-    }
-    throw error;
-  }
+  return api.get<Car[]>('/cars', 'cars');
 };
 
 export const updateCar = async (
   licensePlate: string,
   car: Omit<Car, 'createdAt'>
 ): Promise<Car> => {
-  try {
-    validateLicensePlate(licensePlate);
-
-    const response = await fetch(`${API_URL}cars/${licensePlate}`, {
-      method: 'PUT',
-      headers: {
-        ...getAuthHeaders(),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(car),
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      await handleServiceError(response, {
-        operation: 'update',
-        resource: 'car',
-        resourceId: licensePlate,
-      });
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      handleNetworkError(error, {
-        operation: 'update',
-        resource: 'car',
-        resourceId: licensePlate,
-      });
-    }
-    if (error instanceof Error) {
-      logError(error, { operation: 'updateCar', licensePlate });
-    }
-    throw error;
-  }
+  validateLicensePlate(licensePlate);
+  return api.put<Car>(
+    `/cars/${encodePathParam(licensePlate)}`,
+    car,
+    'car',
+    licensePlate
+  );
 };
 
 export const deleteCar = async (
   licensePlate: string
 ): Promise<{ message: string }> => {
-  try {
-    validateLicensePlate(licensePlate);
-
-    const response = await fetch(`${API_URL}cars/${licensePlate}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(),
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      await handleServiceError(response, {
-        operation: 'delete',
-        resource: 'car',
-        resourceId: licensePlate,
-      });
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      handleNetworkError(error, {
-        operation: 'delete',
-        resource: 'car',
-        resourceId: licensePlate,
-      });
-    }
-    if (error instanceof Error) {
-      logError(error, { operation: 'deleteCar', licensePlate });
-    }
-    throw error;
-  }
+  validateLicensePlate(licensePlate);
+  return api.delete<{ message: string }>(
+    `/cars/${encodePathParam(licensePlate)}`,
+    'car',
+    licensePlate
+  );
 };
 
 export const addCar = async (car: Car): Promise<Car> => {
-  const response = await fetch(`${API_URL}cars`, {
-    method: 'POST',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(car),
-    credentials: 'include',
-  });
-
-  if (!response.ok) throw new Error(`Error adding car: ${response.statusText}`);
-  const result = await response.json();
-  return result.data || result;
+  return api.post<Car>('/cars', car, 'car');
 };
 
 export const getAvailableCarsForPeriod = async (
   startingDate: string,
   endingDate: string
 ): Promise<Car[]> => {
-  const response = await fetch(`${API_URL}cars/available-period`, {
-    method: 'POST',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
+  return api.post<Car[]>(
+    '/cars/available-period',
+    {
+      startingDate,
+      endingDate,
     },
-    body: JSON.stringify({ startingDate, endingDate }),
-    credentials: 'include',
-  });
-
-  if (!response.ok)
-    throw new Error(`Error fetching available cars: ${response.statusText}`);
-  const result = await response.json();
-  return result.data || result;
+    'available cars'
+  );
 };
 
 export const getCarAvailability = async (
   licensePlate: string
 ): Promise<BookingEvent[]> => {
-  const response = await fetch(`${API_URL}cars/${licensePlate}/availability`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  if (!response.ok)
-    throw new Error(`Error fetching car availability: ${response.statusText}`);
-
-  const result = await response.json();
-  return result.data || result;
+  return api.get<BookingEvent[]>(
+    `/cars/${encodePathParam(licensePlate)}/availability`,
+    'car availability',
+    licensePlate
+  );
 };
 
 export async function fetchCarBrands(): Promise<CarBrand[]> {
