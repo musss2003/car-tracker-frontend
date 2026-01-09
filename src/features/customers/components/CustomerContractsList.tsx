@@ -101,10 +101,10 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
     const now = new Date();
     const startDate = new Date(contract.startDate);
     const endDate = new Date(contract.endDate);
-
-    if (now < startDate) return 'upcoming';
     if (now >= startDate && now <= endDate) return 'active';
-    if (now > endDate) return 'completed';
+    if (now > endDate) return 'expired';
+    return 'completed';
+  };
     return 'expired';
   };
 
