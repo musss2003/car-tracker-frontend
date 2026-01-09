@@ -1,4 +1,5 @@
 'use client';
+import { logError } from '@/shared/utils/logger';
 
 import type React from 'react';
 
@@ -64,7 +65,7 @@ const CreateContractPage = ({}) => {
         const data = await getCustomers();
         setCustomers(data);
       } catch (error) {
-        console.error('Error fetching customers:', error);
+        logError('Error fetching customers:', error);
         toast.error('Učitavanje kupaca nije uspjelo');
       }
     };
@@ -108,7 +109,7 @@ const CreateContractPage = ({}) => {
       }
       return true;
     } catch (error) {
-      console.error('Error creating contract:', error);
+      logError('Error creating contract:', error);
       toast.error('Neuspješno kreiranje ugovora');
       return false;
     }
@@ -200,7 +201,7 @@ const CreateContractPage = ({}) => {
         handleClose();
       }
     } catch (error) {
-      console.error('Error creating contract:', error);
+      logError('Error creating contract:', error);
       setErrors((prev) => ({
         ...prev,
         submit: 'Kreiranje ugovora nije uspjelo. Molimo pokušajte ponovo.',

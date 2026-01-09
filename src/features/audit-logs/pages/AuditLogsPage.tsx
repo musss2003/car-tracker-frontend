@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Clock, Filter, Download, Trash2, Search } from 'lucide-react';
@@ -91,7 +92,7 @@ const AuditLogsPage = () => {
       setTotal(response.pagination.total);
       setTotalPages(response.pagination.totalPages);
     } catch (error) {
-      console.error('Failed to fetch audit logs:', error);
+      logError('Failed to fetch audit logs:', error);
       toast.error('Greška pri učitavanju logova');
     } finally {
       setLoading(false);
@@ -117,7 +118,7 @@ const AuditLogsPage = () => {
       await exportAuditLogs(filters);
       toast.success('Logovi uspješno izvezeni');
     } catch (error) {
-      console.error('Failed to export logs:', error);
+      logError('Failed to export logs:', error);
       toast.error('Greška pri izvozu logova');
     } finally {
       setExporting(false);
@@ -140,7 +141,7 @@ const AuditLogsPage = () => {
       toast.success(`Obrisano ${deletedCount} starih logova`);
       fetchLogs();
     } catch (error) {
-      console.error('Failed to cleanup logs:', error);
+      logError('Failed to cleanup logs:', error);
       toast.error('Greška pri brisanju logova');
     } finally {
       setCleaning(false);

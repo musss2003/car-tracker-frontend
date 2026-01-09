@@ -1,4 +1,5 @@
 // Customer Creation Form with unique keys for country selection
+import { logError } from '@/shared/utils/logger';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Label } from '@/shared/components/ui/label';
@@ -131,7 +132,7 @@ const CreateCustomerPage: React.FC = () => {
         const countriesData = await getCountries();
         setCountries(countriesData);
       } catch (error) {
-        console.error('Error fetching countries:', error);
+        logError('Error fetching countries:', error);
         setCountriesError('Greška pri učitavanju zemalja');
       } finally {
         setLoadingCountries(false);
@@ -204,7 +205,7 @@ const CreateCustomerPage: React.FC = () => {
       const filename = await uploadDocument(file);
       return filename;
     } catch (error) {
-      console.error('Error uploading photo:', error);
+      logError('Error uploading photo:', error);
       throw error;
     }
   };
@@ -231,7 +232,7 @@ const CreateCustomerPage: React.FC = () => {
             licensePhotoFilename = uploadedFilename;
           }
         } catch (error) {
-          console.error('Error uploading license photo:', error);
+          logError('Error uploading license photo:', error);
           setSubmitError('Greška pri otpremanju slike vozačke dozvole');
           setIsSubmitting(false);
           return;
@@ -245,7 +246,7 @@ const CreateCustomerPage: React.FC = () => {
             passportPhotoFilename = uploadedFilename;
           }
         } catch (error) {
-          console.error('Error uploading passport photo:', error);
+          logError('Error uploading passport photo:', error);
           setSubmitError('Greška pri otpremanju slike pasoša');
           setIsSubmitting(false);
           return;
@@ -275,7 +276,7 @@ const CreateCustomerPage: React.FC = () => {
       await addCustomer(customerData);
       navigate('/customers');
     } catch (error) {
-      console.error('Error creating customer:', error);
+      logError('Error creating customer:', error);
       setSubmitError('Greška pri kreiranju kupca. Molimo pokušajte ponovo.');
     } finally {
       setIsSubmitting(false);

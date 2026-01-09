@@ -1,4 +1,5 @@
 import type React from 'react';
+import { logError } from '@/shared/utils/logger';
 
 import { useState, useEffect } from 'react';
 import { Plus, FileText, Edit, Trash2, AlertTriangle } from 'lucide-react';
@@ -81,7 +82,7 @@ export default function RegistrationPage() {
         setCar(carData);
         setRegistrations(registrationData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        logError('Error fetching data:', error);
         toast.error('Greška pri učitavanju podataka');
       } finally {
         setLoading(false);
@@ -156,7 +157,7 @@ export default function RegistrationPage() {
 
       setDialogOpen(false);
     } catch (error) {
-      console.error('Error saving registration:', error);
+      logError('Error saving registration:', error);
       toast.error('Greška pri čuvanju registracije');
     } finally {
       setSubmitting(false);
@@ -174,7 +175,7 @@ export default function RegistrationPage() {
       toast.success('Registracija je obrisana');
       setDeleteDialogOpen(false);
     } catch (error) {
-      console.error('Error deleting registration:', error);
+      logError('Error deleting registration:', error);
       toast.error('Greška pri brisanju registracije');
     }
   };

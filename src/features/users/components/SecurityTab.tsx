@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logError } from '@/shared/utils/logger';
 import {
   Card,
   CardContent,
@@ -96,7 +97,7 @@ const SecurityTab = ({ user }: SecurityTabProps) => {
       });
       setIsChangingPassword(false);
     } catch (error: any) {
-      console.error('Failed to change password:', error);
+      logError('Failed to change password:', error);
       const errorMessage =
         error.response?.data?.message || 'Greška pri promjeni lozinke';
       toast.error(errorMessage);

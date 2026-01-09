@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { toast } from 'react-toastify';
 import {
   FilterIcon,
@@ -120,7 +121,7 @@ const CarsPage = () => {
       setCars(carsWithStatus);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch cars:', err);
+      logError('Failed to fetch cars:', err);
       setError('Failed to load cars. Please try again later.');
       toast.error('Failed to load cars');
     } finally {
@@ -225,7 +226,7 @@ const CarsPage = () => {
         toast.error('Registarska oznaka nije pronađena.');
       }
     } catch (error) {
-      console.error('Error deleting car:', error);
+      logError('Error deleting car:', error);
       toast.error('Brisanje vozila nije uspjelo');
     } finally {
       setLoading(false);
@@ -284,7 +285,7 @@ const CarsPage = () => {
       doc.save('vozila.pdf');
       toast.success('PDF uspješno izvezen');
     } catch (error) {
-      console.error('Error exporting to PDF:', error);
+      logError('Error exporting to PDF:', error);
       toast.error('Izvoz PDF-a nije uspio');
     }
   };
@@ -307,7 +308,7 @@ const CarsPage = () => {
       XLSX.writeFile(workbook, 'vozila.xlsx');
       toast.success('Excel uspješno izvezen');
     } catch (error) {
-      console.error('Error exporting to Excel:', error);
+      logError('Error exporting to Excel:', error);
       toast.error('Izvoz Excel-a nije uspio');
     }
   };

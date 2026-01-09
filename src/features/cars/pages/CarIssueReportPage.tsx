@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import {
   Plus,
   AlertTriangle,
@@ -166,7 +167,7 @@ export default function CarIssuesPage() {
 
       setIssues(data);
     } catch (error) {
-      console.error('Error fetching issues:', error);
+      logError('Error fetching issues:', error);
       toast.error('Greška pri učitavanju problema');
     } finally {
       setLoading(false);
@@ -181,7 +182,7 @@ export default function CarIssuesPage() {
 
       setCar(selectedCar);
     } catch (error) {
-      console.error('Error fetching issues:', error);
+      logError('Error fetching issues:', error);
       toast.error('Greška pri učitavanju problema');
     } finally {
       setLoading(false);
@@ -202,7 +203,7 @@ export default function CarIssuesPage() {
       });
       fetchIssues();
     } catch (error) {
-      console.error('Error creating issue:', error);
+      logError('Error creating issue:', error);
       toast.error('Greška pri prijavljivanju problema');
     }
   };
@@ -229,7 +230,7 @@ export default function CarIssuesPage() {
       setSelectedIssue(null);
       fetchIssues();
     } catch (error) {
-      console.error('Error updating issue:', error);
+      logError('Error updating issue:', error);
       toast.error('Greška pri ažuriranju problema');
     }
   };
@@ -243,7 +244,7 @@ export default function CarIssuesPage() {
       toast.success('Status je uspješno ažuriran');
       fetchIssues();
     } catch (error) {
-      console.error('Error updating status:', error);
+      logError('Error updating status:', error);
       toast.error('Greška pri ažuriranju statusa');
     }
   };
@@ -259,7 +260,7 @@ export default function CarIssuesPage() {
       setIssueToDelete(null);
       fetchIssues();
     } catch (error) {
-      console.error('Error deleting issue:', error);
+      logError('Error deleting issue:', error);
       toast.error('Greška pri brisanju problema');
     }
   };

@@ -1,4 +1,5 @@
 'use client';
+import { logError } from '@/shared/utils/logger';
 
 import type React from 'react';
 
@@ -105,11 +106,11 @@ export default function EditContractPage() {
             const carData = await getCar(data.carId);
             setCurrentCar(carData);
           } catch (err) {
-            console.error('Error fetching car:', err);
+            logError('Error fetching car:', err);
           }
         }
       } catch (err) {
-        console.error('Error fetching contract:', err);
+        logError('Error fetching contract:', err);
         setError('Učitavanje ugovora nije uspjelo. Molimo pokušajte ponovo.');
       } finally {
         setLoading(false);
@@ -128,7 +129,7 @@ export default function EditContractPage() {
         const data = await getCustomers();
         setCustomers(data);
       } catch (error) {
-        console.error('Error fetching customers:', error);
+        logError('Error fetching customers:', error);
       }
     };
 
@@ -162,7 +163,7 @@ export default function EditContractPage() {
           setCarBookings(convertedBookings);
         }
       } catch (error) {
-        console.error('Error fetching car bookings:', error);
+        logError('Error fetching car bookings:', error);
       }
     };
 
@@ -308,7 +309,7 @@ export default function EditContractPage() {
       await updateContract(contractId, updatedContract);
       navigate('/contracts');
     } catch (err) {
-      console.error('Error updating contract:', err);
+      logError('Error updating contract:', err);
       setError('Ažuriranje ugovora nije uspjelo. Molimo pokušajte ponovo.');
     } finally {
       setSubmitting(false);

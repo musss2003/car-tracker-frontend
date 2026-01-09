@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logError } from '@/shared/utils/logger';
 import {
   CalendarIcon,
   RefreshCw,
@@ -128,7 +129,7 @@ export default function CarAvailabilityPage() {
         setBookings(events);
         setError(null);
       } catch (error) {
-        console.error('Error fetching car availability:', error);
+        logError('Error fetching car availability:', error);
         setError('Neuspješno učitavanje kalendara');
         toast.error('Neuspješno učitavanje kalendara');
       } finally {

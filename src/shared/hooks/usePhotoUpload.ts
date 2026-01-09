@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { uploadDocument } from '../services/uploadService';
 
 export interface UsePhotoUploadReturn {
@@ -53,7 +54,7 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
       const sizeInMB = (photoFile.size / (1024 * 1024)).toFixed(2);
       const errorMsg = `Fajl je prevelik (${sizeInMB}MB). Maksimalna veličina je 10MB.`;
       setError(errorMsg);
-      console.error('File too large:', photoFile.size, 'bytes');
+      logError(`File too large: ${photoFile.size} bytes`);
       return null;
     }
 
@@ -75,7 +76,7 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
           ? err.message
           : 'Neuspješno postavljanje fotografije';
       setError(errorMessage);
-      console.error('Error uploading photo:', err);
+      logError('Error uploading photo:', err);
       return null;
     } finally {
       setUploading(false);

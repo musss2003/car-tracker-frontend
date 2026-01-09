@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import {
   Card,
   CardContent,
@@ -54,7 +55,7 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
         const photoObjectUrl = URL.createObjectURL(photoBlob);
         setPhotoPreview(photoObjectUrl);
       } catch (error) {
-        console.error('Error loading profile photo:', error);
+        logError('Error loading profile photo:', error);
         setPhotoPreview('');
       } finally {
         setIsLoadingPhoto(false);
@@ -82,7 +83,7 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
       const filename = await uploadDocument(photoFile);
       return filename;
     } catch (error) {
-      console.error('Error uploading photo:', error);
+      logError('Error uploading photo:', error);
       toast.error('Greška pri upload-u slike');
       return null;
     }
@@ -124,7 +125,7 @@ const PersonalInfoTab = ({ user, onUpdate }: PersonalInfoTabProps) => {
       setIsEditing(false);
       toast.success('Profil je uspješno ažuriran');
     } catch (error) {
-      console.error('Failed to update user:', error);
+      logError('Failed to update user:', error);
       toast.error('Greška pri ažuriranju profila');
     } finally {
       setIsSaving(false);

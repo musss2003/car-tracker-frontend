@@ -1,4 +1,5 @@
 'use client';
+import { logError } from '@/shared/utils/logger';
 
 import type React from 'react';
 import { useState, useRef, useEffect } from 'react';
@@ -58,8 +59,8 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
       const photoObjectUrl = URL.createObjectURL(photoBlob);
       setPhotoPreview(photoObjectUrl);
     } catch (error) {
-      console.error('Error loading existing photo:', error);
-      console.error('Photo URL that failed:', photoUrl);
+      logError('Error loading existing photo:', error);
+      logError('Photo URL that failed:', photoUrl);
       // Don't show alert, just silently fail - the photo field will remain empty
       // User can upload a new photo if needed
     } finally {
@@ -123,7 +124,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
     };
 
     reader.onerror = () => {
-      console.error('Error reading file:', reader.error);
+      logError('Error reading file:', reader.error);
       alert('Failed to process photo. Please try again.');
       setIsUploadingPhoto(false);
     };

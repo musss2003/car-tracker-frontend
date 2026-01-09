@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -103,7 +104,7 @@ export function ReportIssueModal({
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error('Error reporting issue:', error);
+      logError('Error reporting issue:', error);
       toast.error('Greška pri prijavljivanju kvara');
     } finally {
       setSubmitting(false);

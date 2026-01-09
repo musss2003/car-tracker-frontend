@@ -1,3 +1,5 @@
+import { logError } from './logger';
+
 export async function checkAuth() {
   try {
     const response = await fetch('/api/session-check', {
@@ -11,7 +13,7 @@ export async function checkAuth() {
       return { isAuthenticated: false };
     }
   } catch (error) {
-    console.error('Error checking authentication:', error);
+    logError('Error checking authentication', error);
     return { isAuthenticated: false };
   }
 }

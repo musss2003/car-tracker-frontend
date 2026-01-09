@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logError } from '@/shared/utils/logger';
 import {
   Select,
   SelectContent,
@@ -107,7 +108,7 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
         setCars(availableCars || []);
         onCarsLoaded?.(availableCars || []);
       } catch (err) {
-        console.error('Error fetching available cars:', err);
+        logError('Error fetching available cars:', err);
         setFetchError(
           'Učitavanje automobila nije uspjelo. Molimo pokušajte ponovo.'
         );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -84,7 +85,7 @@ const CustomerDetailsPage = () => {
       const photoUrlObject = URL.createObjectURL(photoBlob);
       setPhoto(photoUrlObject);
     } catch (error) {
-      console.error('Error loading photo:', error);
+      logError('Error loading photo:', error);
       setPhoto(null);
     } finally {
       setLoadingPhoto(false);
@@ -122,7 +123,7 @@ const CustomerDetailsPage = () => {
           );
         }
       } catch (error) {
-        console.error('Error fetching customer:', error);
+        logError('Error fetching customer:', error);
         setError('Neuspješno učitavanje kupca');
         toast.error('Neuspješno učitavanje kupca');
       } finally {

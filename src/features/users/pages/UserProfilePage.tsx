@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import {
   Card,
@@ -39,7 +40,7 @@ const UserProfilePage = () => {
       const userData = await getUser(authUser.id);
       setUser(userData);
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      logError('Failed to fetch user:', error);
       toast.error('Greška pri učitavanju profila');
     } finally {
       setLoading(false);

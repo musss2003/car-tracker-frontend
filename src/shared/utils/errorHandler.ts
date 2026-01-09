@@ -2,6 +2,7 @@
  * Enhanced error handling utility with contextual information
  * Provides meaningful error messages without exposing sensitive data
  */
+import { logError } from '@/shared/utils/logger';
 
 export class ServiceError extends Error {
   constructor(
@@ -115,15 +116,17 @@ export function handleNetworkError(
 }
 
 /**
- * Logs errors securely without exposing sensitive information
+ * Logs service errors securely without exposing sensitive information
+ * Uses the logger utility from logger.ts for actual logging
  */
-export function logError(
+export function logServiceError(
   error: Error | ServiceError,
   context?: Record<string, unknown>
 ): void {
   const sanitizedMessage = sanitizeErrorMessage(error.message);
 
   if (import.meta.env.DEV) {
+    // Log with full context in development
     console.error('Application Error:', {
       name: error.name,
       message: sanitizedMessage,
@@ -134,9 +137,8 @@ export function logError(
       }),
     });
   } else {
-    // In production, send to error tracking service (e.g., Sentry)
-    // Ensure no sensitive data is included
-    console.error(`Error: ${sanitizedMessage}`);
+    // In production, use secure logger
+    logError(`Error: ${sanitizedMessage}`);
   }
 }
 
@@ -219,9 +221,9 @@ export async function fetchWithErrorHandling<T>(
   } catch (error) {
     // If it's already our custom error with status, rethrow it
     if (error instanceof Error && (error as any).status) {
-      console.error(
-        `Error ${context.operation} ${context.resource}${context.resourceId ? ` (${context.resourceId})` : ''}:`,
-        error.message
+      logError(
+        `Error ${context.operation} ${context.resource}${context.resourceId ? ` (${context.resourceId})` : ''}`,
+        error
       );
       throw error;
     }
@@ -233,10 +235,7 @@ export async function fetchWithErrorHandling<T>(
     networkError.originalError = error;
     networkError.resourceId = context.resourceId;
 
-    console.error(
-      `Network error ${context.operation} ${context.resource}:`,
-      error
-    );
+    logError(`Network error ${context.operation} ${context.resource}`, error);
     throw networkError;
   }
 }
