@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -75,21 +75,6 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
   const [itemsPerPage] = useState<number>(5);
 
   // Fetch customer contracts
-  const fetchContracts = async () => {
-    try {
-      setLoading(true);
-      const data = await getCustomerContracts(customerId);
-      setContracts(data);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to fetch customer contracts:', err);
-      setError('Greška pri učitavanju ugovora');
-      toast.error('Greška pri učitavanju ugovora');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const fetchContracts = useCallback(async () => {
     try {
       setLoading(true);
@@ -119,8 +104,6 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
     if (now >= startDate && now <= endDate) return 'active';
     if (now > endDate) return 'expired';
     return 'completed';
-  };
-    return 'expired';
   };
 
   // Filter and sort contracts
@@ -344,11 +327,10 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
                     <SelectValue placeholder="Svi statusi" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="completed">Završen</SelectItem>
-                    <SelectItem value="expired">Istekao</SelectItem>
-                  </SelectContent>
+                    <SelectItem value="active">Aktivan</SelectItem>
                     <SelectItem value="upcoming">Nadolazeći</SelectItem>
                     <SelectItem value="completed">Završen</SelectItem>
+                    <SelectItem value="expired">Istekao</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

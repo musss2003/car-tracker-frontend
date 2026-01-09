@@ -53,6 +53,10 @@ export const getAvailableCarsForPeriod = async (
   startingDate: string,
   endingDate: string
 ): Promise<Car[]> => {
+  if (isNaN(Date.parse(startingDate)) || isNaN(Date.parse(endingDate))) {
+    throw new Error('Invalid date format for available cars query');
+  }
+
   return api.post<Car[]>(
     '/cars/available-period',
     {
