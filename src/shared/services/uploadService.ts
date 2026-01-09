@@ -1,6 +1,4 @@
-import { getAuthHeaders } from '../utils/getAuthHeaders';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api';
+import { apiRequest } from '../utils/apiService';
 
 // Upload a document/image file
 export const uploadDocument = async (file: File): Promise<string> => {
@@ -14,41 +12,25 @@ export const uploadDocument = async (file: File): Promise<string> => {
   );
 
   try {
-    const token = localStorage.getItem('accessToken');
-    const headers: Record<string, string> = {};
-
-    // Add auth token if exists (don't set Content-Type for FormData)
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_URL}/upload`, {
-      method: 'POST',
-      body: formData,
-      headers: headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      // Handle 413 Payload Too Large specifically
-      if (response.status === 413) {
-        throw new Error(
-          `Fajl je prevelik (${fileSizeMB}MB). Maksimalna veličina je 10MB.`
-        );
+    const data = await apiRequest<{ message: string; filename: string }>(
+      '/upload',
+      {
+        method: 'POST',
+        body: formData,
+        resourceName: 'document',
+        operation: 'upload',
       }
-
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message ||
-          `Neuspješno postavljanje dokumenta: ${response.statusText}`
-      );
-    }
-
-    const data: { message: string; filename: string } = await response.json();
+    );
 
     // Return the filename which can be used to download later
     return data.filename;
   } catch (error) {
+    // Handle 413 Payload Too Large specifically
+    if (error instanceof Error && error.message.includes('413')) {
+      throw new Error(
+        `Fajl je prevelik (${fileSizeMB}MB). Maksimalna veličina je 10MB.`
+      );
+    }
     console.error('Error uploading document:', (error as Error).message);
     throw error;
   }
@@ -62,38 +44,17 @@ export const downloadDocument = async (filename: string): Promise<Blob> => {
   }
 
   try {
-    const authHeaders = getAuthHeaders();
-    const response = await fetch(
-      `${API_URL}/documents/${encodeURIComponent(filename)}`,
+    const response = await apiRequest<Blob>(
+      `/documents/${encodeURIComponent(filename)}`,
       {
         method: 'GET',
-        headers: {
-          ...authHeaders,
-        },
-        credentials: 'include',
+        resourceName: 'document',
+        operation: 'download',
+        resourceId: filename,
       }
     );
 
-    if (!response.ok) {
-      // Check if response is JSON before trying to parse
-      const contentType = response.headers.get('content-type');
-      let errorMessage = `Failed to download document: ${response.statusText}`;
-
-      if (contentType && contentType.includes('application/json')) {
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (parseError) {
-          // If JSON parsing fails, use the default error message
-          console.warn('Failed to parse error response as JSON');
-        }
-      }
-
-      throw new Error(errorMessage);
-    }
-
-    const blob = await response.blob();
-    return blob;
+    return response;
   } catch (error) {
     console.error('Error downloading document:', (error as Error).message);
     throw error;
