@@ -90,9 +90,24 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
     }
   };
 
+  const fetchContracts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getCustomerContracts(customerId);
+      setContracts(data);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to fetch customer contracts:', err);
+      setError('Greška pri učitavanju ugovora');
+      toast.error('Greška pri učitavanju ugovora');
+    } finally {
+      setLoading(false);
+    }
+  }, [customerId]);
+
   useEffect(() => {
     fetchContracts();
-  }, [customerId]);
+  }, [fetchContracts]);
 
   // Determine contract status
   const getContractStatus = (
