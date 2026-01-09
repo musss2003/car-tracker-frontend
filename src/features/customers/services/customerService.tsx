@@ -1,5 +1,6 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import { Customer } from '../types/customer.types';
+import { Contract } from '@/features/contracts/types/contract.types';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + `/api/customers/`;
 
@@ -194,5 +195,27 @@ export const getCountries = async (): Promise<CountryOption[]> => {
       error instanceof Error ? error.message : 'Unknown error';
     console.error('❌ Failed to fetch countries from local API:', errorMessage);
     throw new Error(`Failed to fetch countries: ${errorMessage}`);
+  }
+};
+
+// Get all contracts for a specific customer
+export const getCustomerContracts = async (
+  customerId: string
+): Promise<Contract[]> => {
+  try {
+    const response = await fetch(`${API_URL}${customerId}/contracts`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  } catch (error) {
+    console.error('Error fetching customer contracts:', error);
+    throw error;
   }
 };

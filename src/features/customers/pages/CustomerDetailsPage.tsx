@@ -25,6 +25,7 @@ import {
 import { Customer } from '../types/customer.types';
 import { downloadDocument } from '@/shared/services/uploadService';
 import { getCustomer } from '../services/customerService';
+import CustomerContractsList from '../components/CustomerContractsList';
 
 const CustomerDetailsPage = () => {
   const navigate = useNavigate();
@@ -541,6 +542,14 @@ const CustomerDetailsPage = () => {
                   </CardContent>
                 </Card>
               )}
+
+            {/* Customer Contracts Section */}
+            <div className="lg:col-span-2">
+              <CustomerContractsList
+                customerId={customer.id}
+                customerName={customer.name}
+              />
+            </div>
           </div>
         </div>
       </div>
