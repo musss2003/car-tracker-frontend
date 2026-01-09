@@ -1,9 +1,5 @@
-import apiClient from '@/shared/utils/apiClient';
+import { api, encodePathParam, apiRequest } from '@/shared/utils/apiService';
 import { User } from '../types/user.types';
-import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
-
-const BASE_URL = '/api/users';
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
 
 export interface CreateUserData {
   name: string;
@@ -30,10 +26,7 @@ export interface UpdateUserData {
  * Get all users (admin only)
  */
 export const getUsers = async (): Promise<User[]> => {
-  const response = await apiClient.get<{ success: boolean; data: User[] }>(
-    BASE_URL
-  );
-  return response.data.data;
+  return api.get<User[]>('/api/users', 'users');
 };
 
 /**
@@ -41,10 +34,7 @@ export const getUsers = async (): Promise<User[]> => {
  * @alias getUserById - For compatibility with UserProfile component
  */
 export const getUser = async (id: string): Promise<User> => {
-  const response = await apiClient.get<{ success: boolean; data: User }>(
-    `${BASE_URL}/${id}`
-  );
-  return response.data.data;
+  return api.get<User>(`/api/users/${encodePathParam(id)}`, 'user', id);
 };
 
 /**
@@ -58,11 +48,7 @@ export const getUserById = async (id: string): Promise<User> => {
  * Create new user (admin only)
  */
 export const createUser = async (userData: CreateUserData): Promise<User> => {
-  const response = await apiClient.post<{ success: boolean; data: User }>(
-    BASE_URL,
-    userData
-  );
-  return response.data.data;
+  return api.post<User>('/api/users', userData, 'user');
 };
 
 /**
@@ -72,18 +58,19 @@ export const updateUser = async (
   id: string,
   userData: UpdateUserData
 ): Promise<User> => {
-  const response = await apiClient.put<{ success: boolean; data: User }>(
-    `${BASE_URL}/${id}`,
-    userData
+  return api.put<User>(
+    `/api/users/${encodePathParam(id)}`,
+    userData,
+    'user',
+    id
   );
-  return response.data.data;
 };
 
 /**
  * Delete user (admin only)
  */
 export const deleteUser = async (id: string): Promise<void> => {
-  await apiClient.delete(`${BASE_URL}/${id}`);
+  return api.delete<void>(`/api/users/${encodePathParam(id)}`, 'user', id);
 };
 
 /**
@@ -94,10 +81,12 @@ export const resetUserPassword = async (
   newPassword: string,
   sendEmail: boolean = true
 ): Promise<void> => {
-  await apiClient.post(`${BASE_URL}/${id}/reset-password`, {
-    newPassword,
-    sendEmail,
-  });
+  await api.post<void>(
+    `/api/users/${encodePathParam(id)}/reset-password`,
+    { newPassword, sendEmail },
+    'user password',
+    id
+  );
 };
 
 /**
@@ -108,10 +97,12 @@ export const changePassword = async (
   currentPassword: string,
   newPassword: string
 ): Promise<void> => {
-  await apiClient.put(`${BASE_URL}/${userId}/password`, {
-    currentPassword,
-    newPassword,
-  });
+  await api.put<void>(
+    `/api/users/${encodePathParam(userId)}/password`,
+    { currentPassword, newPassword },
+    'user password',
+    userId
+  );
 };
 
 /**
@@ -124,33 +115,19 @@ export const uploadProfilePhoto = async (
   const formData = new FormData();
   formData.append('document', photoFile);
 
-  // Get auth headers but remove Content-Type for FormData
-  const authHeaders = getAuthHeaders();
-  const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders;
+  // Upload the file using apiRequest with FormData support
+  const uploadResult = await apiRequest<{ filename: string }>(
+    '/api/upload/upload',
+    {
+      method: 'POST',
+      body: formData,
+      resourceName: 'profile photo',
+      operation: 'upload',
+    }
+  );
 
-  // First upload the file
-  const uploadResponse = await fetch(`${API_URL}upload/upload`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: headersWithoutContentType, // Don't set Content-Type - let browser set it with boundary
-    body: formData,
+  // Update the user with the photo URL
+  return updateUser(userId, {
+    profilePhotoUrl: uploadResult.filename,
   });
-
-  if (!uploadResponse.ok) {
-    const errorData = await uploadResponse
-      .json()
-      .catch(() => ({ message: 'Unknown error' }));
-    console.error('Upload failed:', errorData);
-    throw new Error(errorData.message || 'Failed to upload profile photo');
-  }
-
-  const uploadResult = await uploadResponse.json();
-  const filename = uploadResult.filename;
-
-  // Then update the user with the photo URL
-  const updatedUser = await updateUser(userId, {
-    profilePhotoUrl: filename,
-  });
-
-  return updatedUser;
 };
