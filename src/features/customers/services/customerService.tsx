@@ -203,10 +203,13 @@ export const getCustomerContracts = async (
   customerId: string
 ): Promise<Contract[]> => {
   try {
-    const response = await fetch(`${API_URL}${customerId}/contracts`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${API_URL}${encodeURIComponent(customerId)}/contracts`,
+      {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
