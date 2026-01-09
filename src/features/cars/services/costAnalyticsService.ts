@@ -2,7 +2,7 @@ import { getCarServiceHistory } from './carServiceHistory';
 import { getCarRegistrations } from './carRegistrationService';
 import { getCarInsuranceHistory } from './carInsuranceService';
 import { getCarIssueReportsForCar } from './carIssueReportService';
-import { logError } from '@/shared/utils/errorHandler';
+import { logError } from '@/shared/utils/logger';
 import { validateId } from '@/shared/utils/inputValidator';
 import {
   CostAnalytics,
