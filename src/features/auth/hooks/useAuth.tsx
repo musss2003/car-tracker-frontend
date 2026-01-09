@@ -47,7 +47,8 @@ const UserProvider: React.FC<Props> = ({ children }) => {
       );
 
       if (!response.ok) {
-        throw new Error(`Session check failed: ${response.status}`);
+        console.error('Session check failed with status:', response.status);
+        throw new Error('Session check failed');
       }
 
       const data = await response.json();
