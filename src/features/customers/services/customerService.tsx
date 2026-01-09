@@ -212,13 +212,57 @@ export const getCustomerContracts = async (
     );
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      let errorMessage = 'Failed to fetch customer contracts';
+
+      switch (response.status) {
+        case 400:
+          errorMessage = 'Invalid customer ID provided';
+          break;
+        case 401:
+          errorMessage = 'Unauthorized. Please log in again';
+          break;
+        case 403:
+          errorMessage = 'You do not have permission to view this customer';
+          break;
+        case 404:
+          errorMessage = 'Customer not found';
+          break;
+        case 500:
+          errorMessage = 'Server error. Please try again later';
+          break;
+        default:
+          errorMessage = `Failed to fetch contracts (Status: ${response.status})`;
+      }
+
+      const error = new Error(errorMessage);
+      (error as any).status = response.status;
+      (error as any).customerId = customerId;
+      throw error;
     }
 
     const result = await response.json();
     return result.data || result;
   } catch (error) {
-    console.error('Error fetching customer contracts:', error);
-    throw error;
+    // If it's already our custom error with status, rethrow it
+    if (error instanceof Error && (error as any).status) {
+      console.error(
+        `Error fetching contracts for customer ${customerId}:`,
+        error.message
+      );
+      throw error;
+    }
+
+    // Network or parsing error - provide meaningful context
+    const networkError = new Error(
+      `Unable to fetch customer contracts. Please check your connection and try again.`
+    );
+    (networkError as any).originalError = error;
+    (networkError as any).customerId = customerId;
+
+    console.error(
+      `Network error fetching contracts for customer ${customerId}:`,
+      error
+    );
+    throw networkError;
   }
 };
