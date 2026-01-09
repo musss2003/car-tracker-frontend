@@ -329,8 +329,9 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
                     <SelectValue placeholder="Svi statusi" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Svi statusi</SelectItem>
-                    <SelectItem value="active">Aktivan</SelectItem>
+                    <SelectItem value="completed">Završen</SelectItem>
+                    <SelectItem value="expired">Istekao</SelectItem>
+                  </SelectContent>
                     <SelectItem value="upcoming">Nadolazeći</SelectItem>
                     <SelectItem value="completed">Završen</SelectItem>
                   </SelectContent>
