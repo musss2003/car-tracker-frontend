@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { getUnreadNotifications } from '../services/notificationService';
 import { socketService } from '../../../shared/services/socketService';
 
@@ -10,9 +11,9 @@ export const useUnreadCount = () => {
     const fetchUnreadCount = async () => {
       try {
         const notifications = await getUnreadNotifications();
-        setUnreadCount(notifications.length);
+        setUnreadCount((notifications as any[]).length);
       } catch (error) {
-        console.error('Failed to fetch unread count:', error);
+        logError('Failed to fetch unread count', error);
       }
     };
 

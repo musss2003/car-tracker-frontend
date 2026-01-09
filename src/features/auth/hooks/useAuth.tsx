@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { loginAPI, registerAPI } from '../services/authService';
 import { getAuthHeaders } from '../../../shared/utils/getAuthHeaders';
+import { logError } from '../../../shared/utils/logger';
 import { User, UserRole } from '../../users/types/user.types';
 
 export interface AuthContextType {
@@ -47,7 +48,8 @@ const UserProvider: React.FC<Props> = ({ children }) => {
       );
 
       if (!response.ok) {
-        console.error('Session check failed with status:', response.status);
+        // Log status for debugging without exposing sensitive details
+        logError(`Session check failed (Status: ${response.status})`);
         throw new Error('Session check failed');
       }
 
@@ -95,7 +97,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
       toast.success(`Welcome back, ${res.data.username}!`);
       navigate('/');
     } catch (error: any) {
-      console.error('Login error:', error);
+      logError('Login error:', error);
       toast.error('Login failed. Please check your credentials.');
     }
   };
@@ -110,7 +112,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
 
       toast.success('Successfully logged out.');
     } catch (error: any) {
-      console.error('Logout error:', error);
+      logError('Logout error:', error);
       toast.error('Logout failed, but you have been logged out locally.');
     } finally {
       // Always clear local data regardless of server response
@@ -139,7 +141,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
       );
       navigate('/');
     } catch (error: any) {
-      console.error('Registration error:', error);
+      logError('Registration error:', error);
       toast.error('Registration failed. Please try again.');
     }
   };

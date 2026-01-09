@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { UserCog, Plus, Edit, Trash2, Key, Search } from 'lucide-react';
@@ -84,7 +85,7 @@ const UsersPage = () => {
       const data = await getUsersWithStatus();
       setUsers(Array.isArray(data) ? data : []);
     } catch (error: any) {
-      console.error('Error fetching users:', error);
+      logError('Error fetching users:', error);
       toast.error(error.message || 'Greška pri učitavanju korisnika');
       setUsers([]);
     } finally {

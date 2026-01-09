@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Car, CarInsurance } from '../types/car.types';
@@ -80,7 +81,7 @@ export default function CarInsurancePage() {
         setCar(carData);
         setInsurances(insuranceData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        logError('Error fetching data:', error);
         toast.error('Greška pri učitavanju podataka');
       } finally {
         setLoading(false);
@@ -156,7 +157,7 @@ export default function CarInsurancePage() {
 
       setDialogOpen(false);
     } catch (error) {
-      console.error('Error saving insurance:', error);
+      logError('Error saving insurance:', error);
       toast.error('Greška pri čuvanju osiguranja');
     } finally {
       setSubmitting(false);
@@ -174,7 +175,7 @@ export default function CarInsurancePage() {
       toast('Osiguranje je obrisano');
       setDeleteDialogOpen(false);
     } catch (error) {
-      console.error('Error deleting insurance:', error);
+      logError('Error deleting insurance:', error);
       toast.error('Greška pri brisanju osiguranja');
     }
   };

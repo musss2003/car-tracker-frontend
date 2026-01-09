@@ -1,4 +1,5 @@
 import { apiRequest } from '../utils/apiService';
+import { logError } from '@/shared/utils/logger';
 
 // Upload a document/image file
 export const uploadDocument = async (file: File): Promise<string> => {
@@ -31,7 +32,7 @@ export const uploadDocument = async (file: File): Promise<string> => {
         `Fajl je prevelik (${fileSizeMB}MB). Maksimalna veličina je 10MB.`
       );
     }
-    console.error('Error uploading document:', (error as Error).message);
+    logError('Error uploading document:', (error as Error).message);
     throw error;
   }
 };
@@ -56,7 +57,7 @@ export const downloadDocument = async (filename: string): Promise<Blob> => {
 
     return response;
   } catch (error) {
-    console.error('Error downloading document:', (error as Error).message);
+    logError('Error downloading document:', (error as Error).message);
     throw error;
   }
 };

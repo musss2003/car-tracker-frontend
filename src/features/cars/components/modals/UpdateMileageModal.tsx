@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -81,7 +82,7 @@ export function UpdateMileageModal({
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error('Error updating mileage:', error);
+      logError('Error updating mileage:', error);
       toast.error('Greška pri ažuriranju kilometraže');
     } finally {
       setSubmitting(false);

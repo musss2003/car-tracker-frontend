@@ -1,4 +1,5 @@
 import type React from 'react';
+import { logError } from '@/shared/utils/logger';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -112,7 +113,7 @@ export default function EditCarPage() {
   const [carBrands, setCarBrands] = useState<CarBrand[]>([]);
 
   useEffect(() => {
-    fetchCarBrands().then(setCarBrands).catch(console.error);
+    fetchCarBrands().then(setCarBrands).catch(logError);
   }, []);
 
   // Car brands from JSON file
@@ -147,7 +148,7 @@ export default function EditCarPage() {
           photoUrl: carData.photoUrl || '',
         });
       } catch (err) {
-        console.error('Error fetching car:', err);
+        logError('Error fetching car:', err);
         setError('Učitavanje vozila nije uspjelo. Molimo pokušajte ponovo.');
       } finally {
         setLoading(false);
@@ -187,7 +188,7 @@ export default function EditCarPage() {
       setErrors((prev) => ({ ...prev, photoUrl: undefined }));
       return filename;
     } catch (error) {
-      console.error('Error uploading photo:', error);
+      logError('Error uploading photo:', error);
       setErrors((prev) => ({
         ...prev,
         photoUrl: 'Neuspješno dodavanje fotografije. Molimo pokušajte ponovo.',
@@ -274,7 +275,7 @@ export default function EditCarPage() {
       toast.success('Vozilo je uspješno ažurirano');
       navigate('/cars');
     } catch (err) {
-      console.error('Error updating car:', err);
+      logError('Error updating car:', err);
       setError('Ažuriranje vozila nije uspjelo. Molimo pokušajte ponovo.');
       toast.error('Ažuriranje vozila nije uspjelo. Molimo pokušajte ponovo.');
     } finally {
@@ -289,7 +290,7 @@ export default function EditCarPage() {
       toast.success('Vozilo je uspješno obrisano');
       navigate('/cars');
     } catch (error) {
-      console.error('Error deleting car:', error);
+      logError('Error deleting car:', error);
       toast.error('Neuspješno brisanje vozila');
       setSubmitting(false);
     }

@@ -1,5 +1,6 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
 import { api, encodePathParam } from '@/shared/utils/apiService';
+import { logError } from '@/shared/utils/logger';
 import { toast } from 'react-toastify';
 import { Contract, ContractFormData } from '../types/contract.types';
 
@@ -18,7 +19,7 @@ export const getTotalRevenue = async (): Promise<number> => {
 
     throw new Error('Unexpected revenue response format');
   } catch (error) {
-    console.error('Error fetching total revenue:', error);
+    logError('Error fetching total revenue', error);
     throw error;
   }
 };
@@ -43,7 +44,7 @@ export const getContractTemplate = async (): Promise<Response> => {
 
   if (!res.ok) {
     // Log the actual status for debugging purposes only (server-side or dev console)
-    console.error('Failed to fetch contract template:', res.status);
+    logError('Failed to fetch contract template:', res.status);
     throw new Error('Failed to fetch contract template');
   }
   return res;
@@ -88,7 +89,8 @@ export const createAndDownloadContract = async (
     });
     if (!res.ok) {
       const errorText = await res.text();
-      console.error('Server error:', errorText, 'Status:', res.status);
+      // Log status for debugging, but not the full error response
+      logError(`Failed to create contract (Status: ${res.status})`);
       throw new Error('Failed to create contract');
     }
 
@@ -99,7 +101,7 @@ export const createAndDownloadContract = async (
     triggerDownloadContract(await docxBlob, contract.id);
     return contract;
   } catch (error) {
-    console.error('Error creating and downloading contract:', error);
+    logError('Error creating and downloading contract', error);
     throw error; // Re-throw the error so it can be caught by the calling function
   }
 };
@@ -114,7 +116,7 @@ export const downloadContract = async (contractId: string): Promise<void> => {
   );
 
   if (!res.ok) {
-    console.error('Failed to download contract:', res.status);
+    logError('Failed to download contract:', res.status);
     throw new Error('Failed to download contract');
   }
 

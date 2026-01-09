@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { logError } from '@/shared/utils/logger';
 import {
   Card,
   CardHeader,
@@ -82,7 +83,7 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
       setContracts(data);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch customer contracts:', err);
+      logError('Failed to fetch customer contracts', err);
       setError('Greška pri učitavanju ugovora');
       toast.error('Greška pri učitavanju ugovora');
     } finally {

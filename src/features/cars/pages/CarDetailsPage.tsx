@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logError } from '@/shared/utils/logger';
 import {
   ArrowLeft,
   Edit,
@@ -159,7 +160,7 @@ export default function CarDetailsPage() {
       const photoUrlObject = URL.createObjectURL(photoBlob);
       setCarPhoto(photoUrlObject);
     } catch (error) {
-      console.error('Error loading photo:', error);
+      logError('Error loading photo:', error);
       toast.error('Učitavanje fotografije nije uspjelo');
       setCarPhoto(null);
     } finally {
@@ -173,7 +174,7 @@ export default function CarDetailsPage() {
         const count = await getActiveIssueReportsCount(carId);
         setActiveIssueReports(count);
       } catch (error) {
-        console.error('Error fetching active issue reports:', error);
+        logError('Error fetching active issue reports:', error);
         setActiveIssueReports(null);
       }
     };
@@ -183,7 +184,7 @@ export default function CarDetailsPage() {
         const data = await getServiceRemainingKm(carId);
         setServiceKilometersRemaining(data);
       } catch (error) {
-        console.error('Error fetching service km remaining:', error);
+        logError('Error fetching service km remaining:', error);
         setServiceKilometersRemaining(null);
       }
     };
@@ -195,7 +196,7 @@ export default function CarDetailsPage() {
 
         setRegistrationDaysRemaining(data);
       } catch (error) {
-        console.error('Error fetching registration days remaining:', error);
+        logError('Error fetching registration days remaining:', error);
         setRegistrationDaysRemaining(null);
       }
     };
@@ -224,7 +225,7 @@ export default function CarDetailsPage() {
         fetchServiceKmRemaining(id);
         fetchActiveIssueReports(id);
       } catch (error) {
-        console.error('Error fetching car:', error);
+        logError('Error fetching car:', error);
         setError('Greška pri učitavanju vozila');
         toast.error('Greška pri učitavanju vozila');
       } finally {
@@ -284,7 +285,7 @@ export default function CarDetailsPage() {
       toast.success('Vozilo je uspješno obrisano');
       navigate('/cars');
     } catch (error) {
-      console.error('Error deleting car:', error);
+      logError('Error deleting car:', error);
       toast.error('Greška pri brisanju vozila');
     } finally {
       setDeleting(false);
@@ -306,7 +307,7 @@ export default function CarDetailsPage() {
       setServiceKilometersRemaining(serviceKm);
       setActiveIssueReports(issueCount);
     } catch (error) {
-      console.error('Error refreshing maintenance data:', error);
+      logError('Error refreshing maintenance data:', error);
     }
   }, [id]);
 

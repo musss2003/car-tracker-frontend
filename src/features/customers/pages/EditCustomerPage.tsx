@@ -1,4 +1,5 @@
 'use client';
+import { logError } from '@/shared/utils/logger';
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -132,7 +133,7 @@ const EditCustomerPage: React.FC = () => {
         const customerData = await getCustomer(id);
         setCustomer(customerData);
       } catch (error) {
-        console.error('Error loading customer:', error);
+        logError('Error loading customer:', error);
         toast.error('Neuspješno učitavanje podataka o kupcu');
         navigate('/customers');
       } finally {
@@ -250,7 +251,7 @@ const EditCustomerFormContent: React.FC<{
         const countriesData = await getCountries();
         setCountries(countriesData);
       } catch (error) {
-        console.error('Error fetching countries:', error);
+        logError('Error fetching countries:', error);
         setCountriesError('Greška pri učitavanju zemalja');
       } finally {
         setLoadingCountries(false);
@@ -284,8 +285,8 @@ const EditCustomerFormContent: React.FC<{
       const photoObjectUrl = URL.createObjectURL(photoBlob);
       setPhotoUrl(photoObjectUrl);
     } catch (error) {
-      console.error(`Error loading existing ${photoType} photo:`, error);
-      console.error(`${photoType} photo URL that failed:`, photoUrl);
+      logError(`Error loading existing ${photoType} photo:`, error);
+      logError(`${photoType} photo URL that failed:`, photoUrl);
       // Don't set error in UI - just log it and let user upload new photo if needed
       // setErrors((prev) => ({
       //   ...prev,
@@ -406,7 +407,7 @@ const EditCustomerFormContent: React.FC<{
       const filename = await uploadDocument(file);
       return filename;
     } catch (error) {
-      console.error('Error uploading photo:', error);
+      logError('Error uploading photo:', error);
       throw error;
     }
   };
@@ -489,7 +490,7 @@ const EditCustomerFormContent: React.FC<{
             licensePhotoFilename = uploadedFilename;
           }
         } catch (error) {
-          console.error('Error uploading license photo:', error);
+          logError('Error uploading license photo:', error);
           toast.error('Greška pri otpremanju slike vozačke dozvole');
           setIsSubmitting(false);
           return;
@@ -509,7 +510,7 @@ const EditCustomerFormContent: React.FC<{
             passportPhotoFilename = uploadedFilename;
           }
         } catch (error) {
-          console.error('Error uploading passport photo:', error);
+          logError('Error uploading passport photo:', error);
           toast.error('Greška pri otpremanju slike pasoša');
           setIsSubmitting(false);
           return;
@@ -547,7 +548,7 @@ const EditCustomerFormContent: React.FC<{
       toast.success('Kupac je uspješno ažuriran');
       navigate('/customers');
     } catch (error) {
-      console.error('Error updating customer:', error);
+      logError('Error updating customer:', error);
       toast.error('Neuspješno ažuriranje kupca');
     } finally {
       setIsSubmitting(false);

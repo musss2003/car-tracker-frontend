@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -116,7 +117,7 @@ export function LogServiceModal({
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error('Error logging service:', error);
+      logError('Error logging service:', error);
       toast.error('Greška pri zapisivanju servisa');
     } finally {
       setSubmitting(false);

@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { toast } from 'react-toastify';
 import {
   FilterIcon,
@@ -103,7 +104,7 @@ const ContractsPage = () => {
       setContracts(data);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch contracts:', err);
+      logError('Failed to fetch contracts:', err);
       setError('Failed to load contracts. Please try again later.');
       toast.error('Failed to load contracts');
     } finally {
@@ -241,7 +242,7 @@ const ContractsPage = () => {
         toast.error('ID ugovora nije pronađen.');
       }
     } catch (error) {
-      console.error('Error deleting contract:', error);
+      logError('Error deleting contract:', error);
       toast.error('Brisanje ugovora nije uspjelo');
     } finally {
       setLoading(false);
@@ -282,7 +283,7 @@ const ContractsPage = () => {
         toast.error('ID ugovora nije pronađen.');
       }
     } catch (error) {
-      console.error('Error downloading contract:', error);
+      logError('Error downloading contract:', error);
       toast.error('Preuzimanje ugovora nije uspjelo');
     }
   };
@@ -334,7 +335,7 @@ const ContractsPage = () => {
       doc.save('ugovori.pdf');
       toast.success('PDF uspješno izvezen');
     } catch (error) {
-      console.error('Error exporting to PDF:', error);
+      logError('Error exporting to PDF:', error);
       toast.error('Izvoz PDF-a nije uspio');
     }
   };
@@ -369,7 +370,7 @@ const ContractsPage = () => {
       XLSX.writeFile(workbook, 'ugovori.xlsx');
       toast.success('Excel uspješno izvezen');
     } catch (error) {
-      console.error('Error exporting to Excel:', error);
+      logError('Error exporting to Excel:', error);
       toast.error('Izvoz Excel-a nije uspio');
     }
   };

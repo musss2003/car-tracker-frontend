@@ -5,8 +5,9 @@ import React, {
   useContext,
   ReactNode,
 } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { io, Socket } from 'socket.io-client';
-import { Notification } from '../types/Notification';
+import { Notification } from '../types/notification.types';
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -59,7 +60,7 @@ export const NotificationProvider = ({ children, userId }: Props) => {
       const data: Notification[] = await response.json();
       setNotifications(data);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      logError('Error fetching notifications:', error);
     }
   };
 
@@ -82,7 +83,7 @@ export const NotificationProvider = ({ children, userId }: Props) => {
         )
       );
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      logError('Error marking notification as read:', error);
     }
   };
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -119,7 +120,7 @@ const ContractDetailsPage = () => {
         const photoUrlObject = URL.createObjectURL(photoBlob);
         setPhoto(photoUrlObject);
       } catch (error) {
-        console.error('Error loading photo:', error);
+        logError('Error loading photo:', error);
         toast.error('Učitavanje fotografije nije uspjelo');
         setPhoto(null);
       } finally {
@@ -177,7 +178,7 @@ const ContractDetailsPage = () => {
           );
         }
       } catch (error) {
-        console.error('Error fetching contract:', error);
+        logError('Error fetching contract:', error);
         setError('Greška pri učitavanju ugovora');
         toast.error('Greška pri učitavanju ugovora');
       } finally {
@@ -286,7 +287,7 @@ const ContractDetailsPage = () => {
       toast.success('Ugovor je uspješno obrisan');
       navigate('/contracts');
     } catch (error) {
-      console.error('Error deleting contract:', error);
+      logError('Error deleting contract:', error);
       toast.error('Greška pri brisanju ugovora');
     } finally {
       setDeleting(false);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -184,7 +185,7 @@ export default function TimelinePage() {
         setEvents(allEvents);
         setFilteredEvents(allEvents);
       } catch (error) {
-        console.error('Error loading timeline data:', error);
+        logError('Error loading timeline data:', error);
         toast.error('Greška pri učitavanju timeline podataka');
       } finally {
         setLoading(false);
@@ -233,7 +234,7 @@ export default function TimelinePage() {
       link.click();
       toast.success('Timeline uspješno izvezen');
     } catch (error) {
-      console.error('Error exporting timeline:', error);
+      logError('Error exporting timeline:', error);
       toast.error('Greška pri izvozu timeline');
     }
   };

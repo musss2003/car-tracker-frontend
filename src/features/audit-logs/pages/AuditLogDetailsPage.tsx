@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ArrowLeft, Copy, User, Clock, Activity } from 'lucide-react';
@@ -65,7 +66,7 @@ const AuditLogDetailsPage = () => {
       // Filter out current log
       setRelatedLogs(data.filter((l: AuditLog) => l.id !== currentLogId));
     } catch (error) {
-      console.error('Failed to fetch related logs:', error);
+      logError('Failed to fetch related logs:', error);
     } finally {
       setLoadingRelated(false);
     }

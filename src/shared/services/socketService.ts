@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { logError } from '@/shared/utils/logger';
 
 const SOCKET_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
@@ -40,7 +41,7 @@ class SocketService {
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
+      logError('Socket connection error:', error);
     });
 
     this.socket.on('reconnect', (attemptNumber) => {

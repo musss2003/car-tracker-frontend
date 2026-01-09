@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { toast } from 'react-toastify';
 import {
   PencilIcon,
@@ -85,7 +86,7 @@ const CustomersPage = () => {
       setCustomers(data);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch customers:', err);
+      logError('Failed to fetch customers:', err);
       setError('Failed to load customers. Please try again later.');
       toast.error('Failed to load customers');
     } finally {
@@ -195,7 +196,7 @@ const CustomersPage = () => {
         toast.error('No customer selected or customer ID is missing.');
       }
     } catch (error) {
-      console.error('Error deleting customer:', error);
+      logError('Error deleting customer:', error);
       toast.error('Failed to delete customer');
     } finally {
       setLoading(false);
@@ -237,7 +238,7 @@ const CustomersPage = () => {
       XLSX.writeFile(workbook, 'korisnici.xlsx');
       toast.success('Excel uspješno izvezen');
     } catch (error) {
-      console.error('Error exporting to Excel:', error);
+      logError('Error exporting to Excel:', error);
       toast.error('Excel neuspješno izvezen');
     }
   };

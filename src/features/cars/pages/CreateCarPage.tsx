@@ -1,4 +1,5 @@
 import type React from 'react';
+import { logError } from '@/shared/utils/logger';
 
 import { useEffect, useState } from 'react';
 import {
@@ -96,7 +97,7 @@ export default function CreateCarPage() {
         setCarBrands(brands);
       })
       .catch((error) => {
-        console.error('Error fetching car brands:', error);
+        logError('Error fetching car brands:', error);
       });
   }, []);
 
@@ -185,7 +186,7 @@ export default function CreateCarPage() {
       const filename = await uploadDocument(photoFile);
       return filename;
     } catch (error) {
-      console.error('Error uploading photo:', error);
+      logError('Error uploading photo:', error);
       toast.error('Neuspješno dodavanje fotografije');
       return null;
     }
@@ -235,7 +236,7 @@ export default function CreateCarPage() {
       toast.success('Vozilo je uspješno kreirano');
       handleClose();
     } catch (error) {
-      console.error('Error creating car:', error);
+      logError('Error creating car:', error);
       setErrors((prev) => ({
         ...prev,
         submit: 'Kreiranje vozila nije uspjelo. Molimo pokušajte ponovo.',

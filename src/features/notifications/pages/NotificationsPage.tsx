@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate } from 'react-router-dom';
 import {
   Bell,
@@ -55,10 +56,10 @@ const NotificationsPage: React.FC = () => {
       setLoading(true);
       setError(null);
       const data = await getNotifications();
-      setNotifications(data.notifications || []);
+      setNotifications((data as any).notifications || []);
     } catch (err) {
       setError('Failed to load notifications');
-      console.error(err);
+      logError('Failed to load notifications', err);
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ const NotificationsPage: React.FC = () => {
         )
       );
     } catch (err) {
-      console.error('Failed to mark as seen:', err);
+      logError('Failed to mark as seen:', err);
     }
   };
 
@@ -84,7 +85,7 @@ const NotificationsPage: React.FC = () => {
         prev.map((notif) => ({ ...notif, status: 'seen' as const }))
       );
     } catch (err) {
-      console.error('Failed to mark all as seen:', err);
+      logError('Failed to mark all as seen:', err);
     }
   };
 
@@ -93,7 +94,7 @@ const NotificationsPage: React.FC = () => {
       await deleteNotification(id);
       setNotifications((prev) => prev.filter((notif) => notif.id !== id));
     } catch (err) {
-      console.error('Failed to delete notification:', err);
+      logError('Failed to delete notification:', err);
     }
   };
 

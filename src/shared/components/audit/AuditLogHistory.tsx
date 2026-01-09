@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { History, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
@@ -78,7 +79,7 @@ export function AuditLogHistory({
         setAuditLogs(response.data);
         setLoaded(true);
       } catch (error) {
-        console.error('Error fetching audit logs:', error);
+        logError('Error fetching audit logs:', error);
         toast.error('Greška pri učitavanju historije');
         setExpanded(false);
       } finally {

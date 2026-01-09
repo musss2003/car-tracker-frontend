@@ -1,4 +1,5 @@
 import type React from 'react';
+import { logError } from '@/shared/utils/logger';
 
 import { useState, useEffect } from 'react';
 import { Car, CarServiceHistory } from '../types/car.types';
@@ -92,7 +93,7 @@ export default function CarServiceHistoryPage() {
         );
         setServiceHistory(sortedHistory);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        logError('Error fetching data:', error);
         toast.error('Greška pri učitavanju podataka');
       } finally {
         setLoading(false);
@@ -202,7 +203,7 @@ export default function CarServiceHistoryPage() {
 
       setDialogOpen(false);
     } catch (error) {
-      console.error('Error saving service record:', error);
+      logError('Error saving service record:', error);
       toast.error('Greška pri čuvanju servisnog zapisa');
     } finally {
       setSubmitting(false);
@@ -220,7 +221,7 @@ export default function CarServiceHistoryPage() {
       toast.success('Servisni zapis je obrisan');
       setDeleteDialogOpen(false);
     } catch (error) {
-      console.error('Error deleting service record:', error);
+      logError('Error deleting service record:', error);
       toast.error('Greška pri brisanju servisnog zapisa');
     }
   };

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -84,7 +85,7 @@ export default function CostAnalyticsPage() {
         setAnalytics(analyticsData);
         setTopExpenses(expensesData);
       } catch (error) {
-        console.error('Error loading cost analytics:', error);
+        logError('Error loading cost analytics:', error);
         toast.error('Greška pri učitavanju analitike troškova');
       } finally {
         setLoading(false);
@@ -106,7 +107,7 @@ export default function CostAnalyticsPage() {
       link.click();
       toast.success('Izvještaj uspješno izvezen');
     } catch (error) {
-      console.error('Error exporting report:', error);
+      logError('Error exporting report:', error);
       toast.error('Greška pri izvozu izvještaja');
     }
   };

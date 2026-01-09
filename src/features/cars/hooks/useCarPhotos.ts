@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { downloadDocument } from '@/shared/services/uploadService';
 import type { CarWithStatus } from '../types/car.types';
 
@@ -20,14 +21,14 @@ export const useCarPhotos = (cars: CarWithStatus[]) => {
         'image/webp',
       ];
       if (!validImageTypes.includes(blob.type)) {
-        console.error(`Invalid image type for car ${carId}: ${blob.type}`);
+        logError(`Invalid image type for car ${carId}: ${blob.type}`);
         return;
       }
 
       const url = URL.createObjectURL(blob);
       setPhotoUrls((prev) => ({ ...prev, [carId]: url }));
     } catch (error) {
-      console.error(`Failed to load photo for car ${carId}:`, error);
+      logError(`Failed to load photo for car ${carId}:`, error);
     }
   };
 

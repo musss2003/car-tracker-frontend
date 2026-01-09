@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logError } from '@/shared/utils/logger';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -273,7 +274,7 @@ export default function MaintenanceHubPage() {
         });
         setMaintenanceAlerts(alerts);
       } catch (error) {
-        console.error('Error fetching maintenance data:', error);
+        logError('Error fetching maintenance data:', error);
         toast.error('Greška pri učitavanju podataka o održavanju');
       } finally {
         setLoading(false);
