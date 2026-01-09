@@ -95,7 +95,9 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
   }, [customerId]);
 
   // Determine contract status
-  const getContractStatus = (contract: Contract): 'active' | 'upcoming' | 'completed' | 'expired' => {
+  const getContractStatus = (
+    contract: Contract
+  ): 'active' | 'upcoming' | 'completed' | 'expired' => {
     const now = new Date();
     const startDate = new Date(contract.startDate);
     const endDate = new Date(contract.endDate);
@@ -182,8 +184,7 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
   const handleSort = (key: SortKey) => {
     setSortConfig((prev) => ({
       key,
-      direction:
-        prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -197,7 +198,9 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
   };
 
   // Get status badge
-  const getStatusBadge = (status: 'active' | 'upcoming' | 'completed' | 'expired') => {
+  const getStatusBadge = (
+    status: 'active' | 'upcoming' | 'completed' | 'expired'
+  ) => {
     const styles = {
       active: 'bg-green-100 text-green-800',
       upcoming: 'bg-blue-100 text-blue-800',
@@ -347,13 +350,12 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
                       <div className="flex items-center gap-1">
                         <TruckIcon className="w-4 h-4" />
                         Automobil
-                        {sortConfig.key === 'car' && (
-                          sortConfig.direction === 'asc' ? (
+                        {sortConfig.key === 'car' &&
+                          (sortConfig.direction === 'asc' ? (
                             <ChevronUpIcon className="w-4 h-4" />
                           ) : (
                             <ChevronDownIcon className="w-4 h-4" />
-                          )
-                        )}
+                          ))}
                       </div>
                     </TableHead>
                     <TableHead
@@ -363,13 +365,12 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
                       <div className="flex items-center gap-1">
                         <CalendarIcon className="w-4 h-4" />
                         Period Najma
-                        {sortConfig.key === 'startDate' && (
-                          sortConfig.direction === 'asc' ? (
+                        {sortConfig.key === 'startDate' &&
+                          (sortConfig.direction === 'asc' ? (
                             <ChevronUpIcon className="w-4 h-4" />
                           ) : (
                             <ChevronDownIcon className="w-4 h-4" />
-                          )
-                        )}
+                          ))}
                       </div>
                     </TableHead>
                     <TableHead
@@ -379,13 +380,12 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
                       <div className="flex items-center gap-1">
                         <CurrencyDollarIcon className="w-4 h-4" />
                         Ukupna Cijena
-                        {sortConfig.key === 'totalAmount' && (
-                          sortConfig.direction === 'asc' ? (
+                        {sortConfig.key === 'totalAmount' &&
+                          (sortConfig.direction === 'asc' ? (
                             <ChevronUpIcon className="w-4 h-4" />
                           ) : (
                             <ChevronDownIcon className="w-4 h-4" />
-                          )
-                        )}
+                          ))}
                       </div>
                     </TableHead>
                     <TableHead>Status</TableHead>
@@ -410,10 +410,14 @@ const CustomerContractsList: React.FC<CustomerContractsListProps> = ({
                         <TableCell>
                           <div className="text-sm">
                             <div className="font-medium">
-                              {format(new Date(contract.startDate), 'dd.MM.yyyy')}
+                              {format(
+                                new Date(contract.startDate),
+                                'dd.MM.yyyy'
+                              )}
                             </div>
                             <div className="text-gray-500">
-                              do {format(new Date(contract.endDate), 'dd.MM.yyyy')}
+                              do{' '}
+                              {format(new Date(contract.endDate), 'dd.MM.yyyy')}
                             </div>
                           </div>
                         </TableCell>
