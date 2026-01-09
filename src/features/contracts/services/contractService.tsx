@@ -1,54 +1,38 @@
 import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
+import { api, encodePathParam } from '@/shared/utils/apiService';
 import { toast } from 'react-toastify';
 import { Contract, ContractFormData } from '../types/contract.types';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/contracts/';
 
 export const getTotalRevenue = async (): Promise<number> => {
-  const response = await fetch(`${API_URL}revenue/total`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
+  try {
+    const data = await api.get<{ totalRevenue: number }>(
+      '/api/contracts/revenue/total',
+      'revenue'
+    );
 
-  if (!response.ok) {
-    throw new Error(`Error fetching revenue: ${response.statusText}`);
+    if (data && typeof data.totalRevenue === 'number') {
+      return data.totalRevenue;
+    }
+
+    throw new Error('Unexpected revenue response format');
+  } catch (error) {
+    console.error('Error fetching total revenue:', error);
+    throw error;
   }
-
-  const data = await response.json();
-
-  // Backend returns { success: true, data: { totalRevenue: number }, timestamp }
-  if (
-    data &&
-    data.success &&
-    data.data &&
-    typeof data.data.totalRevenue === 'number'
-  ) {
-    return data.data.totalRevenue;
-  }
-
-  throw new Error('Unexpected revenue response format');
 };
 
 export const getContracts = async (): Promise<Contract[]> => {
-  const res = await fetch(`${API_URL}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  const response = await res.json();
-  return response.data || response;
+  return api.get<Contract[]>('/api/contracts', 'contracts');
 };
 
 export const getContract = async (id: string): Promise<Contract> => {
-  const res = await fetch(`${API_URL}${encodeURIComponent(id)}`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  const response = await res.json();
-  return response.data || response;
+  return api.get<Contract>(
+    `/api/contracts/${encodePathParam(id)}`,
+    'contract',
+    id
+  );
 };
 
 export const getContractTemplate = async (): Promise<Response> => {
@@ -62,14 +46,7 @@ export const getContractTemplate = async (): Promise<Response> => {
 };
 
 export const getActiveContracts = async (): Promise<Contract[]> => {
-  const res = await fetch(`${API_URL}active`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  const response = await res.json();
-  return response.data || response;
+  return api.get<Contract[]>('/api/contracts/active', 'active contracts');
 };
 
 export const updateContract = async (
