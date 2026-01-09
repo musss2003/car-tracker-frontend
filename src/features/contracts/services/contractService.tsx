@@ -53,27 +53,23 @@ export const updateContract = async (
   contractId: string,
   updatedContract: Partial<Contract>
 ): Promise<Contract> => {
-  const res = await fetch(`${API_URL}${encodeURIComponent(contractId)}`, {
-    method: 'PUT',
-    headers: {
-      ...getAuthHeaders(),
-    },
-    body: JSON.stringify(updatedContract),
-  });
-
-  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  const result = await api.put<Contract>(
+    `/api/contracts/${encodePathParam(contractId)}`,
+    updatedContract,
+    'contract',
+    contractId
+  );
   toast.success('Contract updated successfully!');
-  const response = await res.json();
-  return response.data || response;
+  return result;
 };
 
 export const deleteContract = async (contractId: string): Promise<void> => {
-  const res = await fetch(`${API_URL}${encodeURIComponent(contractId)}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  await api.delete<void>(
+    `/api/contracts/${encodePathParam(contractId)}`,
+    'contract',
+    contractId
+  );
+  toast.success('Contract deleted successfully!');
 };
 
 export const createAndDownloadContract = async (

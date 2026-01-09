@@ -1,72 +1,31 @@
-import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
+import {
+  api,
+  encodePathParam,
+  buildQueryString,
+} from '@/shared/utils/apiService';
 import { Customer } from '../types/customer.types';
 import { Contract } from '@/features/contracts/types/contract.types';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + `/api/customers/`;
-
 // Get a single customer by ID
 export const getCustomer = async (customerId: string): Promise<Customer> => {
-  try {
-    const response = await fetch(`${API_URL}${customerId}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    console.error('Error fetching customer:', error);
-    throw error;
-  }
+  return api.get<Customer>(
+    `/api/customers/${encodePathParam(customerId)}`,
+    'customer',
+    customerId
+  );
 };
 
 // Get all customers
 export const getCustomers = async (): Promise<Customer[]> => {
-  try {
-    const response = await fetch(API_URL, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    console.error('Error fetching all customers:', error);
-    throw error;
-  }
+  return api.get<Customer[]>('/api/customers', 'customers');
 };
 
 // Search customers by name
 export const searchCustomersByName = async (
   name: string
 ): Promise<Customer[]> => {
-  try {
-    const response = await fetch(
-      `${API_URL}search?name=${encodeURIComponent(name)}`,
-      {
-        method: 'GET',
-        headers: getAuthHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Error searching for customers');
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    console.error('Error fetching customers:', error);
-    throw error;
-  }
+  const query = buildQueryString({ name });
+  return api.get<Customer[]>(`/api/customers/search${query}`, 'customers');
 };
 
 // Update customer
@@ -74,71 +33,28 @@ export const updateCustomer = async (
   customerId: string,
   updatedCustomer: Partial<Customer>
 ): Promise<Customer> => {
-  try {
-    const response = await fetch(`${API_URL}${customerId}`, {
-      method: 'PUT',
-      headers: {
-        ...getAuthHeaders(),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedCustomer),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    console.error('Error updating customer:', error);
-    throw error;
-  }
+  return api.put<Customer>(
+    `/api/customers/${encodePathParam(customerId)}`,
+    updatedCustomer,
+    'customer',
+    customerId
+  );
 };
 
 // Delete customer
 export const deleteCustomer = async (customerId: string): Promise<void> => {
-  try {
-    const response = await fetch(`${API_URL}${customerId}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-  } catch (error) {
-    console.error('Error deleting customer:', error);
-    throw error;
-  }
+  return api.delete<void>(
+    `/api/customers/${encodePathParam(customerId)}`,
+    'customer',
+    customerId
+  );
 };
 
 // Add new customer
 export const addCustomer = async (
   newCustomer: Partial<Customer>
 ): Promise<Customer> => {
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        ...getAuthHeaders(),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newCustomer),
-    });
-
-    console.log(newCustomer);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    console.error('Error adding customer:', error);
-    throw error;
-  }
+  return api.post<Customer>('/api/customers', newCustomer, 'customer');
 };
 
 // Define interface for country data from ApiCountries API
@@ -175,94 +91,16 @@ export interface CountryOption {
 
 // Get all countries from local database API
 export const getCountries = async (): Promise<CountryOption[]> => {
-  try {
-    const response = await fetch(
-      `${API_URL.replace('customers/', '')}countries`,
-      {
-        method: 'GET',
-        headers: getAuthHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    console.error('❌ Failed to fetch countries from local API:', errorMessage);
-    throw new Error(`Failed to fetch countries: ${errorMessage}`);
-  }
+  return api.get<CountryOption[]>('/api/countries', 'countries');
 };
 
 // Get all contracts for a specific customer
 export const getCustomerContracts = async (
   customerId: string
 ): Promise<Contract[]> => {
-  try {
-    const response = await fetch(
-      `${API_URL}${encodeURIComponent(customerId)}/contracts`,
-      {
-        method: 'GET',
-        headers: getAuthHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch customer contracts';
-
-      switch (response.status) {
-        case 400:
-          errorMessage = 'Invalid customer ID provided';
-          break;
-        case 401:
-          errorMessage = 'Unauthorized. Please log in again';
-          break;
-        case 403:
-          errorMessage = 'You do not have permission to view this customer';
-          break;
-        case 404:
-          errorMessage = 'Customer not found';
-          break;
-        case 500:
-          errorMessage = 'Server error. Please try again later';
-          break;
-        default:
-          errorMessage = `Failed to fetch contracts (Status: ${response.status})`;
-      }
-
-      const error = new Error(errorMessage);
-      (error as any).status = response.status;
-      (error as any).customerId = customerId;
-      throw error;
-    }
-
-    const result = await response.json();
-    return result.data || result;
-  } catch (error) {
-    // If it's already our custom error with status, rethrow it
-    if (error instanceof Error && (error as any).status) {
-      console.error(
-        `Error fetching contracts for customer ${customerId}:`,
-        error.message
-      );
-      throw error;
-    }
-
-    // Network or parsing error - provide meaningful context
-    const networkError = new Error(
-      `Unable to fetch customer contracts. Please check your connection and try again.`
-    );
-    (networkError as any).originalError = error;
-    (networkError as any).customerId = customerId;
-
-    console.error(
-      `Network error fetching contracts for customer ${customerId}:`,
-      error
-    );
-    throw networkError;
-  }
+  return api.get<Contract[]>(
+    `/api/customers/${encodePathParam(customerId)}/contracts`,
+    'customer contracts',
+    customerId
+  );
 };

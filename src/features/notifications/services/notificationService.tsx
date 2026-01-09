@@ -1,95 +1,30 @@
-import { getAuthHeaders } from '@/shared/utils/getAuthHeaders';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/notifications/';
+import { api, encodePathParam } from '@/shared/utils/apiService';
 
 export const getNotifications = async () => {
-  try {
-    const response = await fetch(API_URL, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch notifications');
-    }
-
-    const data = await response.json();
-    return data.data; // Backend returns { success, data, timestamp }
-  } catch (err) {
-    console.error((err as Error).message || 'Something went wrong');
-    throw err;
-  }
+  return api.get('/api/notifications', 'notifications');
 };
 
 export const markAsSeen = async (notificationId: string) => {
-  try {
-    const response = await fetch(`${API_URL}${notificationId}/seen`, {
-      method: 'PATCH',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to mark notification as seen');
-    }
-
-    return await response.json();
-  } catch (err) {
-    console.error((err as Error).message);
-    throw err;
-  }
+  return api.patch(
+    `/api/notifications/${encodePathParam(notificationId)}/seen`,
+    {},
+    'notification',
+    notificationId
+  );
 };
 
 export const markAllAsSeen = async () => {
-  try {
-    const response = await fetch(`${API_URL}mark-all-seen`, {
-      method: 'PATCH',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to mark all notifications as seen');
-    }
-
-    return await response.json();
-  } catch (err) {
-    console.error((err as Error).message);
-    throw err;
-  }
+  return api.patch('/api/notifications/mark-all-seen', {}, 'notifications');
 };
 
 export const getUnreadNotifications = async () => {
-  try {
-    const response = await fetch(`${API_URL}unread`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch unread notifications');
-    }
-
-    const data = await response.json();
-    return data.data; // Backend returns { success, data, timestamp }
-  } catch (err) {
-    console.error((err as Error).message || 'Something went wrong');
-    throw err;
-  }
+  return api.get('/api/notifications/unread', 'unread notifications');
 };
 
 export const deleteNotification = async (notificationId: string) => {
-  try {
-    const response = await fetch(`${API_URL}${notificationId}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete notification');
-    }
-
-    return await response.json();
-  } catch (err) {
-    console.error((err as Error).message);
-    throw err;
-  }
+  return api.delete(
+    `/api/notifications/${encodePathParam(notificationId)}`,
+    'notification',
+    notificationId
+  );
 };

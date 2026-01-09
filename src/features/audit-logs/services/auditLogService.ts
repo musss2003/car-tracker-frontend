@@ -1,4 +1,8 @@
-import apiClient from '@/shared/utils/apiClient';
+import {
+  api,
+  buildQueryString,
+  encodePathParam,
+} from '@/shared/utils/apiService';
 import {
   AuditLog,
   AuditLogFilters,
@@ -6,39 +10,35 @@ import {
   AuditLogStatistics,
 } from '../types/auditLog.types';
 
-const BASE_URL = '/api/audit-logs';
-
 /**
  * Get all audit logs with filters and pagination
  */
 export const getAuditLogs = async (
   filters: AuditLogFilters = {}
 ): Promise<AuditLogResponse> => {
-  const params = new URLSearchParams();
+  const query = buildQueryString({
+    userId: filters.userId,
+    action: filters.action,
+    resource: filters.resource,
+    status: filters.status,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    page: filters.page,
+    limit: filters.limit,
+  });
 
-  if (filters.userId) params.append('userId', filters.userId);
-  if (filters.action) params.append('action', filters.action);
-  if (filters.resource) params.append('resource', filters.resource);
-  if (filters.status) params.append('status', filters.status);
-  if (filters.startDate) params.append('startDate', filters.startDate);
-  if (filters.endDate) params.append('endDate', filters.endDate);
-  if (filters.page) params.append('page', filters.page.toString());
-  if (filters.limit) params.append('limit', filters.limit.toString());
-
-  const response = await apiClient.get<AuditLogResponse>(
-    `${BASE_URL}?${params.toString()}`
-  );
-  return response.data;
+  return api.get<AuditLogResponse>(`/api/audit-logs${query}`, 'audit logs');
 };
 
 /**
  * Get audit log by ID
  */
 export const getAuditLogById = async (id: string): Promise<AuditLog> => {
-  const response = await apiClient.get<{ success: boolean; data: AuditLog }>(
-    `${BASE_URL}/${id}`
+  return api.get<AuditLog>(
+    `/api/audit-logs/${encodePathParam(id)}`,
+    'audit log',
+    id
   );
-  return response.data.data;
 };
 
 /**
@@ -48,10 +48,12 @@ export const getUserRecentActivity = async (
   userId: string,
   limit: number = 10
 ): Promise<AuditLog[]> => {
-  const response = await apiClient.get<{ success: boolean; data: AuditLog[] }>(
-    `${BASE_URL}/user/${userId}/recent?limit=${limit}`
+  const query = buildQueryString({ limit });
+  return api.get<AuditLog[]>(
+    `/api/audit-logs/user/${encodePathParam(userId)}/recent${query}`,
+    'user activity',
+    userId
   );
-  return response.data.data;
 };
 
 /**
@@ -61,15 +63,11 @@ export const getAuditStatistics = async (
   startDate?: string,
   endDate?: string
 ): Promise<AuditLogStatistics> => {
-  const params = new URLSearchParams();
-  if (startDate) params.append('startDate', startDate);
-  if (endDate) params.append('endDate', endDate);
-
-  const response = await apiClient.get<{
-    success: boolean;
-    data: AuditLogStatistics;
-  }>(`${BASE_URL}/statistics?${params.toString()}`);
-  return response.data.data;
+  const query = buildQueryString({ startDate, endDate });
+  return api.get<AuditLogStatistics>(
+    `/api/audit-logs/statistics${query}`,
+    'audit statistics'
+  );
 };
 
 /**
@@ -78,32 +76,24 @@ export const getAuditStatistics = async (
 export const exportAuditLogs = async (
   filters: AuditLogFilters = {}
 ): Promise<void> => {
-  const params = new URLSearchParams();
+  const query = buildQueryString({
+    userId: filters.userId,
+    action: filters.action,
+    resource: filters.resource,
+    status: filters.status,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    format: 'csv',
+  });
 
-  if (filters.userId) params.append('userId', filters.userId);
-  if (filters.action) params.append('action', filters.action);
-  if (filters.resource) params.append('resource', filters.resource);
-  if (filters.status) params.append('status', filters.status);
-  if (filters.startDate) params.append('startDate', filters.startDate);
-  if (filters.endDate) params.append('endDate', filters.endDate);
-  params.append('format', 'csv');
-
-  // Direct fetch for blob download
-  const token = localStorage.getItem('accessToken');
-  const response = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL}${BASE_URL}/export?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+  const response = await api.get<Blob>(
+    `/api/audit-logs/export${query}`,
+    'audit logs export'
   );
 
-  if (!response.ok) {
-    throw new Error('Failed to export audit logs');
-  }
-
-  const blob = await response.blob();
+  // Handle blob download
+  const blob =
+    response instanceof Blob ? response : new Blob([JSON.stringify(response)]);
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -120,23 +110,9 @@ export const exportAuditLogs = async (
 export const cleanupOldLogs = async (
   daysToKeep: number = 90
 ): Promise<number> => {
-  const token = localStorage.getItem('accessToken');
-  const response = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL}${BASE_URL}/cleanup`,
-    {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ daysToKeep }),
-    }
+  const result = await api.delete<{ deletedCount: number }>(
+    `/api/audit-logs/cleanup`,
+    'old audit logs'
   );
-
-  if (!response.ok) {
-    throw new Error('Failed to cleanup audit logs');
-  }
-
-  const data = await response.json();
-  return data.data.deletedCount;
+  return result.deletedCount;
 };

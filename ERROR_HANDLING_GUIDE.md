@@ -198,7 +198,7 @@ export const complexRequest = async (id: string): Promise<Data> => {
 
 ```typescript
 // ✅ GOOD
-`/api/customers/${encodePathParam(customerId)}/contracts`// ❌ BAD
+`/api/customers/${encodePathParam(customerId)}/contracts` // ❌ BAD
 `/api/customers/${customerId}/contracts`;
 ```
 
