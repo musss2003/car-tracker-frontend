@@ -14,7 +14,7 @@ export const getCarRegistrationById = async (
   carId: string
 ): Promise<CarRegistration[]> => {
   return api.get<CarRegistration[]>(
-    `/car-registration/${encodePathParam(carId)}`,
+    `/api/car-registration/${encodePathParam(carId)}`,
     'car registration',
     carId
   );
@@ -25,7 +25,7 @@ export const getCarRegistrations = async (
   carId: string
 ): Promise<CarRegistration[]> => {
   return api.get<CarRegistration[]>(
-    `/car-registration/car/${encodePathParam(carId)}`,
+    `/api/car-registration/car/${encodePathParam(carId)}`,
     'car registration',
     carId
   );
@@ -36,7 +36,7 @@ export const getLatestCarRegistration = async (
   carId: string
 ): Promise<CarRegistration> => {
   return api.get<CarRegistration>(
-    `/car-registration/car/${encodePathParam(carId)}/latest`,
+    `/api/car-registration/car/${encodePathParam(carId)}/latest`,
     'car registration',
     carId
   );
@@ -46,7 +46,7 @@ export const getRegistrationDaysRemaining = async (
   carId: string
 ): Promise<number> => {
   const result = await api.get<{ daysRemaining: number }>(
-    `/car-registration/car/${encodePathParam(carId)}/days-remaining`,
+    `/api/car-registration/car/${encodePathParam(carId)}/days-remaining`,
     'registration days remaining',
     carId
   );
@@ -59,7 +59,7 @@ export const updateCarRegistration = async (
   data: Partial<CarRegistration>
 ): Promise<CarRegistration> => {
   return api.put<CarRegistration>(
-    `/car-registration/${encodePathParam(id)}`,
+    `/api/car-registration/${encodePathParam(id)}`,
     data,
     'car registration',
     id
@@ -71,7 +71,7 @@ export const addCarRegistration = async (
   data: Partial<CarRegistration>
 ): Promise<CarRegistration> => {
   return api.post<CarRegistration>(
-    '/car-registration',
+    '/api/car-registration',
     data,
     'car registration'
   );
@@ -80,7 +80,7 @@ export const addCarRegistration = async (
 // Delete registration record
 export const deleteCarRegistration = async (id: string): Promise<void> => {
   await api.delete<void>(
-    `/car-registration/${encodePathParam(id)}`,
+    `/api/car-registration/${encodePathParam(id)}`,
     'car registration',
     id
   );
@@ -106,7 +106,7 @@ export async function getRegistrationAuditLogs(
     success: boolean;
     data: { logs: any[]; pagination: any };
   }>(
-    `/car-registration/${encodePathParam(registrationId)}/audit-logs${queryString}`,
+    `/api/car-registration/${encodePathParam(registrationId)}/audit-logs${queryString}`,
     'registration audit logs',
     registrationId
   );

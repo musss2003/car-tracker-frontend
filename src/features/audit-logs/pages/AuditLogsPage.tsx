@@ -88,12 +88,24 @@ const AuditLogsPage = () => {
       if (endDate) filters.endDate = endDate;
 
       const response = await getAuditLogs(filters);
-      setLogs(response.data);
-      setTotal(response.pagination.total);
-      setTotalPages(response.pagination.totalPages);
+
+      if (response && response.data && response.pagination) {
+        setLogs(response.data);
+        setTotal(response.pagination.total);
+        setTotalPages(response.pagination.totalPages);
+      } else {
+        // Handle unexpected response structure
+        setLogs([]);
+        setTotal(0);
+        setTotalPages(0);
+      }
     } catch (error) {
       logError('Failed to fetch audit logs:', error);
       toast.error('Greška pri učitavanju logova');
+      // Reset state on error
+      setLogs([]);
+      setTotal(0);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
@@ -160,7 +172,7 @@ const AuditLogsPage = () => {
   };
 
   // Filter logs by search term (client-side)
-  const filteredLogs = logs.filter((log) => {
+  const filteredLogs = (logs || []).filter((log) => {
     if (!searchTerm) return true;
 
     const term = searchTerm.toLowerCase();

@@ -15,7 +15,7 @@ export interface UserWithStatus {
 // Get all users with their online status (uses real-time WebSocket data)
 export const getUsersWithStatus = async (): Promise<UserWithStatus[]> => {
   const response = await api.get<{ success: boolean; users: UserWithStatus[] }>(
-    '/activity/users-status',
+    '/api/activity/users-status',
     'user activity'
   );
   return response.users || [];

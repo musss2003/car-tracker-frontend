@@ -14,7 +14,7 @@ export const getCarInsuranceHistory = async (
   carId: string
 ): Promise<CarInsurance[]> => {
   return api.get<CarInsurance[]>(
-    `/car-insurance/${encodePathParam(carId)}`,
+    `/api/car-insurance/${encodePathParam(carId)}`,
     'car insurance',
     carId
   );
@@ -25,7 +25,7 @@ export const getLatestCarInsuranceRecord = async (
   carId: string
 ): Promise<CarInsurance> => {
   return api.get<CarInsurance>(
-    `/car-insurance/${encodePathParam(carId)}/latest`,
+    `/api/car-insurance/${encodePathParam(carId)}/latest`,
     'car insurance',
     carId
   );
@@ -36,7 +36,7 @@ export const addCarInsurance = async (
   data: Partial<CarInsurance>
 ): Promise<CarInsurance> => {
   return api.post<CarInsurance>(
-    `/car-insurance/${encodePathParam(data.carId!)}`,
+    `/api/car-insurance/${encodePathParam(data.carId!)}`,
     data,
     'car insurance'
   );
@@ -48,7 +48,7 @@ export const updateCarInsurance = async (
   data: Partial<CarInsurance>
 ): Promise<CarInsurance> => {
   return api.put<CarInsurance>(
-    `/car-insurance/record/${encodePathParam(id)}`,
+    `/api/car-insurance/record/${encodePathParam(id)}`,
     data,
     'car insurance',
     id
@@ -58,7 +58,7 @@ export const updateCarInsurance = async (
 // Delete insurance policy
 export const deleteCarInsurance = async (id: string): Promise<void> => {
   await api.delete<void>(
-    `/car-insurance/record/${encodePathParam(id)}`,
+    `/api/car-insurance/record/${encodePathParam(id)}`,
     'car insurance',
     id
   );
@@ -84,7 +84,7 @@ export async function getInsuranceAuditLogs(
     success: boolean;
     data: { logs: any[]; pagination: any };
   }>(
-    `/car-insurance/record/${encodePathParam(insuranceId)}/audit-logs${queryString}`,
+    `/api/car-insurance/record/${encodePathParam(insuranceId)}/audit-logs${queryString}`,
     'insurance audit logs',
     insuranceId
   );

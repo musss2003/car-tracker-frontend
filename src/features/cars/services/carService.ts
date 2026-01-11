@@ -10,15 +10,13 @@ import {
   CarRegistration,
 } from '../types/car.types';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
-
 export const getCar = async (carId: string): Promise<Car> => {
   validateId(carId, 'car id');
-  return api.get<Car>(`/cars/${encodePathParam(carId)}`, 'car', carId);
+  return api.get<Car>(`/api/cars/${encodePathParam(carId)}`, 'car', carId);
 };
 
 export const getCars = async (): Promise<Car[]> => {
-  return api.get<Car[]>('/cars', 'cars');
+  return api.get<Car[]>('/api/cars', 'cars');
 };
 
 export const updateCar = async (
@@ -39,14 +37,14 @@ export const deleteCar = async (
 ): Promise<{ message: string }> => {
   validateLicensePlate(licensePlate);
   return api.delete<{ message: string }>(
-    `/cars/${encodePathParam(licensePlate)}`,
+    `/api/cars/${encodePathParam(licensePlate)}`,
     'car',
     licensePlate
   );
 };
 
 export const addCar = async (car: Car): Promise<Car> => {
-  return api.post<Car>('/cars', car, 'car');
+  return api.post<Car>('/api/cars', car, 'car');
 };
 
 export const getAvailableCarsForPeriod = async (
@@ -58,7 +56,7 @@ export const getAvailableCarsForPeriod = async (
   }
 
   return api.post<Car[]>(
-    '/cars/available-period',
+    '/api/cars/available-period',
     {
       startingDate,
       endingDate,
@@ -71,7 +69,7 @@ export const getCarAvailability = async (
   licensePlate: string
 ): Promise<BookingEvent[]> => {
   return api.get<BookingEvent[]>(
-    `/cars/${encodePathParam(licensePlate)}/availability`,
+    `/api/cars/${encodePathParam(licensePlate)}/availability`,
     'car availability',
     licensePlate
   );

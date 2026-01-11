@@ -178,6 +178,7 @@ export async function fetchWithErrorHandling<T>(
     operation: string;
     resource: string;
     resourceId?: string;
+    responseType?: 'json' | 'blob';
   }
 ): Promise<T> {
   try {
@@ -214,6 +215,12 @@ export async function fetchWithErrorHandling<T>(
       error.context = context;
 
       throw error;
+    }
+
+    // Handle different response types
+    if (context.responseType === 'blob') {
+      const blob = await response.blob();
+      return blob as T;
     }
 
     const result = await response.json();

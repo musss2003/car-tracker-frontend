@@ -31,7 +31,7 @@ export async function createCarIssueReport(
 
     const sanitized = sanitizeObject(payload as any);
     const result = await api.post<CarIssueReport>(
-      '/car-issue-report/',
+      '/api/car-issue-report/',
       sanitized,
       'car issue report'
     );
@@ -56,14 +56,17 @@ export async function createCarIssueReport(
 }
 
 export async function getAllCarIssueReports(): Promise<CarIssueReport[]> {
-  return api.get<CarIssueReport[]>('/car-issue-report/', 'car issue reports');
+  return api.get<CarIssueReport[]>(
+    '/api/car-issue-report/',
+    'car issue reports'
+  );
 }
 
 export async function getCarIssueReportsForCar(
   carId: string
 ): Promise<CarIssueReport[]> {
   return api.get<CarIssueReport[]>(
-    `/car-issue-report/car/${encodePathParam(carId)}`,
+    `/api/car-issue-report/car/${encodePathParam(carId)}`,
     'car issue reports',
     carId
   );
@@ -73,7 +76,7 @@ export async function getSingleCarIssueReport(
   id: string
 ): Promise<CarIssueReport> {
   return api.get<CarIssueReport>(
-    `/car-issue-report/${encodePathParam(id)}`,
+    `/api/car-issue-report/${encodePathParam(id)}`,
     'car issue report',
     id
   );
@@ -89,7 +92,7 @@ export async function updateCarIssueReportStatus(
 
     const sanitized = sanitizeObject(payload as any);
     const result = await api.patch<CarIssueReport>(
-      `/car-issue-report/${encodePathParam(id)}`,
+      `/api/car-issue-report/${encodePathParam(id)}`,
       sanitized,
       'car issue report',
       id
@@ -122,7 +125,7 @@ export async function deleteCarIssueReport(
     validateId(id, 'issue report id');
 
     const result = await api.delete<{ success: boolean; id?: string }>(
-      `/car-issue-report/${encodePathParam(id)}`,
+      `/api/car-issue-report/${encodePathParam(id)}`,
       'car issue report',
       id
     );
@@ -147,7 +150,7 @@ export async function deleteCarIssueReport(
 
 export async function getNewIssueReports(): Promise<CarIssueReport[]> {
   return api.get<CarIssueReport[]>(
-    '/car-issue-report/reports/new',
+    '/api/car-issue-report/reports/new',
     'new issue reports'
   );
 }
@@ -156,7 +159,7 @@ export async function getNewIssueReportsByCar(
   carId: string
 ): Promise<CarIssueReport[]> {
   return api.get<CarIssueReport[]>(
-    `/car-issue-report/car/${encodePathParam(carId)}/new`,
+    `/api/car-issue-report/car/${encodePathParam(carId)}/new`,
     'new issue reports',
     carId
   );
@@ -166,7 +169,7 @@ export async function getActiveIssueReportsCount(
   carId: string
 ): Promise<number> {
   const data = await api.get<{ count: number }>(
-    `/car-issue-report/car/${encodePathParam(carId)}/active-count`,
+    `/api/car-issue-report/car/${encodePathParam(carId)}/active-count`,
     'active issue reports count',
     carId
   );
@@ -191,7 +194,7 @@ export async function getIssueReportAuditLogs(
     success: boolean;
     data: { logs: any[]; pagination: any };
   }>(
-    `/car-issue-report/${encodePathParam(issueReportId)}/audit-logs?page=${page}&limit=${limit}`,
+    `/api/car-issue-report/${encodePathParam(issueReportId)}/audit-logs?page=${page}&limit=${limit}`,
     'issue report audit logs',
     issueReportId
   );

@@ -14,7 +14,7 @@ export const getCarServiceHistory = async (
   carId: string
 ): Promise<CarServiceHistory[]> => {
   return api.get<CarServiceHistory[]>(
-    `/car-service-history/${encodePathParam(carId)}`,
+    `/api/car-service-history/${encodePathParam(carId)}`,
     'car service history',
     carId
   );
@@ -25,7 +25,7 @@ export const getLatestServiceRecord = async (
   carId: string
 ): Promise<CarServiceHistory> => {
   return api.get<CarServiceHistory>(
-    `/car-service-history/${encodePathParam(carId)}/latest`,
+    `/api/car-service-history/${encodePathParam(carId)}/latest`,
     'car service history',
     carId
   );
@@ -34,7 +34,7 @@ export const getLatestServiceRecord = async (
 // Get remaining km until next service
 export const getServiceRemainingKm = async (carId: string): Promise<number> => {
   const result = await api.get<{ kmRemaining: number }>(
-    `/car-service-history/${encodePathParam(carId)}/km-remaining`,
+    `/api/car-service-history/${encodePathParam(carId)}/km-remaining`,
     'service km remaining',
     carId
   );
@@ -46,7 +46,7 @@ export const addCarServiceRecord = async (
   data: Partial<CarServiceHistory>
 ): Promise<CarServiceHistory> => {
   return api.post<CarServiceHistory>(
-    `/car-service-history/${encodePathParam(data.carId!)}`,
+    `/api/car-service-history/${encodePathParam(data.carId!)}`,
     data,
     'car service history'
   );
@@ -58,7 +58,7 @@ export const updateServiceRecord = async (
   data: Partial<CarServiceHistory>
 ): Promise<CarServiceHistory> => {
   return api.put<CarServiceHistory>(
-    `/car-service-history/record/${encodePathParam(id)}`,
+    `/api/car-service-history/record/${encodePathParam(id)}`,
     data,
     'car service history',
     id
@@ -68,7 +68,7 @@ export const updateServiceRecord = async (
 // Delete service record
 export const deleteCarServiceRecord = async (id: string): Promise<void> => {
   await api.delete<void>(
-    `/car-service-history/record/${encodePathParam(id)}`,
+    `/api/car-service-history/record/${encodePathParam(id)}`,
     'car service history',
     id
   );
@@ -94,7 +94,7 @@ export async function getServiceHistoryAuditLogs(
     success: boolean;
     data: { logs: any[]; pagination: any };
   }>(
-    `/car-service-history/record/${encodePathParam(serviceId)}/audit-logs${queryString}`,
+    `/api/car-service-history/record/${encodePathParam(serviceId)}/audit-logs${queryString}`,
     'service history audit logs',
     serviceId
   );

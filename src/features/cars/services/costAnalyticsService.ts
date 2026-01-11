@@ -131,9 +131,7 @@ export async function getCarCostAnalytics(
       costPerDay,
     };
   } catch (error) {
-    if (error instanceof Error) {
-      logError(error, { operation: 'getCarCostAnalytics', carId });
-    }
+    logError('Failed to get car cost analytics', error);
     throw error;
   }
 }
@@ -339,9 +337,8 @@ export async function getTopExpenses(
     // Sort by amount descending and take top N
     return expenses.sort((a, b) => b.amount - a.amount).slice(0, limit);
   } catch (error) {
-    if (error instanceof Error) {
-      logError(error, { operation: 'getTopExpenses', carId, limit });
-    }
+    logError('Failed to get car cost analytics', error);
+
     throw error;
   }
 }

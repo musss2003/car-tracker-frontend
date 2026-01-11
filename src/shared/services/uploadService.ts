@@ -14,7 +14,7 @@ export const uploadDocument = async (file: File): Promise<string> => {
 
   try {
     const data = await apiRequest<{ message: string; filename: string }>(
-      '/upload',
+      '/api/upload',
       {
         method: 'POST',
         body: formData,
@@ -46,12 +46,13 @@ export const downloadDocument = async (filename: string): Promise<Blob> => {
 
   try {
     const response = await apiRequest<Blob>(
-      `/documents/${encodeURIComponent(filename)}`,
+      `/api/documents/${encodeURIComponent(filename)}`,
       {
         method: 'GET',
         resourceName: 'document',
         operation: 'download',
         resourceId: filename,
+        responseType: 'blob',
       }
     );
 

@@ -16,6 +16,7 @@ export interface ApiRequestOptions {
   resourceName: string;
   operation: string;
   resourceId?: string;
+  responseType?: 'json' | 'blob'; // Add responseType option
 }
 
 /**
@@ -33,6 +34,7 @@ export async function apiRequest<T>(
     resourceName,
     operation,
     resourceId,
+    responseType = 'json',
   } = options;
 
   const url = `${BASE_URL}${endpoint}`;
@@ -63,6 +65,7 @@ export async function apiRequest<T>(
     operation,
     resource: resourceName,
     resourceId,
+    responseType,
   });
 }
 
