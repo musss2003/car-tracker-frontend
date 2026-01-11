@@ -107,22 +107,19 @@ export const createAndDownloadContract = async (
 };
 
 export const downloadContract = async (contractId: string): Promise<void> => {
-  const res = await fetch(
-    `${API_URL}download/${encodeURIComponent(contractId)}`,
-    {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    }
-  );
-
-  if (!res.ok) {
-    logError('Failed to download contract:', res.status);
+  try {
+    const { docx } = await api.get<{ docx: string }>(
+      `/api/contracts/download/${encodePathParam(contractId)}`,
+      'contract download',
+      contractId
+    );
+    
+    const blob = await extractDocxBlobFromResponse(docx);
+    triggerDownloadContract(blob, contractId);
+  } catch (error) {
+    logError('Failed to download contract', error);
     throw new Error('Failed to download contract');
   }
-
-  const { docx } = await res.json();
-  const blob = await extractDocxBlobFromResponse(docx);
-  triggerDownloadContract(blob, contractId);
 };
 
 const extractDocxBlobFromResponse = async (docx: string): Promise<Blob> => {
