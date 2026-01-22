@@ -42,8 +42,13 @@ describe('Car Service', () => {
         year: 2020,
         color: 'White',
         mileage: 50000,
-        customerId: 'customer-1',
-        createdAt: '2024-01-01',
+        fuelType: 'petrol',
+        transmission: 'automatic',
+        pricePerDay: 50,
+        category: 'economy',
+        status: 'available',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
       };
 
       vi.mocked(api.get).mockResolvedValue(mockCar);
@@ -72,8 +77,13 @@ describe('Car Service', () => {
           year: 2020,
           color: 'White',
           mileage: 50000,
-          customerId: 'customer-1',
-          createdAt: '2024-01-01',
+          fuelType: 'petrol',
+          transmission: 'automatic',
+          pricePerDay: 50,
+          category: 'economy',
+          status: 'available',
+          createdAt: new Date('2024-01-01'),
+          updatedAt: new Date('2024-01-01'),
         },
         {
           id: 'car-2',
@@ -83,8 +93,13 @@ describe('Car Service', () => {
           year: 2021,
           color: 'Black',
           mileage: 30000,
-          customerId: 'customer-2',
-          createdAt: '2024-01-02',
+          fuelType: 'petrol',
+          transmission: 'manual',
+          pricePerDay: 45,
+          category: 'economy',
+          status: 'available',
+          createdAt: new Date('2024-01-02'),
+          updatedAt: new Date('2024-01-02'),
         },
       ];
 
@@ -108,10 +123,15 @@ describe('Car Service', () => {
         year: 2020,
         color: 'Red',
         mileage: 55000,
-        customerId: 'customer-1',
+        fuelType: 'petrol',
+        transmission: 'automatic',
+        pricePerDay: 50,
+        category: 'economy',
+        status: 'available',
+        updatedAt: new Date('2024-01-01'),
       };
 
-      const updatedCar: Car = { ...mockCar, createdAt: '2024-01-01' };
+      const updatedCar: Car = { ...mockCar, createdAt: new Date('2024-01-01') };
       vi.mocked(api.put).mockResolvedValue(updatedCar);
 
       const result = await updateCar('ABC-123', mockCar);
@@ -143,8 +163,13 @@ describe('Car Service', () => {
         year: 2023,
         color: 'Blue',
         mileage: 0,
-        customerId: 'customer-1',
-        createdAt: '2024-01-01',
+        fuelType: 'diesel',
+        transmission: 'automatic',
+        pricePerDay: 100,
+        category: 'luxury',
+        status: 'available',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
       };
 
       vi.mocked(api.post).mockResolvedValue(newCar);
@@ -167,8 +192,13 @@ describe('Car Service', () => {
           year: 2020,
           color: 'White',
           mileage: 50000,
-          customerId: 'customer-1',
-          createdAt: '2024-01-01',
+          fuelType: 'petrol',
+          transmission: 'automatic',
+          pricePerDay: 50,
+          category: 'economy',
+          status: 'available',
+          createdAt: new Date('2024-01-01'),
+          updatedAt: new Date('2024-01-01'),
         },
       ];
 
@@ -196,8 +226,11 @@ describe('Car Service', () => {
       const mockEvents: BookingEvent[] = [
         {
           title: 'Booking 1',
-          start: '2024-01-01',
-          end: '2024-01-05',
+          start: new Date('2024-01-01'),
+          end: new Date('2024-01-05'),
+          contractId: 'contract-1',
+          customerName: 'John Doe',
+          status: 'active',
         },
       ];
 
@@ -217,8 +250,8 @@ describe('Car Service', () => {
 
     it('should fetch car brands from JSON file', async () => {
       const mockBrands: CarBrand[] = [
-        { name: 'Toyota', models: ['Camry', 'Corolla'] },
-        { name: 'Honda', models: ['Civic', 'Accord'] },
+        { name: 'Toyota', popular: true },
+        { name: 'Honda', popular: true },
       ];
 
       global.fetch = vi.fn().mockResolvedValue({

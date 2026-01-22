@@ -38,9 +38,8 @@ describe('Car Insurance Service', () => {
           carId: 'car-123',
           provider: 'State Farm',
           policyNumber: 'POL-123',
-          startDate: '2024-01-01',
-          endDate: '2024-12-31',
-          cost: 1200,
+          insuranceExpiry: '2024-12-31',
+          price: 1200,
           createdAt: '2024-01-01',
         },
         {
@@ -48,9 +47,8 @@ describe('Car Insurance Service', () => {
           carId: 'car-123',
           provider: 'Geico',
           policyNumber: 'POL-456',
-          startDate: '2023-01-01',
-          endDate: '2023-12-31',
-          cost: 1100,
+          insuranceExpiry: '2023-12-31',
+          price: 1100,
           createdAt: '2023-01-01',
         },
       ];
@@ -78,9 +76,8 @@ describe('Car Insurance Service', () => {
         carId: 'car-123',
         provider: 'State Farm',
         policyNumber: 'POL-123',
-        startDate: '2024-01-01',
-        endDate: '2024-12-31',
-        cost: 1200,
+        insuranceExpiry: '2024-12-31',
+        price: 1200,
         createdAt: '2024-01-01',
       };
 
@@ -99,9 +96,8 @@ describe('Car Insurance Service', () => {
         carId: 'car-123',
         provider: 'Allstate',
         policyNumber: 'POL-789',
-        startDate: '2025-01-01',
-        endDate: '2025-12-31',
-        cost: 1300,
+        insuranceExpiry: '2025-12-31',
+        price: 1300,
       };
 
       const createdInsurance: CarInsurance = {
@@ -122,8 +118,8 @@ describe('Car Insurance Service', () => {
   describe('updateCarInsurance', () => {
     it('should update an insurance record', async () => {
       const updateData: Partial<CarInsurance> = {
-        cost: 1400,
-        endDate: '2025-06-30',
+        price: 1400,
+        insuranceExpiry: '2025-06-30',
       };
 
       const updatedInsurance: CarInsurance = {
@@ -131,9 +127,8 @@ describe('Car Insurance Service', () => {
         carId: 'car-123',
         provider: 'State Farm',
         policyNumber: 'POL-123',
-        startDate: '2024-01-01',
-        endDate: '2025-06-30',
-        cost: 1400,
+        insuranceExpiry: '2025-06-30',
+        price: 1400,
         createdAt: '2024-01-01',
       };
 

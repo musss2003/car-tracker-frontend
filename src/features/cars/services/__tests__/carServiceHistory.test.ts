@@ -42,7 +42,7 @@ describe('Car Service History Service', () => {
           cost: 80,
           mileage: 50000,
           serviceDate: '2024-01-15',
-          nextServiceMileage: 55000,
+          nextServiceKm: 55000,
           createdAt: '2024-01-15',
         },
         {
@@ -53,7 +53,7 @@ describe('Car Service History Service', () => {
           cost: 50,
           mileage: 48000,
           serviceDate: '2023-12-01',
-          nextServiceMileage: 53000,
+          nextServiceKm: 53000,
           createdAt: '2023-12-01',
         },
       ];
@@ -84,7 +84,7 @@ describe('Car Service History Service', () => {
         cost: 80,
         mileage: 50000,
         serviceDate: '2024-01-15',
-        nextServiceMileage: 55000,
+        nextServiceKm: 55000,
         createdAt: '2024-01-15',
       };
 
@@ -133,7 +133,7 @@ describe('Car Service History Service', () => {
         cost: 300,
         mileage: 52000,
         serviceDate: '2024-02-01',
-        nextServiceMileage: 62000,
+        nextServiceKm: 62000,
       };
 
       const createdService: CarServiceHistory = {
@@ -166,7 +166,7 @@ describe('Car Service History Service', () => {
         cost: 350,
         mileage: 52000,
         serviceDate: '2024-02-01',
-        nextServiceMileage: 62000,
+        nextServiceKm: 62000,
         createdAt: '2024-02-01',
       };
 

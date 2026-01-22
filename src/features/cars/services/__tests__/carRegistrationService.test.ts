@@ -38,10 +38,9 @@ describe('Car Registration Service', () => {
         {
           id: 'reg-1',
           carId: 'car-123',
-          registrationNumber: 'REG-123',
-          startDate: '2024-01-01',
-          endDate: '2024-12-31',
-          cost: 500,
+          registrationExpiry: '2024-12-31',
+          renewalDate: '2024-12-01',
+          notes: 'Regular registration',
           createdAt: '2024-01-01',
         },
       ];
@@ -61,19 +60,17 @@ describe('Car Registration Service', () => {
         {
           id: 'reg-1',
           carId: 'car-123',
-          registrationNumber: 'REG-123',
-          startDate: '2024-01-01',
-          endDate: '2024-12-31',
-          cost: 500,
+          registrationExpiry: '2024-12-31',
+          renewalDate: '2024-12-01',
+          notes: 'Current registration',
           createdAt: '2024-01-01',
         },
         {
           id: 'reg-2',
           carId: 'car-123',
-          registrationNumber: 'REG-124',
-          startDate: '2023-01-01',
-          endDate: '2023-12-31',
-          cost: 480,
+          registrationExpiry: '2023-12-31',
+          renewalDate: '2023-12-01',
+          notes: 'Previous registration',
           createdAt: '2023-01-01',
         },
       ];
@@ -92,10 +89,9 @@ describe('Car Registration Service', () => {
       const mockRegistration: CarRegistration = {
         id: 'reg-1',
         carId: 'car-123',
-        registrationNumber: 'REG-123',
-        startDate: '2024-01-01',
-        endDate: '2024-12-31',
-        cost: 500,
+        registrationExpiry: '2024-12-31',
+        renewalDate: '2024-12-01',
+        notes: 'Latest registration',
         createdAt: '2024-01-01',
       };
 
@@ -138,17 +134,16 @@ describe('Car Registration Service', () => {
   describe('updateCarRegistration', () => {
     it('should update a registration record', async () => {
       const updateData: Partial<CarRegistration> = {
-        cost: 550,
-        endDate: '2024-12-31',
+        registrationExpiry: '2024-12-31',
+        notes: 'Updated registration',
       };
 
       const updatedRegistration: CarRegistration = {
         id: 'reg-1',
         carId: 'car-123',
-        registrationNumber: 'REG-123',
-        startDate: '2024-01-01',
-        endDate: '2024-12-31',
-        cost: 550,
+        registrationExpiry: '2024-12-31',
+        renewalDate: '2024-12-01',
+        notes: 'Updated registration',
         createdAt: '2024-01-01',
       };
 
@@ -165,10 +160,9 @@ describe('Car Registration Service', () => {
     it('should add a new registration record', async () => {
       const newRegistration: Partial<CarRegistration> = {
         carId: 'car-123',
-        registrationNumber: 'REG-125',
-        startDate: '2025-01-01',
-        endDate: '2025-12-31',
-        cost: 520,
+        registrationExpiry: '2025-12-31',
+        renewalDate: '2025-12-01',
+        notes: 'New registration',
       };
 
       const createdRegistration: CarRegistration = {

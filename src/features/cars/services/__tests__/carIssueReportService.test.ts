@@ -45,17 +45,18 @@ describe('Car Issue Report Service', () => {
     it('should create a new issue report', async () => {
       const payload: CreateCarIssueReportPayload = {
         carId: 'car-123',
-        issueType: 'Engine',
         severity: 'high',
         description: 'Engine making strange noise',
-        reportedBy: 'user-1',
       };
 
       const createdReport: CarIssueReport = {
         id: 'issue-1',
-        ...payload,
-        status: 'new',
-        createdAt: '2024-01-15',
+        carId: 'car-123',
+        description: 'Engine making strange noise',
+        severity: 'high',
+        status: 'open',
+        reportedAt: '2024-01-15',
+        updatedAt: '2024-01-15',
       };
 
       vi.mocked(api.post).mockResolvedValue(createdReport);
@@ -69,10 +70,8 @@ describe('Car Issue Report Service', () => {
     it('should handle API errors and log audit', async () => {
       const payload: CreateCarIssueReportPayload = {
         carId: 'car-123',
-        issueType: 'Engine',
         severity: 'high',
         description: 'Test',
-        reportedBy: 'user-1',
       };
 
       vi.mocked(api.post).mockRejectedValue(new Error('Network error'));
@@ -87,22 +86,20 @@ describe('Car Issue Report Service', () => {
         {
           id: 'issue-1',
           carId: 'car-123',
-          issueType: 'Engine',
           severity: 'high',
           description: 'Engine issue',
-          status: 'new',
-          reportedBy: 'user-1',
-          createdAt: '2024-01-15',
+          status: 'open',
+          reportedAt: '2024-01-15',
+          updatedAt: '2024-01-15',
         },
         {
           id: 'issue-2',
           carId: 'car-456',
-          issueType: 'Brakes',
           severity: 'medium',
           description: 'Brake issue',
           status: 'resolved',
-          reportedBy: 'user-2',
-          createdAt: '2024-01-10',
+          reportedAt: '2024-01-10',
+          updatedAt: '2024-01-10',
         },
       ];
 
@@ -122,12 +119,11 @@ describe('Car Issue Report Service', () => {
         {
           id: 'issue-1',
           carId: 'car-123',
-          issueType: 'Engine',
           severity: 'high',
           description: 'Engine issue',
-          status: 'new',
-          reportedBy: 'user-1',
-          createdAt: '2024-01-15',
+          status: 'open',
+          reportedAt: '2024-01-15',
+          updatedAt: '2024-01-15',
         },
       ];
 
@@ -145,12 +141,11 @@ describe('Car Issue Report Service', () => {
       const mockReport: CarIssueReport = {
         id: 'issue-1',
         carId: 'car-123',
-        issueType: 'Engine',
         severity: 'high',
         description: 'Engine issue',
-        status: 'new',
-        reportedBy: 'user-1',
-        createdAt: '2024-01-15',
+        status: 'open',
+        reportedAt: '2024-01-15',
+        updatedAt: '2024-01-15',
       };
 
       vi.mocked(api.get).mockResolvedValue(mockReport);
@@ -165,20 +160,17 @@ describe('Car Issue Report Service', () => {
   describe('updateCarIssueReportStatus', () => {
     it('should update issue report status', async () => {
       const payload: UpdateCarIssueReportPayload = {
-        status: 'in-progress',
-        resolution: 'Investigating the issue',
+        status: 'in_progress',
       };
 
       const updatedReport: CarIssueReport = {
         id: 'issue-1',
         carId: 'car-123',
-        issueType: 'Engine',
         severity: 'high',
         description: 'Engine issue',
-        status: 'in-progress',
-        resolution: 'Investigating the issue',
-        reportedBy: 'user-1',
-        createdAt: '2024-01-15',
+        status: 'in_progress',
+        reportedAt: '2024-01-15',
+        updatedAt: '2024-01-15',
       };
 
       vi.mocked(api.patch).mockResolvedValue(updatedReport);
@@ -225,12 +217,11 @@ describe('Car Issue Report Service', () => {
         {
           id: 'issue-1',
           carId: 'car-123',
-          issueType: 'Engine',
           severity: 'high',
           description: 'Engine issue',
-          status: 'new',
-          reportedBy: 'user-1',
-          createdAt: '2024-01-15',
+          status: 'open',
+          reportedAt: '2024-01-15',
+          updatedAt: '2024-01-15',
         },
       ];
 
@@ -249,12 +240,11 @@ describe('Car Issue Report Service', () => {
         {
           id: 'issue-1',
           carId: 'car-123',
-          issueType: 'Engine',
           severity: 'high',
           description: 'Engine issue',
-          status: 'new',
-          reportedBy: 'user-1',
-          createdAt: '2024-01-15',
+          status: 'open',
+          reportedAt: '2024-01-15',
+          updatedAt: '2024-01-15',
         },
       ];
 
