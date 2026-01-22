@@ -37,6 +37,11 @@ describe('maintenanceNotificationService', () => {
             daysRemaining: 15,
           },
         ],
+        summary: {
+          critical: 1,
+          warnings: 1,
+          total: 2,
+        },
       };
 
       vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(mockResponse);
@@ -51,6 +56,11 @@ describe('maintenanceNotificationService', () => {
     it('should return empty array when no alerts', async () => {
       const mockResponse = {
         alerts: [],
+        summary: {
+          critical: 0,
+          warnings: 0,
+          total: 0,
+        },
       };
 
       vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(mockResponse);
@@ -104,6 +114,11 @@ describe('maintenanceNotificationService', () => {
             count: 3,
           },
         ],
+        summary: {
+          critical: 2,
+          warnings: 2,
+          total: 4,
+        },
       };
 
       vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(mockResponse);

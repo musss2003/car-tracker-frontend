@@ -26,10 +26,10 @@ describe('Analytics API Integration', () => {
       expect(result.totalCosts).toHaveProperty('registration');
       expect(result.totalCosts).toHaveProperty('insurance');
       expect(result.totalCosts).toHaveProperty('issues');
-      expect(result.totalCosts).toHaveProperty('total');
+      expect(result.totalCosts).toHaveProperty('all');
 
-      expect(result).toHaveProperty('monthlyBreakdown');
-      expect(Array.isArray(result.monthlyBreakdown)).toBe(true);
+      expect(result).toHaveProperty('monthlyCosts');
+      expect(Array.isArray(result.monthlyCosts)).toBe(true);
 
       expect(result).toHaveProperty('categoryBreakdown');
       expect(Array.isArray(result.categoryBreakdown)).toBe(true);
@@ -40,15 +40,15 @@ describe('Analytics API Integration', () => {
       expect(result.projections).toHaveProperty('nextYear');
 
       // Validate data types
-      expect(typeof result.totalCosts.total).toBe('number');
-      expect(result.totalCosts.total).toBeGreaterThanOrEqual(0);
+      expect(typeof result.totalCosts.all).toBe('number');
+      expect(result.totalCosts.all).toBeGreaterThanOrEqual(0);
     });
 
     it('should have monthly breakdown in correct format', async () => {
       const result = await getCarCostAnalytics(TEST_CAR_ID);
 
-      if (result.monthlyBreakdown.length > 0) {
-        const firstMonth = result.monthlyBreakdown[0];
+      if (result.monthlyCosts.length > 0) {
+        const firstMonth = result.monthlyCosts[0];
         expect(firstMonth).toHaveProperty('month');
         expect(firstMonth).toHaveProperty('service');
         expect(firstMonth).toHaveProperty('registration');
@@ -71,7 +71,7 @@ describe('Analytics API Integration', () => {
         );
         
         // Total percentage should be close to 100 (allowing for rounding)
-        if (result.totalCosts.total > 0) {
+        if (result.totalCosts.all > 0) {
           expect(totalPercentage).toBeGreaterThan(95);
           expect(totalPercentage).toBeLessThanOrEqual(100);
         }
@@ -122,18 +122,13 @@ describe('Analytics API Integration', () => {
       const result = await getCarDashboard(TEST_CAR_ID);
 
       // Validate all required fields
+      expect(result).toHaveProperty('car');
       expect(result).toHaveProperty('costAnalytics');
       expect(result).toHaveProperty('maintenanceAlerts');
-      expect(result).toHaveProperty('registrationDaysRemaining');
-      expect(result).toHaveProperty('serviceKilometersRemaining');
-      expect(result).toHaveProperty('activeIssueReports');
-
-      // Validate data types
-      expect(typeof result.registrationDaysRemaining).toBe('number');
-      expect(typeof result.serviceKilometersRemaining).toBe('number');
-      expect(typeof result.activeIssueReports).toBe('number');
+      expect(result).toHaveProperty('recentActivity');
 
       // Validate nested structures
+      expect(result.car).toHaveProperty('id');
       expect(result.costAnalytics).toHaveProperty('totalCosts');
       expect(result.maintenanceAlerts).toHaveProperty('alerts');
     });
@@ -143,7 +138,7 @@ describe('Analytics API Integration', () => {
 
       // Cost analytics should match standalone endpoint structure
       expect(result.costAnalytics).toHaveProperty('totalCosts');
-      expect(result.costAnalytics).toHaveProperty('monthlyBreakdown');
+      expect(result.costAnalytics).toHaveProperty('monthlyCosts');
       expect(result.costAnalytics).toHaveProperty('categoryBreakdown');
       expect(result.costAnalytics).toHaveProperty('projections');
 

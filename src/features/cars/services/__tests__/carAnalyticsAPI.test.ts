@@ -101,8 +101,9 @@ describe('Car Analytics API Service', () => {
   describe('Top Expenses', () => {
     it('should fetch top expenses', async () => {
       const mockResponse = {
-        cars: [{ carId: 'car-1', manufacturer: 'Toyota', model: 'Camry', year: 2020, licensePlate: 'ABC-123', totalCosts: 5000, costBreakdown: { service: 3000, insurance: 1000, registration: 500, issues: 500 }, costPerKm: 0.5, mileage: 10000 }],
-        totalCars: 10,
+        topExpenses: [{ carId: 'car-1', manufacturer: 'Toyota', model: 'Camry', year: 2020, licensePlate: 'ABC-123', totalCosts: 5000, costBreakdown: { service: 3000, insurance: 1000, registration: 500, issues: 500 }, costPerKm: 0.5, mileage: 10000 }],
+        count: 1,
+        limit: 10,
       };
 
       vi.mocked(api.get).mockResolvedValue(mockResponse);
@@ -110,7 +111,7 @@ describe('Car Analytics API Service', () => {
       const result = await getTopExpenses();
 
       expect(api.get).toHaveBeenCalledWith('/api/cars/analytics/top-expenses?limit=10', 'top expenses');
-      expect(result.cars).toHaveLength(1);
+      expect(result.topExpenses).toHaveLength(1);
     });
 
     it('should validate limit range', async () => {
