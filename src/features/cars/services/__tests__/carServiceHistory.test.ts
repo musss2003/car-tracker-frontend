@@ -62,7 +62,11 @@ describe('Car Service History Service', () => {
 
       const result = await getCarServiceHistory('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-service-history/car-123', 'car service history', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-service-history/car-123',
+        'car service history',
+        'car-123'
+      );
       expect(result).toEqual(mockServiceHistory);
       expect(result).toHaveLength(2);
     });
@@ -70,7 +74,9 @@ describe('Car Service History Service', () => {
     it('should handle API errors', async () => {
       vi.mocked(api.get).mockRejectedValue(new Error('Service unavailable'));
 
-      await expect(getCarServiceHistory('car-123')).rejects.toThrow('Service unavailable');
+      await expect(getCarServiceHistory('car-123')).rejects.toThrow(
+        'Service unavailable'
+      );
     });
   });
 
@@ -92,7 +98,11 @@ describe('Car Service History Service', () => {
 
       const result = await getLatestServiceRecord('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-service-history/car-123/latest', 'car service history', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-service-history/car-123/latest',
+        'car service history',
+        'car-123'
+      );
       expect(result).toEqual(mockService);
     });
   });
@@ -146,7 +156,11 @@ describe('Car Service History Service', () => {
 
       const result = await addCarServiceRecord(newService);
 
-      expect(api.post).toHaveBeenCalledWith('/api/car-service-history/car-123', newService, 'car service history');
+      expect(api.post).toHaveBeenCalledWith(
+        '/api/car-service-history/car-123',
+        newService,
+        'car service history'
+      );
       expect(result).toEqual(createdService);
     });
   });

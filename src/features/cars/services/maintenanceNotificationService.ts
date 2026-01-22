@@ -5,9 +5,9 @@
  * - Reduced client-side computation
  * - Consistent alert logic across the platform
  */
-import { 
+import {
   getCarMaintenanceAlerts as getCarMaintenanceAlertsAPI,
-  MaintenanceAlert as BackendMaintenanceAlert 
+  MaintenanceAlert as BackendMaintenanceAlert,
 } from './carAnalyticsAPI';
 
 // Re-export backend types for backward compatibility

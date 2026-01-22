@@ -13,7 +13,7 @@ import {
 describe('Analytics API Integration', () => {
   // Note: These tests require a running backend server
   // Set VITE_API_BASE_URL to your backend URL before running
-  
+
   const TEST_CAR_ID = process.env.TEST_CAR_ID || 'test-car-id';
 
   describe('Cost Analytics Integration', () => {
@@ -69,7 +69,7 @@ describe('Analytics API Integration', () => {
           (sum, cat) => sum + cat.percentage,
           0
         );
-        
+
         // Total percentage should be close to 100 (allowing for rounding)
         if (result.totalCosts.all > 0) {
           expect(totalPercentage).toBeGreaterThan(95);
@@ -97,7 +97,9 @@ describe('Analytics API Integration', () => {
         expect(firstAlert).toHaveProperty('actionUrl');
 
         // Validate enum values
-        expect(['service', 'registration', 'insurance', 'issue']).toContain(firstAlert.type);
+        expect(['service', 'registration', 'insurance', 'issue']).toContain(
+          firstAlert.type
+        );
         expect(['critical', 'warning', 'ok']).toContain(firstAlert.urgency);
       }
     });
@@ -105,10 +107,13 @@ describe('Analytics API Integration', () => {
     it('should include appropriate metadata based on alert type', async () => {
       const result = await getCarMaintenanceAlerts(TEST_CAR_ID);
 
-      result.alerts.forEach(alert => {
+      result.alerts.forEach((alert) => {
         if (alert.type === 'service') {
           expect(alert).toHaveProperty('kmRemaining');
-        } else if (alert.type === 'registration' || alert.type === 'insurance') {
+        } else if (
+          alert.type === 'registration' ||
+          alert.type === 'insurance'
+        ) {
           expect(alert).toHaveProperty('daysRemaining');
         } else if (alert.type === 'issue') {
           expect(alert).toHaveProperty('count');
@@ -163,7 +168,9 @@ describe('Analytics API Integration', () => {
       // Dashboard should be faster (single optimized call)
       console.log(`Dashboard time: ${dashboardTime}ms`);
       console.log(`Separate calls time: ${separateTime}ms`);
-      console.log(`Performance improvement: ${((separateTime - dashboardTime) / separateTime * 100).toFixed(1)}%`);
+      console.log(
+        `Performance improvement: ${(((separateTime - dashboardTime) / separateTime) * 100).toFixed(1)}%`
+      );
 
       // Note: This may not always be true in test environments with caching
       // but documents the expected behavior

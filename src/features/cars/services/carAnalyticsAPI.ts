@@ -181,7 +181,7 @@ export const getTopExpenses = async (
   if (limit < 1 || limit > 100) {
     throw new Error('Limit must be between 1 and 100');
   }
-  
+
   return api.get<TopExpensesResponse>(
     `/api/cars/analytics/top-expenses?limit=${limit}`,
     'top expenses'
@@ -193,9 +193,10 @@ export const getTopExpenses = async (
  * Get fleet-wide maintenance summary
  * Aggregates alerts and statistics across all user's cars
  */
-export const getMaintenanceSummary = async (): Promise<MaintenanceSummaryResponse> => {
-  return api.get<MaintenanceSummaryResponse>(
-    `/api/cars/maintenance/summary`,
-    'maintenance summary'
-  );
-};
+export const getMaintenanceSummary =
+  async (): Promise<MaintenanceSummaryResponse> => {
+    return api.get<MaintenanceSummaryResponse>(
+      `/api/cars/maintenance/summary`,
+      'maintenance summary'
+    );
+  };

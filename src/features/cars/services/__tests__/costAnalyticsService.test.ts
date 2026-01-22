@@ -55,11 +55,15 @@ describe('Cost Analytics Service', () => {
         costPerDay: 6.58,
       };
 
-      vi.mocked(carAnalyticsAPI.getCarCostAnalytics).mockResolvedValue(mockBackendResponse);
+      vi.mocked(carAnalyticsAPI.getCarCostAnalytics).mockResolvedValue(
+        mockBackendResponse
+      );
 
       const result = await getCarCostAnalytics('car-123');
 
-      expect(carAnalyticsAPI.getCarCostAnalytics).toHaveBeenCalledWith('car-123');
+      expect(carAnalyticsAPI.getCarCostAnalytics).toHaveBeenCalledWith(
+        'car-123'
+      );
       expect(result.totalCosts).toBeDefined();
       expect(result.monthlyCosts).toBeDefined();
       expect(result.categoryBreakdown).toBeDefined();
@@ -97,7 +101,9 @@ describe('Cost Analytics Service', () => {
         costPerDay: 3.0,
       };
 
-      vi.mocked(carAnalyticsAPI.getCarCostAnalytics).mockResolvedValue(mockBackendResponse);
+      vi.mocked(carAnalyticsAPI.getCarCostAnalytics).mockResolvedValue(
+        mockBackendResponse
+      );
 
       const result = await getCarCostAnalytics('car-123');
 
@@ -128,7 +134,9 @@ describe('Cost Analytics Service', () => {
         costPerDay: 0,
       };
 
-      vi.mocked(carAnalyticsAPI.getCarCostAnalytics).mockResolvedValue(mockBackendResponse);
+      vi.mocked(carAnalyticsAPI.getCarCostAnalytics).mockResolvedValue(
+        mockBackendResponse
+      );
 
       const result = await getCarCostAnalytics('car-123');
 
@@ -138,9 +146,13 @@ describe('Cost Analytics Service', () => {
 
     it('should handle API errors gracefully', async () => {
       const mockError = new Error('Network error');
-      vi.mocked(carAnalyticsAPI.getCarCostAnalytics).mockRejectedValue(mockError);
+      vi.mocked(carAnalyticsAPI.getCarCostAnalytics).mockRejectedValue(
+        mockError
+      );
 
-      await expect(getCarCostAnalytics('car-123')).rejects.toThrow('Network error');
+      await expect(getCarCostAnalytics('car-123')).rejects.toThrow(
+        'Network error'
+      );
     });
   });
 });

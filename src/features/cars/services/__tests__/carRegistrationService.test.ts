@@ -49,7 +49,11 @@ describe('Car Registration Service', () => {
 
       const result = await getCarRegistrationById('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-registration/car-123', 'car registration', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-registration/car-123',
+        'car registration',
+        'car-123'
+      );
       expect(result).toEqual(mockRegistrations);
     });
   });
@@ -79,7 +83,11 @@ describe('Car Registration Service', () => {
 
       const result = await getCarRegistrations('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-registration/car/car-123', 'car registration', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-registration/car/car-123',
+        'car registration',
+        'car-123'
+      );
       expect(result).toHaveLength(2);
     });
   });
@@ -99,7 +107,11 @@ describe('Car Registration Service', () => {
 
       const result = await getLatestCarRegistration('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-registration/car/car-123/latest', 'car registration', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-registration/car/car-123/latest',
+        'car registration',
+        'car-123'
+      );
       expect(result).toEqual(mockRegistration);
     });
   });
@@ -151,7 +163,12 @@ describe('Car Registration Service', () => {
 
       const result = await updateCarRegistration('reg-1', updateData);
 
-      expect(api.put).toHaveBeenCalledWith('/api/car-registration/reg-1', updateData, 'car registration', 'reg-1');
+      expect(api.put).toHaveBeenCalledWith(
+        '/api/car-registration/reg-1',
+        updateData,
+        'car registration',
+        'reg-1'
+      );
       expect(result).toEqual(updatedRegistration);
     });
   });
@@ -175,7 +192,11 @@ describe('Car Registration Service', () => {
 
       const result = await addCarRegistration(newRegistration);
 
-      expect(api.post).toHaveBeenCalledWith('/api/car-registration', newRegistration, 'car registration');
+      expect(api.post).toHaveBeenCalledWith(
+        '/api/car-registration',
+        newRegistration,
+        'car registration'
+      );
       expect(result).toEqual(createdRegistration);
     });
   });
@@ -186,7 +207,11 @@ describe('Car Registration Service', () => {
 
       await deleteCarRegistration('reg-1');
 
-      expect(api.delete).toHaveBeenCalledWith('/api/car-registration/reg-1', 'car registration', 'reg-1');
+      expect(api.delete).toHaveBeenCalledWith(
+        '/api/car-registration/reg-1',
+        'car registration',
+        'reg-1'
+      );
     });
   });
 

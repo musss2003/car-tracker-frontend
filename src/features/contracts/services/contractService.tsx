@@ -113,7 +113,7 @@ export const downloadContract = async (contractId: string): Promise<void> => {
       'contract download',
       contractId
     );
-    
+
     const blob = await extractDocxBlobFromResponse(docx);
     triggerDownloadContract(blob, contractId);
   } catch (error) {

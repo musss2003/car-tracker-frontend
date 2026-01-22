@@ -286,7 +286,7 @@ export default function CarDetailsPage() {
         getCar(id),
         getCarDashboard(id),
       ]);
-      
+
       if (carData) setCar({ ...carData, isBusy: false });
       setRegistrationDaysRemaining(dashboardData.registrationDaysRemaining);
       setServiceKilometersRemaining(dashboardData.serviceKilometersRemaining);

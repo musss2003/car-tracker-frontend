@@ -55,7 +55,11 @@ describe('Car Service', () => {
 
       const result = await getCar('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/cars/car-123', 'car', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/cars/car-123',
+        'car',
+        'car-123'
+      );
       expect(result).toEqual(mockCar);
     });
 
@@ -136,7 +140,12 @@ describe('Car Service', () => {
 
       const result = await updateCar('ABC-123', mockCar);
 
-      expect(api.put).toHaveBeenCalledWith('/cars/ABC-123', mockCar, 'car', 'ABC-123');
+      expect(api.put).toHaveBeenCalledWith(
+        '/cars/ABC-123',
+        mockCar,
+        'car',
+        'ABC-123'
+      );
       expect(result).toEqual(updatedCar);
     });
   });
@@ -148,7 +157,11 @@ describe('Car Service', () => {
 
       const result = await deleteCar('ABC-123');
 
-      expect(api.delete).toHaveBeenCalledWith('/api/cars/ABC-123', 'car', 'ABC-123');
+      expect(api.delete).toHaveBeenCalledWith(
+        '/api/cars/ABC-123',
+        'car',
+        'ABC-123'
+      );
       expect(result).toEqual(mockResponse);
     });
   });
@@ -204,7 +217,10 @@ describe('Car Service', () => {
 
       vi.mocked(api.post).mockResolvedValue(mockCars);
 
-      const result = await getAvailableCarsForPeriod('2024-01-01', '2024-01-10');
+      const result = await getAvailableCarsForPeriod(
+        '2024-01-01',
+        '2024-01-10'
+      );
 
       expect(api.post).toHaveBeenCalledWith(
         '/api/cars/available-period',
@@ -215,9 +231,9 @@ describe('Car Service', () => {
     });
 
     it('should throw error for invalid date format', async () => {
-      await expect(getAvailableCarsForPeriod('invalid-date', '2024-01-10')).rejects.toThrow(
-        'Invalid date format for available cars query'
-      );
+      await expect(
+        getAvailableCarsForPeriod('invalid-date', '2024-01-10')
+      ).rejects.toThrow('Invalid date format for available cars query');
     });
   });
 
@@ -238,7 +254,11 @@ describe('Car Service', () => {
 
       const result = await getCarAvailability('ABC-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/cars/ABC-123/availability', 'car availability', 'ABC-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/cars/ABC-123/availability',
+        'car availability',
+        'ABC-123'
+      );
       expect(result).toEqual(mockEvents);
     });
   });
@@ -272,7 +292,9 @@ describe('Car Service', () => {
         headers: { get: () => 'application/json' },
       });
 
-      await expect(fetchCarBrands()).rejects.toThrow('Failed to fetch car brands');
+      await expect(fetchCarBrands()).rejects.toThrow(
+        'Failed to fetch car brands'
+      );
     });
 
     it('should throw error for invalid content type', async () => {
@@ -282,7 +304,9 @@ describe('Car Service', () => {
         json: async () => [],
       });
 
-      await expect(fetchCarBrands()).rejects.toThrow('Invalid content type for car brands data');
+      await expect(fetchCarBrands()).rejects.toThrow(
+        'Invalid content type for car brands data'
+      );
     });
 
     it('should throw error for non-array data', async () => {
@@ -292,7 +316,9 @@ describe('Car Service', () => {
         json: async () => ({ invalid: 'data' }),
       });
 
-      await expect(fetchCarBrands()).rejects.toThrow('Invalid car brands data format');
+      await expect(fetchCarBrands()).rejects.toThrow(
+        'Invalid car brands data format'
+      );
     });
   });
 });

@@ -2,7 +2,7 @@
  * ⚠️ MIGRATED TO BACKEND API ⚠️
  * This service now uses the optimized backend analytics endpoints.
  * All calculations are performed server-side using database aggregations.
- * 
+ *
  * Performance improvements:
  * - 50-75% faster page loads
  * - 70-80% reduced bandwidth usage
@@ -31,8 +31,9 @@ export async function getCarCostAnalytics(
 ): Promise<CostAnalytics> {
   try {
     // Call the optimized backend endpoint - replaces 4-6 API calls + client-side processing
-    const analyticsResponse: CostAnalyticsResponse = await getCarCostAnalyticsAPI(carId);
-    
+    const analyticsResponse: CostAnalyticsResponse =
+      await getCarCostAnalyticsAPI(carId);
+
     // Transform backend response to match existing CostAnalytics interface
     // This ensures backward compatibility with existing components
     return transformBackendResponse(analyticsResponse);
@@ -46,29 +47,45 @@ export async function getCarCostAnalytics(
  * Transform backend CostAnalyticsResponse to match existing frontend CostAnalytics interface
  * Ensures backward compatibility with components expecting the old format
  */
-function transformBackendResponse(response: CostAnalyticsResponse): CostAnalytics {
+function transformBackendResponse(
+  response: CostAnalyticsResponse
+): CostAnalytics {
   // Backend provides monthlyCosts directly - transform to MonthlyBreakdown format if needed
-  const monthlyCosts: MonthlyBreakdown[] = response.monthlyCosts.map(month => ({
-    month: month.month,
-    year: month.year,
-    service: month.service,
-    registration: month.registration,
-    insurance: month.insurance,
-    issues: month.issues,
-    total: month.total,
-  }));
+  const monthlyCosts: MonthlyBreakdown[] = response.monthlyCosts.map(
+    (month) => ({
+      month: month.month,
+      year: month.year,
+      service: month.service,
+      registration: month.registration,
+      insurance: month.insurance,
+      issues: month.issues,
+      total: month.total,
+    })
+  );
 
   // Transform category breakdown to include color for UI
-  const categoryBreakdown: CategoryBreakdown[] = response.categoryBreakdown.map(cat => ({
-    name: cat.category === 'Service' ? 'Servis' :
-          cat.category === 'Insurance' ? 'Osiguranje' :
-          cat.category === 'Registration' ? 'Registracija' : 'Problemi',
-    value: cat.amount,
-    percentage: cat.percentage,
-    color: cat.category === 'Service' ? '#10b981' :
-           cat.category === 'Insurance' ? '#8b5cf6' :
-           cat.category === 'Registration' ? '#3b82f6' : '#ef4444',
-  }));
+  const categoryBreakdown: CategoryBreakdown[] = response.categoryBreakdown.map(
+    (cat) => ({
+      name:
+        cat.category === 'Service'
+          ? 'Servis'
+          : cat.category === 'Insurance'
+            ? 'Osiguranje'
+            : cat.category === 'Registration'
+              ? 'Registracija'
+              : 'Problemi',
+      value: cat.amount,
+      percentage: cat.percentage,
+      color:
+        cat.category === 'Service'
+          ? '#10b981'
+          : cat.category === 'Insurance'
+            ? '#8b5cf6'
+            : cat.category === 'Registration'
+              ? '#3b82f6'
+              : '#ef4444',
+    })
+  );
 
   // Generate yearly trends from monthly data
   const yearlyTrends = generateYearlyTrends(monthlyCosts);
@@ -77,7 +94,7 @@ function transformBackendResponse(response: CostAnalyticsResponse): CostAnalytic
   const averages = {
     monthlyAverage: response.averages.monthly,
     serviceAverage: 0, // Backend doesn't provide this specific average yet
-    issueAverage: 0,   // Backend doesn't provide this specific average yet
+    issueAverage: 0, // Backend doesn't provide this specific average yet
   };
 
   // Map backend projections to frontend format
@@ -98,7 +115,6 @@ function transformBackendResponse(response: CostAnalyticsResponse): CostAnalytic
     costPerDay: response.costPerDay,
   };
 }
-
 
 /**
  * Generate yearly trends from monthly data
@@ -150,7 +166,10 @@ export async function getTopExpenses(
     // For now, return empty array as backend provides cross-car analytics
     // Individual car expenses can be derived from the cost analytics monthlyCosts
     // If needed, this can be enhanced to transform monthlyCosts to TopExpense format
-    logError('getTopExpenses is deprecated - use carAnalyticsAPI.getTopExpenses for cross-car analytics', null);
+    logError(
+      'getTopExpenses is deprecated - use carAnalyticsAPI.getTopExpenses for cross-car analytics',
+      null
+    );
     return [];
   } catch (error) {
     logError('Failed to get top expenses', error);
@@ -187,4 +206,3 @@ export function calculateCostComparison(
 
   return { current, previous, change, changePercentage };
 }
-

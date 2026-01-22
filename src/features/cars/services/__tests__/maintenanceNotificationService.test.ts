@@ -44,11 +44,15 @@ describe('maintenanceNotificationService', () => {
         },
       };
 
-      vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(mockResponse);
+      vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(
+        mockResponse
+      );
 
       const result = await getMaintenanceAlerts('car-123');
 
-      expect(carAnalyticsAPI.getCarMaintenanceAlerts).toHaveBeenCalledWith('car-123');
+      expect(carAnalyticsAPI.getCarMaintenanceAlerts).toHaveBeenCalledWith(
+        'car-123'
+      );
       expect(result).toEqual(mockResponse.alerts);
       expect(result).toHaveLength(2);
     });
@@ -63,7 +67,9 @@ describe('maintenanceNotificationService', () => {
         },
       };
 
-      vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(mockResponse);
+      vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(
+        mockResponse
+      );
 
       const result = await getMaintenanceAlerts('car-123');
 
@@ -121,12 +127,19 @@ describe('maintenanceNotificationService', () => {
         },
       };
 
-      vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(mockResponse);
+      vi.mocked(carAnalyticsAPI.getCarMaintenanceAlerts).mockResolvedValue(
+        mockResponse
+      );
 
       const result = await getMaintenanceAlerts('car-123');
 
       expect(result).toHaveLength(4);
-      expect(result.map(a => a.type)).toEqual(['service', 'registration', 'insurance', 'issue']);
+      expect(result.map((a) => a.type)).toEqual([
+        'service',
+        'registration',
+        'insurance',
+        'issue',
+      ]);
     });
   });
 });

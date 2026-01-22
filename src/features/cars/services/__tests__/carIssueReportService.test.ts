@@ -12,7 +12,11 @@ import {
   getActiveIssueReportsCount,
   getIssueReportAuditLogs,
 } from '../carIssueReportService';
-import { CarIssueReport, CreateCarIssueReportPayload, UpdateCarIssueReportPayload } from '../../types/car.types';
+import {
+  CarIssueReport,
+  CreateCarIssueReportPayload,
+  UpdateCarIssueReportPayload,
+} from '../../types/car.types';
 
 // Mock dependencies
 vi.mock('@/shared/utils/apiService', () => ({
@@ -63,7 +67,11 @@ describe('Car Issue Report Service', () => {
 
       const result = await createCarIssueReport(payload);
 
-      expect(api.post).toHaveBeenCalledWith('/api/car-issue-report/', payload, 'car issue report');
+      expect(api.post).toHaveBeenCalledWith(
+        '/api/car-issue-report/',
+        payload,
+        'car issue report'
+      );
       expect(result).toEqual(createdReport);
     });
 
@@ -76,7 +84,9 @@ describe('Car Issue Report Service', () => {
 
       vi.mocked(api.post).mockRejectedValue(new Error('Network error'));
 
-      await expect(createCarIssueReport(payload)).rejects.toThrow('Network error');
+      await expect(createCarIssueReport(payload)).rejects.toThrow(
+        'Network error'
+      );
     });
   });
 
@@ -107,7 +117,10 @@ describe('Car Issue Report Service', () => {
 
       const result = await getAllCarIssueReports();
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-issue-report/', 'car issue reports');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-issue-report/',
+        'car issue reports'
+      );
       expect(result).toEqual(mockReports);
       expect(result).toHaveLength(2);
     });
@@ -131,7 +144,11 @@ describe('Car Issue Report Service', () => {
 
       const result = await getCarIssueReportsForCar('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-issue-report/car/car-123', 'car issue reports', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-issue-report/car/car-123',
+        'car issue reports',
+        'car-123'
+      );
       expect(result).toEqual(mockReports);
     });
   });
@@ -152,7 +169,11 @@ describe('Car Issue Report Service', () => {
 
       const result = await getSingleCarIssueReport('issue-1');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-issue-report/issue-1', 'car issue report', 'issue-1');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-issue-report/issue-1',
+        'car issue report',
+        'issue-1'
+      );
       expect(result).toEqual(mockReport);
     });
   });
@@ -177,7 +198,12 @@ describe('Car Issue Report Service', () => {
 
       const result = await updateCarIssueReportStatus('issue-1', payload);
 
-      expect(api.patch).toHaveBeenCalledWith('/api/car-issue-report/issue-1', payload, 'car issue report', 'issue-1');
+      expect(api.patch).toHaveBeenCalledWith(
+        '/api/car-issue-report/issue-1',
+        payload,
+        'car issue report',
+        'issue-1'
+      );
       expect(result).toEqual(updatedReport);
     });
 
@@ -188,7 +214,9 @@ describe('Car Issue Report Service', () => {
 
       vi.mocked(api.patch).mockRejectedValue(new Error('Update failed'));
 
-      await expect(updateCarIssueReportStatus('issue-1', payload)).rejects.toThrow('Update failed');
+      await expect(
+        updateCarIssueReportStatus('issue-1', payload)
+      ).rejects.toThrow('Update failed');
     });
   });
 
@@ -200,14 +228,20 @@ describe('Car Issue Report Service', () => {
 
       const result = await deleteCarIssueReport('issue-1');
 
-      expect(api.delete).toHaveBeenCalledWith('/api/car-issue-report/issue-1', 'car issue report', 'issue-1');
+      expect(api.delete).toHaveBeenCalledWith(
+        '/api/car-issue-report/issue-1',
+        'car issue report',
+        'issue-1'
+      );
       expect(result).toEqual(mockResponse);
     });
 
     it('should handle delete errors and log audit', async () => {
       vi.mocked(api.delete).mockRejectedValue(new Error('Delete failed'));
 
-      await expect(deleteCarIssueReport('issue-1')).rejects.toThrow('Delete failed');
+      await expect(deleteCarIssueReport('issue-1')).rejects.toThrow(
+        'Delete failed'
+      );
     });
   });
 
@@ -229,7 +263,10 @@ describe('Car Issue Report Service', () => {
 
       const result = await getNewIssueReports();
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-issue-report/reports/new', 'new issue reports');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-issue-report/reports/new',
+        'new issue reports'
+      );
       expect(result).toEqual(mockReports);
     });
   });
@@ -252,7 +289,11 @@ describe('Car Issue Report Service', () => {
 
       const result = await getNewIssueReportsByCar('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-issue-report/car/car-123/new', 'new issue reports', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-issue-report/car/car-123/new',
+        'new issue reports',
+        'car-123'
+      );
       expect(result).toEqual(mockReports);
     });
   });

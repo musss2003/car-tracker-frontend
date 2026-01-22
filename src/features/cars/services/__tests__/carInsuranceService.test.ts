@@ -57,7 +57,11 @@ describe('Car Insurance Service', () => {
 
       const result = await getCarInsuranceHistory('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-insurance/car-123', 'car insurance', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-insurance/car-123',
+        'car insurance',
+        'car-123'
+      );
       expect(result).toEqual(mockInsurance);
       expect(result).toHaveLength(2);
     });
@@ -65,7 +69,9 @@ describe('Car Insurance Service', () => {
     it('should handle API errors', async () => {
       vi.mocked(api.get).mockRejectedValue(new Error('Network error'));
 
-      await expect(getCarInsuranceHistory('car-123')).rejects.toThrow('Network error');
+      await expect(getCarInsuranceHistory('car-123')).rejects.toThrow(
+        'Network error'
+      );
     });
   });
 
@@ -85,7 +91,11 @@ describe('Car Insurance Service', () => {
 
       const result = await getLatestCarInsuranceRecord('car-123');
 
-      expect(api.get).toHaveBeenCalledWith('/api/car-insurance/car-123/latest', 'car insurance', 'car-123');
+      expect(api.get).toHaveBeenCalledWith(
+        '/api/car-insurance/car-123/latest',
+        'car insurance',
+        'car-123'
+      );
       expect(result).toEqual(mockInsurance);
     });
   });
@@ -110,7 +120,11 @@ describe('Car Insurance Service', () => {
 
       const result = await addCarInsurance(newInsurance);
 
-      expect(api.post).toHaveBeenCalledWith('/api/car-insurance/car-123', newInsurance, 'car insurance');
+      expect(api.post).toHaveBeenCalledWith(
+        '/api/car-insurance/car-123',
+        newInsurance,
+        'car insurance'
+      );
       expect(result).toEqual(createdInsurance);
     });
   });
@@ -136,7 +150,12 @@ describe('Car Insurance Service', () => {
 
       const result = await updateCarInsurance('ins-1', updateData);
 
-      expect(api.put).toHaveBeenCalledWith('/api/car-insurance/record/ins-1', updateData, 'car insurance', 'ins-1');
+      expect(api.put).toHaveBeenCalledWith(
+        '/api/car-insurance/record/ins-1',
+        updateData,
+        'car insurance',
+        'ins-1'
+      );
       expect(result).toEqual(updatedInsurance);
     });
   });
@@ -147,7 +166,11 @@ describe('Car Insurance Service', () => {
 
       await deleteCarInsurance('ins-1');
 
-      expect(api.delete).toHaveBeenCalledWith('/api/car-insurance/record/ins-1', 'car insurance', 'ins-1');
+      expect(api.delete).toHaveBeenCalledWith(
+        '/api/car-insurance/record/ins-1',
+        'car insurance',
+        'ins-1'
+      );
     });
   });
 
