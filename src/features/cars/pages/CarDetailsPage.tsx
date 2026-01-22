@@ -42,10 +42,7 @@ import {
 import { downloadDocument } from '@/shared/services/uploadService';
 import { deleteCar, getCar } from '../services/carService';
 import { KPIGauge } from '../components/kpi-gauge';
-import { getRegistrationDaysRemaining } from '../services/carRegistrationService';
-import { getServiceRemainingKm } from '../services/carServiceHistory';
 import { PageHeader } from '@/shared/components/ui/page-header';
-import { getActiveIssueReportsCount } from '../services/carIssueReportService';
 import {
   MaintenanceStatusList,
   MaintenanceStatus,
@@ -60,6 +57,7 @@ import {
   getMaintenanceAlerts,
   MaintenanceAlert,
 } from '../services/maintenanceNotificationService';
+import { getCarDashboard } from '../services/carAnalyticsAPI';
 
 function SpecItem({
   label,
@@ -248,34 +246,21 @@ export default function CarDetailsPage() {
   useEffect(() => {
     if (!id) return;
 
-    const alerts = getMaintenanceAlerts(id, {
-      service: {
-        kmRemaining: serviceKilometersRemaining,
-        serviceInterval: SERVICE_INTERVAL,
-      },
-      registration: {
-        daysRemaining: registrationDaysRemaining,
-        registrationInterval: REGISTRATION_INTERVAL_DAYS,
-      },
-      insurance: {
-        daysRemaining: null, // TODO: Implement insurance tracking
-      },
-      issues: {
-        activeCount: activeIssueReports,
-      },
-    });
+    const fetchAlerts = async () => {
+      try {
+        const alerts = await getMaintenanceAlerts(id);
+        setMaintenanceAlerts(alerts);
+        // Reset dismissed state when alerts change
+        if (alerts.length > 0) {
+          setAlertsDismissed(false);
+        }
+      } catch (error) {
+        logError('Error fetching maintenance alerts:', error);
+      }
+    };
 
-    setMaintenanceAlerts(alerts);
-    // Reset dismissed state when alerts change
-    if (alerts.length > 0) {
-      setAlertsDismissed(false);
-    }
-  }, [
-    id,
-    serviceKilometersRemaining,
-    registrationDaysRemaining,
-    activeIssueReports,
-  ]);
+    fetchAlerts();
+  }, [id]);
 
   const handleDelete = useCallback(async () => {
     if (!car) return;
@@ -296,16 +281,16 @@ export default function CarDetailsPage() {
   const refreshMaintenanceData = useCallback(async () => {
     if (!id) return;
     try {
-      const [carData, regDays, serviceKm, issueCount] = await Promise.all([
+      // Use optimized dashboard endpoint - replaces 4 separate API calls
+      const [carData, dashboardData] = await Promise.all([
         getCar(id),
-        getRegistrationDaysRemaining(id),
-        getServiceRemainingKm(id),
-        getActiveIssueReportsCount(id),
+        getCarDashboard(id),
       ]);
+      
       if (carData) setCar({ ...carData, isBusy: false });
-      setRegistrationDaysRemaining(regDays);
-      setServiceKilometersRemaining(serviceKm);
-      setActiveIssueReports(issueCount);
+      setRegistrationDaysRemaining(dashboardData.registrationDaysRemaining);
+      setServiceKilometersRemaining(dashboardData.serviceKilometersRemaining);
+      setActiveIssueReports(dashboardData.activeIssueReports);
     } catch (error) {
       logError('Error refreshing maintenance data:', error);
     }

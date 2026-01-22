@@ -1,5 +1,16 @@
-import { LucideIcon } from 'lucide-react';
+/**
+ * ⚠️ MIGRATED TO BACKEND API ⚠️
+ * Performance improvements:
+ * - Server-side alert generation
+ * - Reduced client-side computation
+ * - Consistent alert logic across the platform
+ */
+import { 
+  getCarMaintenanceAlerts as getCarMaintenanceAlertsAPI,
+  MaintenanceAlert as BackendMaintenanceAlert 
+} from './carAnalyticsAPI';
 
+// Re-export backend types for backward compatibility
 export interface MaintenanceAlert {
   id: string;
   type: 'service' | 'registration' | 'insurance' | 'issue';
@@ -13,6 +24,10 @@ export interface MaintenanceAlert {
   count?: number;
 }
 
+/**
+ * @deprecated - This type is no longer needed with backend API
+ * Kept for backward compatibility with existing code
+ */
 export interface MaintenanceAlertConfig {
   service: {
     kmRemaining: number | null;
@@ -31,7 +46,21 @@ export interface MaintenanceAlertConfig {
 }
 
 /**
- * Calculate urgency level for service based on km remaining
+ * Get maintenance alerts for a car (now using backend API)
+ * @param carId - The car ID
+ * @param _config - Deprecated, no longer used (backend calculates alerts)
+ */
+export async function getMaintenanceAlerts(
+  carId: string,
+  _config?: MaintenanceAlertConfig
+): Promise<MaintenanceAlert[]> {
+  const response = await getCarMaintenanceAlertsAPI(carId);
+  return response.alerts;
+}
+
+/**
+ * @deprecated - These utility functions are now handled by the backend
+ * Kept for backward compatibility with existing code
  */
 export function calculateServiceUrgency(
   kmRemaining: number | null,
@@ -43,9 +72,6 @@ export function calculateServiceUrgency(
   return 'ok';
 }
 
-/**
- * Calculate urgency level for registration/insurance based on days remaining
- */
 export function calculateDaysUrgency(
   daysRemaining: number | null
 ): 'critical' | 'warning' | 'ok' {
@@ -55,112 +81,12 @@ export function calculateDaysUrgency(
   return 'ok';
 }
 
-/**
- * Calculate urgency level for issues based on count
- */
 export function calculateIssueUrgency(
   activeCount: number | null
 ): 'critical' | 'warning' | 'ok' {
   if (activeCount === null || activeCount === 0) return 'ok';
   if (activeCount >= 3) return 'critical';
   return 'warning';
-}
-
-/**
- * Generate maintenance alerts for a car
- */
-export function getMaintenanceAlerts(
-  carId: string,
-  config: MaintenanceAlertConfig
-): MaintenanceAlert[] {
-  const alerts: MaintenanceAlert[] = [];
-
-  // Service Alert
-  const serviceUrgency = calculateServiceUrgency(
-    config.service.kmRemaining,
-    config.service.serviceInterval
-  );
-  if (serviceUrgency !== 'ok' && config.service.kmRemaining !== null) {
-    alerts.push({
-      id: 'service',
-      type: 'service',
-      urgency: serviceUrgency,
-      title: 'Servis potreban',
-      message:
-        serviceUrgency === 'critical'
-          ? `Servis je hitan! Preostalo samo ${config.service.kmRemaining} km`
-          : `Servis uskoro potreban. Preostalo ${config.service.kmRemaining} km`,
-      actionLabel: 'Zakaži servis',
-      actionUrl: `/cars/${carId}/service-history`,
-      kmRemaining: config.service.kmRemaining,
-    });
-  }
-
-  // Registration Alert
-  const registrationUrgency = calculateDaysUrgency(
-    config.registration.daysRemaining
-  );
-  if (
-    registrationUrgency !== 'ok' &&
-    config.registration.daysRemaining !== null
-  ) {
-    alerts.push({
-      id: 'registration',
-      type: 'registration',
-      urgency: registrationUrgency,
-      title: 'Registracija ističe',
-      message:
-        registrationUrgency === 'critical'
-          ? `Registracija ističe za ${config.registration.daysRemaining} ${config.registration.daysRemaining === 1 ? 'dan' : 'dana'}!`
-          : `Registracija ističe za ${config.registration.daysRemaining} dana`,
-      actionLabel: 'Produlji registraciju',
-      actionUrl: `/cars/${carId}/registration`,
-      daysRemaining: config.registration.daysRemaining,
-    });
-  }
-
-  // Insurance Alert
-  const insuranceUrgency = calculateDaysUrgency(config.insurance.daysRemaining);
-  if (insuranceUrgency !== 'ok' && config.insurance.daysRemaining !== null) {
-    alerts.push({
-      id: 'insurance',
-      type: 'insurance',
-      urgency: insuranceUrgency,
-      title: 'Osiguranje ističe',
-      message:
-        insuranceUrgency === 'critical'
-          ? `Osiguranje ističe za ${config.insurance.daysRemaining} ${config.insurance.daysRemaining === 1 ? 'dan' : 'dana'}!`
-          : `Osiguranje ističe za ${config.insurance.daysRemaining} dana`,
-      actionLabel: 'Obnovi osiguranje',
-      actionUrl: `/cars/${carId}/insurance`,
-      daysRemaining: config.insurance.daysRemaining,
-    });
-  }
-
-  // Issues Alert
-  const issueUrgency = calculateIssueUrgency(config.issues.activeCount);
-  if (issueUrgency !== 'ok' && config.issues.activeCount !== null) {
-    const count = config.issues.activeCount;
-    alerts.push({
-      id: 'issues',
-      type: 'issue',
-      urgency: issueUrgency,
-      title: 'Aktivni kvarovi',
-      message:
-        issueUrgency === 'critical'
-          ? `${count} kritičnih kvarova zahtijeva pažnju!`
-          : `${count} ${count === 1 ? 'kvar' : 'kvara'} na vozilu`,
-      actionLabel: 'Prikaži kvarove',
-      actionUrl: `/cars/${carId}/issues`,
-      count,
-    });
-  }
-
-  // Sort by urgency (critical first)
-  return alerts.sort((a, b) => {
-    const urgencyOrder = { critical: 0, warning: 1, ok: 2 };
-    return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
-  });
 }
 
 /**
