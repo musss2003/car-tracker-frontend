@@ -41,6 +41,9 @@ import {
 } from '@/shared/components/ui/alert-dialog';
 import { downloadDocument } from '@/shared/services/uploadService';
 import { deleteCar, getCar } from '../services/carService';
+import { getActiveIssueReportsCount } from '../services/carIssueReportService';
+import { getRegistrationDaysRemaining } from '../services/carRegistrationService';
+import { getServiceRemainingKm } from '../services/carServiceHistory';
 import { KPIGauge } from '../components/kpi-gauge';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import {
@@ -285,12 +288,36 @@ export default function CarDetailsPage() {
       // Use optimized dashboard endpoint - replaces 4 separate API calls
       const dashboardData = await getCarDashboard(id);
 
-      if (dashboardData.car) setCar({ ...dashboardData.car, isBusy: false });
-      setRegistrationDaysRemaining(dashboardData.registrationDaysRemaining);
-      setServiceKilometersRemaining(dashboardData.serviceKilometersRemaining);
-      setActiveIssueReports(dashboardData.activeIssueReports);
+      // Safely update car data if present
+      if (dashboardData?.car) {
+        setCar({ ...dashboardData.car, isBusy: false });
+      }
+
+      // Extract registration days remaining from maintenance alerts
+      const registrationAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
+        (alert) => alert.type === 'registration'
+      );
+      setRegistrationDaysRemaining(
+        registrationAlert?.daysRemaining ?? null
+      );
+
+      // Extract service kilometers remaining from maintenance alerts
+      const serviceAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
+        (alert) => alert.type === 'service'
+      );
+      setServiceKilometersRemaining(serviceAlert?.kmRemaining ?? null);
+
+      // Extract active issue reports count from recent activity
+      const activeIssuesCount =
+        dashboardData?.recentActivity?.recentIssues?.length ?? 0;
+      setActiveIssueReports(activeIssuesCount);
     } catch (error) {
       logError('Error refreshing maintenance data:', error);
+      toast.error('Greška pri osvježavanju podataka o održavanju');
+      // Set safe defaults on error
+      setRegistrationDaysRemaining(null);
+      setServiceKilometersRemaining(null);
+      setActiveIssueReports(null);
     }
   }, [id]);
 
