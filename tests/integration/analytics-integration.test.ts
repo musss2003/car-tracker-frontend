@@ -35,9 +35,8 @@ describe('Analytics API Integration', () => {
       expect(Array.isArray(result.categoryBreakdown)).toBe(true);
 
       expect(result).toHaveProperty('projections');
-      expect(result.projections).toHaveProperty('nextMonth');
-      expect(result.projections).toHaveProperty('nextQuarter');
-      expect(result.projections).toHaveProperty('nextYear');
+      expect(result.projections).toHaveProperty('monthly');
+      expect(result.projections).toHaveProperty('yearly');
 
       // Validate data types
       expect(typeof result.totalCosts.all).toBe('number');

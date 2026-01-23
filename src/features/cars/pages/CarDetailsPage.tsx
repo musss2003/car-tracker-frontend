@@ -256,6 +256,7 @@ export default function CarDetailsPage() {
         }
       } catch (error) {
         logError('Error fetching maintenance alerts:', error);
+        toast.error('Greška pri učitavanju upozorenja održavanja');
       }
     };
 
@@ -282,12 +283,9 @@ export default function CarDetailsPage() {
     if (!id) return;
     try {
       // Use optimized dashboard endpoint - replaces 4 separate API calls
-      const [carData, dashboardData] = await Promise.all([
-        getCar(id),
-        getCarDashboard(id),
-      ]);
+      const dashboardData = await getCarDashboard(id);
 
-      if (carData) setCar({ ...carData, isBusy: false });
+      if (dashboardData.car) setCar({ ...dashboardData.car, isBusy: false });
       setRegistrationDaysRemaining(dashboardData.registrationDaysRemaining);
       setServiceKilometersRemaining(dashboardData.serviceKilometersRemaining);
       setActiveIssueReports(dashboardData.activeIssueReports);

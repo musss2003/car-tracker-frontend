@@ -100,7 +100,8 @@ function transformBackendResponse(
   // Map backend projections to frontend format
   const projections = {
     nextMonthEstimate: response.projections.monthly,
-    nextQuarterEstimate: response.projections.monthly * 3,
+    // Use yearly projection for a more accurate quarterly estimate
+    nextQuarterEstimate: response.projections.yearly / 4,
     yearEndEstimate: response.projections.yearly,
   };
 
