@@ -168,7 +168,7 @@ export async function getTopExpenses(
 ): Promise<TopExpense[]> {
   // Defense-in-depth: Validate inputs
   validateId(carId, 'car ID');
-  
+
   if (limit < 1 || limit > 100) {
     throw new Error('Limit must be between 1 and 100');
   }
