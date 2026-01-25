@@ -190,9 +190,21 @@ describe('Analytics API Integration', () => {
       await expect(getCarCostAnalytics('invalid-id')).rejects.toThrow();
     });
 
-    it('should handle network errors', async () => {
-      // This test would require mocking network failures
-      // Placeholder for manual testing
+    it.skip('should handle network errors', async () => {
+      // TODO: Implement network error handling test
+      // Requires mocking api.get to simulate network failures
+      // Should verify that:
+      // 1. Network errors are caught and logged
+      // 2. Errors are re-thrown for component-level handling
+      // 3. User-friendly error messages are provided
+      //
+      // Example implementation:
+      // vi.mock('../../src/shared/utils/apiService', () => ({
+      //   api: {
+      //     get: vi.fn().mockRejectedValue(new Error('Network error'))
+      //   }
+      // }));
+      // await expect(getCarCostAnalytics(TEST_CAR_ID)).rejects.toThrow('Network error');
     });
   });
 });
