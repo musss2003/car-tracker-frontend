@@ -155,23 +155,67 @@ function generateYearlyTrends(monthlyCosts: MonthlyBreakdown[]): YearlyTrend[] {
 }
 
 /**
- * Get top expenses (now uses backend cross-car analytics)
- * NOTE: This returns different data structure from backend.
- * For cross-car analysis, use getTopExpenses from carAnalyticsAPI directly.
+ * Get top expenses for a single car by fetching and aggregating all expense records
+ * This provides detailed per-car expense breakdown for the UI
  */
 export async function getTopExpenses(
   carId: string,
   limit: number = 10
 ): Promise<TopExpense[]> {
   try {
-    // For now, return empty array as backend provides cross-car analytics
-    // Individual car expenses can be derived from the cost analytics monthlyCosts
-    // If needed, this can be enhanced to transform monthlyCosts to TopExpense format
-    logError(
-      'getTopExpenses is deprecated - use carAnalyticsAPI.getTopExpenses for cross-car analytics',
-      null
+    // Import services dynamically to avoid circular dependencies
+    const { getCarServiceHistory } = await import('./carServiceHistory');
+    const { getCarInsuranceHistory } = await import('./carInsuranceService');
+    const { getCarRegistrations } = await import('./carRegistrationService');
+    const { getCarIssueReportsForCar } = await import(
+      './carIssueReportService'
     );
-    return [];
+
+    // Fetch all expense records in parallel
+    const [services, insurances, registrations, issues] = await Promise.all([
+      getCarServiceHistory(carId).catch(() => []),
+      getCarInsuranceHistory(carId).catch(() => []),
+      getCarRegistrations(carId).catch(() => []),
+      getCarIssueReportsForCar(carId).catch(() => []),
+    ]);
+
+    // Transform all records to TopExpense format
+    const expenses: TopExpense[] = [
+      ...services.map((s: any) => ({
+        id: s.id,
+        type: 'service' as const,
+        date: s.serviceDate,
+        description: s.description || 'Servisiranje',
+        amount: s.cost || 0,
+      })),
+      ...insurances.map((i: any) => ({
+        id: i.id,
+        type: 'insurance' as const,
+        date: i.insuranceDate,
+        description: `Osiguranje - ${i.policyNumber || 'N/A'}`,
+        amount: i.price || 0,
+      })),
+      ...registrations.map((r: any) => ({
+        id: r.id,
+        type: 'registration' as const,
+        date: r.registrationDate,
+        description: 'Registracija vozila',
+        amount: r.cost || 0,
+      })),
+      ...issues.map((issue: any) => ({
+        id: issue.id,
+        type: 'issue' as const,
+        date: issue.reportedAt,
+        description: issue.description || 'Kvar',
+        amount: issue.estimatedCost || 0,
+      })),
+    ];
+
+    // Sort by amount (highest first) and take top N
+    return expenses
+      .filter((e) => e.amount > 0)
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, limit);
   } catch (error) {
     logError('Failed to get top expenses', error);
     throw error;
