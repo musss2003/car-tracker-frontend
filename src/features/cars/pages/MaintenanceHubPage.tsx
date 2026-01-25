@@ -255,23 +255,8 @@ export default function MaintenanceHubPage() {
           .map((e) => Number(e.cost) || 0);
         setYearlyCost(Number(yearCosts.reduce((sum, cost) => sum + cost, 0)));
 
-        // Generate alerts
-        const alerts = getMaintenanceAlerts(id, {
-          service: {
-            kmRemaining: serviceKm,
-            serviceInterval: SERVICE_INTERVAL,
-          },
-          registration: {
-            daysRemaining: regDays,
-            registrationInterval: REGISTRATION_INTERVAL_DAYS,
-          },
-          insurance: {
-            daysRemaining: null,
-          },
-          issues: {
-            activeCount: issueCount,
-          },
-        });
+        // Generate alerts (now using backend API)
+        const alerts = await getMaintenanceAlerts(id);
         setMaintenanceAlerts(alerts);
       } catch (error) {
         logError('Error fetching maintenance data:', error);

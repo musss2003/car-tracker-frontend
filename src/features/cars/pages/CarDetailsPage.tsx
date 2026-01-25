@@ -40,12 +40,9 @@ import {
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
 import { downloadDocument } from '@/shared/services/uploadService';
-import { deleteCar, getCar } from '../services/carService';
+import { deleteCar } from '../services/carService';
 import { KPIGauge } from '../components/kpi-gauge';
-import { getRegistrationDaysRemaining } from '../services/carRegistrationService';
-import { getServiceRemainingKm } from '../services/carServiceHistory';
 import { PageHeader } from '@/shared/components/ui/page-header';
-import { getActiveIssueReportsCount } from '../services/carIssueReportService';
 import {
   MaintenanceStatusList,
   MaintenanceStatus,
@@ -60,6 +57,7 @@ import {
   getMaintenanceAlerts,
   MaintenanceAlert,
 } from '../services/maintenanceNotificationService';
+import { getCarDashboard } from '../services/carAnalyticsAPI';
 
 function SpecItem({
   label,
@@ -169,65 +167,54 @@ export default function CarDetailsPage() {
   }, []);
 
   useEffect(() => {
-    const fetchActiveIssueReports = async (carId: string) => {
-      try {
-        const count = await getActiveIssueReportsCount(carId);
-        setActiveIssueReports(count);
-      } catch (error) {
-        logError('Error fetching active issue reports:', error);
-        setActiveIssueReports(null);
-      }
-    };
-
-    const fetchServiceKmRemaining = async (carId: string) => {
-      try {
-        const data = await getServiceRemainingKm(carId);
-        setServiceKilometersRemaining(data);
-      } catch (error) {
-        logError('Error fetching service km remaining:', error);
-        setServiceKilometersRemaining(null);
-      }
-    };
-
-    const fetchRegistrationDaysRemaining = async (carId: string) => {
-      try {
-        // getRegistrationDaysRemaining returns a Promise<number> (or an object), so await it directly.
-        const data = await getRegistrationDaysRemaining(carId);
-
-        setRegistrationDaysRemaining(data);
-      } catch (error) {
-        logError('Error fetching registration days remaining:', error);
-        setRegistrationDaysRemaining(null);
-      }
-    };
-
     const fetchCarAndRelatedData = async () => {
       if (!id) return;
 
       try {
         setLoading(true);
-        const fetchedCar = await getCar(id);
-        if (!fetchedCar) {
+        // Use optimized dashboard endpoint - single API call instead of 4
+        const dashboardData = await getCarDashboard(id);
+
+        if (!dashboardData?.car) {
           setError('Vozilo nije pronađeno');
           toast.error('Vozilo nije pronađeno');
           navigate('/cars');
           return;
         }
-        setCar({ ...fetchedCar, isBusy: false });
+
+        setCar({ ...dashboardData.car, isBusy: false });
         setError(null);
 
-        if (fetchedCar.photoUrl && fetchedCar.photoUrl.trim() !== '') {
-          loadPhoto(fetchedCar.photoUrl);
+        if (
+          dashboardData.car.photoUrl &&
+          dashboardData.car.photoUrl.trim() !== ''
+        ) {
+          loadPhoto(dashboardData.car.photoUrl);
         }
 
-        // Fetch related data
-        fetchRegistrationDaysRemaining(id);
-        fetchServiceKmRemaining(id);
-        fetchActiveIssueReports(id);
+        // Extract maintenance data from dashboard response
+        const registrationAlert =
+          dashboardData?.maintenanceAlerts?.alerts?.find(
+            (alert) => alert.type === 'registration'
+          );
+        setRegistrationDaysRemaining(registrationAlert?.daysRemaining ?? null);
+
+        const serviceAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
+          (alert) => alert.type === 'service'
+        );
+        setServiceKilometersRemaining(serviceAlert?.kmRemaining ?? null);
+
+        const activeIssuesCount =
+          dashboardData?.recentActivity?.recentIssues?.length ?? 0;
+        setActiveIssueReports(activeIssuesCount);
       } catch (error) {
         logError('Error fetching car:', error);
         setError('Greška pri učitavanju vozila');
         toast.error('Greška pri učitavanju vozila');
+        // Set safe defaults on error
+        setRegistrationDaysRemaining(null);
+        setServiceKilometersRemaining(null);
+        setActiveIssueReports(null);
       } finally {
         setLoading(false);
       }
@@ -248,34 +235,22 @@ export default function CarDetailsPage() {
   useEffect(() => {
     if (!id) return;
 
-    const alerts = getMaintenanceAlerts(id, {
-      service: {
-        kmRemaining: serviceKilometersRemaining,
-        serviceInterval: SERVICE_INTERVAL,
-      },
-      registration: {
-        daysRemaining: registrationDaysRemaining,
-        registrationInterval: REGISTRATION_INTERVAL_DAYS,
-      },
-      insurance: {
-        daysRemaining: null, // TODO: Implement insurance tracking
-      },
-      issues: {
-        activeCount: activeIssueReports,
-      },
-    });
+    const fetchAlerts = async () => {
+      try {
+        const alerts = await getMaintenanceAlerts(id);
+        setMaintenanceAlerts(alerts);
+        // Reset dismissed state when alerts change
+        if (alerts.length > 0) {
+          setAlertsDismissed(false);
+        }
+      } catch (error) {
+        logError('Error fetching maintenance alerts:', error);
+        toast.error('Greška pri učitavanju upozorenja održavanja');
+      }
+    };
 
-    setMaintenanceAlerts(alerts);
-    // Reset dismissed state when alerts change
-    if (alerts.length > 0) {
-      setAlertsDismissed(false);
-    }
-  }, [
-    id,
-    serviceKilometersRemaining,
-    registrationDaysRemaining,
-    activeIssueReports,
-  ]);
+    fetchAlerts();
+  }, [id]);
 
   const handleDelete = useCallback(async () => {
     if (!car) return;
@@ -296,18 +271,37 @@ export default function CarDetailsPage() {
   const refreshMaintenanceData = useCallback(async () => {
     if (!id) return;
     try {
-      const [carData, regDays, serviceKm, issueCount] = await Promise.all([
-        getCar(id),
-        getRegistrationDaysRemaining(id),
-        getServiceRemainingKm(id),
-        getActiveIssueReportsCount(id),
-      ]);
-      if (carData) setCar({ ...carData, isBusy: false });
-      setRegistrationDaysRemaining(regDays);
-      setServiceKilometersRemaining(serviceKm);
-      setActiveIssueReports(issueCount);
+      // Use optimized dashboard endpoint - replaces 4 separate API calls
+      const dashboardData = await getCarDashboard(id);
+
+      // Safely update car data if present
+      if (dashboardData?.car) {
+        setCar({ ...dashboardData.car, isBusy: false });
+      }
+
+      // Extract registration days remaining from maintenance alerts
+      const registrationAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
+        (alert) => alert.type === 'registration'
+      );
+      setRegistrationDaysRemaining(registrationAlert?.daysRemaining ?? null);
+
+      // Extract service kilometers remaining from maintenance alerts
+      const serviceAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
+        (alert) => alert.type === 'service'
+      );
+      setServiceKilometersRemaining(serviceAlert?.kmRemaining ?? null);
+
+      // Extract active issue reports count from recent activity
+      const activeIssuesCount =
+        dashboardData?.recentActivity?.recentIssues?.length ?? 0;
+      setActiveIssueReports(activeIssuesCount);
     } catch (error) {
       logError('Error refreshing maintenance data:', error);
+      toast.error('Greška pri osvježavanju podataka o održavanju');
+      // Set safe defaults on error
+      setRegistrationDaysRemaining(null);
+      setServiceKilometersRemaining(null);
+      setActiveIssueReports(null);
     }
   }, [id]);
 
