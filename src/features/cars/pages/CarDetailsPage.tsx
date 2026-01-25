@@ -40,10 +40,7 @@ import {
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
 import { downloadDocument } from '@/shared/services/uploadService';
-import { deleteCar, getCar } from '../services/carService';
-import { getActiveIssueReportsCount } from '../services/carIssueReportService';
-import { getRegistrationDaysRemaining } from '../services/carRegistrationService';
-import { getServiceRemainingKm } from '../services/carServiceHistory';
+import { deleteCar } from '../services/carService';
 import { KPIGauge } from '../components/kpi-gauge';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import {
@@ -170,65 +167,49 @@ export default function CarDetailsPage() {
   }, []);
 
   useEffect(() => {
-    const fetchActiveIssueReports = async (carId: string) => {
-      try {
-        const count = await getActiveIssueReportsCount(carId);
-        setActiveIssueReports(count);
-      } catch (error) {
-        logError('Error fetching active issue reports:', error);
-        setActiveIssueReports(null);
-      }
-    };
-
-    const fetchServiceKmRemaining = async (carId: string) => {
-      try {
-        const data = await getServiceRemainingKm(carId);
-        setServiceKilometersRemaining(data);
-      } catch (error) {
-        logError('Error fetching service km remaining:', error);
-        setServiceKilometersRemaining(null);
-      }
-    };
-
-    const fetchRegistrationDaysRemaining = async (carId: string) => {
-      try {
-        // getRegistrationDaysRemaining returns a Promise<number> (or an object), so await it directly.
-        const data = await getRegistrationDaysRemaining(carId);
-
-        setRegistrationDaysRemaining(data);
-      } catch (error) {
-        logError('Error fetching registration days remaining:', error);
-        setRegistrationDaysRemaining(null);
-      }
-    };
-
     const fetchCarAndRelatedData = async () => {
       if (!id) return;
 
       try {
         setLoading(true);
-        const fetchedCar = await getCar(id);
-        if (!fetchedCar) {
+        // Use optimized dashboard endpoint - single API call instead of 4
+        const dashboardData = await getCarDashboard(id);
+        
+        if (!dashboardData?.car) {
           setError('Vozilo nije pronađeno');
           toast.error('Vozilo nije pronađeno');
           navigate('/cars');
           return;
         }
-        setCar({ ...fetchedCar, isBusy: false });
+        
+        setCar({ ...dashboardData.car, isBusy: false });
         setError(null);
 
-        if (fetchedCar.photoUrl && fetchedCar.photoUrl.trim() !== '') {
-          loadPhoto(fetchedCar.photoUrl);
+        if (dashboardData.car.photoUrl && dashboardData.car.photoUrl.trim() !== '') {
+          loadPhoto(dashboardData.car.photoUrl);
         }
 
-        // Fetch related data
-        fetchRegistrationDaysRemaining(id);
-        fetchServiceKmRemaining(id);
-        fetchActiveIssueReports(id);
+        // Extract maintenance data from dashboard response
+        const registrationAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
+          (alert) => alert.type === 'registration'
+        );
+        setRegistrationDaysRemaining(registrationAlert?.daysRemaining ?? null);
+
+        const serviceAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
+          (alert) => alert.type === 'service'
+        );
+        setServiceKilometersRemaining(serviceAlert?.kmRemaining ?? null);
+
+        const activeIssuesCount = dashboardData?.recentActivity?.recentIssues?.length ?? 0;
+        setActiveIssueReports(activeIssuesCount);
       } catch (error) {
         logError('Error fetching car:', error);
         setError('Greška pri učitavanju vozila');
         toast.error('Greška pri učitavanju vozila');
+        // Set safe defaults on error
+        setRegistrationDaysRemaining(null);
+        setServiceKilometersRemaining(null);
+        setActiveIssueReports(null);
       } finally {
         setLoading(false);
       }
