@@ -78,7 +78,7 @@ export interface AuditLogStatistics {
 
 export interface AuditLogResponse {
   success: boolean;
-  data: AuditLog[];
+  logs: AuditLog[];
   pagination: {
     page: number;
     limit: number;

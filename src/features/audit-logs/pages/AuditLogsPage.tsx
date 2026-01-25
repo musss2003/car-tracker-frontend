@@ -87,19 +87,30 @@ const AuditLogsPage = () => {
       if (startDate) filters.startDate = startDate;
       if (endDate) filters.endDate = endDate;
 
+      console.log('🔍 Fetching audit logs with filters:', filters);
       const response = await getAuditLogs(filters);
+      console.log('📊 Audit logs response:', response);
 
-      if (response && response.data && response.pagination) {
-        setLogs(response.data);
+      if (response && response.logs && response.pagination) {
+        console.log('✅ Setting logs:', response.logs.length, 'items, total:', response.pagination.total);
+        setLogs(response.logs);
         setTotal(response.pagination.total);
         setTotalPages(response.pagination.totalPages);
       } else {
         // Handle unexpected response structure
+        console.warn('⚠️ Unexpected response structure:', response);
         setLogs([]);
         setTotal(0);
         setTotalPages(0);
       }
     } catch (error: any) {
+      console.error('❌ Error fetching audit logs:', error);
+      console.error('Error details:', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+        fullError: error
+      });
       logError('Failed to fetch audit logs:', error);
       
       // Show specific error message based on error type

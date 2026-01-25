@@ -33,7 +33,7 @@ export const loginAPI = async (
   password: string
 ): Promise<LoginResult> => {
   const data = await api.post<LoginResponse>(
-    '/auth/login',
+    '/api/auth/login',
     {
       username,
       password,
@@ -53,7 +53,7 @@ export const registerAPI = async (
   password: string
 ): Promise<RegisterResult> => {
   const data = await api.post<RegisterResponse & { accessToken?: string }>(
-    '/auth/register',
+    '/api/auth/register',
     { email, username, password },
     'authentication'
   );
