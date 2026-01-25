@@ -182,12 +182,25 @@ export async function getTopExpenses(
       './carIssueReportService'
     );
 
-    // Fetch all expense records in parallel
+    // Fetch all expense records in parallel with error handling
+    // Continue with partial data if some sources fail, but log errors for debugging
     const [services, insurances, registrations, issues] = await Promise.all([
-      getCarServiceHistory(carId).catch(() => []),
-      getCarInsuranceHistory(carId).catch(() => []),
-      getCarRegistrations(carId).catch(() => []),
-      getCarIssueReportsForCar(carId).catch(() => []),
+      getCarServiceHistory(carId).catch((error) => {
+        logError('Failed to fetch service history for top expenses', error);
+        return [];
+      }),
+      getCarInsuranceHistory(carId).catch((error) => {
+        logError('Failed to fetch insurance history for top expenses', error);
+        return [];
+      }),
+      getCarRegistrations(carId).catch((error) => {
+        logError('Failed to fetch registrations for top expenses', error);
+        return [];
+      }),
+      getCarIssueReportsForCar(carId).catch((error) => {
+        logError('Failed to fetch issue reports for top expenses', error);
+        return [];
+      }),
     ]);
 
     // Transform all records to TopExpense format
