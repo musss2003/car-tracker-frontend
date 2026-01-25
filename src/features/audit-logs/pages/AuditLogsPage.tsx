@@ -99,9 +99,20 @@ const AuditLogsPage = () => {
         setTotal(0);
         setTotalPages(0);
       }
-    } catch (error) {
+    } catch (error: any) {
       logError('Failed to fetch audit logs:', error);
-      toast.error('Greška pri učitavanju logova');
+      
+      // Show specific error message based on error type
+      if (error?.response?.status === 403) {
+        toast.error('Nemate dozvolu za pristup audit logovima (potrebna admin uloga)');
+      } else if (error?.response?.status === 401) {
+        toast.error('Niste prijavljeni. Molimo prijavite se ponovo.');
+      } else if (error?.response?.data?.message) {
+        toast.error(`Greška: ${error.response.data.message}`);
+      } else {
+        toast.error('Greška pri učitavanju logova');
+      }
+      
       // Reset state on error
       setLogs([]);
       setTotal(0);
