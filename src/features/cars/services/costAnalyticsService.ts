@@ -10,6 +10,7 @@
  */
 
 import { logError } from '@/shared/utils/logger';
+import { validateId } from '@/shared/utils/inputValidator';
 import {
   CostAnalytics,
   MonthlyBreakdown,
@@ -29,6 +30,9 @@ import {
 export async function getCarCostAnalytics(
   carId: string
 ): Promise<CostAnalytics> {
+  // Defense-in-depth: Validate input before forwarding to API layer
+  validateId(carId, 'car ID');
+
   try {
     // Call the optimized backend endpoint - replaces 4-6 API calls + client-side processing
     const analyticsResponse: CostAnalyticsResponse =
@@ -162,6 +166,13 @@ export async function getTopExpenses(
   carId: string,
   limit: number = 10
 ): Promise<TopExpense[]> {
+  // Defense-in-depth: Validate inputs
+  validateId(carId, 'car ID');
+  
+  if (limit < 1 || limit > 100) {
+    throw new Error('Limit must be between 1 and 100');
+  }
+
   try {
     // Import services dynamically to avoid circular dependencies
     const { getCarServiceHistory } = await import('./carServiceHistory');
