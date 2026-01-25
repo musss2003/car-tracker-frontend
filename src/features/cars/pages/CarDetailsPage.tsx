@@ -174,25 +174,29 @@ export default function CarDetailsPage() {
         setLoading(true);
         // Use optimized dashboard endpoint - single API call instead of 4
         const dashboardData = await getCarDashboard(id);
-        
+
         if (!dashboardData?.car) {
           setError('Vozilo nije pronađeno');
           toast.error('Vozilo nije pronađeno');
           navigate('/cars');
           return;
         }
-        
+
         setCar({ ...dashboardData.car, isBusy: false });
         setError(null);
 
-        if (dashboardData.car.photoUrl && dashboardData.car.photoUrl.trim() !== '') {
+        if (
+          dashboardData.car.photoUrl &&
+          dashboardData.car.photoUrl.trim() !== ''
+        ) {
           loadPhoto(dashboardData.car.photoUrl);
         }
 
         // Extract maintenance data from dashboard response
-        const registrationAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
-          (alert) => alert.type === 'registration'
-        );
+        const registrationAlert =
+          dashboardData?.maintenanceAlerts?.alerts?.find(
+            (alert) => alert.type === 'registration'
+          );
         setRegistrationDaysRemaining(registrationAlert?.daysRemaining ?? null);
 
         const serviceAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
@@ -200,7 +204,8 @@ export default function CarDetailsPage() {
         );
         setServiceKilometersRemaining(serviceAlert?.kmRemaining ?? null);
 
-        const activeIssuesCount = dashboardData?.recentActivity?.recentIssues?.length ?? 0;
+        const activeIssuesCount =
+          dashboardData?.recentActivity?.recentIssues?.length ?? 0;
         setActiveIssueReports(activeIssuesCount);
       } catch (error) {
         logError('Error fetching car:', error);
@@ -278,9 +283,7 @@ export default function CarDetailsPage() {
       const registrationAlert = dashboardData?.maintenanceAlerts?.alerts?.find(
         (alert) => alert.type === 'registration'
       );
-      setRegistrationDaysRemaining(
-        registrationAlert?.daysRemaining ?? null
-      );
+      setRegistrationDaysRemaining(registrationAlert?.daysRemaining ?? null);
 
       // Extract service kilometers remaining from maintenance alerts
       const serviceAlert = dashboardData?.maintenanceAlerts?.alerts?.find(

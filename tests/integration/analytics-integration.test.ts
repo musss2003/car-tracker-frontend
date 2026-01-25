@@ -161,7 +161,7 @@ describe('Analytics API Integration', () => {
       //
       // This test is skipped but preserved for manual benchmarking.
       // To run manually: npm test -- analytics-integration.test.ts --reporter=verbose
-      
+
       const startDashboard = Date.now();
       await getCarDashboard(TEST_CAR_ID);
       const dashboardTime = Date.now() - startDashboard;
