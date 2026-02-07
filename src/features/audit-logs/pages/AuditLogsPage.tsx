@@ -92,7 +92,12 @@ const AuditLogsPage = () => {
       console.log('📊 Audit logs response:', response);
 
       if (response && response.logs && response.pagination) {
-        console.log('✅ Setting logs:', response.logs.length, 'items, total:', response.pagination.total);
+        console.log(
+          '✅ Setting logs:',
+          response.logs.length,
+          'items, total:',
+          response.pagination.total
+        );
         setLogs(response.logs);
         setTotal(response.pagination.total);
         setTotalPages(response.pagination.totalPages);
@@ -109,13 +114,15 @@ const AuditLogsPage = () => {
         status: error?.response?.status,
         data: error?.response?.data,
         message: error?.message,
-        fullError: error
+        fullError: error,
       });
       logError('Failed to fetch audit logs:', error);
-      
+
       // Show specific error message based on error type
       if (error?.response?.status === 403) {
-        toast.error('Nemate dozvolu za pristup audit logovima (potrebna admin uloga)');
+        toast.error(
+          'Nemate dozvolu za pristup audit logovima (potrebna admin uloga)'
+        );
       } else if (error?.response?.status === 401) {
         toast.error('Niste prijavljeni. Molimo prijavite se ponovo.');
       } else if (error?.response?.data?.message) {
@@ -123,7 +130,7 @@ const AuditLogsPage = () => {
       } else {
         toast.error('Greška pri učitavanju logova');
       }
-      
+
       // Reset state on error
       setLogs([]);
       setTotal(0);
