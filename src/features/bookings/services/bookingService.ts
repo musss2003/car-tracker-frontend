@@ -64,38 +64,6 @@ class BookingService {
     return query ? `?${query}` : '';
   }
 
-  /**
-   * Validate date format and logic
-   * @throws Error if dates are invalid
-   */
-  private validateDates(startDate: string, endDate: string): void {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (isNaN(start.getTime())) {
-      throw new Error('Invalid start date format');
-    }
-
-    if (isNaN(end.getTime())) {
-      throw new Error('Invalid end date format');
-    }
-
-    if (start >= end) {
-      throw new Error('End date must be after start date');
-    }
-  }
-
-  /**
-   * Validate single date format
-   * @throws Error if date is invalid
-   */
-  private validateSingleDate(date: string, fieldName: string): void {
-    const parsed = new Date(date);
-    if (isNaN(parsed.getTime())) {
-      throw new Error(`Invalid ${fieldName} format`);
-    }
-  }
-
   // ==================== CRUD Operations ====================
 
   /**
@@ -135,22 +103,13 @@ class BookingService {
 
   /**
    * Create a new booking
+   * Note: UI layer should validate required fields and date logic before calling
    */
   async createBooking(data: CreateBookingDto): Promise<Booking> {
     try {
-      // Validate required fields
-      if (!data.customerId || !data.carId || !data.startDate || !data.endDate) {
-        throw new Error(
-          'Missing required fields: customerId, carId, startDate, endDate'
-        );
-      }
-
-      // Validate ID formats to prevent injection attacks
-      validateId(data.customerId, 'customer id');
-      validateId(data.carId, 'car id');
-
-      // Validate date range
-      this.validateDates(data.startDate, data.endDate);
+      // Security validation only - prevent injection attacks
+      if (data.customerId) validateId(data.customerId, 'customer id');
+      if (data.carId) validateId(data.carId, 'car id');
 
       return await api.post<Booking>(this.basePath, data, 'booking');
     } catch (error) {
@@ -161,28 +120,11 @@ class BookingService {
 
   /**
    * Update an existing booking
+   * Note: UI layer should validate dates and business logic before calling
    */
   async updateBooking(id: string, data: UpdateBookingDto): Promise<Booking> {
     try {
       validateId(id, 'booking id');
-
-      // Comprehensive date validation
-      // If both dates provided, validate the range
-      if (data.startDate && data.endDate) {
-        this.validateDates(data.startDate, data.endDate);
-      }
-      // If only start date provided, validate format
-      else if (data.startDate) {
-        this.validateSingleDate(data.startDate, 'start date');
-        // Warning: Updating only start date may create invalid range
-        // Backend should validate against existing end date
-      }
-      // If only end date provided, validate format
-      else if (data.endDate) {
-        this.validateSingleDate(data.endDate, 'end date');
-        // Warning: Updating only end date may create invalid range
-        // Backend should validate against existing start date
-      }
 
       return await api.put<Booking>(
         `${this.basePath}/${encodePathParam(id)}`,
@@ -235,18 +177,15 @@ class BookingService {
 
   /**
    * Cancel a booking with reason
+   * Note: UI layer should validate reason is provided
    */
   async cancelBooking(id: string, reason: string): Promise<Booking> {
     try {
       validateId(id, 'booking id');
 
-      if (!reason || reason.trim().length === 0) {
-        throw new Error('Cancellation reason is required');
-      }
-
       return await api.post<Booking>(
         `${this.basePath}/${encodePathParam(id)}/cancel`,
-        { reason: reason.trim() },
+        { reason },
         'booking',
         id
       );
@@ -312,6 +251,7 @@ class BookingService {
 
   /**
    * Check if a car is available for a given date range
+   * Note: UI layer should validate date logic before calling
    */
   async checkAvailability(
     carId: string,
@@ -320,9 +260,6 @@ class BookingService {
   ): Promise<AvailabilityResponse> {
     try {
       validateId(carId, 'car id');
-
-      // Validate date range using helper method
-      this.validateDates(startDate, endDate);
 
       return await api.post<AvailabilityResponse>(
         `${this.basePath}/check-availability`,
@@ -374,12 +311,9 @@ class BookingService {
    */
   async getBookingsByStatus(status: string): Promise<Booking[]> {
     try {
-      if (!status || status.trim().length === 0) {
-        throw new Error('Status is required');
-      }
-
+      const queryString = this.buildQueryString({ status });
       return await api.get<Booking[]>(
-        `${this.basePath}?status=${encodeURIComponent(status)}`,
+        `${this.basePath}${queryString}`,
         'bookings by status'
       );
     } catch (error) {
@@ -393,10 +327,6 @@ class BookingService {
    */
   async searchByReference(reference: string): Promise<Booking | null> {
     try {
-      if (!reference || reference.trim().length === 0) {
-        throw new Error('Booking reference is required');
-      }
-
       return await api.get<Booking | null>(
         `${this.basePath}/search/${encodePathParam(reference)}`,
         'booking search',
