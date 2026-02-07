@@ -24,13 +24,17 @@ export interface BookingExtra {
   pricePerDay?: number;
 }
 
-export interface Booking {
+export interface CreateBookingExtraDto {
+  type: BookingExtraType;
+  quantity: number;
+}
+
+interface BookingBase {
   _id: string;
   customerId: string;
   carId: string;
   startDate: string;
   endDate: string;
-  status: BookingStatus;
   totalEstimatedCost: number;
   depositAmount: number;
   depositPaid: boolean;
@@ -40,19 +44,45 @@ export interface Booking {
   dropoffLocation?: string;
   additionalDrivers?: string[];
   extras?: BookingExtra[];
-  cancelledAt?: string;
-  cancellationReason?: string;
-  convertedToContractId?: string;
-  convertedAt?: string;
-  expiresAt: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-
-  // Populated fields
   customer?: Customer;
   car?: Car;
 }
+
+interface PendingBooking extends BookingBase {
+  status: BookingStatus.PENDING;
+  expiresAt: string;
+}
+
+interface ConfirmedBooking extends BookingBase {
+  status: BookingStatus.CONFIRMED;
+}
+
+interface CancelledBooking extends BookingBase {
+  status: BookingStatus.CANCELLED;
+  cancelledAt: string;
+  cancellationReason: string;
+}
+
+interface ConvertedBooking extends BookingBase {
+  status: BookingStatus.CONVERTED;
+  convertedToContractId: string;
+  convertedAt: string;
+}
+
+interface ExpiredBooking extends BookingBase {
+  status: BookingStatus.EXPIRED;
+  expiresAt: string;
+}
+
+export type Booking =
+  | PendingBooking
+  | ConfirmedBooking
+  | CancelledBooking
+  | ConvertedBooking
+  | ExpiredBooking;
 
 export interface CreateBookingDto {
   customerId: string;
@@ -61,7 +91,7 @@ export interface CreateBookingDto {
   endDate: string;
   pickupLocation?: string;
   dropoffLocation?: string;
-  extras?: BookingExtra[];
+  extras?: CreateBookingExtraDto[];
   notes?: string;
 }
 
@@ -70,6 +100,6 @@ export interface UpdateBookingDto {
   endDate?: string;
   pickupLocation?: string;
   dropoffLocation?: string;
-  extras?: BookingExtra[];
+  extras?: CreateBookingExtraDto[];
   notes?: string;
 }
