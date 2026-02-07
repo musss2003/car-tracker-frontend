@@ -1,4 +1,8 @@
-import { api, buildQueryString, encodePathParam } from '@/shared/utils/apiService';
+import {
+  api,
+  buildQueryString,
+  encodePathParam,
+} from '@/shared/utils/apiService';
 import { validateId } from '@/shared/utils/inputValidator';
 import type {
   Booking,
@@ -221,7 +225,9 @@ class BookingService {
   /**
    * Get bookings with a specific status
    */
-  async getBookingsByStatus(status: BookingStatus | string): Promise<Booking[]> {
+  async getBookingsByStatus(
+    status: BookingStatus | string
+  ): Promise<Booking[]> {
     const queryString = buildQueryString({ status });
     return await api.get<Booking[]>(
       `${this.basePath}${queryString}`,
