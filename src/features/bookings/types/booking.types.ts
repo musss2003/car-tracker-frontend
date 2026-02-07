@@ -1,9 +1,12 @@
+import type { Customer } from '../../customers';
+import type { Car } from '../../cars';
+
 export enum BookingStatus {
   PENDING = 'pending',
   CONFIRMED = 'confirmed',
   CANCELLED = 'cancelled',
   CONVERTED = 'converted',
-  EXPIRED = 'expired'
+  EXPIRED = 'expired',
 }
 
 export enum BookingExtraType {
@@ -12,7 +15,7 @@ export enum BookingExtraType {
   ADDITIONAL_DRIVER = 'additional_driver',
   INSURANCE_UPGRADE = 'insurance_upgrade',
   WIFI = 'wifi',
-  ROOF_RACK = 'roof_rack'
+  ROOF_RACK = 'roof_rack',
 }
 
 export interface BookingExtra {
@@ -45,10 +48,10 @@ export interface Booking {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-  
+
   // Populated fields
-  customer?: any;
-  car?: any;
+  customer?: Customer;
+  car?: Car;
 }
 
 export interface CreateBookingDto {
