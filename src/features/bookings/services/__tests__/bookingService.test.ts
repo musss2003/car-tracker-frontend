@@ -7,7 +7,10 @@ import type {
   UpdateBookingDto,
 } from '../../types/booking.types';
 import { BookingStatus, BookingExtraType } from '../../types/booking.types';
-import type { PaginatedResponse, AvailabilityResponse } from '../bookingService';
+import type {
+  PaginatedResponse,
+  AvailabilityResponse,
+} from '../bookingService';
 
 // Mock dependencies
 vi.mock('@/shared/utils/apiService', () => ({
@@ -222,9 +225,7 @@ describe('Booking Service', () => {
         extras: [],
       };
 
-      vi.mocked(api.post).mockRejectedValue(
-        new Error('Car not available')
-      );
+      vi.mocked(api.post).mockRejectedValue(new Error('Car not available'));
 
       await expect(bookingService.createBooking(createData)).rejects.toThrow(
         'Car not available'
@@ -321,13 +322,11 @@ describe('Booking Service', () => {
     });
 
     it('should handle API errors', async () => {
-      vi.mocked(api.delete).mockRejectedValue(
-        new Error('Deletion failed')
-      );
+      vi.mocked(api.delete).mockRejectedValue(new Error('Deletion failed'));
 
-      await expect(
-        bookingService.deleteBooking('booking-123')
-      ).rejects.toThrow('Deletion failed');
+      await expect(bookingService.deleteBooking('booking-123')).rejects.toThrow(
+        'Deletion failed'
+      );
     });
   });
 
@@ -375,9 +374,7 @@ describe('Booking Service', () => {
     });
 
     it('should handle API errors', async () => {
-      vi.mocked(api.post).mockRejectedValue(
-        new Error('Confirmation failed')
-      );
+      vi.mocked(api.post).mockRejectedValue(new Error('Confirmation failed'));
 
       await expect(
         bookingService.confirmBooking('booking-123')
@@ -432,9 +429,7 @@ describe('Booking Service', () => {
     });
 
     it('should handle API errors', async () => {
-      vi.mocked(api.post).mockRejectedValue(
-        new Error('Cancellation failed')
-      );
+      vi.mocked(api.post).mockRejectedValue(new Error('Cancellation failed'));
 
       await expect(
         bookingService.cancelBooking('booking-123', 'Test reason')
@@ -486,9 +481,7 @@ describe('Booking Service', () => {
     });
 
     it('should handle API errors', async () => {
-      vi.mocked(api.post).mockRejectedValue(
-        new Error('Conversion failed')
-      );
+      vi.mocked(api.post).mockRejectedValue(new Error('Conversion failed'));
 
       await expect(
         bookingService.convertToContract('booking-123')
@@ -594,9 +587,9 @@ describe('Booking Service', () => {
     it('should handle API errors', async () => {
       vi.mocked(api.get).mockRejectedValue(new Error('Fetch failed'));
 
-      await expect(
-        bookingService.getBookingsByCar('car-456')
-      ).rejects.toThrow('Fetch failed');
+      await expect(bookingService.getBookingsByCar('car-456')).rejects.toThrow(
+        'Fetch failed'
+      );
     });
   });
 
@@ -790,7 +783,9 @@ describe('Booking Service', () => {
 
       vi.mocked(api.get).mockResolvedValue(mockBookings);
 
-      const result = await bookingService.getBookingsByStatus(BookingStatus.CONFIRMED);
+      const result = await bookingService.getBookingsByStatus(
+        BookingStatus.CONFIRMED
+      );
 
       expect(api.get).toHaveBeenCalledWith(
         '/api/bookings?status=confirmed',
