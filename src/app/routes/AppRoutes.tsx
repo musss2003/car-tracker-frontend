@@ -61,6 +61,11 @@ const EditContractPage = lazy(
   () => import('../../features/contracts/pages/EditContractPage')
 );
 
+// Bookings Pages - Feature-based imports
+const BookingsPage = lazy(
+  () => import('../../features/bookings/pages/BookingsPage')
+);
+
 // Customers Pages - Feature-based imports
 const CustomersPage = lazy(
   () => import('../../features/customers/pages/CustomersPage')
@@ -168,6 +173,8 @@ export function AppRoutes() {
           <Route path="/contracts/:id" element={<ContractDetailsPage />} />
           <Route path="/contracts/:id/edit" element={<EditContractPage />} />
           <Route path="/contracts" element={<ContractsPage />} />
+
+          <Route path="/bookings" element={<BookingsPage />} />
 
           <Route path="/customers/new" element={<CreateCustomerPage />} />
           <Route path="/customers/:id" element={<CustomerDetailsPage />} />
