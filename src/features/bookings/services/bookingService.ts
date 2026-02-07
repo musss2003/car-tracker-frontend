@@ -1,8 +1,8 @@
-import { api, encodePathParam } from '@/shared/utils/apiService';
+import { api, buildQueryString, encodePathParam } from '@/shared/utils/apiService';
 import { validateId } from '@/shared/utils/inputValidator';
-import { logError } from '@/shared/utils/logger';
 import type {
   Booking,
+  BookingStatus,
   CreateBookingDto,
   UpdateBookingDto,
 } from '../types/booking.types';
@@ -19,7 +19,7 @@ export interface PaginatedResponse<T> {
 export interface QueryParams {
   page?: number;
   limit?: number;
-  status?: string;
+  status?: BookingStatus | string; // Allow enum or string for flexibility
   customerId?: string;
   carId?: string;
   startDate?: string;
@@ -34,35 +34,12 @@ export interface AvailabilityResponse {
   message?: string;
 }
 
-export interface BookingResponse {
-  booking: Booking;
-  message?: string;
-}
-
 /**
  * Booking Service - Handles all booking-related API operations
  * Follows RESTful conventions and uses centralized error handling
  */
 class BookingService {
   private readonly basePath = '/api/bookings';
-
-  /**
-   * Build query string from params object
-   */
-  private buildQueryString(params?: QueryParams): string {
-    if (!params) return '';
-
-    const searchParams = new URLSearchParams();
-
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        searchParams.append(key, String(value));
-      }
-    });
-
-    const query = searchParams.toString();
-    return query ? `?${query}` : '';
-  }
 
   // ==================== CRUD Operations ====================
 
@@ -72,33 +49,23 @@ class BookingService {
   async getAllBookings(
     params?: QueryParams
   ): Promise<PaginatedResponse<Booking>> {
-    try {
-      const queryString = this.buildQueryString(params);
-      return await api.get<PaginatedResponse<Booking>>(
-        `${this.basePath}${queryString}`,
-        'bookings'
-      );
-    } catch (error) {
-      logError('Error fetching bookings', error);
-      throw error;
-    }
+    const queryString = buildQueryString(params || {});
+    return await api.get<PaginatedResponse<Booking>>(
+      `${this.basePath}${queryString}`,
+      'bookings'
+    );
   }
 
   /**
    * Get a single booking by ID
    */
   async getBookingById(id: string): Promise<Booking> {
-    try {
-      validateId(id, 'booking id');
-      return await api.get<Booking>(
-        `${this.basePath}/${encodePathParam(id)}`,
-        'booking',
-        id
-      );
-    } catch (error) {
-      logError('Error fetching booking', error);
-      throw error;
-    }
+    validateId(id, 'booking id');
+    return await api.get<Booking>(
+      `${this.basePath}/${encodePathParam(id)}`,
+      'booking',
+      id
+    );
   }
 
   /**
@@ -106,16 +73,11 @@ class BookingService {
    * Note: UI layer should validate required fields and date logic before calling
    */
   async createBooking(data: CreateBookingDto): Promise<Booking> {
-    try {
-      // Security validation only - prevent injection attacks
-      if (data.customerId) validateId(data.customerId, 'customer id');
-      if (data.carId) validateId(data.carId, 'car id');
+    // Security validation only - prevent injection attacks
+    if (data.customerId) validateId(data.customerId, 'customer id');
+    if (data.carId) validateId(data.carId, 'car id');
 
-      return await api.post<Booking>(this.basePath, data, 'booking');
-    } catch (error) {
-      logError('Error creating booking', error);
-      throw error;
-    }
+    return await api.post<Booking>(this.basePath, data, 'booking');
   }
 
   /**
@@ -123,36 +85,26 @@ class BookingService {
    * Note: UI layer should validate dates and business logic before calling
    */
   async updateBooking(id: string, data: UpdateBookingDto): Promise<Booking> {
-    try {
-      validateId(id, 'booking id');
+    validateId(id, 'booking id');
 
-      return await api.put<Booking>(
-        `${this.basePath}/${encodePathParam(id)}`,
-        data,
-        'booking',
-        id
-      );
-    } catch (error) {
-      logError('Error updating booking', error);
-      throw error;
-    }
+    return await api.put<Booking>(
+      `${this.basePath}/${encodePathParam(id)}`,
+      data,
+      'booking',
+      id
+    );
   }
 
   /**
    * Delete a booking
    */
   async deleteBooking(id: string): Promise<{ message: string }> {
-    try {
-      validateId(id, 'booking id');
-      return await api.delete<{ message: string }>(
-        `${this.basePath}/${encodePathParam(id)}`,
-        'booking',
-        id
-      );
-    } catch (error) {
-      logError('Error deleting booking', error);
-      throw error;
-    }
+    validateId(id, 'booking id');
+    return await api.delete<{ message: string }>(
+      `${this.basePath}/${encodePathParam(id)}`,
+      'booking',
+      id
+    );
   }
 
   // ==================== Specialized Operations ====================
@@ -161,18 +113,13 @@ class BookingService {
    * Confirm a booking
    */
   async confirmBooking(id: string): Promise<Booking> {
-    try {
-      validateId(id, 'booking id');
-      return await api.post<Booking>(
-        `${this.basePath}/${encodePathParam(id)}/confirm`,
-        {},
-        'booking',
-        id
-      );
-    } catch (error) {
-      logError('Error confirming booking', error);
-      throw error;
-    }
+    validateId(id, 'booking id');
+    return await api.post<Booking>(
+      `${this.basePath}/${encodePathParam(id)}/confirm`,
+      {},
+      'booking',
+      id
+    );
   }
 
   /**
@@ -180,37 +127,27 @@ class BookingService {
    * Note: UI layer should validate reason is provided
    */
   async cancelBooking(id: string, reason: string): Promise<Booking> {
-    try {
-      validateId(id, 'booking id');
+    validateId(id, 'booking id');
 
-      return await api.post<Booking>(
-        `${this.basePath}/${encodePathParam(id)}/cancel`,
-        { reason },
-        'booking',
-        id
-      );
-    } catch (error) {
-      logError('Error cancelling booking', error);
-      throw error;
-    }
+    return await api.post<Booking>(
+      `${this.basePath}/${encodePathParam(id)}/cancel`,
+      { reason },
+      'booking',
+      id
+    );
   }
 
   /**
    * Convert a booking to a contract
    */
   async convertToContract(id: string): Promise<Booking> {
-    try {
-      validateId(id, 'booking id');
-      return await api.post<Booking>(
-        `${this.basePath}/${encodePathParam(id)}/convert`,
-        {},
-        'booking',
-        id
-      );
-    } catch (error) {
-      logError('Error converting booking to contract', error);
-      throw error;
-    }
+    validateId(id, 'booking id');
+    return await api.post<Booking>(
+      `${this.basePath}/${encodePathParam(id)}/convert`,
+      {},
+      'booking',
+      id
+    );
   }
 
   // ==================== Query Operations ====================
@@ -219,34 +156,24 @@ class BookingService {
    * Get all bookings for a specific customer
    */
   async getBookingsByCustomer(customerId: string): Promise<Booking[]> {
-    try {
-      validateId(customerId, 'customer id');
-      return await api.get<Booking[]>(
-        `${this.basePath}/customer/${encodePathParam(customerId)}`,
-        'customer bookings',
-        customerId
-      );
-    } catch (error) {
-      logError('Error fetching customer bookings', error);
-      throw error;
-    }
+    validateId(customerId, 'customer id');
+    return await api.get<Booking[]>(
+      `${this.basePath}/customer/${encodePathParam(customerId)}`,
+      'customer bookings',
+      customerId
+    );
   }
 
   /**
    * Get all bookings for a specific car
    */
   async getBookingsByCar(carId: string): Promise<Booking[]> {
-    try {
-      validateId(carId, 'car id');
-      return await api.get<Booking[]>(
-        `${this.basePath}/car/${encodePathParam(carId)}`,
-        'car bookings',
-        carId
-      );
-    } catch (error) {
-      logError('Error fetching car bookings', error);
-      throw error;
-    }
+    validateId(carId, 'car id');
+    return await api.get<Booking[]>(
+      `${this.basePath}/car/${encodePathParam(carId)}`,
+      'car bookings',
+      carId
+    );
   }
 
   /**
@@ -258,84 +185,59 @@ class BookingService {
     startDate: string,
     endDate: string
   ): Promise<AvailabilityResponse> {
-    try {
-      validateId(carId, 'car id');
+    validateId(carId, 'car id');
 
-      return await api.post<AvailabilityResponse>(
-        `${this.basePath}/check-availability`,
-        {
-          carId,
-          startDate,
-          endDate,
-        },
-        'availability check'
-      );
-    } catch (error) {
-      logError('Error checking availability', error);
-      throw error;
-    }
+    return await api.post<AvailabilityResponse>(
+      `${this.basePath}/check-availability`,
+      {
+        carId,
+        startDate,
+        endDate,
+      },
+      'availability check'
+    );
   }
 
   /**
    * Get upcoming bookings (confirmed bookings with start date in the future)
    */
   async getUpcomingBookings(): Promise<Booking[]> {
-    try {
-      return await api.get<Booking[]>(
-        `${this.basePath}/upcoming`,
-        'upcoming bookings'
-      );
-    } catch (error) {
-      logError('Error fetching upcoming bookings', error);
-      throw error;
-    }
+    return await api.get<Booking[]>(
+      `${this.basePath}/upcoming`,
+      'upcoming bookings'
+    );
   }
 
   /**
    * Get bookings that are about to expire
    */
   async getExpiringBookings(): Promise<Booking[]> {
-    try {
-      return await api.get<Booking[]>(
-        `${this.basePath}/expiring`,
-        'expiring bookings'
-      );
-    } catch (error) {
-      logError('Error fetching expiring bookings', error);
-      throw error;
-    }
+    return await api.get<Booking[]>(
+      `${this.basePath}/expiring`,
+      'expiring bookings'
+    );
   }
 
   /**
    * Get bookings with a specific status
    */
-  async getBookingsByStatus(status: string): Promise<Booking[]> {
-    try {
-      const queryString = this.buildQueryString({ status });
-      return await api.get<Booking[]>(
-        `${this.basePath}${queryString}`,
-        'bookings by status'
-      );
-    } catch (error) {
-      logError('Error fetching bookings by status', error);
-      throw error;
-    }
+  async getBookingsByStatus(status: BookingStatus | string): Promise<Booking[]> {
+    const queryString = buildQueryString({ status });
+    return await api.get<Booking[]>(
+      `${this.basePath}${queryString}`,
+      'bookings by status'
+    );
   }
 
   /**
    * Search bookings by booking reference
    */
   async searchByReference(reference: string): Promise<Booking | null> {
-    try {
-      return await api.get<Booking | null>(
-        `${this.basePath}/search/${encodePathParam(reference)}`,
-        'booking search',
-        reference
-      );
-    } catch (error) {
-      logError('Error searching booking by reference', error);
-      throw error;
-    }
+    return await api.get<Booking | null>(
+      `${this.basePath}/search/${encodePathParam(reference)}`,
+      'booking search',
+      reference
+    );
   }
 }
 
