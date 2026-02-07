@@ -27,6 +27,7 @@ import {
   Settings,
   ClipboardList,
   UserCog,
+  Calendar,
 } from 'lucide-react';
 
 export function AppSidebar() {
@@ -52,6 +53,7 @@ export function AppSidebar() {
       title: 'Upravljanje',
       items: [
         { to: '/contracts', icon: FileText, label: 'Ugovori', badge: '' },
+        { to: '/bookings', icon: Calendar, label: 'Rezervacije', badge: '' },
         { to: '/customers', icon: Users, label: 'Kupci', badge: '' },
       ],
     },
