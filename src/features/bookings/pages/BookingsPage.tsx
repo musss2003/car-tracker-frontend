@@ -74,6 +74,9 @@ const BookingsPage = () => {
   const [filterCar, setFilterCar] = useState<string>('');
   const [filterStartDate, setFilterStartDate] = useState<string>('');
   const [filterEndDate, setFilterEndDate] = useState<string>('');
+  const [filterDepositPaid, setFilterDepositPaid] = useState<string>('all');
+  const [filterMinCost, setFilterMinCost] = useState<string>('');
+  const [filterMaxCost, setFilterMaxCost] = useState<string>('');
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
@@ -161,6 +164,35 @@ const BookingsPage = () => {
       );
     }
 
+    // Apply deposit paid filter
+    if (filterDepositPaid && filterDepositPaid !== 'all') {
+      const isPaid = filterDepositPaid === 'paid';
+      result = result.filter((booking) => booking.depositPaid === isPaid);
+    }
+
+    // Apply cost range filters
+    if (filterMinCost) {
+      const minCost = parseFloat(filterMinCost);
+      if (!isNaN(minCost)) {
+        result = result.filter(
+          (booking) =>
+            booking.totalEstimatedCost !== undefined &&
+            booking.totalEstimatedCost >= minCost
+        );
+      }
+    }
+
+    if (filterMaxCost) {
+      const maxCost = parseFloat(filterMaxCost);
+      if (!isNaN(maxCost)) {
+        result = result.filter(
+          (booking) =>
+            booking.totalEstimatedCost !== undefined &&
+            booking.totalEstimatedCost <= maxCost
+        );
+      }
+    }
+
     // Apply sorting
     result.sort((a, b) => {
       let aValue: any;
@@ -213,6 +245,9 @@ const BookingsPage = () => {
     filterCar,
     filterStartDate,
     filterEndDate,
+    filterDepositPaid,
+    filterMinCost,
+    filterMaxCost,
     sortConfig,
   ]);
 
@@ -233,6 +268,9 @@ const BookingsPage = () => {
     filterCar,
     filterStartDate,
     filterEndDate,
+    filterDepositPaid,
+    filterMinCost,
+    filterMaxCost,
   ]);
 
   // Handle sorting
@@ -351,6 +389,9 @@ const BookingsPage = () => {
     setFilterCar('');
     setFilterStartDate('');
     setFilterEndDate('');
+    setFilterDepositPaid('all');
+    setFilterMinCost('');
+    setFilterMaxCost('');
   };
 
   // Check if any filters are active
@@ -360,7 +401,10 @@ const BookingsPage = () => {
     filterCustomer ||
     filterCar ||
     filterStartDate ||
-    filterEndDate;
+    filterEndDate ||
+    (filterDepositPaid && filterDepositPaid !== 'all') ||
+    filterMinCost ||
+    filterMaxCost;
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -467,6 +511,50 @@ const BookingsPage = () => {
               type="date"
               value={filterEndDate}
               onChange={(e) => setFilterEndDate(e.target.value)}
+            />
+          </div>
+
+          {/* Deposit Paid Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Deposit Status</label>
+            <Select
+              value={filterDepositPaid}
+              onValueChange={setFilterDepositPaid}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All deposits" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Deposits</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="unpaid">Unpaid</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Min Cost Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Min Cost ($)</label>
+            <Input
+              type="number"
+              placeholder="Min cost..."
+              value={filterMinCost}
+              onChange={(e) => setFilterMinCost(e.target.value)}
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          {/* Max Cost Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Max Cost ($)</label>
+            <Input
+              type="number"
+              placeholder="Max cost..."
+              value={filterMaxCost}
+              onChange={(e) => setFilterMaxCost(e.target.value)}
+              min="0"
+              step="0.01"
             />
           </div>
         </div>
