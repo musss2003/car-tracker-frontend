@@ -1,5 +1,16 @@
 import { useEffect, useState, useMemo } from 'react';
 import { logError } from '@/shared/utils/logger';
+import {
+  logAudit,
+  AuditAction,
+  AuditOutcome,
+  sanitizeAuditMetadata,
+} from '@/shared/utils/audit';
+import {
+  isValidUUID,
+  validateCancellationReason,
+  sanitizeSearchQuery,
+} from '@/shared/utils/validation';
 import { toast } from 'react-toastify';
 import {
   FilterIcon,
@@ -135,7 +146,9 @@ const BookingsPage = () => {
           booking.customer?.name
             ?.toLowerCase()
             .includes(filterCustomer.toLowerCase()) ||
-          booking.customerId?.toLowerCase().includes(filterCustomer.toLowerCase())
+          booking.customerId
+            ?.toLowerCase()
+            .includes(filterCustomer.toLowerCase())
       );
     }
 
@@ -277,8 +290,7 @@ const BookingsPage = () => {
   const handleSort = (key: string) => {
     setSortConfig((prev) => ({
       key,
-      direction:
-        prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -325,12 +337,49 @@ const BookingsPage = () => {
 
   // Handle confirm booking
   const handleConfirm = async (booking: Booking) => {
+    // Input validation
+    if (!booking._id || !isValidUUID(booking._id)) {
+      const errorMsg = 'Invalid booking ID';
+      toast.error(errorMsg);
+      logAudit({
+        action: AuditAction.BOOKING_CONFIRMED,
+        outcome: AuditOutcome.FAILURE,
+        resourceType: 'booking',
+        resourceId: booking._id || 'unknown',
+        errorMessage: 'Invalid booking ID format',
+      });
+      return;
+    }
+
     try {
       await bookingService.confirmBooking(booking._id);
+      
+      // Audit log - SUCCESS
+      logAudit({
+        action: AuditAction.BOOKING_CONFIRMED,
+        outcome: AuditOutcome.SUCCESS,
+        resourceType: 'booking',
+        resourceId: booking._id,
+        metadata: sanitizeAuditMetadata({
+          bookingReference: booking.bookingReference,
+          previousStatus: booking.status,
+        }),
+      });
+
       toast.success('Booking confirmed successfully');
       fetchBookings();
     } catch (err) {
       const errorMessage = 'Failed to confirm booking';
+      
+      // Audit log - FAILURE
+      logAudit({
+        action: AuditAction.BOOKING_CONFIRMED,
+        outcome: AuditOutcome.FAILURE,
+        resourceType: 'booking',
+        resourceId: booking._id,
+        errorMessage: err instanceof Error ? err.message : 'Unknown error',
+      });
+
       logError(errorMessage, err);
       toast.error(errorMessage);
     }
@@ -344,16 +393,52 @@ const BookingsPage = () => {
   };
 
   const handleCancelConfirm = async () => {
-    if (!bookingToCancel || !cancellationReason.trim()) {
-      toast.error('Please provide a cancellation reason');
+    if (!bookingToCancel) {
+      toast.error('No booking selected for cancellation');
       return;
     }
+
+    // Validate booking ID
+    if (!bookingToCancel._id || !isValidUUID(bookingToCancel._id)) {
+      toast.error('Invalid booking ID');
+      logAudit({
+        action: AuditAction.BOOKING_CANCELLED,
+        outcome: AuditOutcome.FAILURE,
+        resourceType: 'booking',
+        resourceId: bookingToCancel._id || 'unknown',
+        errorMessage: 'Invalid booking ID format',
+      });
+      return;
+    }
+
+    // Validate and sanitize cancellation reason
+    const validation = validateCancellationReason(cancellationReason);
+    if (!validation.valid) {
+      toast.error(validation.error || 'Invalid cancellation reason');
+      return;
+    }
+
+    const sanitizedReason = validation.sanitized!;
 
     try {
       await bookingService.cancelBooking(
         bookingToCancel._id,
-        cancellationReason
+        sanitizedReason
       );
+
+      // Audit log - SUCCESS
+      logAudit({
+        action: AuditAction.BOOKING_CANCELLED,
+        outcome: AuditOutcome.SUCCESS,
+        resourceType: 'booking',
+        resourceId: bookingToCancel._id,
+        metadata: sanitizeAuditMetadata({
+          bookingReference: bookingToCancel.bookingReference,
+          previousStatus: bookingToCancel.status,
+          reasonLength: sanitizedReason.length,
+        }),
+      });
+
       toast.success('Booking cancelled successfully');
       setShowCancelDialog(false);
       setBookingToCancel(null);
@@ -361,6 +446,16 @@ const BookingsPage = () => {
       fetchBookings();
     } catch (err) {
       const errorMessage = 'Failed to cancel booking';
+
+      // Audit log - FAILURE
+      logAudit({
+        action: AuditAction.BOOKING_CANCELLED,
+        outcome: AuditOutcome.FAILURE,
+        resourceType: 'booking',
+        resourceId: bookingToCancel._id,
+        errorMessage: err instanceof Error ? err.message : 'Unknown error',
+      });
+
       logError(errorMessage, err);
       toast.error(errorMessage);
     }
@@ -446,7 +541,7 @@ const BookingsPage = () => {
             <Input
               placeholder="Search by reference..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(sanitizeSearchQuery(e.target.value))}
             />
           </div>
 
@@ -480,7 +575,7 @@ const BookingsPage = () => {
             <Input
               placeholder="Search by customer..."
               value={filterCustomer}
-              onChange={(e) => setFilterCustomer(e.target.value)}
+              onChange={(e) => setFilterCustomer(sanitizeSearchQuery(e.target.value))}
             />
           </div>
 
@@ -490,7 +585,7 @@ const BookingsPage = () => {
             <Input
               placeholder="Search by car..."
               value={filterCar}
-              onChange={(e) => setFilterCar(e.target.value)}
+              onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
             />
           </div>
 
@@ -596,7 +691,9 @@ const BookingsPage = () => {
         ) : error ? (
           <div className="p-8 text-center">
             <XCircleIcon className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Error Loading Bookings</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Error Loading Bookings
+            </h3>
             <p className="text-muted-foreground mb-4">{error}</p>
             <Button onClick={fetchBookings}>Try Again</Button>
           </div>
