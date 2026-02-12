@@ -32,7 +32,7 @@ export interface AuditContext {
  * Log an audit event for security and compliance tracking
  * Note: Client-side audit logs are supplementary to backend audit trails
  * The backend MUST implement comprehensive audit logging as the source of truth
- * 
+ *
  * @param context - The audit event context
  */
 export const logAudit = (context: AuditContext): void => {
