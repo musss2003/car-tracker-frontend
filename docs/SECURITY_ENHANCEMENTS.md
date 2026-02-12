@@ -1,6 +1,7 @@
 # Security Enhancements - Bookings Page
 
 ## Overview
+
 This document details the security improvements implemented in the Bookings List Page to address audit logging, PII protection, and input validation concerns.
 
 ## Issues Addressed
@@ -12,7 +13,9 @@ This document details the security improvements implemented in the Bookings List
 **Solution**: Implemented comprehensive client-side audit logging with the following features:
 
 #### Audit Logging Utility (`src/shared/utils/audit.ts`)
+
 - **Structured audit events** with standardized fields:
+
   - `action`: Type of action performed (BOOKING_CONFIRMED, BOOKING_CANCELLED, etc.)
   - `outcome`: Result of action (SUCCESS, FAILURE, PENDING)
   - `resourceType`: Type of resource affected
@@ -22,13 +25,14 @@ This document details the security improvements implemented in the Bookings List
   - `userAgent`: Browser information for session tracking
 
 - **Audit Actions Tracked**:
+
   ```typescript
-  - BOOKING_CONFIRMED
-  - BOOKING_CANCELLED
-  - BOOKING_CREATED
-  - BOOKING_UPDATED
-  - BOOKING_VIEWED
-  - FILTER_APPLIED
+  -BOOKING_CONFIRMED -
+    BOOKING_CANCELLED -
+    BOOKING_CREATED -
+    BOOKING_UPDATED -
+    BOOKING_VIEWED -
+    FILTER_APPLIED;
   ```
 
 - **PII-Safe Metadata**: `sanitizeAuditMetadata()` automatically redacts sensitive fields:
@@ -39,6 +43,7 @@ This document details the security improvements implemented in the Bookings List
 #### Implementation in BookingsPage
 
 **Confirm Booking**:
+
 ```typescript
 // SUCCESS case
 logAudit({
@@ -63,6 +68,7 @@ logAudit({
 ```
 
 **Cancel Booking**:
+
 ```typescript
 logAudit({
   action: AuditAction.BOOKING_CANCELLED,
@@ -78,6 +84,7 @@ logAudit({
 ```
 
 **Important Notes**:
+
 - ✅ Client-side audit logs are **supplementary** to backend audit trails
 - ✅ Backend MUST implement comprehensive audit logging as source of truth
 - ✅ Currently logs to console with `[AUDIT]` prefix for visibility
@@ -92,6 +99,7 @@ logAudit({
 **Solution**: Enhanced error handling with multiple layers of protection:
 
 #### Already Implemented in `logger.ts`
+
 The existing `logError()` function already sanitizes errors:
 
 ```typescript
@@ -110,18 +118,22 @@ export const logError = (message: string, error?: unknown): void => {
 ```
 
 **Protection Features**:
+
 - ✅ Only logs error messages, not full error objects
 - ✅ No request/response payloads logged
 - ✅ No headers, tokens, or authentication data exposed
 - ✅ Unknown error types get generic message
 
 #### Enhanced in BookingsPage
+
 All error handling now includes:
+
 1. **Audit context** for error tracking (without PII)
 2. **Sanitized error messages** via existing logger
 3. **User-friendly error messages** via toast notifications
 
 Example:
+
 ```typescript
 catch (err) {
   // 1. Log audit event (no PII)
@@ -142,6 +154,7 @@ catch (err) {
 ```
 
 **Verification**:
+
 - ✅ No raw error objects logged
 - ✅ No request/response data in logs
 - ✅ Sensitive fields redacted in audit metadata
@@ -158,6 +171,7 @@ catch (err) {
 #### Validation Utility (`src/shared/utils/validation.ts`)
 
 **UUID Validation**:
+
 ```typescript
 isValidUUID(value: string): boolean
 // Validates format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -165,6 +179,7 @@ isValidUUID(value: string): boolean
 ```
 
 **Text Sanitization**:
+
 ```typescript
 sanitizeTextInput(value: string, maxLength: number): string
 // - Removes null bytes and control characters
@@ -174,6 +189,7 @@ sanitizeTextInput(value: string, maxLength: number): string
 ```
 
 **Cancellation Reason Validation**:
+
 ```typescript
 validateCancellationReason(reason: string)
 // Returns: { valid: boolean; error?: string; sanitized?: string }
@@ -183,6 +199,7 @@ validateCancellationReason(reason: string)
 ```
 
 **Search Query Sanitization**:
+
 ```typescript
 sanitizeSearchQuery(query: string): string
 // - Removes SQL injection patterns (SELECT, DROP, etc.)
@@ -192,6 +209,7 @@ sanitizeSearchQuery(query: string): string
 ```
 
 **Numeric Validation**:
+
 ```typescript
 validateNumericInput(value: string, min: number, max: number)
 // - Validates number format
@@ -200,6 +218,7 @@ validateNumericInput(value: string, min: number, max: number)
 ```
 
 **Date Validation**:
+
 ```typescript
 validateDateInput(value: string)
 // - Validates date format
@@ -210,6 +229,7 @@ validateDateInput(value: string)
 #### Implementation in BookingsPage
 
 **Confirm Booking**:
+
 ```typescript
 // Validate booking ID format
 if (!booking._id || !isValidUUID(booking._id)) {
@@ -226,6 +246,7 @@ if (!booking._id || !isValidUUID(booking._id)) {
 ```
 
 **Cancel Booking**:
+
 ```typescript
 // Validate and sanitize cancellation reason
 const validation = validateCancellationReason(cancellationReason);
@@ -239,6 +260,7 @@ await bookingService.cancelBooking(bookingToCancel._id, sanitizedReason);
 ```
 
 **Search Filters**:
+
 ```typescript
 // All search inputs are sanitized on change
 onChange={(e) => setSearchTerm(sanitizeSearchQuery(e.target.value))}
@@ -247,6 +269,7 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 ```
 
 **Protection Features**:
+
 - ✅ UUID format validation prevents malformed IDs
 - ✅ SQL injection patterns removed from search queries
 - ✅ XSS patterns sanitized
@@ -302,12 +325,14 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 ### Important Notes
 
 ⚠️ **Backend is Primary Security Boundary**:
+
 - Client-side validation is for UX and defense-in-depth ONLY
 - Backend MUST validate ALL inputs as if client doesn't exist
 - Backend MUST enforce authorization on every request
 - Backend MUST maintain comprehensive audit trail
 
 ✅ **Client-Side Responsibilities**:
+
 - Prevent obviously invalid requests
 - Provide immediate user feedback
 - Sanitize search queries to prevent injection
@@ -319,6 +344,7 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 ## Compliance & Best Practices
 
 ### Audit Logging
+
 - ✅ All critical actions logged (confirm, cancel, create, update)
 - ✅ Both success and failure outcomes recorded
 - ✅ Timestamps in ISO 8601 format
@@ -327,6 +353,7 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 - 🔄 Ready for GDPR/CCPA compliance with backend integration
 
 ### PII Protection
+
 - ✅ Error messages sanitized (no stack traces to users)
 - ✅ No request/response payloads in logs
 - ✅ Sensitive fields automatically redacted
@@ -334,6 +361,7 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 - ✅ Cancellation reason length logged, not content
 
 ### Input Validation
+
 - ✅ All user inputs sanitized
 - ✅ UUID format validation
 - ✅ Length limits enforced
@@ -346,6 +374,7 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 ## Testing Checklist
 
 ### Audit Logging Tests
+
 - [ ] Verify audit events appear in console for confirm action
 - [ ] Verify audit events appear in console for cancel action
 - [ ] Confirm SUCCESS outcome logged for successful operations
@@ -354,12 +383,14 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 - [ ] Check timestamp format is ISO 8601
 
 ### PII Protection Tests
+
 - [ ] Trigger error and verify no PII in console
 - [ ] Check error objects don't expose request data
 - [ ] Verify sensitive metadata fields are redacted
 - [ ] Confirm user-friendly error messages (not technical)
 
 ### Input Validation Tests
+
 - [ ] Try invalid UUID for booking ID
 - [ ] Try very long cancellation reason (>500 chars)
 - [ ] Try very short cancellation reason (<10 chars)
@@ -372,17 +403,21 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 ## Future Enhancements
 
 ### Phase 2 (Recommended)
+
 1. **Backend Audit Endpoint**:
+
    - Send client audit events to `/api/audit` for centralized logging
    - Correlation with backend audit trail
    - Persistent storage for compliance
 
 2. **Content Security Policy (CSP)**:
+
    - Add CSP headers to prevent XSS
    - Restrict inline scripts
    - Whitelist trusted domains
 
 3. **Rate Limiting**:
+
    - Client-side rate limiting for repeated failures
    - Exponential backoff for retries
    - Protection against brute force
@@ -397,11 +432,13 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 ## Files Modified
 
 ### New Files Created
+
 1. `src/shared/utils/audit.ts` - Audit logging utility
 2. `src/shared/utils/validation.ts` - Input validation & sanitization
 3. `docs/SECURITY_ENHANCEMENTS.md` - This documentation
 
 ### Files Modified
+
 1. `src/features/bookings/pages/BookingsPage.tsx`:
    - Added audit logging to confirm/cancel actions
    - Added UUID validation
@@ -410,25 +447,27 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
    - Enhanced error handling
 
 ### Existing Files (Already Secure)
+
 1. `src/shared/utils/logger.ts` - Already PII-safe
 
 ---
 
 ## Compliance Status
 
-| Requirement | Status | Notes |
-|------------|--------|-------|
-| Audit trail for critical actions | ✅ Implemented | Client + Backend needed |
-| PII protection in logs | ✅ Implemented | Sanitization active |
-| Input validation | ✅ Implemented | Defense-in-depth |
-| Error handling | ✅ Implemented | User-friendly messages |
-| SQL injection prevention | ✅ Implemented | Search sanitization |
-| XSS prevention | ✅ Implemented | Input sanitization |
-| Authorization checks | ⚠️ Backend Only | Client doesn't control |
-| Rate limiting | ⚠️ Backend Only | Client can't enforce |
-| Data encryption | ⚠️ Backend Only | HTTPS/TLS required |
+| Requirement                      | Status          | Notes                   |
+| -------------------------------- | --------------- | ----------------------- |
+| Audit trail for critical actions | ✅ Implemented  | Client + Backend needed |
+| PII protection in logs           | ✅ Implemented  | Sanitization active     |
+| Input validation                 | ✅ Implemented  | Defense-in-depth        |
+| Error handling                   | ✅ Implemented  | User-friendly messages  |
+| SQL injection prevention         | ✅ Implemented  | Search sanitization     |
+| XSS prevention                   | ✅ Implemented  | Input sanitization      |
+| Authorization checks             | ⚠️ Backend Only | Client doesn't control  |
+| Rate limiting                    | ⚠️ Backend Only | Client can't enforce    |
+| Data encryption                  | ⚠️ Backend Only | HTTPS/TLS required      |
 
 **Legend**:
+
 - ✅ Implemented and tested
 - ⚠️ Backend responsibility (verify separately)
 - 🔄 Ready for implementation
@@ -440,6 +479,7 @@ onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
 The following MUST be verified in the backend API:
 
 ### 1. Audit Logging
+
 - [ ] All booking confirm operations logged with user context
 - [ ] All booking cancel operations logged with user context
 - [ ] Audit logs include timestamp, user ID, action, outcome
@@ -447,18 +487,21 @@ The following MUST be verified in the backend API:
 - [ ] Audit logs stored persistently (database/log aggregation)
 
 ### 2. Authorization
+
 - [ ] Only authorized users can confirm bookings
 - [ ] Only authorized users can cancel bookings
 - [ ] Users can only modify their own bookings (or admin/employee)
 - [ ] Proper role-based access control enforced
 
 ### 3. Input Validation
+
 - [ ] Booking ID validated (UUID format, exists in database)
 - [ ] Cancellation reason validated (length, format)
 - [ ] All inputs sanitized against injection
 - [ ] Schema validation with class-validator or similar
 
 ### 4. PII Protection
+
 - [ ] Backend logs don't expose PII
 - [ ] Error responses don't leak sensitive data
 - [ ] Audit logs sanitize PII appropriately
@@ -469,6 +512,7 @@ The following MUST be verified in the backend API:
 ## Summary
 
 **Security improvements implemented**:
+
 1. ✅ Comprehensive audit logging for all critical booking actions
 2. ✅ PII-safe error handling with sanitized logging
 3. ✅ Defense-in-depth input validation and sanitization
@@ -477,6 +521,7 @@ The following MUST be verified in the backend API:
 6. ✅ Structured audit events ready for backend integration
 
 **Next steps**:
+
 1. Verify backend audit logging implementation
 2. Test backend authorization enforcement
 3. Implement backend audit endpoint (`/api/audit`)

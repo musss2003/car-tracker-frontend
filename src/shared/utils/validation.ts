@@ -176,7 +176,10 @@ export const sanitizeSearchQuery = (query: string): string => {
   }
 
   // Remove SQL injection patterns
-  let sanitized = query.replace(/('|--|;|\/\*|\*\/|xp_|sp_|exec|execute|select|insert|update|delete|drop|create|alter|union)/gi, '');
+  let sanitized = query.replace(
+    /('|--|;|\/\*|\*\/|xp_|sp_|exec|execute|select|insert|update|delete|drop|create|alter|union)/gi,
+    ''
+  );
 
   // Remove excessive whitespace
   sanitized = sanitized.replace(/\s+/g, ' ');

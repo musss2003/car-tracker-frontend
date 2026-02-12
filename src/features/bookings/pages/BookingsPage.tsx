@@ -76,7 +76,9 @@ const BookingsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
   const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
-  const [cancellationReason, setCancellationReason] = useState<string>('');
+  const [cancellationReason, setCancellationReason] = useState<string>('');  const [isCancelling, setIsCancelling] = useState<boolean>(false);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalBookings, setTotalBookings] = useState<number>(0);
 
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -100,13 +102,42 @@ const BookingsPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
-  // Fetch bookings data
+  // Fetch bookings data with server-side filtering, sorting, and pagination
   const fetchBookings = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await bookingService.getAllBookings();
+
+      // Build query parameters for server-side processing
+      const queryParams: any = {
+        page: currentPage,
+        limit: itemsPerPage,
+        sortBy: sortConfig.key,
+        sortOrder: sortConfig.direction,
+      };
+
+      // Add filters only if they have values
+      if (searchTerm) queryParams.search = sanitizeSearchQuery(searchTerm);
+      if (filterStatus && filterStatus !== 'all') queryParams.status = filterStatus;
+      if (filterCustomer) queryParams.customerSearch = sanitizeSearchQuery(filterCustomer);
+      if (filterCar) queryParams.carSearch = sanitizeSearchQuery(filterCar);
+      if (filterStartDate) queryParams.startDate = filterStartDate;
+      if (filterEndDate) {
+        // Adjust end date to include the entire day (23:59:59.999)
+        const endOfDay = new Date(filterEndDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        queryParams.endDate = endOfDay.toISOString();
+      }
+      if (filterDepositPaid && filterDepositPaid !== 'all') {
+        queryParams.depositPaid = filterDepositPaid === 'paid';
+      }
+      if (filterMinCost) queryParams.minCost = parseFloat(filterMinCost);
+      if (filterMaxCost) queryParams.maxCost = parseFloat(filterMaxCost);
+
+      const response = await bookingService.getAllBookings(queryParams);
       setBookings(response.data || []);
+      setTotalPages(response.totalPages || 1);
+      setTotalBookings(response.total || 0);
     } catch (err) {
       const errorMessage = 'Failed to fetch bookings';
       setError(errorMessage);
@@ -117,141 +148,12 @@ const BookingsPage = () => {
     }
   };
 
+  // Re-fetch when any filter, sort, or pagination parameter changes
   useEffect(() => {
     fetchBookings();
-  }, []);
-
-  // Filtering and sorting logic
-  const filteredAndSortedBookings = useMemo(() => {
-    let result = [...bookings];
-
-    // Apply search filter (booking reference)
-    if (searchTerm) {
-      result = result.filter((booking) =>
-        booking.bookingReference
-          ?.toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Apply status filter
-    if (filterStatus && filterStatus !== 'all') {
-      result = result.filter((booking) => booking.status === filterStatus);
-    }
-
-    // Apply customer filter
-    if (filterCustomer) {
-      result = result.filter(
-        (booking) =>
-          booking.customer?.name
-            ?.toLowerCase()
-            .includes(filterCustomer.toLowerCase()) ||
-          booking.customerId
-            ?.toLowerCase()
-            .includes(filterCustomer.toLowerCase())
-      );
-    }
-
-    // Apply car filter
-    if (filterCar) {
-      result = result.filter(
-        (booking) =>
-          booking.car?.licensePlate
-            ?.toLowerCase()
-            .includes(filterCar.toLowerCase()) ||
-          booking.car?.model?.toLowerCase().includes(filterCar.toLowerCase()) ||
-          booking.carId?.toLowerCase().includes(filterCar.toLowerCase())
-      );
-    }
-
-    // Apply date range filter
-    if (filterStartDate) {
-      result = result.filter(
-        (booking) => new Date(booking.startDate) >= new Date(filterStartDate)
-      );
-    }
-
-    if (filterEndDate) {
-      result = result.filter(
-        (booking) => new Date(booking.endDate) <= new Date(filterEndDate)
-      );
-    }
-
-    // Apply deposit paid filter
-    if (filterDepositPaid && filterDepositPaid !== 'all') {
-      const isPaid = filterDepositPaid === 'paid';
-      result = result.filter((booking) => booking.depositPaid === isPaid);
-    }
-
-    // Apply cost range filters
-    if (filterMinCost) {
-      const minCost = parseFloat(filterMinCost);
-      if (!isNaN(minCost)) {
-        result = result.filter(
-          (booking) =>
-            booking.totalEstimatedCost !== undefined &&
-            booking.totalEstimatedCost >= minCost
-        );
-      }
-    }
-
-    if (filterMaxCost) {
-      const maxCost = parseFloat(filterMaxCost);
-      if (!isNaN(maxCost)) {
-        result = result.filter(
-          (booking) =>
-            booking.totalEstimatedCost !== undefined &&
-            booking.totalEstimatedCost <= maxCost
-        );
-      }
-    }
-
-    // Apply sorting
-    result.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
-      switch (sortConfig.key) {
-        case 'bookingReference':
-          aValue = a.bookingReference || '';
-          bValue = b.bookingReference || '';
-          break;
-        case 'customer':
-          aValue = a.customer?.name || '';
-          bValue = b.customer?.name || '';
-          break;
-        case 'car':
-          aValue = a.car?.licensePlate || '';
-          bValue = b.car?.licensePlate || '';
-          break;
-        case 'startDate':
-          aValue = new Date(a.startDate).getTime();
-          bValue = new Date(b.startDate).getTime();
-          break;
-        case 'status':
-          aValue = a.status;
-          bValue = b.status;
-          break;
-        case 'createdAt':
-          aValue = new Date(a.createdAt).getTime();
-          bValue = new Date(b.createdAt).getTime();
-          break;
-        default:
-          return 0;
-      }
-
-      if (aValue < bValue) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-      return 0;
-    });
-
-    return result;
   }, [
-    bookings,
+    currentPage,
+    itemsPerPage,
     searchTerm,
     filterStatus,
     filterCustomer,
@@ -264,16 +166,14 @@ const BookingsPage = () => {
     sortConfig,
   ]);
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredAndSortedBookings.length / itemsPerPage);
-  const paginatedBookings = filteredAndSortedBookings.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // Server-side processing eliminates the need for client-side filtering, sorting, and pagination
+  // The `bookings` state already contains the processed data from the backend
 
   // Reset to first page when filters change
   useEffect(() => {
-    setCurrentPage(1);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
   }, [
     searchTerm,
     filterStatus,
@@ -353,7 +253,7 @@ const BookingsPage = () => {
 
     try {
       await bookingService.confirmBooking(booking._id);
-      
+
       // Audit log - SUCCESS
       logAudit({
         action: AuditAction.BOOKING_CONFIRMED,
@@ -367,10 +267,16 @@ const BookingsPage = () => {
       });
 
       toast.success('Booking confirmed successfully');
-      fetchBookings();
+      
+      // Update local state instead of re-fetching all bookings
+      setBookings((prevBookings) =>
+        prevBookings.map((b) =>
+          b._id === booking._id ? { ...b, status: BookingStatus.CONFIRMED } : b
+        )
+      );
     } catch (err) {
       const errorMessage = 'Failed to confirm booking';
-      
+
       // Audit log - FAILURE
       logAudit({
         action: AuditAction.BOOKING_CONFIRMED,
@@ -420,11 +326,9 @@ const BookingsPage = () => {
 
     const sanitizedReason = validation.sanitized!;
 
+    setIsCancelling(true);
     try {
-      await bookingService.cancelBooking(
-        bookingToCancel._id,
-        sanitizedReason
-      );
+      await bookingService.cancelBooking(bookingToCancel._id, sanitizedReason);
 
       // Audit log - SUCCESS
       logAudit({
@@ -458,6 +362,8 @@ const BookingsPage = () => {
 
       logError(errorMessage, err);
       toast.error(errorMessage);
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -541,7 +447,9 @@ const BookingsPage = () => {
             <Input
               placeholder="Search by reference..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(sanitizeSearchQuery(e.target.value))}
+              onChange={(e) =>
+                setSearchTerm(sanitizeSearchQuery(e.target.value))
+              }
             />
           </div>
 
@@ -575,7 +483,9 @@ const BookingsPage = () => {
             <Input
               placeholder="Search by customer..."
               value={filterCustomer}
-              onChange={(e) => setFilterCustomer(sanitizeSearchQuery(e.target.value))}
+              onChange={(e) =>
+                setFilterCustomer(sanitizeSearchQuery(e.target.value))
+              }
             />
           </div>
 
@@ -585,7 +495,9 @@ const BookingsPage = () => {
             <Input
               placeholder="Search by car..."
               value={filterCar}
-              onChange={(e) => setFilterCar(sanitizeSearchQuery(e.target.value))}
+              onChange={(e) =>
+                setFilterCar(sanitizeSearchQuery(e.target.value))
+              }
             />
           </div>
 
@@ -795,7 +707,7 @@ const BookingsPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedBookings.map((booking) => (
+              {bookings.map((booking) => (
                 <TableRow key={booking._id}>
                   <TableCell className="font-medium">
                     {booking.bookingReference}
@@ -855,10 +767,10 @@ const BookingsPage = () => {
       </div>
 
       {/* Pagination */}
-      {!loading && !error && filteredAndSortedBookings.length > 0 && (
+      {!loading && !error && totalBookings > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
+            Showing {bookings.length} of {totalBookings} total bookings (Page {currentPage} of {totalPages})
           </p>
           <div className="flex gap-2">
             <Button
@@ -906,9 +818,10 @@ const BookingsPage = () => {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelConfirm}
+              disabled={isCancelling}
               className="bg-destructive hover:bg-destructive/90"
             >
-              Confirm Cancellation
+              {isCancelling ? 'Cancelling...' : 'Confirm Cancellation'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
