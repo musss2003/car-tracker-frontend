@@ -67,6 +67,35 @@ import { bookingService } from '../services/bookingService';
 import type { Booking } from '../types/booking.types';
 import { BookingStatus } from '../types/booking.types';
 
+// Status badge configuration (outside component to prevent recreation on every render)
+const statusConfigMap = {
+  [BookingStatus.PENDING]: {
+    variant: 'secondary' as const,
+    icon: ClockIcon,
+    label: 'Pending',
+  },
+  [BookingStatus.CONFIRMED]: {
+    variant: 'default' as const,
+    icon: CheckCircleIcon,
+    label: 'Confirmed',
+  },
+  [BookingStatus.CANCELLED]: {
+    variant: 'destructive' as const,
+    icon: XCircleIcon,
+    label: 'Cancelled',
+  },
+  [BookingStatus.CONVERTED]: {
+    variant: 'default' as const,
+    icon: DocumentIcon,
+    label: 'Converted',
+  },
+  [BookingStatus.EXPIRED]: {
+    variant: 'outline' as const,
+    icon: ClockIcon,
+    label: 'Expired',
+  },
+};
+
 const BookingsPage = () => {
   const navigate = useNavigate();
 
@@ -184,6 +213,7 @@ const BookingsPage = () => {
     filterDepositPaid,
     filterMinCost,
     filterMaxCost,
+    itemsPerPage,
   ]);
 
   // Handle sorting
@@ -196,41 +226,13 @@ const BookingsPage = () => {
 
   // Get status badge color and icon
   const getStatusBadge = (status: BookingStatus) => {
-    const config = {
-      [BookingStatus.PENDING]: {
-        variant: 'secondary' as const,
-        icon: ClockIcon,
-        label: 'Pending',
-      },
-      [BookingStatus.CONFIRMED]: {
-        variant: 'default' as const,
-        icon: CheckCircleIcon,
-        label: 'Confirmed',
-      },
-      [BookingStatus.CANCELLED]: {
-        variant: 'destructive' as const,
-        icon: XCircleIcon,
-        label: 'Cancelled',
-      },
-      [BookingStatus.CONVERTED]: {
-        variant: 'default' as const,
-        icon: DocumentIcon,
-        label: 'Converted',
-      },
-      [BookingStatus.EXPIRED]: {
-        variant: 'outline' as const,
-        icon: ClockIcon,
-        label: 'Expired',
-      },
-    };
-
-    const statusConfig = config[status] || config[BookingStatus.PENDING];
-    const Icon = statusConfig.icon;
+    const cfg = statusConfigMap[status] || statusConfigMap[BookingStatus.PENDING];
+    const Icon = cfg.icon;
 
     return (
-      <Badge variant={statusConfig.variant} className="gap-1">
+      <Badge variant={cfg.variant} className="gap-1">
         <Icon className="h-3 w-3" />
-        {statusConfig.label}
+        {cfg.label}
       </Badge>
     );
   };
@@ -818,7 +820,7 @@ const BookingsPage = () => {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelConfirm}
-              disabled={isCancelling}
+              disabled={isCancelling || !cancellationReason.trim()}
               className="bg-destructive hover:bg-destructive/90"
             >
               {isCancelling ? 'Cancelling...' : 'Confirm Cancellation'}
