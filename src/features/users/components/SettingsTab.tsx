@@ -22,7 +22,10 @@ interface SettingsTabProps {
   onUpdate: (user: User) => void;
 }
 
-const SettingsTab = ({ user, onUpdate }: SettingsTabProps) => {
+const SettingsTab = ({
+  user: _user,
+  onUpdate: _onUpdate,
+}: SettingsTabProps) => {
   const [language, setLanguage] = useState<string>('bs');
 
   useEffect(() => {
