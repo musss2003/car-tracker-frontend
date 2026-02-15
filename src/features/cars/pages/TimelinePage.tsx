@@ -2,15 +2,7 @@ import { useState, useEffect } from 'react';
 import { logError } from '@/shared/utils/logger';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import {
-  Calendar,
-  ArrowLeft,
-  Download,
-  Filter,
-  LayoutList,
-  LayoutGrid,
-  Clock,
-} from 'lucide-react';
+import { Calendar, Download, Filter, LayoutList, Clock } from 'lucide-react';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { LoadingState } from '@/shared/components/ui/loading-state';
 import { Card, CardContent } from '@/shared/components/ui/card';

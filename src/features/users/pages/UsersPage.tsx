@@ -31,7 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
-import { User } from '../types/user.types';
 import * as userService from '../services/userService';
 import { OnlineStatus } from '../components/OnlineStatus';
 import {

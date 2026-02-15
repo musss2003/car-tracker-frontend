@@ -2,13 +2,6 @@ import { useState, useEffect } from 'react';
 import { logError } from '@/shared/utils/logger';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
-import {
   Tabs,
   TabsContent,
   TabsList,

@@ -14,7 +14,6 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
-import { Card } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import {
   Dialog,
@@ -191,7 +190,7 @@ export default function CarIssuesPage() {
 
   const handleCreate = async () => {
     try {
-      const response = await createCarIssueReport(formData);
+      const _response = await createCarIssueReport(formData);
 
       toast.success('Problem je uspješno prijavljen');
       setShowCreateDialog(false);
@@ -220,7 +219,7 @@ export default function CarIssuesPage() {
         diagnosticPdfUrl: formData.diagnosticPdfUrl,
       };
 
-      const response = await updateCarIssueReportStatus(
+      const _response = await updateCarIssueReportStatus(
         selectedIssue.id,
         updatePayload
       );
@@ -237,7 +236,7 @@ export default function CarIssuesPage() {
 
   const handleStatusChange = async (issueId: string, newStatus: string) => {
     try {
-      const response = await updateCarIssueReportStatus(issueId, {
+      const _response = await updateCarIssueReportStatus(issueId, {
         status: newStatus as 'open' | 'in_progress' | 'resolved',
       });
 
@@ -253,7 +252,7 @@ export default function CarIssuesPage() {
     if (!issueToDelete) return;
 
     try {
-      const response = await deleteCarIssueReport(issueToDelete);
+      const _response = await deleteCarIssueReport(issueToDelete);
 
       toast.success('Problem je uspješno obrisan');
       setShowDeleteDialog(false);

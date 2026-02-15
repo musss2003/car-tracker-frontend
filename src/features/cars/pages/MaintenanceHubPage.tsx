@@ -11,7 +11,6 @@ import {
   TrendingUp,
   DollarSign,
   Clock,
-  Filter,
   Search,
   Download,
 } from 'lucide-react';
@@ -63,8 +62,8 @@ interface MaintenanceEvent {
   data: any; // Original data object
 }
 
-const SERVICE_INTERVAL = 10000;
-const REGISTRATION_INTERVAL_DAYS = 365;
+const _SERVICE_INTERVAL = 10000;
+const _REGISTRATION_INTERVAL_DAYS = 365;
 
 export default function MaintenanceHubPage() {
   const navigate = useNavigate();
@@ -82,13 +81,15 @@ export default function MaintenanceHubPage() {
   >([]);
 
   // KPI states
-  const [registrationDaysRemaining, setRegistrationDaysRemaining] = useState<
+  const [_registrationDaysRemaining, setRegistrationDaysRemaining] = useState<
     number | null
   >(null);
-  const [serviceKmRemaining, setServiceKmRemaining] = useState<number | null>(
+  const [_serviceKmRemaining, setServiceKmRemaining] = useState<number | null>(
     null
   );
-  const [activeIssueCount, setActiveIssueCount] = useState<number | null>(null);
+  const [_activeIssueCount, setActiveIssueCount] = useState<number | null>(
+    null
+  );
 
   // Cost statistics
   const [totalCost, setTotalCost] = useState(0);
@@ -526,7 +527,7 @@ export default function MaintenanceHubPage() {
                           issue:
                             'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
                         };
-                        const truncatedDescription =
+                        const _truncatedDescription =
                           event.description.length > 100
                             ? event.description.substring(0, 100) + '...'
                             : event.description;

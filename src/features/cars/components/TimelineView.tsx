@@ -171,7 +171,6 @@ interface TimelineEventCardProps {
 function TimelineEventCard({
   event,
   compact,
-  showConnector,
   onClick,
 }: TimelineEventCardProps) {
   const Icon = getEventIcon(event.type);

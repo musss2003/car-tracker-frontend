@@ -7,7 +7,6 @@ import {
   Text as RechartsText,
 } from 'recharts';
 import { Card } from '@/shared/components/ui/card';
-import { AlertTriangle, Clock, CalendarCheck } from 'lucide-react';
 
 // --- 1. Type Definitions ---
 interface GaugeData {

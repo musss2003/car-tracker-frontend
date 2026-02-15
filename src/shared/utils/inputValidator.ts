@@ -44,7 +44,7 @@ export function validateLicensePlate(plate: string): string {
   }
 
   // Allow letters, numbers, hyphens, and spaces
-  if (!/^[A-Z0-9\s\-]+$/.test(trimmed)) {
+  if (!/^[A-Z0-9\s-]+$/.test(trimmed)) {
     throw new Error('Invalid license plate: contains invalid characters');
   }
 

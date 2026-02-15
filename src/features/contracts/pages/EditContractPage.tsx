@@ -80,7 +80,7 @@ export default function EditContractPage() {
     photoFile,
     setPhotoFile,
     uploadPhoto,
-    error: photoError,
+    error: _photoError,
   } = usePhotoUpload();
 
   // Fetch contract data

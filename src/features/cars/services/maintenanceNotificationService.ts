@@ -5,10 +5,7 @@
  * - Reduced client-side computation
  * - Consistent alert logic across the platform
  */
-import {
-  getCarMaintenanceAlerts as getCarMaintenanceAlertsAPI,
-  MaintenanceAlert as BackendMaintenanceAlert,
-} from './carAnalyticsAPI';
+import { getCarMaintenanceAlerts as getCarMaintenanceAlertsAPI } from './carAnalyticsAPI';
 
 // Re-export backend types for backward compatibility
 export interface MaintenanceAlert {
@@ -64,7 +61,7 @@ export async function getMaintenanceAlerts(
  */
 export function calculateServiceUrgency(
   kmRemaining: number | null,
-  serviceInterval: number
+  _serviceInterval: number
 ): 'critical' | 'warning' | 'ok' {
   if (kmRemaining === null) return 'ok';
   if (kmRemaining < 500) return 'critical';

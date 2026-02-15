@@ -16,7 +16,7 @@ export const calculateDuration = (
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays;
-  } catch (error) {
+  } catch (_error) {
     return 0;
   }
 };

@@ -16,8 +16,6 @@ import { LoadingState } from '@/shared/components/ui/loading-state';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { Button } from '@/shared/components/ui/button';
 import { AlertTriangle, Edit, Plus, Shield, Trash2 } from 'lucide-react';
-import { DetailCard } from '@/shared/components/ui/detail-card';
-import { DetailField } from '@/shared/components/ui/detail-field';
 import { Badge } from '@/shared/components/ui/badge';
 import {
   Dialog,

@@ -9,7 +9,6 @@ import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { Button } from '@/shared/components/ui/button';
 import { FormSection } from '@/shared/components/ui/form-section';
 import { FormField } from '@/shared/components/ui/form-field';
-import { LoadingState } from '@/shared/components/ui/loading-state';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { CustomerSearchSelect } from '@/shared/components/ui/customer-search-select';
 import { DateRangeValidator } from '@/shared/components/ui/date-range-validator';
@@ -32,7 +31,7 @@ import { usePhotoUpload } from '@/shared/hooks/usePhotoUpload';
 import { createAndDownloadContract } from '../services/contractService';
 import { PhotoUpload } from '@/shared/components/ui/photo-upload';
 
-const CreateContractPage = ({}) => {
+const CreateContractPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<ContractFormData>({
@@ -56,7 +55,7 @@ const CreateContractPage = ({}) => {
     photoFile,
     setPhotoFile,
     uploadPhoto,
-    error: photoError,
+    error: _photoError,
   } = usePhotoUpload();
 
   useEffect(() => {
