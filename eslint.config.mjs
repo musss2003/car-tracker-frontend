@@ -19,7 +19,7 @@ export default [
       parserOptions: {
         ecmaVersion: 2020,
         sourceType: 'module',
-        project: './tsconfig.json',
+        project: './tsconfig.eslint.json',
         ecmaFeatures: {
           jsx: true,
         },
@@ -60,7 +60,7 @@ export default [
     rules: {
       ...prettierConfig.rules,
       'prettier/prettier': 'error',
-      
+
       // TypeScript rules
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
@@ -76,7 +76,7 @@ export default [
       'no-unused-vars': 'off', // Disable base rule in favor of TypeScript version
       'no-console': 'off',
       'no-undef': 'off', // TypeScript handles this
-      
+
       // React rules
       'react/react-in-jsx-scope': 'off', // Not needed in React 17+
       'react/prop-types': 'off', // Using TypeScript for prop validation
@@ -107,7 +107,7 @@ export default [
       parserOptions: {
         ecmaVersion: 2020,
         sourceType: 'module',
-        project: './tsconfig.json',
+        project: './tsconfig.eslint.json',
         ecmaFeatures: {
           jsx: true,
         },
