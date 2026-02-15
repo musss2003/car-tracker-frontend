@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { screen, waitFor, within } from '@testing-library/react';import { cleanup } from '@testing-library/react';import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
+import { cleanup } from '@testing-library/react';
 import { renderWithProviders } from '@/test-utils';
 import CreateBookingPage from '../CreateBookingPage';
-import { bookingService } from '../../services/bookingService';
 import { getCustomers } from '@/features/customers/services/customerService';
 import { getAvailableCarsForPeriod } from '@/features/cars/services/carService';
 import { BookingStatus } from '../../types/booking.types';
@@ -124,7 +124,7 @@ describe('CreateBookingPage', () => {
       await waitFor(() => {
         expect(screen.getByText('Create New Booking')).toBeInTheDocument();
       });
-      
+
       expect(
         screen.getByText(/Reserve a car for a customer with availability/i)
       ).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('CreateBookingPage', () => {
       await waitFor(() => {
         expect(screen.getByLabelText(/Start Date/i)).toBeInTheDocument();
       });
-      
+
       expect(screen.getByLabelText(/End Date/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Pickup Location/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Dropoff Location/i)).toBeInTheDocument();
@@ -149,7 +149,7 @@ describe('CreateBookingPage', () => {
       await waitFor(() => {
         expect(screen.getByLabelText(/GPS Navigation/i)).toBeInTheDocument();
       });
-      
+
       expect(screen.getByLabelText(/Child Seat/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Additional Driver/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Insurance Upgrade/i)).toBeInTheDocument();
@@ -165,7 +165,7 @@ describe('CreateBookingPage', () => {
           screen.getByRole('button', { name: /Create Booking/i })
         ).toBeInTheDocument();
       });
-      
+
       expect(
         screen.getByRole('button', { name: /Cancel/i })
       ).toBeInTheDocument();
@@ -187,7 +187,7 @@ describe('CreateBookingPage', () => {
       await waitFor(() => {
         expect(getCustomers).toHaveBeenCalled();
       });
-      
+
       // Customers are passed to CustomerSearchSelect component
       // The component manages its own rendering of customer options
     });
@@ -199,7 +199,7 @@ describe('CreateBookingPage', () => {
 
       const gpsCheckbox = await screen.findByLabelText(/GPS Navigation/i);
       const childSeatCheckbox = await screen.findByLabelText(/Child Seat/i);
-      
+
       expect(gpsCheckbox).not.toBeChecked();
       expect(childSeatCheckbox).not.toBeChecked();
     });
@@ -234,7 +234,9 @@ describe('CreateBookingPage', () => {
     it('should have cancel button that navigates back', async () => {
       renderWithProviders(<CreateBookingPage />);
 
-      const cancelButton = await screen.findByRole('button', { name: /Cancel/i });
+      const cancelButton = await screen.findByRole('button', {
+        name: /Cancel/i,
+      });
       expect(cancelButton).toBeInTheDocument();
     });
 
@@ -278,7 +280,9 @@ describe('CreateBookingPage', () => {
 
   describe('Error Handling', () => {
     it('should handle customer fetch error gracefully', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       vi.mocked(getCustomers).mockRejectedValueOnce(
         new Error('Failed to fetch customers')
       );

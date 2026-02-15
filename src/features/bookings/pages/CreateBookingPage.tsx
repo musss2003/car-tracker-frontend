@@ -14,7 +14,10 @@ import { bookingService } from '../services/bookingService';
 import { getCustomers } from '@/features/customers/services/customerService';
 import { logAudit, AuditAction, AuditOutcome } from '@/shared/utils/audit';
 import { logError } from '@/shared/utils/logger';
-import type { CreateBookingDto, BookingExtraType } from '../types/booking.types';
+import type {
+  CreateBookingDto,
+  BookingExtraType,
+} from '../types/booking.types';
 import type { Customer } from '@/features/customers/types/customer.types';
 import type { Car } from '@/features/cars/types/car.types';
 
@@ -24,7 +27,11 @@ const BOOKING_EXTRAS: Array<{
   pricePerDay: number;
 }> = [
   { type: 'gps' as BookingExtraType, label: 'GPS Navigation', pricePerDay: 5 },
-  { type: 'child_seat' as BookingExtraType, label: 'Child Seat', pricePerDay: 3 },
+  {
+    type: 'child_seat' as BookingExtraType,
+    label: 'Child Seat',
+    pricePerDay: 3,
+  },
   {
     type: 'additional_driver' as BookingExtraType,
     label: 'Additional Driver',
@@ -103,7 +110,11 @@ const CreateBookingPage = () => {
   }, []);
 
   // Handle car price calculation callback from CarAvailabilitySelect
-  const handlePriceCalculated = (dailyRate: number, totalAmount: number, days: number) => {
+  const handlePriceCalculated = (
+    dailyRate: number,
+    totalAmount: number,
+    days: number
+  ) => {
     setCarDailyRate(dailyRate);
     setCarCost(totalAmount);
     setTotalDays(days);
@@ -501,7 +512,9 @@ const CreateBookingPage = () => {
                 {extrasCost > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Extras:</span>
-                    <span className="font-medium">${extrasCost.toFixed(2)}</span>
+                    <span className="font-medium">
+                      ${extrasCost.toFixed(2)}
+                    </span>
                   </div>
                 )}
                 <div className="border-t border-blue-300 pt-3 flex justify-between">
@@ -511,9 +524,7 @@ const CreateBookingPage = () => {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">
-                    Deposit Required (20%):
-                  </span>
+                  <span className="text-gray-600">Deposit Required (20%):</span>
                   <span className="font-medium text-orange-600">
                     ${depositAmount.toFixed(2)}
                   </span>

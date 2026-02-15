@@ -23,7 +23,8 @@ window.ResizeObserver = ResizeObserver;
 // Assign directly without vi.fn to prevent restoreMocks from breaking it
 window.matchMedia = (query: string) => ({
   matches: false,
-  media: query,  onchange: null,
+  media: query,
+  onchange: null,
   addListener: () => {}, // deprecated
   removeListener: () => {}, // deprecated
   addEventListener: () => {},
