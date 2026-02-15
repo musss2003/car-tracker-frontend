@@ -23,6 +23,7 @@ export enum AuditResource {
   AUTH = 'auth',
   NOTIFICATION = 'notification',
   COUNTRY = 'country',
+  BOOKING = 'booking',
 }
 
 export enum AuditStatus {

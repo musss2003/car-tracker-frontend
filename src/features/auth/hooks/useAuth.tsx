@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { loginAPI, registerAPI } from '../services/authService';
 import { getAuthHeaders } from '../../../shared/utils/getAuthHeaders';
 import { logError } from '../../../shared/utils/logger';
-import { User, UserRole } from '../../users/types/user.types';
+import { User } from '../../users/types/user.types';
 
 export interface AuthContextType {
   user: User | null;

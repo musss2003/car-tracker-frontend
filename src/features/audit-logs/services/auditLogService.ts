@@ -108,7 +108,7 @@ export const exportAuditLogs = async (
  * Delete old audit logs (admin only)
  */
 export const cleanupOldLogs = async (
-  daysToKeep: number = 90
+  _daysToKeep: number = 90
 ): Promise<number> => {
   const result = await api.delete<{ deletedCount: number }>(
     `/api/audit-logs/cleanup`,

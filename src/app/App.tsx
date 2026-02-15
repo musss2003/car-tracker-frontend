@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import ErrorBoundary from '../shared/components/feedback/ErrorBoundary/ErrorBoundary';
-import { AppRoutes } from './routes/AppRoutes';
+import { AppRouter } from '../routing/router';
 import { socketService } from '../shared/services/socketService';
 
 import { Toaster } from '@/shared/components/ui/sonner';
@@ -57,7 +57,7 @@ function App() {
 
           {/* PAGE CONTENT */}
           <div className="p-4">
-            <AppRoutes />
+            <AppRouter />
           </div>
         </main>
       </div>
