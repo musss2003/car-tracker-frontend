@@ -24,6 +24,11 @@ export default defineConfig({
     setupFiles: './src/setup-test.ts',
     globals: true,
     include: ['src/**/*.test.{ts,tsx}'],
+    restoreMocks: false,
+    unstubGlobals: false,
+    unstubEnvs: false,
+    testTimeout: 5000,
+   hookTimeout: 5000,
     coverage: {
       reporter: ['text', 'json', 'lcov'], // lcov is needed for Codecov
     },
