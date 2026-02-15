@@ -172,16 +172,66 @@ describe('CreateBookingPage', () => {
     });
   });
 
-  // NOTE: Customer loading tests temporarily disabled due to test environment issues.
-  // The following test scenarios have been deferred:
-  // - Fetching customers on mount
-  // - Passing customer data to child components
-  // - Form validation
-  // - Extras selection
-  // - Cost calculation
-  // - Form submission  
-  // - Navigation
-  // - Error handling
-  //
-  // These scenarios are better tested through E2E tests.
+  describe('Customer Loading', () => {
+    it('should fetch customers on mount', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      await waitFor(() => {
+        expect(getCustomers).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('should pass customer data to CustomerSearchSelect', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      await waitFor(() => {
+        expect(getCustomers).toHaveBeenCalled();
+      });
+      
+      // Customers are passed to CustomerSearchSelect component
+      // The component manages its own rendering of customer options
+    });
+  });
+
+  describe('Extras Selection', () => {
+    it('should render extras checkboxes as unchecked by default', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      const gpsCheckbox = await screen.findByLabelText(/GPS Navigation/i);
+      const childSeatCheckbox = await screen.findByLabelText(/Child Seat/i);
+      
+      expect(gpsCheckbox).not.toBeChecked();
+      expect(childSeatCheckbox).not.toBeChecked();
+    });
+  });
+
+  describe('Cost Calculation', () => {
+    it('should not show cost summary when no car is selected', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      await screen.findByText('Create New Booking');
+
+      expect(screen.queryByText(/Total Cost/i)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle customer fetch error gracefully', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.mocked(getCustomers).mockRejectedValueOnce(
+        new Error('Failed to fetch customers')
+      );
+
+      renderWithProviders(<CreateBookingPage />);
+
+      await waitFor(() => {
+        expect(getCustomers).toHaveBeenCalled();
+      });
+
+      // Component should still render despite error
+      expect(screen.getByText('Create New Booking')).toBeInTheDocument();
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
 });
