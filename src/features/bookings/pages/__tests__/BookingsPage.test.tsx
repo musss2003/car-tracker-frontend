@@ -134,11 +134,11 @@ describe('BookingsPage', () => {
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Bookings')).toBeInTheDocument();
+        expect(screen.getByText('Rezervacije')).toBeInTheDocument();
       });
 
       expect(
-        screen.getByText('Manage and track all reservation bookings')
+        screen.getByText('Upravljajte i pratite sve rezervacije')
       ).toBeInTheDocument();
     });
 
@@ -146,7 +146,7 @@ describe('BookingsPage', () => {
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Create Booking')).toBeInTheDocument();
+        expect(screen.getByText('Kreiraj Rezervaciju')).toBeInTheDocument();
       });
     });
 
@@ -192,8 +192,8 @@ describe('BookingsPage', () => {
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Pending')).toBeInTheDocument();
-        expect(screen.getByText('Confirmed')).toBeInTheDocument();
+        expect(screen.getByText('Na Čekanju')).toBeInTheDocument();
+        expect(screen.getByText('Potvrđeno')).toBeInTheDocument();
       });
     });
 
@@ -211,11 +211,13 @@ describe('BookingsPage', () => {
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('No Bookings Found')).toBeInTheDocument();
+        expect(
+          screen.getByText('Nema Pronađenih Rezervacija')
+        ).toBeInTheDocument();
       });
 
       expect(
-        screen.getByText('Get started by creating your first booking.')
+        screen.getByText('Započnite kreiranjem vaše prve rezervacije.')
       ).toBeInTheDocument();
     });
 
@@ -227,10 +229,12 @@ describe('BookingsPage', () => {
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Error Loading Bookings')).toBeInTheDocument();
+        expect(
+          screen.getByText('Greška Pri Učitavanju Rezervacija')
+        ).toBeInTheDocument();
       });
 
-      expect(screen.getByText('Try Again')).toBeInTheDocument();
+      expect(screen.getByText('Pokušaj Ponovo')).toBeInTheDocument();
     });
   });
 
@@ -243,7 +247,9 @@ describe('BookingsPage', () => {
         expect(screen.getByText('BK-2026-001')).toBeInTheDocument();
       });
 
-      const searchInput = screen.getByPlaceholderText('Search by reference...');
+      const searchInput = screen.getByPlaceholderText(
+        'Pretraži po referenci...'
+      );
       await user.type(searchInput, 'BK-2026-001');
 
       await waitFor(() => {
@@ -293,9 +299,7 @@ describe('BookingsPage', () => {
         expect(screen.getByText('BK-2026-001')).toBeInTheDocument();
       });
 
-      const customerInput = screen.getByPlaceholderText(
-        'Search by customer...'
-      );
+      const customerInput = screen.getByPlaceholderText('Pretraži po kupcu...');
       await user.type(customerInput, 'John');
 
       await waitFor(() => {
@@ -346,11 +350,13 @@ describe('BookingsPage', () => {
       });
 
       // Apply some filters
-      const searchInput = screen.getByPlaceholderText('Search by reference...');
+      const searchInput = screen.getByPlaceholderText(
+        'Pretraži po referenci...'
+      );
       await user.type(searchInput, 'test');
 
       // Clear filters
-      const clearButton = screen.getByText('Clear All');
+      const clearButton = screen.getByText('Očisti Sve');
       await user.click(clearButton);
 
       await waitFor(() => {
@@ -368,7 +374,7 @@ describe('BookingsPage', () => {
         expect(screen.getByText('BK-2026-001')).toBeInTheDocument();
       });
 
-      const referenceHeader = screen.getByText('Reference').closest('th');
+      const referenceHeader = screen.getByText('Referenca').closest('th');
       await user.click(referenceHeader!);
 
       await waitFor(() => {
@@ -391,7 +397,7 @@ describe('BookingsPage', () => {
         expect(screen.getByText('BK-2026-001')).toBeInTheDocument();
       });
 
-      const dateHeader = screen.getByText('Date Range').closest('th');
+      const dateHeader = screen.getByText('Period').closest('th');
       await user.click(dateHeader!);
 
       await waitFor(() => {
@@ -415,9 +421,11 @@ describe('BookingsPage', () => {
         expect(screen.getByText('BK-2026-001')).toBeInTheDocument();
       });
 
-      expect(screen.getByText('Showing 2 of 2 bookings')).toBeInTheDocument();
-      expect(screen.getByText('Previous')).toBeInTheDocument();
-      expect(screen.getByText('Next')).toBeInTheDocument();
+      expect(
+        screen.getByText(/Prikazano 2 od 2 ukupno rezervacija/)
+      ).toBeInTheDocument();
+      expect(screen.getByText('Prethodno')).toBeInTheDocument();
+      expect(screen.getByText('Sljedeće')).toBeInTheDocument();
     });
 
     it('should navigate to next page', async () => {
@@ -436,7 +444,7 @@ describe('BookingsPage', () => {
         expect(screen.getByText('BK-2026-001')).toBeInTheDocument();
       });
 
-      const nextButton = screen.getByText('Next');
+      const nextButton = screen.getByText('Sljedeće');
       await user.click(nextButton);
 
       await waitFor(() => {
@@ -501,10 +509,10 @@ describe('BookingsPage', () => {
         within(row).queryByText('BK-2026-001')
       );
 
-      const actionsButton = within(pendingRow!).getByText('Actions');
+      const actionsButton = within(pendingRow!).getByText('Akcije');
       await user.click(actionsButton);
 
-      const confirmButton = await screen.findByText('Confirm');
+      const confirmButton = await screen.findByText('Potvrdi');
       await user.click(confirmButton);
 
       await waitFor(() => {
@@ -512,7 +520,7 @@ describe('BookingsPage', () => {
           bookingService.bookingService.confirmBooking
         ).toHaveBeenCalledWith('booking-1');
         expect(toast.success).toHaveBeenCalledWith(
-          'Booking confirmed successfully'
+          'Rezervacija uspješno potvrđena'
         );
       });
     });
@@ -534,14 +542,16 @@ describe('BookingsPage', () => {
         within(row).queryByText('BK-2026-001')
       );
 
-      const actionsButton = within(pendingRow!).getByText('Actions');
+      const actionsButton = within(pendingRow!).getByText('Akcije');
       await user.click(actionsButton);
 
-      const confirmButton = await screen.findByText('Confirm');
+      const confirmButton = await screen.findByText('Potvrdi');
       await user.click(confirmButton);
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Failed to confirm booking');
+        expect(toast.error).toHaveBeenCalledWith(
+          'Neuspješno potvrđivanje rezervacije'
+        );
       });
     });
 
@@ -558,17 +568,17 @@ describe('BookingsPage', () => {
         within(row).queryByText('BK-2026-001')
       );
 
-      const actionsButton = within(pendingRow!).getByText('Actions');
+      const actionsButton = within(pendingRow!).getByText('Akcije');
       await user.click(actionsButton);
 
-      const cancelButton = await screen.findByText('Cancel');
+      const cancelButton = await screen.findByText('Otkaži');
       await user.click(cancelButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Cancel Booking')).toBeInTheDocument();
+        expect(screen.getByText('Otkaži Rezervaciju')).toBeInTheDocument();
         expect(
           screen.getByText(
-            'Please provide a reason for cancelling this booking.'
+            'Molimo navedite razlog za otkazivanje ove rezervacije.'
           )
         ).toBeInTheDocument();
       });
@@ -592,15 +602,15 @@ describe('BookingsPage', () => {
         within(row).queryByText('BK-2026-001')
       );
 
-      const actionsButton = within(pendingRow!).getByText('Actions');
+      const actionsButton = within(pendingRow!).getByText('Akcije');
       await user.click(actionsButton);
 
-      const cancelButton = await screen.findByText('Cancel');
+      const cancelButton = await screen.findByText('Otkaži');
       await user.click(cancelButton);
 
       // Enter cancellation reason
       const reasonInput = await screen.findByPlaceholderText(
-        'Cancellation reason...'
+        'Razlog otkazivanja...'
       );
       await user.type(
         reasonInput,
@@ -608,7 +618,7 @@ describe('BookingsPage', () => {
       );
 
       // Confirm cancellation
-      const confirmButton = screen.getByText('Confirm Cancellation');
+      const confirmButton = screen.getByText('Potvrdi Otkazivanje');
       await user.click(confirmButton);
 
       await waitFor(() => {
@@ -619,7 +629,7 @@ describe('BookingsPage', () => {
           'Customer requested cancellation due to schedule change'
         );
         expect(toast.success).toHaveBeenCalledWith(
-          'Booking cancelled successfully'
+          'Rezervacija uspješno otkazana'
         );
       });
     });
@@ -651,12 +661,12 @@ describe('BookingsPage', () => {
       await user.type(reasonInput, 'short');
 
       // Try to confirm
-      const confirmButton = screen.getByText('Confirm Cancellation');
+      const confirmButton = screen.getByText('Potvrdi Otkazivanje');
       await user.click(confirmButton);
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith(
-          'Cancellation reason must be at least 10 characters'
+          'Razlog otkazivanja mora imati najmanje 10 karaktera'
         );
         expect(
           bookingService.bookingService.cancelBooking
@@ -678,20 +688,22 @@ describe('BookingsPage', () => {
         within(row).queryByText('BK-2026-001')
       );
 
-      const actionsButton = within(pendingRow!).getByText('Actions');
+      const actionsButton = within(pendingRow!).getByText('Akcije');
       await user.click(actionsButton);
 
-      const cancelMenuButton = await screen.findByText('Cancel');
+      const cancelMenuButton = await screen.findByText('Otkaži');
       await user.click(cancelMenuButton);
 
       // Close dialog
       const dialogCancelButton = screen
-        .getAllByText('Cancel')
-        .find((el) => el.closest('button')?.textContent === 'Cancel');
+        .getAllByText('Otkaži')
+        .find((el) => el.closest('button')?.textContent === 'Otkaži');
       await user.click(dialogCancelButton!);
 
       await waitFor(() => {
-        expect(screen.queryByText('Cancel Booking')).not.toBeInTheDocument();
+        expect(
+          screen.queryByText('Otkaži Rezervaciju')
+        ).not.toBeInTheDocument();
       });
     });
   });
@@ -763,7 +775,7 @@ describe('BookingsPage', () => {
 
       // Status should update optimistically
       await waitFor(() => {
-        expect(screen.getByText('Cancelled')).toBeInTheDocument();
+        expect(screen.getByText('Otkazano')).toBeInTheDocument();
       });
     });
   });
@@ -778,7 +790,9 @@ describe('BookingsPage', () => {
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Greška Pri Učitavanju Rezervacija')).toBeInTheDocument();
+        expect(
+          screen.getByText('Greška Pri Učitavanju Rezervacija')
+        ).toBeInTheDocument();
       });
 
       // Click retry

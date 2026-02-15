@@ -50,7 +50,7 @@ const getAllMunicipalities = (): MunicipalityOption[] => {
   if (data['Federacija Bosne i Hercegovine']) {
     const federation = data['Federacija Bosne i Hercegovine'];
     Object.entries(federation).forEach(
-      ([canton, cantonMunicipalities]: [string, any]) => {
+      ([_canton, cantonMunicipalities]: [string, any]) => {
         if (Array.isArray(cantonMunicipalities)) {
           cantonMunicipalities.forEach((name: string) => {
             municipalities.push({
@@ -404,7 +404,7 @@ const CreateCustomerPage: React.FC = () => {
                           Učitavanje...
                         </SelectItem>
                       ) : countries.length > 0 ? (
-                        countries.map((country, index) => {
+                        countries.map((country, _index) => {
                           const uniqueValue = `${country.dialCode}|||${country.code}`;
                           return (
                             <SelectItem key={uniqueValue} value={uniqueValue}>
@@ -477,7 +477,7 @@ const CreateCustomerPage: React.FC = () => {
                         Učitavanje...
                       </SelectItem>
                     ) : countries.length > 0 ? (
-                      countries.map((country, index) => (
+                      countries.map((country, _index) => (
                         <SelectItem
                           key={`country-${country.name.replace(/\s/g, '_')}`}
                           value={country.name}
