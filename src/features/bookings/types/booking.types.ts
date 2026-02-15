@@ -42,6 +42,10 @@ interface BookingBase {
   bookingReference: string;
   pickupLocation?: string;
   dropoffLocation?: string;
+  pickupLocationNotes?: string;
+  dropoffLocationNotes?: string;
+  pickupCoordinates?: { lat: number; lng: number };
+  dropoffCoordinates?: { lat: number; lng: number };
   additionalDrivers?: string[];
   extras?: BookingExtra[];
   createdBy: string;
@@ -91,6 +95,10 @@ export interface CreateBookingDto {
   endDate: string;
   pickupLocation?: string;
   dropoffLocation?: string;
+  pickupLocationNotes?: string;
+  dropoffLocationNotes?: string;
+  pickupCoordinates?: { lat: number; lng: number };
+  dropoffCoordinates?: { lat: number; lng: number };
   extras?: CreateBookingExtraDto[];
   notes?: string;
 }

@@ -8,6 +8,10 @@ import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { PageHeader } from '@/shared/components/ui/page-header';
+import {
+  LocationPicker,
+  LocationData,
+} from '@/shared/components/ui/location-picker';
 import { CustomerSearchSelect } from '@/features/customers/components/customer-search-select';
 import { CarAvailabilitySelect } from '@/features/cars/components/car-availability-select';
 import { bookingService } from '../services/bookingService';
@@ -63,8 +67,12 @@ const CreateBookingPage = () => {
   const [carId, setCarId] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [pickupLocation, setPickupLocation] = useState('');
-  const [dropoffLocation, setDropoffLocation] = useState('');
+  const [pickupLocation, setPickupLocation] = useState<LocationData | null>(
+    null
+  );
+  const [dropoffLocation, setDropoffLocation] = useState<LocationData | null>(
+    null
+  );
   const [notes, setNotes] = useState('');
 
   // Customer data
@@ -254,8 +262,22 @@ const CreateBookingPage = () => {
         carId,
         startDate,
         endDate,
-        ...(pickupLocation && { pickupLocation }),
-        ...(dropoffLocation && { dropoffLocation }),
+        ...(pickupLocation && {
+          pickupLocation: pickupLocation.address,
+          pickupLocationNotes: pickupLocation.notes,
+          pickupCoordinates: {
+            lat: pickupLocation.lat,
+            lng: pickupLocation.lng,
+          },
+        }),
+        ...(dropoffLocation && {
+          dropoffLocation: dropoffLocation.address,
+          dropoffLocationNotes: dropoffLocation.notes,
+          dropoffCoordinates: {
+            lat: dropoffLocation.lat,
+            lng: dropoffLocation.lng,
+          },
+        }),
         ...(extras.length > 0 && { extras }),
         ...(notes && { notes }),
       };
@@ -402,28 +424,27 @@ const CreateBookingPage = () => {
         {/* Locations */}
         <Card>
           <CardContent className="pt-6">
-            <div className="grid gap-6 md:grid-cols-2">
+            <h3 className="text-lg font-semibold mb-6">Lokacije</h3>
+            <div className="grid gap-8 lg:grid-cols-2">
               {/* Pickup Location */}
-              <div className="space-y-2">
-                <Label htmlFor="pickupLocation">Lokacija Preuzimanja</Label>
-                <Input
-                  id="pickupLocation"
-                  type="text"
-                  placeholder="npr. Glavni Ured, Aerodromski Terminal 1"
+              <div className="max-w-2xl">
+                <LocationPicker
+                  label="Lokacija Preuzimanja"
+                  placeholder="Pretraži adresu..."
+                  notesPlaceholder="npr. Glavni Ured - Kod recepcije"
                   value={pickupLocation}
-                  onChange={(e) => setPickupLocation(e.target.value)}
+                  onChange={setPickupLocation}
                 />
               </div>
 
               {/* Dropoff Location */}
-              <div className="space-y-2">
-                <Label htmlFor="dropoffLocation">Lokacija Vraćanja</Label>
-                <Input
-                  id="dropoffLocation"
-                  type="text"
-                  placeholder="npr. Glavni Ured, Aerodromski Terminal 1"
+              <div className="max-w-2xl">
+                <LocationPicker
+                  label="Lokacija Vraćanja"
+                  placeholder="Pretraži adresu..."
+                  notesPlaceholder="npr. Aerodromski Terminal 1 - Parking B"
                   value={dropoffLocation}
-                  onChange={(e) => setDropoffLocation(e.target.value)}
+                  onChange={setDropoffLocation}
                 />
               </div>
             </div>
