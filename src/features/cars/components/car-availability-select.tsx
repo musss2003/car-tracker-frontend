@@ -162,7 +162,7 @@ export const CarAvailabilitySelect: React.FC<CarAvailabilitySelectProps> = ({
   return (
     <div className={cn('space-y-4', className)}>
       <FormField
-        label="Vehicle"
+        label="Automobil"
         id="carId"
         error={error}
         required={required}
