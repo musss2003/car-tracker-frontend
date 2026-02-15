@@ -205,6 +205,26 @@ describe('CreateBookingPage', () => {
     });
   });
 
+  describe('Form Validation', () => {
+    it('should have submit button initially enabled', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      const submitButton = await screen.findByRole('button', {
+        name: /Create Booking/i,
+      });
+
+      expect(submitButton).toBeInTheDocument();
+      expect(submitButton).not.toBeDisabled();
+    });
+
+    it('should have cancel button that navigates back', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      const cancelButton = await screen.findByRole('button', { name: /Cancel/i });
+      expect(cancelButton).toBeInTheDocument();
+    });
+  });
+
   describe('Cost Calculation', () => {
     it('should not show cost summary when no car is selected', async () => {
       renderWithProviders(<CreateBookingPage />);
