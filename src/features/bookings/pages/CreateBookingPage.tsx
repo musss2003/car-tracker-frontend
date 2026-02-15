@@ -14,6 +14,7 @@ import { bookingService } from '../services/bookingService';
 import { getCustomers } from '@/features/customers/services/customerService';
 import { logAudit, AuditAction, AuditOutcome } from '@/shared/utils/audit';
 import { logError } from '@/shared/utils/logger';
+import { ROUTES } from '@/routing/paths';
 import type {
   CreateBookingDto,
   BookingExtraType,
@@ -298,6 +299,7 @@ const CreateBookingPage = () => {
       <PageHeader
         title="Kreiraj Novu Rezervaciju"
         subtitle="Rezerviši automobil za kupca sa provjerom dostupnosti i izračunom cijene"
+        onBack={() => navigate(ROUTES.bookings.root)}
       />
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-6">

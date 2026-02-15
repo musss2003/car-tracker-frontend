@@ -148,14 +148,14 @@ describe('CreateBookingPage', () => {
       renderWithProviders(<CreateBookingPage />);
 
       await waitFor(() => {
-        expect(screen.getByLabelText(/GPS Navigation/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/GPS Navigacija/i)).toBeInTheDocument();
       });
 
-      expect(screen.getByLabelText(/Child Seat/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Additional Driver/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Insurance Upgrade/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Mobile WiFi/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Roof Rack/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Dječije Sjedište/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Dodatni Vozač/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Nadogradnja Osiguranja/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Mobilni WiFi/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Krovni Nosač/i)).toBeInTheDocument();
     });
 
     it('should render form action buttons', async () => {

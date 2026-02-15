@@ -638,15 +638,15 @@ describe('BookingsPage', () => {
         within(row).queryByText('BK-2026-001')
       );
 
-      const actionsButton = within(pendingRow!).getByText('Actions');
+      const actionsButton = within(pendingRow!).getByText('Akcije');
       await user.click(actionsButton);
 
-      const cancelButton = await screen.findByText('Cancel');
+      const cancelButton = await screen.findByText('Otkaži');
       await user.click(cancelButton);
 
-      // Enter short reason
+      // Enter reason and confirm
       const reasonInput = await screen.findByPlaceholderText(
-        'Cancellation reason...'
+        'Razlog otkazivanja...'
       );
       await user.type(reasonInput, 'short');
 
@@ -706,7 +706,7 @@ describe('BookingsPage', () => {
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Pending')).toBeInTheDocument();
+        expect(screen.getByText('Na Čekanju')).toBeInTheDocument();
       });
 
       // Confirm booking
@@ -715,15 +715,15 @@ describe('BookingsPage', () => {
         within(row).queryByText('BK-2026-001')
       );
 
-      const actionsButton = within(pendingRow!).getByText('Actions');
+      const actionsButton = within(pendingRow!).getByText('Akcije');
       await user.click(actionsButton);
 
-      const confirmButton = await screen.findByText('Confirm');
+      const confirmButton = await screen.findByText('Potvrdi');
       await user.click(confirmButton);
 
       // Status should update optimistically without refetch
       await waitFor(() => {
-        const badges = screen.getAllByText('Confirmed');
+        const badges = screen.getAllByText('Potvrđeno');
         expect(badges.length).toBeGreaterThan(0);
       });
     });
@@ -746,19 +746,19 @@ describe('BookingsPage', () => {
         within(row).queryByText('BK-2026-001')
       );
 
-      const actionsButton = within(pendingRow!).getByText('Actions');
+      const actionsButton = within(pendingRow!).getByText('Akcije');
       await user.click(actionsButton);
 
-      const cancelButton = await screen.findByText('Cancel');
+      const cancelButton = await screen.findByText('Otkaži');
       await user.click(cancelButton);
 
       // Enter reason and confirm
       const reasonInput = await screen.findByPlaceholderText(
-        'Cancellation reason...'
+        'Razlog otkazivanja...'
       );
       await user.type(reasonInput, 'Customer requested cancellation');
 
-      const confirmButton = screen.getByText('Confirm Cancellation');
+      const confirmButton = screen.getByText('Potvrdi Otkazivanje');
       await user.click(confirmButton);
 
       // Status should update optimistically
@@ -778,11 +778,11 @@ describe('BookingsPage', () => {
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('Error Loading Bookings')).toBeInTheDocument();
+        expect(screen.getByText('Greška Pri Učitavanju Rezervacija')).toBeInTheDocument();
       });
 
       // Click retry
-      const retryButton = screen.getByText('Try Again');
+      const retryButton = screen.getByText('Pokušaj Ponovo');
 
       vi.mocked(bookingService.bookingService.getAllBookings).mockResolvedValue(
         mockBookingsResponse
