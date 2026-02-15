@@ -5,11 +5,9 @@ import { toast } from 'sonner';
 import {
   TrendingUp,
   TrendingDown,
-  DollarSign,
   Calendar,
   PieChart,
   BarChart3,
-  ArrowLeft,
   Download,
   AlertCircle,
   TrendingUp as TrendingUpIcon,
@@ -51,11 +49,7 @@ import {
   calculateCostComparison,
 } from '../services/costAnalyticsService';
 import { Car } from '../types/car.types';
-import {
-  CostAnalytics,
-  TopExpense,
-  MonthlyBreakdown,
-} from '../types/costAnalytics.types';
+import { CostAnalytics, TopExpense } from '../types/costAnalytics.types';
 
 export default function CostAnalyticsPage() {
   const navigate = useNavigate();

@@ -13,7 +13,7 @@ interface NotificationsTabProps {
   onUpdate: (user: User) => void;
 }
 
-const NotificationsTab = ({ user, onUpdate }: NotificationsTabProps) => {
+const NotificationsTab = ({ user }: NotificationsTabProps) => {
   return (
     <div className="space-y-6">
       {/* System Notifications Info */}

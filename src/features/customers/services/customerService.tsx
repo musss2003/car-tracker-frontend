@@ -57,30 +57,6 @@ export const addCustomer = async (
   return api.post<Customer>('/api/customers', newCustomer, 'customer');
 };
 
-// Define interface for country data from ApiCountries API
-interface Country {
-  name: string;
-  flag: string;
-  dialCodes: string[];
-  alpha2Code: string;
-  alpha3Code: string;
-  capital: string;
-  region: string;
-  subregion: string;
-  population: number;
-  currencies: Array<{
-    code: string;
-    name: string;
-    symbol: string;
-  }>;
-  languages: Array<{
-    iso639_1: string;
-    iso639_2: string;
-    name: string;
-    nativeName: string;
-  }>;
-}
-
 // Interface for the country data we need in the form
 export interface CountryOption {
   name: string;

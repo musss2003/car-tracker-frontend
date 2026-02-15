@@ -811,12 +811,12 @@ describe('BookingsPage', () => {
 
     it('should validate booking ID format', async () => {
       // Mock booking with invalid ID
-      const invalidBooking = {
+      const _invalidBooking = {
         ...mockBookingsResponse.data[0],
         _id: '', // Invalid empty ID
       } as Booking;
 
-      const user = userEvent.setup();
+      const _user = userEvent.setup();
       renderWithProviders(<BookingsPage />);
 
       await waitFor(() => {

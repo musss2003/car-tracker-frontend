@@ -5,10 +5,6 @@ import {
 } from '@/shared/utils/apiService';
 import { CarInsurance } from '../types/car.types';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/';
-
-const BASE_URL = `${API_URL}car-insurance/`;
-
 // Get all insurance records for a car
 export const getCarInsuranceHistory = async (
   carId: string

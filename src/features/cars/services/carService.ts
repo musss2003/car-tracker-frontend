@@ -3,12 +3,7 @@ import {
   validateId,
   validateLicensePlate,
 } from '@/shared/utils/inputValidator';
-import {
-  BookingEvent,
-  Car,
-  CarBrand,
-  CarRegistration,
-} from '../types/car.types';
+import { BookingEvent, Car, CarBrand } from '../types/car.types';
 
 export const getCar = async (carId: string): Promise<Car> => {
   validateId(carId, 'car id');

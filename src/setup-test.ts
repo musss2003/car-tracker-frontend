@@ -33,13 +33,13 @@ window.matchMedia = (query: string) => ({
 });
 
 // Mock URL.createObjectURL and revokeObjectURL for file handling
-URL.createObjectURL = vi.fn((blob: Blob) => `blob:${Date.now()}`);
+URL.createObjectURL = vi.fn((_blob: Blob) => `blob:${Date.now()}`);
 URL.revokeObjectURL = vi.fn();
 
 // Mock fetch API globally for auth session checks
 vi.stubGlobal(
   'fetch',
-  vi.fn((url: string | URL | Request, options?: RequestInit) => {
+  vi.fn((url: string | URL | Request, _options?: RequestInit) => {
     const urlString = typeof url === 'string' ? url : url.toString();
 
     // Mock auth session check to always return authenticated immediately

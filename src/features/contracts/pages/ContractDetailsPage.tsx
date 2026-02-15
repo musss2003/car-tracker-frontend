@@ -59,9 +59,9 @@ const ContractDetailsPage = () => {
   );
   const [passportPhoto, setPassportPhoto] = useState<string | null>(null);
   const [contractPhoto, setContractPhoto] = useState<string | null>(null);
-  const [loadingLicensePhoto, setLoadingLicensePhoto] = useState(false);
-  const [loadingPassportPhoto, setLoadingPassportPhoto] = useState(false);
-  const [loadingContractPhoto, setLoadingContractPhoto] = useState(false);
+  const [_loadingLicensePhoto, setLoadingLicensePhoto] = useState(false);
+  const [_loadingPassportPhoto, setLoadingPassportPhoto] = useState(false);
+  const [_loadingContractPhoto, setLoadingContractPhoto] = useState(false);
 
   // Modal state for photo preview
   const [modalOpen, setModalOpen] = useState(false);
@@ -214,7 +214,7 @@ const ContractDetailsPage = () => {
           month: 'long',
           day: 'numeric',
         });
-      } catch (error) {
+      } catch (_error) {
         return 'N/A';
       }
     },

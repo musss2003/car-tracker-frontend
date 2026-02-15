@@ -41,12 +41,8 @@ import {
 } from '@/shared/components/ui/alert-dialog';
 import { downloadDocument } from '@/shared/services/uploadService';
 import { deleteCar } from '../services/carService';
-import { KPIGauge } from '../components/kpi-gauge';
 import { PageHeader } from '@/shared/components/ui/page-header';
-import {
-  MaintenanceStatusList,
-  MaintenanceStatus,
-} from '../components/MaintenanceStatusList';
+import { MaintenanceStatusList } from '../components/MaintenanceStatusList';
 import {
   LogServiceModal,
   ReportIssueModal,

@@ -1,4 +1,3 @@
-'use client';
 import { logError } from '@/shared/utils/logger';
 
 import { useState, useEffect } from 'react';
@@ -49,7 +48,7 @@ const getAllMunicipalities = (): MunicipalityOption[] => {
   if (data['Federacija Bosne i Hercegovine']) {
     const federation = data['Federacija Bosne i Hercegovine'];
     Object.entries(federation).forEach(
-      ([canton, cantonMunicipalities]: [string, any]) => {
+      ([_canton, cantonMunicipalities]: [string, any]) => {
         if (Array.isArray(cantonMunicipalities)) {
           cantonMunicipalities.forEach((name: string) => {
             municipalities.push({
@@ -203,7 +202,7 @@ const EditCustomerFormContent: React.FC<{
 
   // Form state
   const [formData, setFormData] = useState<CustomerFormData>(initialData);
-  const [originalData, setOriginalData] =
+  const [originalData, _setOriginalData] =
     useState<CustomerFormData>(initialData);
 
   const [errors, setErrors] = useState<CustomerFormErrors>({});
@@ -219,24 +218,24 @@ const EditCustomerFormContent: React.FC<{
   const [selectedLicensePhoto, setSelectedLicensePhoto] = useState<File | null>(
     null
   );
-  const [licensePhotoPreview, setLicensePhotoPreview] = useState<string | null>(
-    null
-  );
+  const [licensePhotoPreview, _setLicensePhotoPreview] = useState<
+    string | null
+  >(null);
   const [existingLicensePhotoUrl, setExistingLicensePhotoUrl] = useState<
     string | null
   >(null);
-  const [isLoadingLicensePhoto, setIsLoadingLicensePhoto] = useState(false);
+  const [_isLoadingLicensePhoto, setIsLoadingLicensePhoto] = useState(false);
 
   // Photo upload state for passport
   const [selectedPassportPhoto, setSelectedPassportPhoto] =
     useState<File | null>(null);
-  const [passportPhotoPreview, setPassportPhotoPreview] = useState<
+  const [passportPhotoPreview, _setPassportPhotoPreview] = useState<
     string | null
   >(null);
   const [existingPassportPhotoUrl, setExistingPassportPhotoUrl] = useState<
     string | null
   >(null);
-  const [isLoadingPassportPhoto, setIsLoadingPassportPhoto] = useState(false);
+  const [_isLoadingPassportPhoto, setIsLoadingPassportPhoto] = useState(false);
 
   // Track if photos were explicitly removed
   const [licensePhotoRemoved, setLicensePhotoRemoved] = useState(false);
@@ -687,7 +686,7 @@ const EditCustomerFormContent: React.FC<{
                             Učitavanje...
                           </SelectItem>
                         ) : countries.length > 0 ? (
-                          countries.map((country, index) => {
+                          countries.map((country, _index) => {
                             const uniqueValue = `${country.dialCode}|||${country.code}`;
                             return (
                               <SelectItem key={uniqueValue} value={uniqueValue}>
@@ -762,7 +761,7 @@ const EditCustomerFormContent: React.FC<{
                           Učitavanje...
                         </SelectItem>
                       ) : countries.length > 0 ? (
-                        countries.map((country, index) => (
+                        countries.map((country, _index) => (
                           <SelectItem
                             key={`country-${country.name.replace(/\s/g, '_')}`}
                             value={country.name}

@@ -9,8 +9,6 @@ import { toast } from 'sonner';
 import { LoadingState } from '@/shared/components/ui/loading-state';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { Button } from '@/shared/components/ui/button';
-import { DetailCard } from '@/shared/components/ui/detail-card';
-import { DetailField } from '@/shared/components/ui/detail-field';
 import { Badge } from '@/shared/components/ui/badge';
 import {
   Dialog,

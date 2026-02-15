@@ -5,7 +5,6 @@ import {
   RefreshCw,
   User,
   Clock,
-  DollarSign,
   List,
   Grid3x3,
 } from 'lucide-react';
@@ -17,7 +16,7 @@ import {
 } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { BookingEvent, Car, CarWithStatus } from '../types/car.types';
+import { BookingEvent, Car } from '../types/car.types';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';

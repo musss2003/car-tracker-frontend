@@ -44,7 +44,7 @@ class SocketService {
       logError('Socket connection error:', error);
     });
 
-    this.socket.on('reconnect', (attemptNumber) => {
+    this.socket.on('reconnect', (_attemptNumber) => {
       if (this.userId) {
         this.socket?.emit('user:online', this.userId);
       }

@@ -28,7 +28,7 @@ interface Props {
 
 export const NotificationProvider = ({ children, userId }: Props) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [_socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     const newSocket = io(API_URL);

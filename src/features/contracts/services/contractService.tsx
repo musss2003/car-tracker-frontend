@@ -88,7 +88,7 @@ export const createAndDownloadContract = async (
       body: JSON.stringify(contractData),
     });
     if (!res.ok) {
-      const errorText = await res.text();
+      const _errorText = await res.text();
       // Log status for debugging, but not the full error response
       logError(`Failed to create contract (Status: ${res.status})`);
       throw new Error('Failed to create contract');
@@ -140,7 +140,7 @@ const triggerDownloadContract = async (blob: Blob, contractId: string) => {
 
   const contractData = await getContract(contractId);
 
-  const contract =
+  const _contract =
     (a.download = `contract_${contractData.customer.name.replace(/\s+/g, '_')}_${contractData.car.licensePlate}_${new Date(contractData.startDate).toISOString().split('T')[0]}_${new Date(contractData.endDate).toISOString().split('T')[0]}.docx`);
 
   document.body.appendChild(a);
