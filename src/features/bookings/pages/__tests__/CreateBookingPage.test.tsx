@@ -122,11 +122,11 @@ describe('CreateBookingPage', () => {
       // console.log(container.innerHTML);
 
       await waitFor(() => {
-        expect(screen.getByText('Create New Booking')).toBeInTheDocument();
+        expect(screen.getByText('Kreiraj Novu Rezervaciju')).toBeInTheDocument();
       });
 
       expect(
-        screen.getByText(/Reserve a car for a customer with availability/i)
+        screen.getByText(/Rezerviši automobil za kupca sa provjerom dostupnosti/i)
       ).toBeInTheDocument();
     });
 
@@ -134,13 +134,13 @@ describe('CreateBookingPage', () => {
       renderWithProviders(<CreateBookingPage />);
 
       await waitFor(() => {
-        expect(screen.getByLabelText(/Start Date/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Datum Početka/i)).toBeInTheDocument();
       });
 
-      expect(screen.getByLabelText(/End Date/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Pickup Location/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Dropoff Location/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Notes/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Datum Završetka/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Lokacija Preuzimanja/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Lokacija Vraćanja/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Napomene/i)).toBeInTheDocument();
     });
 
     it('should render all booking extras checkboxes', async () => {
@@ -162,12 +162,12 @@ describe('CreateBookingPage', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByRole('button', { name: /Create Booking/i })
+          screen.getByRole('button', { name: /Kreiraj Rezervaciju/i })
         ).toBeInTheDocument();
       });
 
       expect(
-        screen.getByRole('button', { name: /Cancel/i })
+        screen.getByRole('button', { name: /Otkaži/i })
       ).toBeInTheDocument();
     });
   });
@@ -197,8 +197,8 @@ describe('CreateBookingPage', () => {
     it('should render extras checkboxes as unchecked by default', async () => {
       renderWithProviders(<CreateBookingPage />);
 
-      const gpsCheckbox = await screen.findByLabelText(/GPS Navigation/i);
-      const childSeatCheckbox = await screen.findByLabelText(/Child Seat/i);
+      const gpsCheckbox = await screen.findByLabelText(/GPS Navigacija/i);
+      const childSeatCheckbox = await screen.findByLabelText(/Dječije Sjedište/i);
 
       expect(gpsCheckbox).not.toBeChecked();
       expect(childSeatCheckbox).not.toBeChecked();
@@ -207,15 +207,15 @@ describe('CreateBookingPage', () => {
     it('should render all 6 booking extras with correct labels', async () => {
       renderWithProviders(<CreateBookingPage />);
 
-      await screen.findByText('Create New Booking');
+      await screen.findByText('Kreiraj Novu Rezervaciju');
 
       // Verify all 6 extras are present
-      expect(screen.getByLabelText(/GPS Navigation/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Child Seat/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Additional Driver/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Insurance Upgrade/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Mobile WiFi/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Roof Rack/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/GPS Navigacija/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Dječije Sjedište/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Dodatni Vozač/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Nadogradnja Osiguranja/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Mobilni WiFi/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Krovni Nosač/i)).toBeInTheDocument();
     });
   });
 
@@ -224,7 +224,7 @@ describe('CreateBookingPage', () => {
       renderWithProviders(<CreateBookingPage />);
 
       const submitButton = await screen.findByRole('button', {
-        name: /Create Booking/i,
+        name: /Kreiraj Rezervaciju/i,
       });
 
       expect(submitButton).toBeInTheDocument();
@@ -235,7 +235,7 @@ describe('CreateBookingPage', () => {
       renderWithProviders(<CreateBookingPage />);
 
       const cancelButton = await screen.findByRole('button', {
-        name: /Cancel/i,
+        name: /Otkaži/i,
       });
       expect(cancelButton).toBeInTheDocument();
     });
@@ -243,8 +243,8 @@ describe('CreateBookingPage', () => {
     it('should render date fields with proper labels', async () => {
       renderWithProviders(<CreateBookingPage />);
 
-      const startDateField = await screen.findByLabelText(/Start Date/i);
-      const endDateField = screen.getByLabelText(/End Date/i);
+      const startDateField = await screen.findByLabelText(/Datum Početka/i);
+      const endDateField = screen.getByLabelText(/Datum Završetka/i);
 
       expect(startDateField).toBeInTheDocument();
       expect(endDateField).toBeInTheDocument();
@@ -253,16 +253,16 @@ describe('CreateBookingPage', () => {
     it('should render location fields', async () => {
       renderWithProviders(<CreateBookingPage />);
 
-      await screen.findByText('Create New Booking');
+      await screen.findByText('Kreiraj Novu Rezervaciju');
 
-      expect(screen.getByLabelText(/Pickup Location/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Dropoff Location/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Lokacija Preuzimanja/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Lokacija Vraćanja/i)).toBeInTheDocument();
     });
 
     it('should render notes textarea', async () => {
       renderWithProviders(<CreateBookingPage />);
 
-      const notesField = await screen.findByLabelText(/Notes/i);
+      const notesField = await screen.findByLabelText(/Napomene/i);
       expect(notesField).toBeInTheDocument();
       expect(notesField.tagName).toBe('TEXTAREA');
     });
@@ -272,9 +272,9 @@ describe('CreateBookingPage', () => {
     it('should not show cost summary when no car is selected', async () => {
       renderWithProviders(<CreateBookingPage />);
 
-      await screen.findByText('Create New Booking');
+      await screen.findByText('Kreiraj Novu Rezervaciju');
 
-      expect(screen.queryByText(/Total Cost/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Ukupna Cijena/i)).not.toBeInTheDocument();
     });
   });
 
@@ -294,7 +294,7 @@ describe('CreateBookingPage', () => {
       });
 
       // Component should still render despite error
-      expect(screen.getByText('Create New Booking')).toBeInTheDocument();
+      expect(screen.getByText('Kreiraj Novu Rezervaciju')).toBeInTheDocument();
 
       consoleErrorSpy.mockRestore();
     });
