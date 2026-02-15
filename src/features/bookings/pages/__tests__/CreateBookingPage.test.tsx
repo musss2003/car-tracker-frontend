@@ -223,6 +223,33 @@ describe('CreateBookingPage', () => {
       const cancelButton = await screen.findByRole('button', { name: /Cancel/i });
       expect(cancelButton).toBeInTheDocument();
     });
+
+    it('should render date fields with proper labels', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      const startDateField = await screen.findByLabelText(/Start Date/i);
+      const endDateField = screen.getByLabelText(/End Date/i);
+
+      expect(startDateField).toBeInTheDocument();
+      expect(endDateField).toBeInTheDocument();
+    });
+
+    it('should render location fields', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      await screen.findByText('Create New Booking');
+
+      expect(screen.getByLabelText(/Pickup Location/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Dropoff Location/i)).toBeInTheDocument();
+    });
+
+    it('should render notes textarea', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      const notesField = await screen.findByLabelText(/Notes/i);
+      expect(notesField).toBeInTheDocument();
+      expect(notesField.tagName).toBe('TEXTAREA');
+    });
   });
 
   describe('Cost Calculation', () => {
