@@ -58,14 +58,14 @@ export const validateCancellationReason = (
   if (!sanitized) {
     return {
       valid: false,
-      error: 'Cancellation reason is required',
+      error: 'Razlog otkazivanja je obavezan',
     };
   }
 
   if (sanitized.length < 10) {
     return {
       valid: false,
-      error: 'Cancellation reason must be at least 10 characters',
+      error: 'Razlog otkazivanja mora imati najmanje 10 karaktera',
     };
   }
 

@@ -26,7 +26,7 @@ import {
 import { Customer } from '../types/customer.types';
 import { downloadDocument } from '@/shared/services/uploadService';
 import { getCustomer } from '../services/customerService';
-import CustomerContractsList from '../components/CustomerContractsList';
+import CustomerContractsList from '../components/customer-contracts-list';
 
 const CustomerDetailsPage = () => {
   const navigate = useNavigate();

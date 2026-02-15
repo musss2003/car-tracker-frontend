@@ -116,6 +116,8 @@ describe('CreateBookingPage', () => {
 
   describe('Rendering', () => {
     it('should render page title and description', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
       await waitFor(() => {
         expect(
           screen.getByText('Kreiraj Novu Rezervaciju')
@@ -153,7 +155,9 @@ describe('CreateBookingPage', () => {
 
       expect(screen.getByLabelText(/Dječije Sjedište/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Dodatni Vozač/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Nadogradnja Osiguranja/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/Nadogradnja Osiguranja/i)
+      ).toBeInTheDocument();
       expect(screen.getByLabelText(/Mobilni WiFi/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Krovni Nosač/i)).toBeInTheDocument();
     });
