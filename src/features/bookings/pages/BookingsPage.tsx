@@ -72,27 +72,27 @@ const statusConfigMap = {
   [BookingStatus.PENDING]: {
     variant: 'secondary' as const,
     icon: ClockIcon,
-    label: 'Pending',
+    label: 'Na Čekanju',
   },
   [BookingStatus.CONFIRMED]: {
     variant: 'default' as const,
     icon: CheckCircleIcon,
-    label: 'Confirmed',
+    label: 'Potvrđeno',
   },
   [BookingStatus.CANCELLED]: {
     variant: 'destructive' as const,
     icon: XCircleIcon,
-    label: 'Cancelled',
+    label: 'Otkazano',
   },
   [BookingStatus.CONVERTED]: {
     variant: 'default' as const,
     icon: DocumentIcon,
-    label: 'Converted',
+    label: 'Konvertovano',
   },
   [BookingStatus.EXPIRED]: {
     variant: 'outline' as const,
     icon: ClockIcon,
-    label: 'Expired',
+    label: 'Isteklo',
   },
 };
 
@@ -171,7 +171,7 @@ const BookingsPage = () => {
       setTotalPages(response.totalPages || 1);
       setTotalBookings(response.total || 0);
     } catch (err) {
-      const errorMessage = 'Failed to fetch bookings';
+      const errorMessage = 'Neuspješno učitavanje rezervacija';
       setError(errorMessage);
       logError(errorMessage, err);
       toast.error(errorMessage);
@@ -275,7 +275,7 @@ const BookingsPage = () => {
         }),
       });
 
-      toast.success('Booking confirmed successfully');
+      toast.success('Rezervacija uspješno potvrđena');
 
       // Update local state instead of re-fetching all bookings
       setBookings((prevBookings) =>
@@ -284,7 +284,7 @@ const BookingsPage = () => {
         )
       );
     } catch (err) {
-      const errorMessage = 'Failed to confirm booking';
+      const errorMessage = 'Neuspješno potvrđivanje rezervacije';
 
       // Audit log - FAILURE
       logAudit({
@@ -309,7 +309,7 @@ const BookingsPage = () => {
 
   const handleCancelConfirm = async () => {
     if (!bookingToCancel) {
-      toast.error('No booking selected for cancellation');
+      toast.error('Nijedna rezervacija nije odabrana za otkazivanje');
       return;
     }
 
@@ -333,7 +333,7 @@ const BookingsPage = () => {
     // Validate and sanitize cancellation reason
     const validation = validateCancellationReason(cancellationReason);
     if (!validation.valid) {
-      toast.error(validation.error || 'Invalid cancellation reason');
+      toast.error(validation.error || 'Neispravan razlog otkazivanja');
       return;
     }
 
@@ -356,7 +356,7 @@ const BookingsPage = () => {
         }),
       });
 
-      toast.success('Booking cancelled successfully');
+      toast.success('Rezervacija uspješno otkazana');
       setShowCancelDialog(false);
       setBookingToCancel(null);
       setCancellationReason('');
@@ -375,7 +375,7 @@ const BookingsPage = () => {
         )
       );
     } catch (err) {
-      const errorMessage = 'Failed to cancel booking';
+      const errorMessage = 'Neuspješno otkazivanje rezervacije';
 
       // Audit log - FAILURE
       logAudit({
@@ -438,14 +438,14 @@ const BookingsPage = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Rezervacije</h1>
           <p className="text-muted-foreground">
-            Manage and track all reservation bookings
+            Upravljajte i pratite sve rezervacije
           </p>
         </div>
         <Button onClick={() => navigate('/bookings/new')} size="default">
           <PlusIcon className="h-4 w-4 mr-2" />
-          Create Booking
+          Kreiraj Rezervaciju
         </Button>
       </div>
 
@@ -453,7 +453,7 @@ const BookingsPage = () => {
       <div className="bg-card rounded-lg border p-4 space-y-4">
         <div className="flex items-center gap-2">
           <FilterIcon className="h-5 w-5 text-muted-foreground" />
-          <h2 className="font-semibold">Filters</h2>
+          <h2 className="font-semibold">Filteri</h2>
           {hasActiveFilters && (
             <Button
               variant="ghost"
@@ -461,7 +461,7 @@ const BookingsPage = () => {
               onClick={clearFilters}
               className="ml-auto"
             >
-              Clear All
+              Očisti Sve
             </Button>
           )}
         </div>
@@ -469,9 +469,9 @@ const BookingsPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Search by Reference */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Booking Reference</label>
+            <label className="text-sm font-medium">Referenca Rezervacije</label>
             <Input
-              placeholder="Search by reference..."
+              placeholder="Pretraži po referenci..."
               value={searchTerm}
               onChange={(e) =>
                 setSearchTerm(sanitizeSearchQuery(e.target.value))
@@ -484,30 +484,30 @@ const BookingsPage = () => {
             <label className="text-sm font-medium">Status</label>
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger>
-                <SelectValue placeholder="All statuses" />
+                <SelectValue placeholder="Svi statusi" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value={BookingStatus.PENDING}>Pending</SelectItem>
+                <SelectItem value="all">Svi Statusi</SelectItem>
+                <SelectItem value={BookingStatus.PENDING}>Na Čekanju</SelectItem>
                 <SelectItem value={BookingStatus.CONFIRMED}>
-                  Confirmed
+                  Potvrđeno
                 </SelectItem>
                 <SelectItem value={BookingStatus.CANCELLED}>
-                  Cancelled
+                  Otkazano
                 </SelectItem>
                 <SelectItem value={BookingStatus.CONVERTED}>
-                  Converted
+                  Konvertovano
                 </SelectItem>
-                <SelectItem value={BookingStatus.EXPIRED}>Expired</SelectItem>
+                <SelectItem value={BookingStatus.EXPIRED}>Isteklo</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Customer Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Customer</label>
+            <label className="text-sm font-medium">Kupac</label>
             <Input
-              placeholder="Search by customer..."
+              placeholder="Pretraži po kupcu..."
               value={filterCustomer}
               onChange={(e) =>
                 setFilterCustomer(sanitizeSearchQuery(e.target.value))
@@ -517,9 +517,9 @@ const BookingsPage = () => {
 
           {/* Car Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Car</label>
+            <label className="text-sm font-medium">Automobil</label>
             <Input
-              placeholder="Search by car..."
+              placeholder="Pretraži po automobilu..."
               value={filterCar}
               onChange={(e) =>
                 setFilterCar(sanitizeSearchQuery(e.target.value))
@@ -529,7 +529,7 @@ const BookingsPage = () => {
 
           {/* Start Date Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Start Date From</label>
+            <label className="text-sm font-medium">Datum Početka Od</label>
             <Input
               type="date"
               value={filterStartDate}
@@ -539,7 +539,7 @@ const BookingsPage = () => {
 
           {/* End Date Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">End Date Until</label>
+            <label className="text-sm font-medium">Datum Završetka Do</label>
             <Input
               type="date"
               value={filterEndDate}
@@ -549,28 +549,28 @@ const BookingsPage = () => {
 
           {/* Deposit Paid Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Deposit Status</label>
+            <label className="text-sm font-medium">Status Depozita</label>
             <Select
               value={filterDepositPaid}
               onValueChange={setFilterDepositPaid}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All deposits" />
+                <SelectValue placeholder="Svi depoziti" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Deposits</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="unpaid">Unpaid</SelectItem>
+                <SelectItem value="all">Svi Depoziti</SelectItem>
+                <SelectItem value="paid">Plaćeno</SelectItem>
+                <SelectItem value="unpaid">Neplaćeno</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Min Cost Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Min Cost ($)</label>
+            <label className="text-sm font-medium">Min. Cijena ($)</label>
             <Input
               type="number"
-              placeholder="Min cost..."
+              placeholder="Min. cijena..."
               value={filterMinCost}
               onChange={(e) => setFilterMinCost(e.target.value)}
               min="0"
@@ -580,10 +580,10 @@ const BookingsPage = () => {
 
           {/* Max Cost Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Max Cost ($)</label>
+            <label className="text-sm font-medium">Maks. Cijena ($)</label>
             <Input
               type="number"
-              placeholder="Max cost..."
+              placeholder="Maks. cijena..."
               value={filterMaxCost}
               onChange={(e) => setFilterMaxCost(e.target.value)}
               min="0"
@@ -596,10 +596,10 @@ const BookingsPage = () => {
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing {bookings.length} of {totalBookings} bookings
+          Prikazano {bookings.length} od {totalBookings} rezervacija
         </p>
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Show:</label>
+          <label className="text-sm font-medium">Prikaži:</label>
           <Select
             value={itemsPerPage.toString()}
             onValueChange={(value) => setItemsPerPage(Number(value))}
@@ -629,28 +629,28 @@ const BookingsPage = () => {
           <div className="p-8 text-center">
             <XCircleIcon className="h-12 w-12 text-destructive mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">
-              Error Loading Bookings
+              Greška Pri Učitavanju Rezervacija
             </h3>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={fetchBookings}>Try Again</Button>
+            <Button onClick={fetchBookings}>Pokušaj Ponovo</Button>
           </div>
         ) : bookings.length === 0 ? (
           <div className="p-8 text-center">
             <ClockIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Bookings Found</h3>
+            <h3 className="text-lg font-semibold mb-2">Nema Pronađenih Rezervacija</h3>
             <p className="text-muted-foreground mb-4">
               {hasActiveFilters
-                ? 'No bookings match your current filters. Try adjusting your search criteria.'
-                : 'Get started by creating your first booking.'}
+                ? 'Nijedna rezervacija ne odgovara vašim filterima. Pokušajte prilagoditi kriterije pretrage.'
+                : 'Započnite kreiranjem vaše prve rezervacije.'}
             </p>
             {hasActiveFilters ? (
               <Button variant="outline" onClick={clearFilters}>
-                Clear Filters
+                Očisti Filtere
               </Button>
             ) : (
               <Button onClick={() => navigate('/bookings/create')}>
                 <PlusIcon className="h-4 w-4 mr-2" />
-                Create Booking
+                Kreiraj Rezervaciju
               </Button>
             )}
           </div>
@@ -663,7 +663,7 @@ const BookingsPage = () => {
                   onClick={() => handleSort('bookingReference')}
                 >
                   <div className="flex items-center gap-2">
-                    Reference
+                    Referenca
                     {sortConfig.key === 'bookingReference' &&
                       (sortConfig.direction === 'asc' ? (
                         <ChevronUpIcon className="h-4 w-4" />
@@ -677,7 +677,7 @@ const BookingsPage = () => {
                   onClick={() => handleSort('customer')}
                 >
                   <div className="flex items-center gap-2">
-                    Customer
+                    Kupac
                     {sortConfig.key === 'customer' &&
                       (sortConfig.direction === 'asc' ? (
                         <ChevronUpIcon className="h-4 w-4" />
@@ -691,7 +691,7 @@ const BookingsPage = () => {
                   onClick={() => handleSort('car')}
                 >
                   <div className="flex items-center gap-2">
-                    Car
+                    Automobil
                     {sortConfig.key === 'car' &&
                       (sortConfig.direction === 'asc' ? (
                         <ChevronUpIcon className="h-4 w-4" />
@@ -705,7 +705,7 @@ const BookingsPage = () => {
                   onClick={() => handleSort('startDate')}
                 >
                   <div className="flex items-center gap-2">
-                    Date Range
+                    Period
                     {sortConfig.key === 'startDate' &&
                       (sortConfig.direction === 'asc' ? (
                         <ChevronUpIcon className="h-4 w-4" />
@@ -728,7 +728,7 @@ const BookingsPage = () => {
                       ))}
                   </div>
                 </TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right">Akcije</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -753,7 +753,7 @@ const BookingsPage = () => {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm">
-                          Actions
+                          Akcije
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -761,14 +761,14 @@ const BookingsPage = () => {
                           onClick={() => navigate(`/bookings/${booking._id}`)}
                         >
                           <EyeIcon className="h-4 w-4 mr-2" />
-                          View Details
+                          Pogledaj Detalje
                         </DropdownMenuItem>
                         {booking.status === BookingStatus.PENDING && (
                           <DropdownMenuItem
                             onClick={() => handleConfirm(booking)}
                           >
                             <CheckIcon className="h-4 w-4 mr-2" />
-                            Confirm
+                            Potvrdi
                           </DropdownMenuItem>
                         )}
                         {(booking.status === BookingStatus.PENDING ||
@@ -778,7 +778,7 @@ const BookingsPage = () => {
                             className="text-destructive"
                           >
                             <XCircleIcon className="h-4 w-4 mr-2" />
-                            Cancel
+                            Otkaži
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -795,8 +795,8 @@ const BookingsPage = () => {
       {!loading && !error && totalBookings > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {bookings.length} of {totalBookings} total bookings (Page{' '}
-            {currentPage} of {totalPages})
+            Prikazano {bookings.length} od {totalBookings} ukupno rezervacija (Stranica{' '}
+            {currentPage} od {totalPages})
           </p>
           <div className="flex gap-2">
             <Button
@@ -805,7 +805,7 @@ const BookingsPage = () => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
             >
-              Previous
+              Prethodno
             </Button>
             <Button
               variant="outline"
@@ -815,7 +815,7 @@ const BookingsPage = () => {
               }
               disabled={currentPage === totalPages}
             >
-              Next
+              Sljedeće
             </Button>
           </div>
         </div>
@@ -825,14 +825,14 @@ const BookingsPage = () => {
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel Booking</AlertDialogTitle>
+            <AlertDialogTitle>Otkaži Rezervaciju</AlertDialogTitle>
             <AlertDialogDescription>
-              Please provide a reason for cancelling this booking.
+              Molimo navedite razlog za otkazivanje ove rezervacije.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
             <Input
-              placeholder="Cancellation reason..."
+              placeholder="Razlog otkazivanja..."
               value={cancellationReason}
               onChange={(e) => setCancellationReason(e.target.value)}
               className="w-full"
@@ -840,14 +840,14 @@ const BookingsPage = () => {
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setShowCancelDialog(false)}>
-              Cancel
+              Otkaži
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelConfirm}
               disabled={isCancelling || !cancellationReason.trim()}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isCancelling ? 'Cancelling...' : 'Confirm Cancellation'}
+              {isCancelling ? 'Otkazivanje...' : 'Potvrdi Otkazivanje'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

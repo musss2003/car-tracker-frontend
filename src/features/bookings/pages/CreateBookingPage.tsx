@@ -26,24 +26,24 @@ const BOOKING_EXTRAS: Array<{
   label: string;
   pricePerDay: number;
 }> = [
-  { type: 'gps' as BookingExtraType, label: 'GPS Navigation', pricePerDay: 5 },
+  { type: 'gps' as BookingExtraType, label: 'GPS Navigacija', pricePerDay: 5 },
   {
     type: 'child_seat' as BookingExtraType,
-    label: 'Child Seat',
+    label: 'Dječije Sjedište',
     pricePerDay: 3,
   },
   {
     type: 'additional_driver' as BookingExtraType,
-    label: 'Additional Driver',
+    label: 'Dodatni Vozač',
     pricePerDay: 10,
   },
   {
     type: 'insurance_upgrade' as BookingExtraType,
-    label: 'Insurance Upgrade',
+    label: 'Nadogradnja Osiguranja',
     pricePerDay: 15,
   },
-  { type: 'wifi' as BookingExtraType, label: 'Mobile WiFi', pricePerDay: 4 },
-  { type: 'roof_rack' as BookingExtraType, label: 'Roof Rack', pricePerDay: 7 },
+  { type: 'wifi' as BookingExtraType, label: 'Mobilni WiFi', pricePerDay: 4 },
+  { type: 'roof_rack' as BookingExtraType, label: 'Krovni Nosač', pricePerDay: 7 },
 ];
 
 const DEPOSIT_PERCENTAGE = 0.2; // 20% deposit
@@ -100,7 +100,7 @@ const CreateBookingPage = () => {
         setCustomers(data);
       } catch (error) {
         logError('Failed to fetch customers', error);
-        toast.error('Failed to load customers');
+        toast.error('Neuspješno učitavanje kupaca');
       } finally {
         setLoadingCustomers(false);
       }
@@ -155,33 +155,33 @@ const CreateBookingPage = () => {
     const newErrors: Record<string, string> = {};
 
     if (!customerId) {
-      newErrors.customerId = 'Customer is required';
+      newErrors.customerId = 'Kupac je obavezan';
     }
 
     if (!carId) {
-      newErrors.carId = 'Car is required';
+      newErrors.carId = 'Automobil je obavezan';
     }
 
     if (!startDate) {
-      newErrors.startDate = 'Start date is required';
+      newErrors.startDate = 'Datum početka je obavezan';
     } else {
       const start = new Date(startDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       if (start < today) {
-        newErrors.startDate = 'Start date must be in the future';
+        newErrors.startDate = 'Datum početka mora biti u budućnosti';
       }
     }
 
     if (!endDate) {
-      newErrors.endDate = 'End date is required';
+      newErrors.endDate = 'Datum završetka je obavezan';
     } else if (startDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
 
       if (end <= start) {
-        newErrors.endDate = 'End date must be after start date';
+        newErrors.endDate = 'Datum završetka mora biti nakon datuma početka';
       }
     }
 
@@ -229,7 +229,7 @@ const CreateBookingPage = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error('Please fix the form errors');
+      toast.error('Molimo ispravite greške u formularu');
       return;
     }
 
@@ -271,7 +271,7 @@ const CreateBookingPage = () => {
         },
       });
 
-      toast.success('Booking created successfully!');
+      toast.success('Rezervacija uspješno kreirana!');
       navigate(`/bookings/${newBooking._id}`);
     } catch (error) {
       logError('Failed to create booking', error);
@@ -283,7 +283,7 @@ const CreateBookingPage = () => {
         metadata: { customerId, carId },
       });
 
-      toast.error('Failed to create booking. Please try again.');
+      toast.error('Neuspješno kreiranje rezervacije. Pokušajte ponovo.');
     } finally {
       setLoading(false);
     }
@@ -292,8 +292,8 @@ const CreateBookingPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <PageHeader
-        title="Create New Booking"
-        subtitle="Reserve a car for a customer with availability checking and pricing calculation"
+        title="Kreiraj Novu Rezervaciju"
+        subtitle="Rezerviši automobil za kupca sa provjerom dostupnosti i izračunom cijene"
       />
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-6">
@@ -304,7 +304,7 @@ const CreateBookingPage = () => {
               {/* Customer Selection */}
               <div className="space-y-2">
                 <Label htmlFor="customer">
-                  Customer <span className="text-red-500">*</span>
+                  Kupac <span className="text-red-500">*</span>
                 </Label>
                 <CustomerSearchSelect
                   value={customerId}
@@ -313,7 +313,7 @@ const CreateBookingPage = () => {
                   disabled={loadingCustomers}
                 />
                 {loadingCustomers && (
-                  <p className="text-sm text-gray-500">Loading customers...</p>
+                  <p className="text-sm text-gray-500">Učitavanje kupaca...</p>
                 )}
                 {errors.customerId && (
                   <p className="text-sm text-red-500">{errors.customerId}</p>
@@ -323,7 +323,7 @@ const CreateBookingPage = () => {
               {/* Car Selection */}
               <div className="space-y-2">
                 <Label htmlFor="car">
-                  Car <span className="text-red-500">*</span>
+                  Automobil <span className="text-red-500">*</span>
                 </Label>
                 <CarAvailabilitySelect
                   value={carId}
@@ -347,7 +347,7 @@ const CreateBookingPage = () => {
               {/* Start Date */}
               <div className="space-y-2">
                 <Label htmlFor="startDate">
-                  Start Date <span className="text-red-500">*</span>
+                  Datum Početka <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="startDate"
@@ -370,7 +370,7 @@ const CreateBookingPage = () => {
               {/* End Date */}
               <div className="space-y-2">
                 <Label htmlFor="endDate">
-                  End Date <span className="text-red-500">*</span>
+                  Datum Završetka <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="endDate"
@@ -399,11 +399,11 @@ const CreateBookingPage = () => {
             <div className="grid gap-6 md:grid-cols-2">
               {/* Pickup Location */}
               <div className="space-y-2">
-                <Label htmlFor="pickupLocation">Pickup Location</Label>
+                <Label htmlFor="pickupLocation">Lokacija Preuzimanja</Label>
                 <Input
                   id="pickupLocation"
                   type="text"
-                  placeholder="e.g., Main Office, Airport Terminal 1"
+                  placeholder="npr. Glavni Ured, Aerodromski Terminal 1"
                   value={pickupLocation}
                   onChange={(e) => setPickupLocation(e.target.value)}
                 />
@@ -411,11 +411,11 @@ const CreateBookingPage = () => {
 
               {/* Dropoff Location */}
               <div className="space-y-2">
-                <Label htmlFor="dropoffLocation">Dropoff Location</Label>
+                <Label htmlFor="dropoffLocation">Lokacija Vraćanja</Label>
                 <Input
                   id="dropoffLocation"
                   type="text"
-                  placeholder="e.g., Main Office, Airport Terminal 1"
+                  placeholder="npr. Glavni Ured, Aerodromski Terminal 1"
                   value={dropoffLocation}
                   onChange={(e) => setDropoffLocation(e.target.value)}
                 />
@@ -428,7 +428,7 @@ const CreateBookingPage = () => {
         <Card>
           <CardContent className="pt-6">
             <Label className="text-lg font-semibold mb-4 block">
-              Additional Extras
+              Dodatni Dodaci
             </Label>
             <div className="grid gap-4 md:grid-cols-2">
               {BOOKING_EXTRAS.map((extra) => (
@@ -452,7 +452,7 @@ const CreateBookingPage = () => {
                         {extra.label}
                       </Label>
                       <p className="text-sm text-gray-500">
-                        ${extra.pricePerDay}/day
+                        ${extra.pricePerDay}/dan
                       </p>
                     </div>
                   </div>
@@ -481,10 +481,10 @@ const CreateBookingPage = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <Label htmlFor="notes">Napomene</Label>
               <Textarea
                 id="notes"
-                placeholder="Add any special requests or notes..."
+                placeholder="Dodajte posebne zahtjeve ili napomene..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={4}
@@ -497,34 +497,34 @@ const CreateBookingPage = () => {
         {totalCost > 0 && (
           <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
             <CardContent className="pt-6">
-              <h3 className="text-lg font-semibold mb-4">Cost Summary</h3>
+              <h3 className="text-lg font-semibold mb-4">Pregled Troškova</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Rental Period:</span>
+                  <span className="text-gray-600">Period Iznajmljivanja:</span>
                   <span className="font-medium">
-                    {totalDays} {totalDays === 1 ? 'day' : 'days'}
+                    {totalDays} {totalDays === 1 ? 'dan' : 'dana'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Car Rental:</span>
+                  <span className="text-gray-600">Iznajmljivanje Automobila:</span>
                   <span className="font-medium">${carCost.toFixed(2)}</span>
                 </div>
                 {extrasCost > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Extras:</span>
+                    <span className="text-gray-600">Dodaci:</span>
                     <span className="font-medium">
                       ${extrasCost.toFixed(2)}
                     </span>
                   </div>
                 )}
                 <div className="border-t border-blue-300 pt-3 flex justify-between">
-                  <span className="font-semibold text-lg">Total Cost:</span>
+                  <span className="font-semibold text-lg">Ukupna Cijena:</span>
                   <span className="font-bold text-lg text-blue-600">
                     ${totalCost.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Deposit Required (20%):</span>
+                  <span className="text-gray-600">Potreban Depozit (20%):</span>
                   <span className="font-medium text-orange-600">
                     ${depositAmount.toFixed(2)}
                   </span>
@@ -542,10 +542,10 @@ const CreateBookingPage = () => {
             onClick={() => navigate('/bookings')}
             disabled={loading}
           >
-            Cancel
+            Otkaži
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Booking'}
+            {loading ? 'Kreiranje...' : 'Kreiraj Rezervaciju'}
           </Button>
         </div>
       </form>
