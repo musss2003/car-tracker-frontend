@@ -30,6 +30,13 @@ export interface QueryParams {
   endDate?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  // Additional filter parameters
+  search?: string; // General search term
+  customerSearch?: string; // Filter by customer name
+  carSearch?: string; // Filter by car details
+  depositPaid?: boolean; // Filter by deposit payment status
+  minCost?: number; // Minimum cost filter
+  maxCost?: number; // Maximum cost filter
 }
 
 export interface AvailabilityResponse {

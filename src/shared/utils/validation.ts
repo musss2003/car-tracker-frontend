@@ -68,12 +68,7 @@ export const validateCancellationReason = (
     };
   }
 
-  if (sanitized.length > 500) {
-    return {
-      valid: false,
-      error: 'Cancellation reason must not exceed 500 characters',
-    };
-  }
+  // Note: Max length already enforced by sanitizeTextInput(reason, 500) above
 
   return {
     valid: true,
