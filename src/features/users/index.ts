@@ -8,5 +8,4 @@ export * from './services/userService';
 export type * from './types/user.types';
 
 // Components
-export { default as UserProfile } from './components/UserProfile/UserProfile';
 export { default as UserEditFields } from './components/UserEditFields';

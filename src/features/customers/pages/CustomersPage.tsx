@@ -49,7 +49,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
 
-import type { Customer } from '@/types/Customer';
+import type { Customer } from '../types/customer.types';
 import { deleteCustomer, getCustomers } from '../services/customerService';
 
 const CustomersPage = () => {

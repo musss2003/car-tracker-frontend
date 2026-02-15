@@ -27,12 +27,14 @@ This document details the security improvements implemented in the Bookings List
 - **Audit Actions Tracked**:
 
   ```typescript
-  -BOOKING_CONFIRMED -
-    BOOKING_CANCELLED -
-    BOOKING_CREATED -
-    BOOKING_UPDATED -
-    BOOKING_VIEWED -
-    FILTER_APPLIED;
+  enum AuditAction {
+    BOOKING_CONFIRMED = 'BOOKING_CONFIRMED',
+    BOOKING_CANCELLED = 'BOOKING_CANCELLED',
+    BOOKING_CREATED = 'BOOKING_CREATED',
+    BOOKING_UPDATED = 'BOOKING_UPDATED',
+    BOOKING_VIEWED = 'BOOKING_VIEWED',
+    FILTER_APPLIED = 'FILTER_APPLIED',
+  }
   ```
 
 - **PII-Safe Metadata**: `sanitizeAuditMetadata()` automatically redacts sensitive fields:
@@ -59,7 +61,7 @@ logAudit({
 
 // FAILURE case
 logAudit({
-  action: AuditAction.BOOKING_CANCELLED,
+  action: AuditAction.BOOKING_CONFIRMED,
   outcome: AuditOutcome.FAILURE,
   resourceType: 'booking',
   resourceId: booking._id,

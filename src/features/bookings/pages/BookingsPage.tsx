@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { logError } from '@/shared/utils/logger';
 import {
   logAudit,
@@ -7,10 +7,10 @@ import {
   sanitizeAuditMetadata,
 } from '@/shared/utils/audit';
 import {
-  isValidUUID,
   validateCancellationReason,
   sanitizeSearchQuery,
 } from '@/shared/utils/validation';
+import { validateId } from '@/shared/utils/inputValidator';
 import { toast } from 'react-toastify';
 import {
   FilterIcon,
@@ -105,7 +105,8 @@ const BookingsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
   const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
-  const [cancellationReason, setCancellationReason] = useState<string>('');  const [isCancelling, setIsCancelling] = useState<boolean>(false);
+  const [cancellationReason, setCancellationReason] = useState<string>('');
+  const [isCancelling, setIsCancelling] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalBookings, setTotalBookings] = useState<number>(0);
 
@@ -147,8 +148,10 @@ const BookingsPage = () => {
 
       // Add filters only if they have values
       if (searchTerm) queryParams.search = sanitizeSearchQuery(searchTerm);
-      if (filterStatus && filterStatus !== 'all') queryParams.status = filterStatus;
-      if (filterCustomer) queryParams.customerSearch = sanitizeSearchQuery(filterCustomer);
+      if (filterStatus && filterStatus !== 'all')
+        queryParams.status = filterStatus;
+      if (filterCustomer)
+        queryParams.customerSearch = sanitizeSearchQuery(filterCustomer);
       if (filterCar) queryParams.carSearch = sanitizeSearchQuery(filterCar);
       if (filterStartDate) queryParams.startDate = filterStartDate;
       if (filterEndDate) {
@@ -180,6 +183,7 @@ const BookingsPage = () => {
   // Re-fetch when any filter, sort, or pagination parameter changes
   useEffect(() => {
     fetchBookings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     currentPage,
     itemsPerPage,
@@ -200,9 +204,8 @@ const BookingsPage = () => {
 
   // Reset to first page when filters change
   useEffect(() => {
-    if (currentPage !== 1) {
-      setCurrentPage(1);
-    }
+    setCurrentPage((prev) => (prev !== 1 ? 1 : prev));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     searchTerm,
     filterStatus,
@@ -226,7 +229,8 @@ const BookingsPage = () => {
 
   // Get status badge color and icon
   const getStatusBadge = (status: BookingStatus) => {
-    const cfg = statusConfigMap[status] || statusConfigMap[BookingStatus.PENDING];
+    const cfg =
+      statusConfigMap[status] || statusConfigMap[BookingStatus.PENDING];
     const Icon = cfg.icon;
 
     return (
@@ -240,15 +244,18 @@ const BookingsPage = () => {
   // Handle confirm booking
   const handleConfirm = async (booking: Booking) => {
     // Input validation
-    if (!booking._id || !isValidUUID(booking._id)) {
-      const errorMsg = 'Invalid booking ID';
+    try {
+      validateId(booking._id || '', 'booking ID');
+    } catch (err) {
+      const errorMsg =
+        err instanceof Error ? err.message : 'Invalid booking ID';
       toast.error(errorMsg);
       logAudit({
         action: AuditAction.BOOKING_CONFIRMED,
         outcome: AuditOutcome.FAILURE,
         resourceType: 'booking',
         resourceId: booking._id || 'unknown',
-        errorMessage: 'Invalid booking ID format',
+        errorMessage: errorMsg,
       });
       return;
     }
@@ -269,7 +276,7 @@ const BookingsPage = () => {
       });
 
       toast.success('Booking confirmed successfully');
-      
+
       // Update local state instead of re-fetching all bookings
       setBookings((prevBookings) =>
         prevBookings.map((b) =>
@@ -307,14 +314,18 @@ const BookingsPage = () => {
     }
 
     // Validate booking ID
-    if (!bookingToCancel._id || !isValidUUID(bookingToCancel._id)) {
-      toast.error('Invalid booking ID');
+    try {
+      validateId(bookingToCancel._id || '', 'booking ID');
+    } catch (err) {
+      const errorMsg =
+        err instanceof Error ? err.message : 'Invalid booking ID';
+      toast.error(errorMsg);
       logAudit({
         action: AuditAction.BOOKING_CANCELLED,
         outcome: AuditOutcome.FAILURE,
         resourceType: 'booking',
         resourceId: bookingToCancel._id || 'unknown',
-        errorMessage: 'Invalid booking ID format',
+        errorMessage: errorMsg,
       });
       return;
     }
@@ -349,7 +360,20 @@ const BookingsPage = () => {
       setShowCancelDialog(false);
       setBookingToCancel(null);
       setCancellationReason('');
-      fetchBookings();
+
+      // Optimistic update: Update local state instead of re-fetching
+      setBookings((prevBookings) =>
+        prevBookings.map((b) =>
+          b._id === bookingToCancel._id
+            ? {
+                ...b,
+                status: BookingStatus.CANCELLED,
+                cancelledAt: new Date().toISOString(),
+                cancellationReason: sanitizedReason,
+              }
+            : b
+        )
+      );
     } catch (err) {
       const errorMessage = 'Failed to cancel booking';
 
@@ -572,8 +596,7 @@ const BookingsPage = () => {
       {/* Results Summary */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing {paginatedBookings.length} of{' '}
-          {filteredAndSortedBookings.length} bookings
+          Showing {bookings.length} of {totalBookings} bookings
         </p>
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium">Show:</label>
@@ -611,7 +634,7 @@ const BookingsPage = () => {
             <p className="text-muted-foreground mb-4">{error}</p>
             <Button onClick={fetchBookings}>Try Again</Button>
           </div>
-        ) : filteredAndSortedBookings.length === 0 ? (
+        ) : bookings.length === 0 ? (
           <div className="p-8 text-center">
             <ClockIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Bookings Found</h3>
@@ -772,7 +795,8 @@ const BookingsPage = () => {
       {!loading && !error && totalBookings > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {bookings.length} of {totalBookings} total bookings (Page {currentPage} of {totalPages})
+            Showing {bookings.length} of {totalBookings} total bookings (Page{' '}
+            {currentPage} of {totalPages})
           </p>
           <div className="flex gap-2">
             <Button
