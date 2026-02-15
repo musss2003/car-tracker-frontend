@@ -1,8 +1,6 @@
 import { UserRole } from '@/features/users';
 import { api } from '@/shared/utils/apiService';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL + '/api/auth/';
-
 type RegisterResponse = {
   username: string;
   email: string;

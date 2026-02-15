@@ -66,6 +66,7 @@ import { useNavigate } from 'react-router-dom';
 import { bookingService } from '../services/bookingService';
 import type { Booking } from '../types/booking.types';
 import { BookingStatus } from '../types/booking.types';
+import { ROUTES } from '@/routing/paths';
 
 // Status badge configuration (outside component to prevent recreation on every render)
 const statusConfigMap = {
@@ -443,7 +444,7 @@ const BookingsPage = () => {
             Upravljajte i pratite sve rezervacije
           </p>
         </div>
-        <Button onClick={() => navigate('/bookings/new')} size="default">
+        <Button onClick={() => navigate(ROUTES.bookings.create)} size="default">
           <PlusIcon className="h-4 w-4 mr-2" />
           Kreiraj Rezervaciju
         </Button>
@@ -488,7 +489,9 @@ const BookingsPage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Svi Statusi</SelectItem>
-                <SelectItem value={BookingStatus.PENDING}>Na Čekanju</SelectItem>
+                <SelectItem value={BookingStatus.PENDING}>
+                  Na Čekanju
+                </SelectItem>
                 <SelectItem value={BookingStatus.CONFIRMED}>
                   Potvrđeno
                 </SelectItem>
@@ -637,7 +640,9 @@ const BookingsPage = () => {
         ) : bookings.length === 0 ? (
           <div className="p-8 text-center">
             <ClockIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Nema Pronađenih Rezervacija</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Nema Pronađenih Rezervacija
+            </h3>
             <p className="text-muted-foreground mb-4">
               {hasActiveFilters
                 ? 'Nijedna rezervacija ne odgovara vašim filterima. Pokušajte prilagoditi kriterije pretrage.'
@@ -648,7 +653,7 @@ const BookingsPage = () => {
                 Očisti Filtere
               </Button>
             ) : (
-              <Button onClick={() => navigate('/bookings/create')}>
+              <Button onClick={() => navigate(ROUTES.bookings.create)}>
                 <PlusIcon className="h-4 w-4 mr-2" />
                 Kreiraj Rezervaciju
               </Button>
@@ -795,8 +800,8 @@ const BookingsPage = () => {
       {!loading && !error && totalBookings > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Prikazano {bookings.length} od {totalBookings} ukupno rezervacija (Stranica{' '}
-            {currentPage} od {totalPages})
+            Prikazano {bookings.length} od {totalBookings} ukupno rezervacija
+            (Stranica {currentPage} od {totalPages})
           </p>
           <div className="flex gap-2">
             <Button

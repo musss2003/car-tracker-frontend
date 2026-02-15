@@ -43,7 +43,11 @@ const BOOKING_EXTRAS: Array<{
     pricePerDay: 15,
   },
   { type: 'wifi' as BookingExtraType, label: 'Mobilni WiFi', pricePerDay: 4 },
-  { type: 'roof_rack' as BookingExtraType, label: 'Krovni Nosač', pricePerDay: 7 },
+  {
+    type: 'roof_rack' as BookingExtraType,
+    label: 'Krovni Nosač',
+    pricePerDay: 7,
+  },
 ];
 
 const DEPOSIT_PERCENTAGE = 0.2; // 20% deposit
@@ -66,7 +70,7 @@ const CreateBookingPage = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
 
   // Car data
-  const [availableCars, setAvailableCars] = useState<Car[]>([]);
+  const [_availableCars, setAvailableCars] = useState<Car[]>([]);
 
   // Extras state - quantities for each extra type
   const [extrasQuantities, setExtrasQuantities] = useState<
@@ -82,7 +86,7 @@ const CreateBookingPage = () => {
 
   // Pricing state - managed by CarAvailabilitySelect
   const [totalDays, setTotalDays] = useState(0);
-  const [carDailyRate, setCarDailyRate] = useState(0);
+  const [_carDailyRate, setCarDailyRate] = useState(0);
   const [carCost, setCarCost] = useState(0);
   const [extrasCost, setExtrasCost] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
@@ -506,7 +510,9 @@ const CreateBookingPage = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Iznajmljivanje Automobila:</span>
+                  <span className="text-gray-600">
+                    Iznajmljivanje Automobila:
+                  </span>
                   <span className="font-medium">${carCost.toFixed(2)}</span>
                 </div>
                 {extrasCost > 0 && (

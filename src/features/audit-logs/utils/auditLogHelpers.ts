@@ -39,6 +39,7 @@ export const getResourceLabel = (resource: AuditResource): string => {
     [AuditResource.AUTH]: 'Autentifikacija',
     [AuditResource.NOTIFICATION]: 'Notifikacija',
     [AuditResource.COUNTRY]: 'Država',
+    [AuditResource.BOOKING]: 'Rezervacija',
   };
   return labels[resource] || resource;
 };
@@ -148,7 +149,9 @@ export const formatUserAgent = (userAgent?: string): string => {
   const browser = browserMatch ? browserMatch[0] : '';
   const os = osMatch ? osMatch[0] : '';
 
-  return `${browser} on ${os}` || userAgent.substring(0, 50) + '...';
+  return browser && os
+    ? `${browser} on ${os}`
+    : userAgent.substring(0, 50) + '...';
 };
 
 /**

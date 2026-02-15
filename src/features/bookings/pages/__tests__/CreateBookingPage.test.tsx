@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { cleanup } from '@testing-library/react';
 import { renderWithProviders } from '@/test-utils';
 import CreateBookingPage from '../CreateBookingPage';
@@ -81,7 +81,7 @@ const mockCars: Car[] = [
   } as const satisfies Car,
 ];
 
-const mockCreatedBooking = {
+const _mockCreatedBooking = {
   _id: 'booking-123',
   status: BookingStatus.PENDING,
   customerId: 'customer-1',
@@ -116,17 +116,16 @@ describe('CreateBookingPage', () => {
 
   describe('Rendering', () => {
     it('should render page title and description', async () => {
-      const { container } = renderWithProviders(<CreateBookingPage />);
-
-      // Debug: log the rendered HTML
-      // console.log(container.innerHTML);
-
       await waitFor(() => {
-        expect(screen.getByText('Kreiraj Novu Rezervaciju')).toBeInTheDocument();
+        expect(
+          screen.getByText('Kreiraj Novu Rezervaciju')
+        ).toBeInTheDocument();
       });
 
       expect(
-        screen.getByText(/Rezerviši automobil za kupca sa provjerom dostupnosti/i)
+        screen.getByText(
+          /Rezerviši automobil za kupca sa provjerom dostupnosti/i
+        )
       ).toBeInTheDocument();
     });
 
@@ -138,7 +137,9 @@ describe('CreateBookingPage', () => {
       });
 
       expect(screen.getByLabelText(/Datum Završetka/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Lokacija Preuzimanja/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/Lokacija Preuzimanja/i)
+      ).toBeInTheDocument();
       expect(screen.getByLabelText(/Lokacija Vraćanja/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Napomene/i)).toBeInTheDocument();
     });
@@ -198,7 +199,8 @@ describe('CreateBookingPage', () => {
       renderWithProviders(<CreateBookingPage />);
 
       const gpsCheckbox = await screen.findByLabelText(/GPS Navigacija/i);
-      const childSeatCheckbox = await screen.findByLabelText(/Dječije Sjedište/i);
+      const childSeatCheckbox =
+        await screen.findByLabelText(/Dječije Sjedište/i);
 
       expect(gpsCheckbox).not.toBeChecked();
       expect(childSeatCheckbox).not.toBeChecked();
@@ -213,7 +215,9 @@ describe('CreateBookingPage', () => {
       expect(screen.getByLabelText(/GPS Navigacija/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Dječije Sjedište/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Dodatni Vozač/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Nadogradnja Osiguranja/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/Nadogradnja Osiguranja/i)
+      ).toBeInTheDocument();
       expect(screen.getByLabelText(/Mobilni WiFi/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Krovni Nosač/i)).toBeInTheDocument();
     });
@@ -255,7 +259,9 @@ describe('CreateBookingPage', () => {
 
       await screen.findByText('Kreiraj Novu Rezervaciju');
 
-      expect(screen.getByLabelText(/Lokacija Preuzimanja/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/Lokacija Preuzimanja/i)
+      ).toBeInTheDocument();
       expect(screen.getByLabelText(/Lokacija Vraćanja/i)).toBeInTheDocument();
     });
 
