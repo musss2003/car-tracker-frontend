@@ -19,6 +19,21 @@ class ResizeObserver {
 
 window.ResizeObserver = ResizeObserver;
 
+// Mock matchMedia for responsive design tests
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
 // Mock URL.createObjectURL and revokeObjectURL for file handling
 URL.createObjectURL = vi.fn((blob: Blob) => `blob:${Date.now()}`);
 URL.revokeObjectURL = vi.fn();
