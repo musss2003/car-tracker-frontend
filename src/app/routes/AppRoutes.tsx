@@ -65,6 +65,9 @@ const EditContractPage = lazy(
 const BookingsPage = lazy(
   () => import('../../features/bookings/pages/BookingsPage')
 );
+const CreateBookingPage = lazy(
+  () => import('../../features/bookings/pages/CreateBookingPage')
+);
 
 // Customers Pages - Feature-based imports
 const CustomersPage = lazy(
@@ -174,6 +177,7 @@ export function AppRoutes() {
           <Route path="/contracts/:id/edit" element={<EditContractPage />} />
           <Route path="/contracts" element={<ContractsPage />} />
 
+          <Route path="/bookings/new" element={<CreateBookingPage />} />
           <Route path="/bookings" element={<BookingsPage />} />
 
           <Route path="/customers/new" element={<CreateCustomerPage />} />

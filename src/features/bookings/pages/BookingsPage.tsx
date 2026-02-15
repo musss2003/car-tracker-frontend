@@ -443,7 +443,7 @@ const BookingsPage = () => {
             Manage and track all reservation bookings
           </p>
         </div>
-        <Button onClick={() => navigate('/bookings/create')} size="default">
+        <Button onClick={() => navigate('/bookings/new')} size="default">
           <PlusIcon className="h-4 w-4 mr-2" />
           Create Booking
         </Button>
