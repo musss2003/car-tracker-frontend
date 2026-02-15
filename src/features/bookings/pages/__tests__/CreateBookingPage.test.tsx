@@ -203,6 +203,20 @@ describe('CreateBookingPage', () => {
       expect(gpsCheckbox).not.toBeChecked();
       expect(childSeatCheckbox).not.toBeChecked();
     });
+
+    it('should render all 6 booking extras with correct labels', async () => {
+      renderWithProviders(<CreateBookingPage />);
+
+      await screen.findByText('Create New Booking');
+
+      // Verify all 6 extras are present
+      expect(screen.getByLabelText(/GPS Navigation/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Child Seat/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Additional Driver/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Insurance Upgrade/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Mobile WiFi/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Roof Rack/i)).toBeInTheDocument();
+    });
   });
 
   describe('Form Validation', () => {
