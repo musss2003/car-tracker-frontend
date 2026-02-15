@@ -64,9 +64,9 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint . --ext .ts,.tsx",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "lint:ci": "eslint . --ext .ts,.tsx --max-warnings=0",
+    "lint": "npx eslint . --ext .ts,.tsx",
+    "lint:fix": "npx eslint . --ext .ts,.tsx --fix",
+    "lint:ci": "npx eslint . --ext .ts,.tsx --max-warnings=0",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"**/*.{json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"**/*.{json,md}\"",
     "type-check": "tsc --noEmit"
