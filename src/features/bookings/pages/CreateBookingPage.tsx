@@ -248,8 +248,8 @@ const CreateBookingPage = () => {
 
       // Log audit
       await logAudit({
-        action: AuditAction.CREATE,
-        resource: 'booking',
+        action: AuditAction.BOOKING_CREATED,
+        resourceType: 'booking',
         resourceId: newBooking._id,
         outcome: AuditOutcome.SUCCESS,
         metadata: {
@@ -266,8 +266,8 @@ const CreateBookingPage = () => {
       logError('Failed to create booking', error);
 
       await logAudit({
-        action: AuditAction.CREATE,
-        resource: 'booking',
+        action: AuditAction.BOOKING_CREATED,
+        resourceType: 'booking',
         outcome: AuditOutcome.FAILURE,
         metadata: { customerId, carId },
       });
@@ -282,7 +282,7 @@ const CreateBookingPage = () => {
     <div className="container mx-auto px-4 py-8">
       <PageHeader
         title="Create New Booking"
-        description="Reserve a car for a customer with availability checking and pricing calculation"
+        subtitle="Reserve a car for a customer with availability checking and pricing calculation"
       />
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-6">
