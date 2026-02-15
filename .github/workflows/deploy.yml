@@ -1,0 +1,73 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run linter
+      run: npm run lint:ci
+    
+    - name: Type check
+      run: npm run type-check
+    
+    - name: Run tests
+      run: npm test
+    
+    - name: Build project
+      run: npm run build
+    
+    - name: Verify build output
+      run: |
+        test -d dist || (echo "Build failed: dist/ directory not found" && exit 1)
+        test -f dist/index.html || (echo "Build failed: dist/index.html not found" && exit 1)
+        echo "✅ Build successful"
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Deploy to Vercel (Production)
+      # This step would integrate with Vercel deployment
+      # For now, it's a placeholder - actual deployment handled by Vercel Git integration
+      run: |
+        echo "✅ Build passed - Vercel will auto-deploy from main branch"
+        echo "📦 Deployment will be available at your Vercel domain"
+    
+    # Alternative: Manual deployment to custom server
+    # Uncomment and configure if deploying to custom hosting
+    # - name: Deploy to Server
+    #   env:
+    #     DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+    #     DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+    #     DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+    #   run: |
+    #     echo "$DEPLOY_KEY" > deploy_key && chmod 600 deploy_key
+    #     npm run build
+    #     rsync -avz -e "ssh -i deploy_key -o StrictHostKeyChecking=no" \
+    #       dist/ ${DEPLOY_USER}@${DEPLOY_HOST}:/var/www/car-tracker/
+    #     rm -f deploy_key

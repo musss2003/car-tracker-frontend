@@ -55,15 +55,21 @@
     "yup": "^1.4.0"
   },
   "scripts": {
+    "start": "vite preview",
+    "start:prod": "vite preview --port 4173",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
     "clean": "rm -rf node_modules/.vite",
     "dev:clean": "npm run clean && vite",
     "test": "vitest run",
+    "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "lint:ci": "eslint . --ext .ts,.tsx --max-warnings=0",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"**/*.{json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"**/*.{json,md}\"",
+    "type-check": "tsc --noEmit"
   },
   "eslintConfig": {
     "extends": [
