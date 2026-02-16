@@ -479,7 +479,7 @@ const CreateBookingPage = () => {
                         {extra.label}
                       </Label>
                       <p className="text-sm text-gray-500">
-                        ${extra.pricePerDay}/dan
+                        {extra.pricePerDay} KM/dan
                       </p>
                     </div>
                   </div>
@@ -536,26 +536,26 @@ const CreateBookingPage = () => {
                   <span className="text-gray-600">
                     Iznajmljivanje Automobila:
                   </span>
-                  <span className="font-medium">${carCost.toFixed(2)}</span>
+                  <span className="font-medium">{carCost.toFixed(2)} KM</span>
                 </div>
                 {extrasCost > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Dodaci:</span>
                     <span className="font-medium">
-                      ${extrasCost.toFixed(2)}
+                      {extrasCost.toFixed(2)} KM
                     </span>
                   </div>
                 )}
                 <div className="border-t border-blue-300 pt-3 flex justify-between">
                   <span className="font-semibold text-lg">Ukupna Cijena:</span>
                   <span className="font-bold text-lg text-blue-600">
-                    ${totalCost.toFixed(2)}
+                    {totalCost.toFixed(2)} KM
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Potreban Depozit (20%):</span>
                   <span className="font-medium text-orange-600">
-                    ${depositAmount.toFixed(2)}
+                    {depositAmount.toFixed(2)} KM
                   </span>
                 </div>
               </div>

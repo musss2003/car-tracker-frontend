@@ -570,7 +570,7 @@ const BookingsPage = () => {
 
           {/* Min Cost Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Min. Cijena ($)</label>
+            <label className="text-sm font-medium">Min. Cijena (KM)</label>
             <Input
               type="number"
               placeholder="Min. cijena..."
@@ -583,7 +583,7 @@ const BookingsPage = () => {
 
           {/* Max Cost Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Maks. Cijena ($)</label>
+            <label className="text-sm font-medium">Maks. Cijena (KM)</label>
             <Input
               type="number"
               placeholder="Maks. cijena..."
