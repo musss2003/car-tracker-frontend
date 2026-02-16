@@ -23,6 +23,7 @@ export const ROUTES = {
   bookings: {
     root: '/bookings',
     create: '/bookings/new',
+    details: '/bookings/:id',
   },
 
   contracts: {

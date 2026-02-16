@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { bookingService } from '../services/bookingService';
 import { getCustomers } from '@/features/customers/services/customerService';
+import { ROUTES } from '@/routing/paths';
 import {
   logAudit,
   AuditAction,
@@ -327,7 +328,7 @@ export const useCreateBooking = () => {
       }
 
       toast.success('Rezervacija uspješno kreirana!');
-      navigate(`/bookings/${newBooking._id}`);
+      navigate(ROUTES.bookings.details.replace(':id', newBooking._id));
     } catch (error) {
       // Log the error (logError already sanitizes sensitive data)
       logError('Failed to create booking', error);
@@ -357,6 +358,15 @@ export const useCreateBooking = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Navigation actions
+  const goBack = () => {
+    navigate(ROUTES.bookings.root);
+  };
+
+  const cancelBooking = () => {
+    navigate(ROUTES.bookings.root);
   };
 
   return {
@@ -394,6 +404,8 @@ export const useCreateBooking = () => {
       handlePriceCalculated,
       handleCarsLoaded,
       handleSubmit,
+      goBack,
+      cancelBooking,
     },
   };
 };

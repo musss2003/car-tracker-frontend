@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
@@ -9,12 +8,10 @@ import { PageHeader } from '@/shared/components/ui/page-header';
 import { LocationPicker } from '@/shared/components/ui/location-picker';
 import { CustomerSearchSelect } from '@/features/customers/components/customer-search-select';
 import { CarAvailabilitySelect } from '@/features/cars/components/car-availability-select';
-import { ROUTES } from '@/routing/paths';
 import { DashboardLayout } from '@/shared/components/layout';
 import { useCreateBooking, BOOKING_EXTRAS } from '../hooks/useCreateBooking';
 
 const CreateBookingPage = () => {
-  const navigate = useNavigate();
   const { state, actions } = useCreateBooking();
 
   return (
@@ -22,7 +19,7 @@ const CreateBookingPage = () => {
       <PageHeader
         title="Kreiraj Novu Rezervaciju"
         subtitle="Rezerviši automobil za kupca sa provjerom dostupnosti i izračunom cijene"
-        onBack={() => navigate(ROUTES.bookings.root)}
+        onBack={actions.goBack}
       />
 
       <form onSubmit={actions.handleSubmit} className="mt-6 space-y-6">
@@ -266,7 +263,7 @@ const CreateBookingPage = () => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate('/bookings')}
+            onClick={actions.cancelBooking}
             disabled={state.loading}
           >
             Otkaži
