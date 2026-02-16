@@ -5,6 +5,7 @@ import { renderWithProviders } from '@/test-utils';
 import CreateBookingPage from '../CreateBookingPage';
 import { getCustomers } from '@/features/customers/services/customerService';
 import { getAvailableCarsForPeriod } from '@/features/cars/services/carService';
+import { bookingService } from '../../services/bookingService';
 import { BookingStatus } from '../../types/booking.types';
 import type { Booking } from '../../types/booking.types';
 import type { Customer } from '@/features/customers/types/customer.types';
@@ -13,6 +14,7 @@ import type { Car } from '@/features/cars/types/car.types';
 // Mock dependencies
 vi.mock('@/features/customers/services/customerService');
 vi.mock('@/features/cars/services/carService');
+vi.mock('../../services/bookingService');
 vi.mock('@/shared/utils/audit');
 
 const mockNavigate = vi.fn();
@@ -81,7 +83,7 @@ const mockCars: Car[] = [
   } as const satisfies Car,
 ];
 
-const _mockCreatedBooking = {
+const mockCreatedBooking = {
   _id: 'booking-123',
   status: BookingStatus.PENDING,
   customerId: 'customer-1',
@@ -107,6 +109,10 @@ describe('CreateBookingPage', () => {
     vi.mocked(getCustomers).mockResolvedValue(mockCustomers);
     // Mock car service
     vi.mocked(getAvailableCarsForPeriod).mockResolvedValue(mockCars);
+    // Mock booking creation
+    vi.mocked(bookingService.createBooking).mockResolvedValue(
+      mockCreatedBooking
+    );
   });
 
   afterEach(() => {
