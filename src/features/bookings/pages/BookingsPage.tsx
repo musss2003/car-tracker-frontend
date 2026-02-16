@@ -11,6 +11,7 @@ import {
   sanitizeSearchQuery,
 } from '@/shared/utils/validation';
 import { validateId } from '@/shared/utils/inputValidator';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'react-toastify';
 import {
   FilterIcon,
@@ -99,6 +100,7 @@ const statusConfigMap = {
 
 const BookingsPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // State management
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -251,30 +253,43 @@ const BookingsPage = () => {
       const errorMsg =
         err instanceof Error ? err.message : 'Invalid booking ID';
       toast.error(errorMsg);
-      logAudit({
-        action: AuditAction.BOOKING_CONFIRMED,
-        outcome: AuditOutcome.FAILURE,
-        resourceType: 'booking',
-        resourceId: booking._id || 'unknown',
-        errorMessage: errorMsg,
-      });
+      // Non-blocking audit log for validation failure
+      try {
+        logAudit({
+          action: AuditAction.BOOKING_CONFIRMED,
+          outcome: AuditOutcome.FAILURE,
+          resourceType: 'booking',
+          resourceId: booking._id || 'unknown',
+          errorMessage: errorMsg,
+          metadata: sanitizeAuditMetadata({
+            userId: user?.id || 'unknown',
+          }),
+        });
+      } catch (auditError) {
+        logError('Audit logging failed', auditError);
+      }
       return;
     }
 
     try {
       await bookingService.confirmBooking(booking._id);
 
-      // Audit log - SUCCESS
-      logAudit({
-        action: AuditAction.BOOKING_CONFIRMED,
-        outcome: AuditOutcome.SUCCESS,
-        resourceType: 'booking',
-        resourceId: booking._id,
-        metadata: sanitizeAuditMetadata({
-          bookingReference: booking.bookingReference,
-          previousStatus: booking.status,
-        }),
-      });
+      // Audit log - SUCCESS (non-blocking)
+      try {
+        logAudit({
+          action: AuditAction.BOOKING_CONFIRMED,
+          outcome: AuditOutcome.SUCCESS,
+          resourceType: 'booking',
+          resourceId: booking._id,
+          metadata: sanitizeAuditMetadata({
+            userId: user?.id || 'unknown',
+            bookingReference: booking.bookingReference,
+            previousStatus: booking.status,
+          }),
+        });
+      } catch (auditError) {
+        logError('Audit logging failed for booking confirmation', auditError);
+      }
 
       toast.success('Rezervacija uspješno potvrđena');
 
@@ -287,14 +302,24 @@ const BookingsPage = () => {
     } catch (err) {
       const errorMessage = 'Neuspješno potvrđivanje rezervacije';
 
-      // Audit log - FAILURE
-      logAudit({
-        action: AuditAction.BOOKING_CONFIRMED,
-        outcome: AuditOutcome.FAILURE,
-        resourceType: 'booking',
-        resourceId: booking._id,
-        errorMessage: err instanceof Error ? err.message : 'Unknown error',
-      });
+      // Audit log - FAILURE (non-blocking)
+      try {
+        logAudit({
+          action: AuditAction.BOOKING_CONFIRMED,
+          outcome: AuditOutcome.FAILURE,
+          resourceType: 'booking',
+          resourceId: booking._id,
+          errorMessage: err instanceof Error ? err.message : 'Unknown error',
+          metadata: sanitizeAuditMetadata({
+            userId: user?.id || 'unknown',
+          }),
+        });
+      } catch (auditError) {
+        logError(
+          'Audit logging failed for booking confirmation failure',
+          auditError
+        );
+      }
 
       logError(errorMessage, err);
       toast.error(errorMessage);
@@ -321,13 +346,21 @@ const BookingsPage = () => {
       const errorMsg =
         err instanceof Error ? err.message : 'Invalid booking ID';
       toast.error(errorMsg);
-      logAudit({
-        action: AuditAction.BOOKING_CANCELLED,
-        outcome: AuditOutcome.FAILURE,
-        resourceType: 'booking',
-        resourceId: bookingToCancel._id || 'unknown',
-        errorMessage: errorMsg,
-      });
+      // Non-blocking audit log for validation failure
+      try {
+        logAudit({
+          action: AuditAction.BOOKING_CANCELLED,
+          outcome: AuditOutcome.FAILURE,
+          resourceType: 'booking',
+          resourceId: bookingToCancel._id || 'unknown',
+          errorMessage: errorMsg,
+          metadata: sanitizeAuditMetadata({
+            userId: user?.id || 'unknown',
+          }),
+        });
+      } catch (auditError) {
+        logError('Audit logging failed', auditError);
+      }
       return;
     }
 
@@ -344,18 +377,23 @@ const BookingsPage = () => {
     try {
       await bookingService.cancelBooking(bookingToCancel._id, sanitizedReason);
 
-      // Audit log - SUCCESS
-      logAudit({
-        action: AuditAction.BOOKING_CANCELLED,
-        outcome: AuditOutcome.SUCCESS,
-        resourceType: 'booking',
-        resourceId: bookingToCancel._id,
-        metadata: sanitizeAuditMetadata({
-          bookingReference: bookingToCancel.bookingReference,
-          previousStatus: bookingToCancel.status,
-          reasonLength: sanitizedReason.length,
-        }),
-      });
+      // Audit log - SUCCESS (non-blocking)
+      try {
+        logAudit({
+          action: AuditAction.BOOKING_CANCELLED,
+          outcome: AuditOutcome.SUCCESS,
+          resourceType: 'booking',
+          resourceId: bookingToCancel._id,
+          metadata: sanitizeAuditMetadata({
+            userId: user?.id || 'unknown',
+            bookingReference: bookingToCancel.bookingReference,
+            previousStatus: bookingToCancel.status,
+            reasonLength: sanitizedReason.length,
+          }),
+        });
+      } catch (auditError) {
+        logError('Audit logging failed for booking cancellation', auditError);
+      }
 
       toast.success('Rezervacija uspješno otkazana');
       setShowCancelDialog(false);
@@ -378,14 +416,24 @@ const BookingsPage = () => {
     } catch (err) {
       const errorMessage = 'Neuspješno otkazivanje rezervacije';
 
-      // Audit log - FAILURE
-      logAudit({
-        action: AuditAction.BOOKING_CANCELLED,
-        outcome: AuditOutcome.FAILURE,
-        resourceType: 'booking',
-        resourceId: bookingToCancel._id,
-        errorMessage: err instanceof Error ? err.message : 'Unknown error',
-      });
+      // Audit log - FAILURE (non-blocking)
+      try {
+        logAudit({
+          action: AuditAction.BOOKING_CANCELLED,
+          outcome: AuditOutcome.FAILURE,
+          resourceType: 'booking',
+          resourceId: bookingToCancel._id,
+          errorMessage: err instanceof Error ? err.message : 'Unknown error',
+          metadata: sanitizeAuditMetadata({
+            userId: user?.id || 'unknown',
+          }),
+        });
+      } catch (auditError) {
+        logError(
+          'Audit logging failed for booking cancellation failure',
+          auditError
+        );
+      }
 
       logError(errorMessage, err);
       toast.error(errorMessage);

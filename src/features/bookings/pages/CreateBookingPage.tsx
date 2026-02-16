@@ -16,8 +16,14 @@ import { CustomerSearchSelect } from '@/features/customers/components/customer-s
 import { CarAvailabilitySelect } from '@/features/cars/components/car-availability-select';
 import { bookingService } from '../services/bookingService';
 import { getCustomers } from '@/features/customers/services/customerService';
-import { logAudit, AuditAction, AuditOutcome } from '@/shared/utils/audit';
+import {
+  logAudit,
+  AuditAction,
+  AuditOutcome,
+  sanitizeAuditMetadata,
+} from '@/shared/utils/audit';
 import { logError } from '@/shared/utils/logger';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { ROUTES } from '@/routing/paths';
 import type {
   CreateBookingDto,
@@ -59,6 +65,7 @@ const DEPOSIT_PERCENTAGE = 0.2; // 20% deposit
 
 const CreateBookingPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
 
@@ -164,6 +171,9 @@ const CreateBookingPage = () => {
   }, [totalDays, carCost, extrasQuantities]);
 
   // Validate form
+  // NOTE: This is client-side validation only for UX.
+  // The backend MUST enforce equivalent validation and sanitization
+  // for all user-supplied fields (notes, locations, dates, etc.)
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -284,31 +294,53 @@ const CreateBookingPage = () => {
 
       const newBooking = await bookingService.createBooking(bookingData);
 
-      // Log audit
-      await logAudit({
-        action: AuditAction.BOOKING_CREATED,
-        resourceType: 'booking',
-        resourceId: newBooking._id,
-        outcome: AuditOutcome.SUCCESS,
-        metadata: {
-          bookingReference: newBooking.bookingReference,
-          customerId,
-          carId,
-          totalCost,
-        },
-      });
+      // Log audit - wrapped in try-catch to prevent audit failures from blocking UX
+      try {
+        await logAudit({
+          action: AuditAction.BOOKING_CREATED,
+          resourceType: 'booking',
+          resourceId: newBooking._id,
+          outcome: AuditOutcome.SUCCESS,
+          metadata: sanitizeAuditMetadata({
+            bookingReference: newBooking.bookingReference,
+            userId: user?.id || 'unknown',
+            customerId,
+            carId,
+            totalCost,
+            hasExtras: Object.values(extrasQuantities).some((q) => q > 0),
+          }),
+        });
+      } catch (auditError) {
+        // Log audit failure but don't block user flow
+        logError('Audit logging failed for booking creation', auditError);
+      }
 
       toast.success('Rezervacija uspješno kreirana!');
       navigate(`/bookings/${newBooking._id}`);
     } catch (error) {
+      // Log the error (logError already sanitizes sensitive data)
       logError('Failed to create booking', error);
 
-      await logAudit({
-        action: AuditAction.BOOKING_CREATED,
-        resourceType: 'booking',
-        outcome: AuditOutcome.FAILURE,
-        metadata: { customerId, carId },
-      });
+      // Log audit failure - wrapped in try-catch to ensure user sees error toast
+      try {
+        await logAudit({
+          action: AuditAction.BOOKING_CREATED,
+          resourceType: 'booking',
+          outcome: AuditOutcome.FAILURE,
+          metadata: sanitizeAuditMetadata({
+            userId: user?.id || 'unknown',
+            customerId,
+            carId,
+            errorType: error instanceof Error ? error.name : 'unknown',
+          }),
+        });
+      } catch (auditError) {
+        // Log audit failure but don't block error handling
+        logError(
+          'Audit logging failed for booking creation failure',
+          auditError
+        );
+      }
 
       toast.error('Neuspješno kreiranje rezervacije. Pokušajte ponovo.');
     } finally {
@@ -350,9 +382,6 @@ const CreateBookingPage = () => {
 
               {/* Car Selection */}
               <div className="space-y-2">
-                <Label htmlFor="car">
-                  Automobil <span className="text-red-500">*</span>
-                </Label>
                 <CarAvailabilitySelect
                   value={carId}
                   onChange={handleCarChange}

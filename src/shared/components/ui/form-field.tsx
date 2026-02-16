@@ -51,7 +51,9 @@ export const FormField: React.FC<FormFieldProps> = ({
     <div className={cn('space-y-2', className)}>
       <Label htmlFor={id}>
         {label}
-        {required && <span className="text-destructive ml-1">*</span>}
+        {required && (
+          <span className="text-destructive ml-1 text-red-500">*</span>
+        )}
       </Label>
       {children}
       {helperText && !error && (
