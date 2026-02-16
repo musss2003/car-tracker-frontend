@@ -813,7 +813,14 @@ const BookingsPage = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() => navigate(`/bookings/${booking._id}`)}
+                            onClick={() =>
+                              navigate(
+                                ROUTES.bookings.details.replace(
+                                  ':id',
+                                  booking._id
+                                )
+                              )
+                            }
                           >
                             <EyeIcon className="h-4 w-4 mr-2" />
                             Pogledaj Detalje
