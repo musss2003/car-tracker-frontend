@@ -25,6 +25,7 @@ import {
 import { logError } from '@/shared/utils/logger';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { ROUTES } from '@/routing/paths';
+import { DashboardLayout } from '@/shared/components/layout';
 import type {
   CreateBookingDto,
   BookingExtraType,
@@ -349,7 +350,7 @@ const CreateBookingPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <DashboardLayout>
       <PageHeader
         title="Kreiraj Novu Rezervaciju"
         subtitle="Rezerviši automobil za kupca sa provjerom dostupnosti i izračunom cijene"
@@ -607,7 +608,7 @@ const CreateBookingPage = () => {
           </Button>
         </div>
       </form>
-    </div>
+    </DashboardLayout>
   );
 };
 

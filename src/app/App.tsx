@@ -56,9 +56,7 @@ function App() {
           )}
 
           {/* PAGE CONTENT */}
-          <div className="p-4">
-            <AppRouter />
-          </div>
+          <AppRouter />
         </main>
       </div>
     </ErrorBoundary>

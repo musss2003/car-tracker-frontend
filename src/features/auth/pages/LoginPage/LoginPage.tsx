@@ -3,8 +3,11 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import './LoginPage.css';
 import { useAuth } from '../../hooks/useAuth';
+import { AuthLayout } from '@/shared/components/layout';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
 
 interface LoginFormInputs {
   username: string;
@@ -12,8 +15,8 @@ interface LoginFormInputs {
 }
 
 const validation = Yup.object().shape({
-  username: Yup.string().required('Username is required'),
-  password: Yup.string().required('Password is required'),
+  username: Yup.string().required('Korisničko ime je obavezno'),
+  password: Yup.string().required('Lozinka je obavezna'),
 });
 
 const LoginPage: React.FC = () => {
@@ -23,7 +26,7 @@ const LoginPage: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormInputs>({
     resolver: yupResolver(validation),
   });
@@ -33,66 +36,83 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <section className="login-page">
-      <div className="login-container">
-        <div className="login-box">
-          <div className="login-content">
-            <h1 className="login-title">Sign in to your account</h1>
-            <form className="login-form" onSubmit={handleSubmit(handleLogin)}>
-              <div>
-                <label htmlFor="username" className="login-label">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  className="login-input"
-                  placeholder="Username"
-                  {...register('username')}
-                />
-                {errors.username && (
-                  <p className="login-error">{errors.username.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="password" className="login-label">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="••••••••"
-                  className="login-input"
-                  {...register('password')}
-                />
-                {errors.password && (
-                  <p className="login-error">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="login-links">
-                <a href="#">Forgot password?</a>
-              </div>
-
-              <button type="submit" className="login-button">
-                Sign in
-              </button>
-
-              <p className="login-register">
-                Don’t have an account yet?{' '}
-                <span
-                  className="register-link"
-                  onClick={() => navigate('/register')}
-                >
-                  Sign up
-                </span>
-              </p>
-            </form>
-          </div>
+    <AuthLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-bold tracking-tight">
+            Prijavite se na svoj račun
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Unesite svoje podatke za nastavak
+          </p>
         </div>
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
+          {/* Username Field */}
+          <div className="space-y-2">
+            <Label htmlFor="username">Korisničko ime</Label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="Unesite korisničko ime"
+              {...register('username')}
+              className={errors.username ? 'border-destructive' : ''}
+              autoComplete="username"
+            />
+            {errors.username && (
+              <p className="text-sm text-destructive">
+                {errors.username.message}
+              </p>
+            )}
+          </div>
+
+          {/* Password Field */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Lozinka</Label>
+              <a
+                href="#"
+                className="text-sm text-primary hover:underline"
+                onClick={(e) => e.preventDefault()}
+              >
+                Zaboravili lozinku?
+              </a>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              {...register('password')}
+              className={errors.password ? 'border-destructive' : ''}
+              autoComplete="current-password"
+            />
+            {errors.password && (
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Prijavljivanje...' : 'Prijavi se'}
+          </Button>
+        </form>
+
+        {/* Register Link */}
+        <p className="text-center text-sm text-muted-foreground">
+          Nemate račun?{' '}
+          <span
+            onClick={() => navigate('/register')}
+            className="text-primary font-medium hover:underline cursor-pointer"
+          >
+            Registrujte se
+          </span>
+        </p>
       </div>
-    </section>
+    </AuthLayout>
   );
 };
 
