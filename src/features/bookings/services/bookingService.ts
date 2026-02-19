@@ -21,6 +21,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface QueryParams {
+  [key: string]: unknown;
   page?: number;
   limit?: number;
   status?: BookingStatus | string; // Allow enum or string for flexibility
