@@ -39,22 +39,29 @@ export async function apiRequest<T>(
 
   const url = `${BASE_URL}${endpoint}`;
 
-  const requestOptions: RequestInit = {
+  // Build headers, but remove Content-Type if body is FormData
+  let mergedHeaders = {
+    ...(includeAuth ? getAuthHeaders() : {}),
+    ...headers,
+  };
+
+  let requestOptions: RequestInit = {
     method,
-    headers: {
-      ...(includeAuth ? getAuthHeaders() : {}),
-      ...headers,
-    },
+    headers: mergedHeaders,
     credentials: 'include',
   };
 
   if (body && method !== 'GET') {
     if (body instanceof FormData) {
-      // Don't set Content-Type for FormData - browser will set it with boundary
+      // Remove Content-Type if present (browser will set it with boundary)
+      if ('Content-Type' in mergedHeaders) {
+        const { ['Content-Type']: _, ...rest } = mergedHeaders;
+        requestOptions.headers = rest;
+      }
       requestOptions.body = body;
     } else {
       requestOptions.headers = {
-        ...requestOptions.headers,
+        ...mergedHeaders,
         'Content-Type': 'application/json',
       };
       requestOptions.body = JSON.stringify(body);
