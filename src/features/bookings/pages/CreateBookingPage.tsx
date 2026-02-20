@@ -7,7 +7,8 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { PageHeader } from '@/shared/components/ui/page-header';
 import { LocationPicker } from '@/shared/components/ui/location-picker';
 import { CustomerSearchSelect } from '@/features/customers/components/customer-search-select';
-import { CarAvailabilitySelect } from '@/features/cars/components/car-availability-select';
+// ✅ Fix 1: use the same import path as CreateContractPage
+import { CarAvailabilitySelect } from '@/shared/components/ui/car-availability-select';
 import { DashboardLayout } from '@/shared/components/layout';
 import { useCreateBooking, BOOKING_EXTRAS } from '../hooks/useCreateBooking';
 
@@ -49,6 +50,9 @@ const CreateBookingPage = () => {
               </div>
 
               {/* Car Selection */}
+              {/* ✅ Fix 2: removed onCarsLoaded (not a prop on the shared component)  */}
+              {/* ✅ Fix 3: onPriceCalculated signature matches shared component: (dailyRate, totalAmount) */}
+              {/*          days is calculated inside the hook from startDate/endDate instead             */}
               <div className="space-y-2">
                 <CarAvailabilitySelect
                   value={state.carId}
@@ -56,7 +60,6 @@ const CreateBookingPage = () => {
                   startDate={state.startDate}
                   endDate={state.endDate}
                   required
-                  onCarsLoaded={actions.handleCarsLoaded}
                   onPriceCalculated={actions.handlePriceCalculated}
                   error={state.errors.carId}
                 />

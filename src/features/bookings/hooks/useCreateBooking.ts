@@ -18,7 +18,6 @@ import type {
   BookingExtraType,
 } from '../types/booking.types';
 import type { Customer } from '@/features/customers/types/customer.types';
-import type { Car } from '@/features/cars/types/car.types';
 
 const DEPOSIT_PERCENTAGE = 0.2; // 20% deposit
 
@@ -51,6 +50,45 @@ export const BOOKING_EXTRAS: Array<{
   },
 ];
 
+// ─── Helper: strip characters not allowed by backend Matches() regex ─────────
+// Backend allows only: a-z A-Z 0-9 whitespace , . - ( )
+// Geocoder returns accented/Bosnian chars (š, ž, đ, č, ć) — transliterate them
+// then strip anything still outside the allowed set.
+const CHAR_MAP: Record<string, string> = {
+  š: 's',
+  Š: 'S',
+  ž: 'z',
+  Ž: 'Z',
+  đ: 'd',
+  Đ: 'D',
+  č: 'c',
+  Č: 'C',
+  ć: 'c',
+  Ć: 'C',
+  á: 'a',
+  é: 'e',
+  í: 'i',
+  ó: 'o',
+  ú: 'u',
+  ü: 'u',
+  ö: 'o',
+  ä: 'a',
+};
+
+const sanitizeLocation = (value: string): string =>
+  value
+    .split('')
+    .map((ch) => CHAR_MAP[ch] ?? ch)
+    .join('')
+    .replace(/[^a-zA-Z0-9\s,.\-()]/g, '');
+
+// ─── Helper: derive day count from two date strings ───────────────────────────
+const calcDays = (start: string, end: string): number => {
+  if (!start || !end) return 0;
+  const diff = new Date(end).getTime() - new Date(start).getTime();
+  return Math.max(0, Math.ceil(diff / 86_400_000));
+};
+
 export const useCreateBooking = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -73,10 +111,7 @@ export const useCreateBooking = () => {
   // Customer data
   const [customers, setCustomers] = useState<Customer[]>([]);
 
-  // Car data
-  const [availableCars, setAvailableCars] = useState<Car[]>([]);
-
-  // Extras state - quantities for each extra type
+  // Extras state
   const [extrasQuantities, setExtrasQuantities] = useState<
     Record<BookingExtraType, number>
   >({
@@ -88,8 +123,7 @@ export const useCreateBooking = () => {
     roof_rack: 0,
   });
 
-  // Pricing state - managed by CarAvailabilitySelect
-  const [totalDays, setTotalDays] = useState(0);
+  // Pricing state
   const [carDailyRate, setCarDailyRate] = useState(0);
   const [carCost, setCarCost] = useState(0);
   const [extrasCost, setExtrasCost] = useState(0);
@@ -99,7 +133,7 @@ export const useCreateBooking = () => {
   // Form errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Fetch customers on mount
+  // ── Fetch customers on mount ────────────────────────────────────────────────
   useEffect(() => {
     const fetchCustomers = async () => {
       setLoadingCustomers(true);
@@ -117,61 +151,49 @@ export const useCreateBooking = () => {
     fetchCustomers();
   }, []);
 
-  // Handle car price calculation callback from CarAvailabilitySelect
-  const handlePriceCalculated = (
-    dailyRate: number,
-    totalAmount: number,
-    days: number
-  ) => {
+  // ── Derive totalDays from dates (source of truth) ───────────────────────────
+  const totalDays = calcDays(startDate, endDate);
+
+  // ── Handle price callback from CarAvailabilitySelect ───────────────────────
+  // The shared component calls onPriceCalculated(dailyRate, totalAmount) — 2 args.
+  // We store dailyRate and recompute carCost from dailyRate × totalDays so that
+  // changing dates always re-triggers the correct cost without a stale closure.
+  const handlePriceCalculated = (dailyRate: number, totalAmount: number) => {
     setCarDailyRate(dailyRate);
+    // Use totalAmount directly from the component as it accounts for its own
+    // day calculation; we keep it in sync via the effect below as dates change.
     setCarCost(totalAmount);
-    setTotalDays(days);
   };
 
-  // Handle cars loaded callback
-  const handleCarsLoaded = (cars: Car[]) => {
-    setAvailableCars(cars);
-  };
-
-  // Calculate extras cost when extras or days change
+  // ── Re-derive carCost when dates change (dailyRate is already stored) ───────
   useEffect(() => {
-    if (!totalDays) {
-      setExtrasCost(0);
-      setTotalCost(carCost);
-      setDepositAmount(carCost * DEPOSIT_PERCENTAGE);
-      return;
+    if (carDailyRate > 0 && totalDays > 0) {
+      setCarCost(carDailyRate * totalDays);
     }
+  }, [totalDays, carDailyRate]);
 
-    // Calculate extras cost
+  // ── Recalculate extras + total whenever costs or extras change ──────────────
+  useEffect(() => {
     let extrasTotal = 0;
     BOOKING_EXTRAS.forEach((extra) => {
       const quantity = extrasQuantities[extra.type];
-      if (quantity > 0) {
+      if (quantity > 0 && totalDays > 0) {
         extrasTotal += extra.pricePerDay * quantity * totalDays;
       }
     });
     setExtrasCost(extrasTotal);
 
-    // Calculate total cost and deposit
     const total = carCost + extrasTotal;
     setTotalCost(total);
     setDepositAmount(total * DEPOSIT_PERCENTAGE);
   }, [totalDays, carCost, extrasQuantities]);
 
-  // Validate form
-  // NOTE: This is client-side validation only for UX.
-  // The backend MUST enforce equivalent validation and sanitization
-  // for all user-supplied fields (notes, locations, dates, etc.)
+  // ── Validation ──────────────────────────────────────────────────────────────
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!customerId) {
-      newErrors.customerId = 'Kupac je obavezan';
-    }
-
-    if (!carId) {
-      newErrors.carId = 'Automobil je obavezan';
-    }
+    if (!customerId) newErrors.customerId = 'Kupac je obavezan';
+    if (!carId) newErrors.carId = 'Automobil je obavezan';
 
     if (!startDate) {
       newErrors.startDate = 'Datum početka je obavezan';
@@ -179,7 +201,6 @@ export const useCreateBooking = () => {
       const start = new Date(startDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
       if (start < today) {
         newErrors.startDate = 'Datum početka mora biti u budućnosti';
       }
@@ -190,7 +211,6 @@ export const useCreateBooking = () => {
     } else if (startDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-
       if (end <= start) {
         newErrors.endDate = 'Datum završetka mora biti nakon datuma početka';
       }
@@ -200,66 +220,41 @@ export const useCreateBooking = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle customer selection
-  const handleCustomerChange = (customerId: string) => {
-    setCustomerId(customerId);
-    if (errors.customerId) {
-      setErrors((prev) => ({ ...prev, customerId: '' }));
-    }
+  // ── Field handlers ──────────────────────────────────────────────────────────
+  const handleCustomerChange = (value: string) => {
+    setCustomerId(value);
+    if (errors.customerId) setErrors((prev) => ({ ...prev, customerId: '' }));
   };
 
-  // Handle car selection
-  const handleCarChange = (carId: string) => {
-    setCarId(carId);
-    if (errors.carId) {
-      setErrors((prev) => ({ ...prev, carId: '' }));
-    }
+  const handleCarChange = (value: string) => {
+    setCarId(value);
+    if (errors.carId) setErrors((prev) => ({ ...prev, carId: '' }));
   };
 
-  // Handle start date change - clear both start and end date errors
   const handleStartDateChange = (date: string) => {
     setStartDate(date);
-    setErrors((prev) => ({
-      ...prev,
-      startDate: '',
-      endDate: '',
-    }));
+    setErrors((prev) => ({ ...prev, startDate: '', endDate: '' }));
   };
 
-  // Handle end date change
   const handleEndDateChange = (date: string) => {
     setEndDate(date);
-    if (errors.endDate) {
-      setErrors((prev) => ({ ...prev, endDate: '' }));
-    }
+    if (errors.endDate) setErrors((prev) => ({ ...prev, endDate: '' }));
   };
 
-  // Handle extras checkbox change
   const handleExtraToggle = (extraType: BookingExtraType, checked: boolean) => {
-    setExtrasQuantities((prev) => ({
-      ...prev,
-      [extraType]: checked ? 1 : 0,
-    }));
+    setExtrasQuantities((prev) => ({ ...prev, [extraType]: checked ? 1 : 0 }));
   };
 
-  // Handle extras quantity change
   const handleExtraQuantityChange = (
     extraType: BookingExtraType,
     quantity: number
   ) => {
     const newQuantity = Math.max(0, quantity);
-    setExtrasQuantities((prev) => ({
-      ...prev,
-      [extraType]: newQuantity,
-    }));
-
-    // If quantity is set to 0, also toggle the checkbox off
-    if (newQuantity === 0) {
-      handleExtraToggle(extraType, false);
-    }
+    setExtrasQuantities((prev) => ({ ...prev, [extraType]: newQuantity }));
+    if (newQuantity === 0) handleExtraToggle(extraType, false);
   };
 
-  // Handle form submission
+  // ── Submit ──────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -271,7 +266,6 @@ export const useCreateBooking = () => {
     setLoading(true);
 
     try {
-      // Build extras array
       const extras = BOOKING_EXTRAS.filter(
         (extra) => extrasQuantities[extra.type] > 0
       ).map((extra) => ({
@@ -285,7 +279,7 @@ export const useCreateBooking = () => {
         startDate,
         endDate,
         ...(pickupLocation && {
-          pickupLocation: pickupLocation.address,
+          pickupLocation: sanitizeLocation(pickupLocation.address),
           pickupLocationNotes: pickupLocation.notes,
           pickupCoordinates: {
             lat: pickupLocation.lat,
@@ -293,7 +287,7 @@ export const useCreateBooking = () => {
           },
         }),
         ...(dropoffLocation && {
-          dropoffLocation: dropoffLocation.address,
+          dropoffLocation: sanitizeLocation(dropoffLocation.address),
           dropoffLocationNotes: dropoffLocation.notes,
           dropoffCoordinates: {
             lat: dropoffLocation.lat,
@@ -306,7 +300,6 @@ export const useCreateBooking = () => {
 
       const newBooking = await bookingService.createBooking(bookingData);
 
-      // Log audit - wrapped in try-catch to prevent audit failures from blocking UX
       try {
         await logAudit({
           action: AuditAction.BOOKING_CREATED,
@@ -323,17 +316,14 @@ export const useCreateBooking = () => {
           }),
         });
       } catch (auditError) {
-        // Log audit failure but don't block user flow
         logError('Audit logging failed for booking creation', auditError);
       }
 
       toast.success('Rezervacija uspješno kreirana!');
       navigate(ROUTES.bookings.details.replace(':id', newBooking._id));
     } catch (error) {
-      // Log the error (logError already sanitizes sensitive data)
       logError('Failed to create booking', error);
 
-      // Log audit failure - wrapped in try-catch to ensure user sees error toast
       try {
         await logAudit({
           action: AuditAction.BOOKING_CREATED,
@@ -347,7 +337,6 @@ export const useCreateBooking = () => {
           }),
         });
       } catch (auditError) {
-        // Log audit failure but don't block error handling
         logError(
           'Audit logging failed for booking creation failure',
           auditError
@@ -360,14 +349,9 @@ export const useCreateBooking = () => {
     }
   };
 
-  // Navigation actions
-  const goBack = () => {
-    navigate(ROUTES.bookings.root);
-  };
-
-  const cancelBooking = () => {
-    navigate(ROUTES.bookings.root);
-  };
+  // ── Navigation ──────────────────────────────────────────────────────────────
+  const goBack = () => navigate(ROUTES.bookings.root);
+  const cancelBooking = () => navigate(ROUTES.bookings.root);
 
   return {
     state: {
@@ -381,7 +365,6 @@ export const useCreateBooking = () => {
       dropoffLocation,
       notes,
       customers,
-      availableCars,
       extrasQuantities,
       totalDays,
       carDailyRate,
@@ -402,7 +385,6 @@ export const useCreateBooking = () => {
       handleExtraToggle,
       handleExtraQuantityChange,
       handlePriceCalculated,
-      handleCarsLoaded,
       handleSubmit,
       goBack,
       cancelBooking,
