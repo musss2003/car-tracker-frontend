@@ -10,11 +10,9 @@ export enum BookingStatus {
 }
 
 export enum BookingExtraType {
-  GPS = 'gps',
+  SIM_CARD = 'sim_card',
   CHILD_SEAT = 'child_seat',
-  ADDITIONAL_DRIVER = 'additional_driver',
-  INSURANCE_UPGRADE = 'insurance_upgrade',
-  WIFI = 'wifi',
+  KASKO_INSURANCE = 'kasko_insurance',
   ROOF_RACK = 'roof_rack',
 }
 
@@ -31,7 +29,7 @@ export interface CreateBookingExtraDto {
 
 interface BookingBase {
   _id: string;
-  customerId: string;
+  customerId?: string;
   carId: string;
   startDate: string;
   endDate: string;
@@ -89,7 +87,7 @@ export type Booking =
   | ExpiredBooking;
 
 export interface CreateBookingDto {
-  customerId: string;
+  customerId?: string;
   carId: string;
   startDate: string;
   endDate: string;

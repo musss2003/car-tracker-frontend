@@ -26,27 +26,25 @@ export const BOOKING_EXTRAS: Array<{
   label: string;
   pricePerDay: number;
 }> = [
-  { type: 'gps' as BookingExtraType, label: 'GPS Navigacija', pricePerDay: 5 },
+  {
+    type: 'sim_card' as BookingExtraType,
+    label: 'SIM Kartica (20GB)',
+    pricePerDay: 20,
+  },
   {
     type: 'child_seat' as BookingExtraType,
     label: 'Dječije Sjedište',
-    pricePerDay: 3,
+    pricePerDay: 5,
   },
   {
-    type: 'additional_driver' as BookingExtraType,
-    label: 'Dodatni Vozač',
-    pricePerDay: 10,
+    type: 'kasko_insurance' as BookingExtraType,
+    label: 'Kasko Osiguranje',
+    pricePerDay: 20,
   },
-  {
-    type: 'insurance_upgrade' as BookingExtraType,
-    label: 'Nadogradnja Osiguranja',
-    pricePerDay: 15,
-  },
-  { type: 'wifi' as BookingExtraType, label: 'Mobilni WiFi', pricePerDay: 4 },
   {
     type: 'roof_rack' as BookingExtraType,
     label: 'Krovni Nosač',
-    pricePerDay: 7,
+    pricePerDay: 10,
   },
 ];
 

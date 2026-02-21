@@ -41,7 +41,13 @@ interface LocationPickerProps {
   defaultCenter?: [number, number];
 }
 
-// Component to handle map clicks
+// ─── LocationMarker ───────────────────────────────────────────────────────────
+// FIX: onAddressUpdate now receives the new position directly as a second arg
+// instead of reading markerPosition from the parent's state (stale closure).
+// Previously: click → setPosition(newPos) → reverseGeocode callback fires →
+//   handleAddressUpdate reads old markerPosition (null) → onChange never called.
+// Now:        click → setPosition(newPos) → reverseGeocode callback fires with
+//   newPos already in hand → onChange called immediately on first click.
 function LocationMarker({
   position,
   setPosition,
@@ -49,14 +55,15 @@ function LocationMarker({
 }: {
   position: [number, number] | null;
   setPosition: (pos: [number, number]) => void;
-  onAddressUpdate: (address: string) => void;
+  onAddressUpdate: (address: string, pos: [number, number]) => void;
 }) {
   useMapEvents({
     click(e) {
       const newPos: [number, number] = [e.latlng.lat, e.latlng.lng];
       setPosition(newPos);
-      // Reverse geocode to get address
-      reverseGeocode(e.latlng.lat, e.latlng.lng, onAddressUpdate);
+      reverseGeocode(e.latlng.lat, e.latlng.lng, (address) =>
+        onAddressUpdate(address, newPos)
+      );
     },
   });
 
@@ -127,32 +134,30 @@ export function LocationPicker({
   >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Update parent when marker position or notes change
   const handleMarkerPositionChange = (pos: [number, number]) => {
     setMarkerPosition(pos);
   };
 
-  const handleAddressUpdate = (newAddress: string) => {
+  // FIX: receives the authoritative position directly — no stale state reads
+  const handleAddressUpdate = (newAddress: string, pos: [number, number]) => {
     setAddress(newAddress);
-    if (markerPosition) {
-      onChange({
-        address: newAddress,
-        notes: notes,
-        lat: markerPosition[0],
-        lng: markerPosition[1],
-      });
-    }
+    onChange({
+      address: newAddress,
+      notes: notes,
+      lat: pos[0],
+      lng: pos[1],
+    });
   };
 
   // Handle address input with autocomplete
   const handleAddressInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setAddress(value);
+    const val = e.target.value;
+    setAddress(val);
 
-    if (value.length > 2) {
+    if (val.length > 2) {
       try {
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&format=json&limit=5&addressdetails=1`
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&addressdetails=1`
         );
         const data = await response.json();
         setSearchSuggestions(data);
@@ -242,7 +247,7 @@ export function LocationPicker({
         {label}
       </Label>
 
-      {/* Address Search Input - First */}
+      {/* Address Search Input */}
       <div className="space-y-2 relative">
         <Label htmlFor={`address-${label}`} className="text-sm font-medium">
           Adresa
@@ -314,7 +319,7 @@ export function LocationPicker({
         </div>
       </div>
 
-      {/* Map - Second */}
+      {/* Map */}
       <div className="space-y-2">
         <Label className="text-sm font-medium">
           Odaberite na Mapi
@@ -346,7 +351,7 @@ export function LocationPicker({
         </Card>
       </div>
 
-      {/* Selected Location Display - Better styled */}
+      {/* Selected Location Display */}
       {markerPosition && (
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="p-4">
@@ -360,8 +365,10 @@ export function LocationPicker({
                   <p className="text-sm text-gray-800 font-medium break-words">
                     {address}
                   </p>
+                  {/* FIX: read from markerPosition (always in sync) not value (lags by one render) */}
                   <p className="text-xs text-gray-600 mt-1">
-                    {value?.lat.toFixed(6)}, {value?.lng.toFixed(6)}
+                    {markerPosition[0].toFixed(6)},{' '}
+                    {markerPosition[1].toFixed(6)}
                   </p>
                 </div>
               </div>
@@ -370,7 +377,7 @@ export function LocationPicker({
         </Card>
       )}
 
-      {/* Notes Field - Third */}
+      {/* Notes Field */}
       <div className="space-y-2">
         <Label htmlFor={`notes-${label}`} className="text-sm font-medium">
           Napomena
